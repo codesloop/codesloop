@@ -1,0 +1,27 @@
+# -- generate random
+openssl rand -out rand 4096
+
+# -- CA private key
+openssl genrsa -des3 -out rootca_private.key 2048
+
+# -- CA request, should be deleted
+openssl req -new -key rootca_private.key -out rootca.req
+
+# -- CA own certificate
+openssl x509 -req -days 7305 -sha1 -extensions v3_ca -signkey rootca_private.key -in rootca.req -out rootca.crt
+
+# -- Server RSA key
+openssl genrsa -out server_rsa.key 2048
+
+# -- Server request
+openssl req -new -key server_rsa.key -out server.req
+
+# -- Server cerificate
+openssl x509 -req -days 3650 -sha1 -extensions v3_req -CA rootca.crt -CAkey rootca_private.key -CAserial rootca.srl -CAcreateserial -in server.req -out server.crt
+
+# -- Print server certificate
+openssl x509 -in server.crt -noout -text
+
+# -- Print server private ket
+openssl rsa -in server_rsa.key -noout -text
+

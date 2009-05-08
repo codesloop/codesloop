@@ -1,0 +1,163 @@
+/*
+Copyright (c) 2008,2009, David Beck
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+#ifndef _csl_common_pbuf_hh_included_
+#define _csl_common_pbuf_hh_included_
+
+/**
+   @file pbuf.hh
+   @brief Paged buffer management
+ */
+
+#include "pvlist.hh"
+#include "mpool.hh"
+#ifdef __cplusplus
+
+namespace csl
+{
+  namespace common
+  {
+    /**
+    @brief Paged buffer management
+
+    pbuf manages a list of fixed sized buffers and each buffer has pbuf::buf_size memory.
+    internal buffers are represented by pbuf::buf structure that stores a pointer to the
+    memory location and the size of the used memory. this size cannot be more than buf::buf_size
+
+    pbuf::buf items are stored in a bufpool_t structure which is a pvlist. iterators over
+    the internal data are provided, so it can be iterated over without the need of calling
+    other accessors.
+
+    an initial buffer is allocated on the stack, so if the memory needed is less than buf_size
+    than it is a lot faster
+    */
+    class pbuf
+    {
+      public:
+        enum { buf_size = 2048 };
+
+        /** @brief constructor */
+        pbuf();
+
+        /** @brief destructor */
+        ~pbuf() {}
+
+        /** @brief buf represents a memory region */
+        struct buf
+        {
+          unsigned char * data_; ///<pointer to the allocated data
+          unsigned int    size_; ///<used size
+
+          unsigned int free_space()   { return buf_size - size_; }
+          unsigned char * data_here() { return (size_ == buf_size ? 0 : (data_+size_)); }
+
+          /** @brief constructor */
+          buf() : data_(0), size_(0) {}
+        };
+
+        /**
+        @brief appends the data pointed by dta to the internal buffers
+        @param dta is the location
+        @param sz is the amount of memory to be appended
+        @return true if successful
+        */
+        bool append(const unsigned char * dta, unsigned int sz);
+
+        /**
+        @brief appends the string pointed by str to the internal buffers
+        @param str is the string
+        @return true if successful
+         */
+        bool append(const char * str)
+        {
+          unsigned int l=0;
+          if( !str || (l=::strlen(str))== 0 ) return false;
+          return append((unsigned char *)str,l);
+        }
+
+        pbuf & operator<<(const char * str) { append(str); return *this; }
+
+        /**
+        @brief copies the internal data to the specified location
+        @param ptr is the location
+        @return true if successful
+
+        this function assumes that the caller allocated the neccessary amount of memory
+         */
+        bool copy_to(unsigned char * ptr) const;
+
+        /** @brief returns the amount of data stored */
+        inline unsigned int size() const   { return size_; }
+
+        /** @brief returns the amount of bufs allocated */
+        inline unsigned int n_bufs() const { return bufpool_.n_items(); }
+
+        typedef pvlist< 32,buf,delete_destructor<buf> > bufpool_t; ///<the buffer pool type
+        typedef bufpool_t::iterator iterator;                      ///<iterator over the buffer pool
+        typedef bufpool_t::const_iterator const_iterator;          ///<constant iterator over the buffer pool
+
+        inline iterator begin() { return bufpool_.begin(); }
+        inline iterator end()   { return bufpool_.end();   }
+        inline iterator last()  { return bufpool_.last();  }
+
+        inline const_iterator begin() const { return bufpool_.begin(); }
+        inline const_iterator end() const   { return bufpool_.end();   }
+        inline const_iterator last() const  { return bufpool_.last();  }
+
+        inline const_iterator const_begin() const { return bufpool_.const_begin(); }
+        inline const_iterator const_end() const   { return bufpool_.const_end();   }
+        inline const_iterator const_last() const  { return bufpool_.const_last();  }
+
+        /** @brief free all allocated data */
+        inline void free_all()
+        {
+          bufpool_.free_all();
+          pool_.free_all();
+          size_ = 0;
+        }
+
+        /** @brief tests if equal
+
+        iterates over each buffer and compares them one by one
+        */
+        bool operator==(const pbuf & other) const;
+
+        pbuf(const pbuf & other);              ///<copy constructor
+        pbuf & operator=(const pbuf & other);  ///<copy operator
+
+      private:
+        buf * allocate(unsigned int size);
+
+        /* variables */
+        unsigned int    size_;
+        unsigned char   preallocated_[buf_size];
+        bufpool_t       bufpool_;
+        mpool<>         pool_;
+    };
+  }
+}
+
+#endif /* __cplusplus */
+#endif /* _csl_common_pbuf_hh_included_ */
