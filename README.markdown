@@ -12,11 +12,11 @@ Each module has a src directory for the sources and a test directory for the cor
 Modules
 -------
 
-*  [common module](common/)
-*  [nthread module](nthread/)
-*  [sec module](sec/)
-*  [comm module](comm/)
-*  [slt3 module](slt3/)
-*  [sched module](sched/)
+*  *common module* : common code including performance sensible memory pooling and other memory helpers, XDR helper, test timer, zlib compressed file handling
+*  *nthread module* : cross platform threading primitives like thread, event and mutex
+*  *sec module* : security functions that includes Elliptic Curve Diffie Hellman key exchange, AES/UMAC based encrypted packets and Blowfish/SHA1 base encrypted buffers
+*  *comm module* : _under construction_ (the first to complete: UDP based secured unicast and multicast communication)
+*  *slt3 module* : SQLite3 helpers including a simple Object Relational Mapper (ORM)
+*  *sched module* : _under construction_ (distributed schedule)
 
 [Codesloop home](http://codesloop.blogspot.com/)
