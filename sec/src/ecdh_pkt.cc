@@ -432,7 +432,7 @@ namespace csl
         unsigned char * buf = gen_ualloc( sz+hl );
         if( !response_.encrypted_creds().copy_to(buf) ) return false;
 
-        cb.init_crypt( (unsigned char *)buf, (unsigned char *)get_session_key(), false );
+        cb.init_crypt( (unsigned char *)buf, (const char *)get_session_key(), false );
         cb.add_data( (unsigned char *)buf+hl, sz, false );
 
         // XDR decrypt
@@ -498,7 +498,7 @@ namespace csl
 
         if( pb.size() > maxlen ) return false;
 
-        cb.init_crypt( buf, (unsigned char *)seskey, true );
+        cb.init_crypt( buf, (const char *)seskey, true );
         buf    += hl;
 
         pb.copy_to( buf );

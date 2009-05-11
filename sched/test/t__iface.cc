@@ -41,16 +41,19 @@ using namespace csl::sched;
 /** @brief contains tests related to sched::schedule */
 namespace test_iface {
 
-  /** @todo document me */
   void baseline()
   {
   }
 
-  /** @todo document me */
   void new_item()
   {
     //schedule s("schedule name");
+
+    // open schedule
+    // - if synch-client (start receiver)
   }
+
+
 
 } // end of test_iface
 

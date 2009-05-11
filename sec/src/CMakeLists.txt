@@ -23,6 +23,13 @@
 
 IF(WIN32)
 
+  ADD_DEFINITIONS( -DUMAC_AE_USE_STDINT=0
+                   -DUMAC_AE_SUPPORT=1
+                   -DRUN_TESTS=0
+                   -DSSE2=0
+                   -DFORCE_C_ONLY=1
+                 )
+
   INCLUDE_DIRECTORIES(
       ../../common/src 
       $ENV{OPENSSL_DEV_ENV}/include
@@ -37,29 +44,40 @@ IF(WIN32)
 
 ELSE(WIN32)
 
-  ADD_DEFINITIONS(-Wall -g3)
+  ADD_DEFINITIONS( -Wall
+                   -g3
+                   -DUMAC_AE_USE_STDINT=1
+                   -DUMAC_AE_SUPPORT=1
+                   -DRUN_TESTS=0
+                   -DSSE2=0
+                   -DFORCE_C_ONLY=1
+                  )
 
-  INCLUDE_DIRECTORIES(
-	  ../src
-	  ../../common/src
-	  /usr/local/ssl/include
-	  )
+  INCLUDE_DIRECTORIES( ../src
+                       ../../common/src
+                       /usr/local/ssl/include
+                     )
 
-  LINK_DIRECTORIES(
-	  ../../common/src
-	  ../src
-	  /usr/local/ssl/lib
-	  )
+  LINK_DIRECTORIES( ../../common/src
+                    ../src
+                    /usr/local/ssl/lib
+                   )
+
 ENDIF(WIN32)
 
 ADD_LIBRARY( csl_sec STATIC
-             bignum.cc         bignum.hh
-             ecdh_key.cc       ecdh_key.hh
-             xdr_challenge.cc  xdr_challenge.hh
-             xdr_response.cc   xdr_response.hh
-             sha1_conv.cc
-             ecdh_pkt.cc   ecdh_pkt.hh
-             crypt_buf.cc  crypt_buf.hh )
+             bignum.cc           bignum.hh
+             ecdh_key.cc         ecdh_key.hh
+             xdr_challenge.cc    xdr_challenge.hh
+             xdr_response.cc     xdr_response.hh
+             sha1_conv.cc        csl_sec.h
+             ecdh_pkt.cc         ecdh_pkt.hh
+             crypt_buf.cc        crypt_buf.hh
+             crypt_pkt.cc        crypt_pkt.hh
+             # -- 3rd party UMAC and AES
+             umac.c              umac.h  umac_ae.h
+             rijndael-alg-fst.c  rijndael-alg-fst.h
+           )
 
 # -- EOF --
 

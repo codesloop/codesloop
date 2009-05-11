@@ -65,7 +65,7 @@ void test_crypt(size_t * l)
   unsigned char mac0[200];
   unsigned char mac1[200];
 
-  unsigned char * key = (unsigned char *)"adc83b19e793491b1c6ea0fd8b46cd9f32e592fc";
+  const char * key = "adc83b19e793491b1c6ea0fd8b46cd9f32e592fc";
 
   memset( plain,0xCC,sizeof(plain) );
   size_t * k = l;
@@ -143,7 +143,7 @@ unsigned char speed_buff_[1024*1024*4];
 */
 void test_speed()
 {
-  unsigned char * key = (unsigned char *)"adc83b19e793491b1c6ea0fd8b46cd9f32e592fc";
+  const char * key = "adc83b19e793491b1c6ea0fd8b46cd9f32e592fc";
   crypt_buf cre;
   assert( cre.init_crypt(speed_buff_,key,true) == true );
   assert( cre.add_data(speed_buff_,sizeof(speed_buff_),true) == true );
@@ -164,6 +164,34 @@ void test_speed2()
   assert( cre.init_crypt(speed_buff_,key,sizeof(key),true) == true );
   assert( cre.add_data(speed_buff_,sizeof(speed_buff_),true) == true );
 }
+
+void test_rn()
+{
+  unsigned char k0[21];
+  unsigned char data[100];
+
+  unsigned char enc1[100+CSL_SEC_CRYPT_BUF_HEAD_LEN+CSL_SEC_CRYPT_BUF_MAC_LEN];
+  unsigned char enc2[100+CSL_SEC_CRYPT_BUF_HEAD_LEN+CSL_SEC_CRYPT_BUF_MAC_LEN];
+
+  memset(k0,'A',20); k0[20]=0;
+  memset(data,'B',sizeof(data));
+
+  crypt_buf cre;
+  assert( cre.init_crypt(enc1,k0,20,true,k0) == true );
+  assert( cre.add_data(enc1+CSL_SEC_CRYPT_BUF_HEAD_LEN,100,true) == true );
+  assert( cre.finalize(enc1+100+CSL_SEC_CRYPT_BUF_HEAD_LEN) == true );
+
+  memset(data,'C',sizeof(data));
+
+  crypt_buf crd;
+  assert( crd.init_crypt(enc2,k0,20,true,k0) == true );
+  assert( crd.add_data(enc2+CSL_SEC_CRYPT_BUF_HEAD_LEN,100,true) == true );
+  assert( crd.finalize(enc2+100+CSL_SEC_CRYPT_BUF_HEAD_LEN) == true );
+
+  assert( memcmp(enc1,enc2,CSL_SEC_CRYPT_BUF_HEAD_LEN) == 0 );
+  assert( memcmp(enc1,enc2,CSL_SEC_CRYPT_BUF_HEAD_LEN+100) != 0 );
+}
+
 
 /**
    @test Crypto-streaming test 2
@@ -278,22 +306,24 @@ int main()
   test_crypt( t01 );
   test_crypt( t02 );
 
-  csl_common_print_results( "t0   ", csl_common_test_timer_v0(t0),"" );
-  csl_common_print_results( "t1   ", csl_common_test_timer_v0(t1),"" );
-  csl_common_print_results( "t2   ", csl_common_test_timer_v0(t2),"" );
-  csl_common_print_results( "t3   ", csl_common_test_timer_v0(t3),"" );
-  csl_common_print_results( "t4   ", csl_common_test_timer_v0(t4),"" );
-  csl_common_print_results( "t5   ", csl_common_test_timer_v0(t5),"" );
+  csl_common_print_results( "rn     ", csl_common_test_timer_v0(test_rn),"" );
 
-  csl_common_print_results( "z0   ", csl_common_test_timer_v0(z0),"" );
-  csl_common_print_results( "z1   ", csl_common_test_timer_v0(z1),"" );
-  csl_common_print_results( "z2   ", csl_common_test_timer_v0(z2),"" );
-  csl_common_print_results( "z3   ", csl_common_test_timer_v0(z3),"" );
-  csl_common_print_results( "z4   ", csl_common_test_timer_v0(z4),"" );
-  csl_common_print_results( "z5   ", csl_common_test_timer_v0(z5),"" );
+  csl_common_print_results( "t0     ", csl_common_test_timer_v0(t0),"" );
+  csl_common_print_results( "t1     ", csl_common_test_timer_v0(t1),"" );
+  csl_common_print_results( "t2     ", csl_common_test_timer_v0(t2),"" );
+  csl_common_print_results( "t3     ", csl_common_test_timer_v0(t3),"" );
+  csl_common_print_results( "t4     ", csl_common_test_timer_v0(t4),"" );
+  csl_common_print_results( "t5     ", csl_common_test_timer_v0(t5),"" );
 
-  csl_common_print_results( "speed", csl_common_test_timer_v0(test_speed),"" );
-  csl_common_print_results( "spee2", csl_common_test_timer_v0(test_speed2),"" );
+  csl_common_print_results( "z0     ", csl_common_test_timer_v0(z0),"" );
+  csl_common_print_results( "z1     ", csl_common_test_timer_v0(z1),"" );
+  csl_common_print_results( "z2     ", csl_common_test_timer_v0(z2),"" );
+  csl_common_print_results( "z3     ", csl_common_test_timer_v0(z3),"" );
+  csl_common_print_results( "z4     ", csl_common_test_timer_v0(z4),"" );
+  csl_common_print_results( "z5     ", csl_common_test_timer_v0(z5),"" );
+
+  csl_common_print_results( "speed  ", csl_common_test_timer_v0(test_speed),"" );
+  csl_common_print_results( "speed2 ", csl_common_test_timer_v0(test_speed2),"" );
 
   return 0;
 }

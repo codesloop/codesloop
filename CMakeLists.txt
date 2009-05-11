@@ -27,6 +27,7 @@ PROJECT(codesloop)
 # SET(CMAKE_VERBOSE_MAKEFILE ON)
 
 SUBDIRS( common
+	 comm
          sec
          nthread
          slt3

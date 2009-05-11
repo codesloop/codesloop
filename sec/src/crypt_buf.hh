@@ -37,6 +37,14 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 #include <memory>
 
+#ifndef CSL_SEC_CRYPT_BUF_HEAD_LEN
+#define CSL_SEC_CRYPT_BUF_HEAD_LEN 8
+#endif /* CSL_SEC_CRYPT_BUF_HEAD_LEN */
+
+#ifndef CSL_SEC_CRYPT_BUF_MAC_LEN
+#define CSL_SEC_CRYPT_BUF_MAC_LEN 40
+#endif /* CSL_SEC_CRYPT_BUF_HEAD_LEN */
+
 namespace csl
 {
   namespace sec
@@ -94,6 +102,7 @@ namespace csl
          @param buf the output buffer where the header will be placed
          @param key the en/decryption key, a zero terminated C string
          @param encrypt wether we do encrypt or decrypt now
+         @param rndata is CSL_SEC_CRYPT_BUF_HEAD_LEN bytes of random data or NULL
          @return true if successful, false otherwise
 
          The function does not allocate memory for buf, it rather expects that
@@ -103,8 +112,14 @@ namespace csl
          The key is cut to a multiple of 32 bits as Blowfish expects that. For
          security reasons at least 12 bytes of key is needed and it should not
          be longer than 56 bytes.
+
+         The optional rndata is only needed for encryption, this is used for initializing
+         the encryption stream.
       */
-      bool init_crypt(unsigned char * buf,const unsigned char * key,bool encrypt);
+      bool init_crypt( unsigned char * buf,
+                       const char * key,
+                       bool encrypt,
+                       const unsigned char * rndata=0 );
 
       /**
          @brief initialization by memory buffer key
@@ -112,6 +127,7 @@ namespace csl
          @param key the en/decryption key, a binary memory buffer
          @param keylen the length of the en/decryption key buffer
          @param encrypt wether we do encrypt or decrypt now
+         @param rndata is CSL_SEC_CRYPT_BUF_HEAD_LEN bytes of random data or NULL
          @return true if successful, false otherwise
 
          The function does not allocate memory for buf, it rather expects that
@@ -119,12 +135,15 @@ namespace csl
          any number of bytes between 12 and 56 bytes.
 
          The key is cut to a multiple of 32 bits as Blowfish expects that.
+
+         The optional rndata is only needed for encryption, this is used for initializing
+         the encryption stream.
       */
-      bool init_crypt(
-        unsigned char * buf,
-        const unsigned char * key,
-        size_t keylen,
-        bool encrypt);
+      bool init_crypt( unsigned char * buf,
+                       const unsigned char * key,
+                       size_t keylen,
+                       bool encrypt,
+                       const unsigned char * rndata=0);
 
       /**
          @brief en/decrypt data

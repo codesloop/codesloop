@@ -196,6 +196,9 @@ namespace csl
         /** @brief return the allocated data */
         inline const unsigned char * data() const { return data_; }
 
+        /** @brief return the internal data pointer */
+        inline unsigned char * private_data() const { return data_; }
+
       private:
         unsigned char   preallocated_[SZ];   ///<the preallocated buffer
         unsigned char * data_;               ///<the data

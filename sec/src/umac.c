@@ -52,10 +52,21 @@
 /* ---------------------------------------------------------------------- */
 
 #define UMAC_OUTPUT_LEN     8  /* Alowable: 4, 8, 12, 16                  */
+
+#ifndef FORCE_C_ONLY
 #define FORCE_C_ONLY        1  /* ANSI C and 64-bit integers req'd        */
+#endif /*FORCE_C_ONLY*/
+
 #define AES_IMPLEMENTAION   2  /* 1 = OpenSSL, 2 = Barreto, 3 = Gladman   */
+
+#ifndef SSE2
 #define SSE2                0  /* Is SSE2 is available?                   */
+#endif /*SSE2*/
+
+#ifndef RUN_TESTS
 #define RUN_TESTS           1  /* Run basic correctness/speed tests       */
+#endif /*RUN_TESTS*/
+
 #define UMAC_AE_SUPPORT     1  /* Enable auhthenticated encrytion         */
 
 /* ---------------------------------------------------------------------- */
@@ -1897,7 +1908,7 @@ umac_ctx_t umac_new(char key[])
     umac_ctx_t ctx;
     char bytes_to_add;
     aes_int_key prf_key;
-    
+
     ctx = (umac_ctx_t)malloc(sizeof(umac_ctx)+ALLOC_BOUNDARY);
     if (ctx) {
         if (ALLOC_BOUNDARY) {
@@ -1910,7 +1921,7 @@ umac_ctx_t umac_new(char key[])
         pdf_init(&ctx->pdf, prf_key);
         uhash_init(&ctx->hash, prf_key);
     }
-        
+
     return (ctx);
 }
 
@@ -2424,4 +2435,4 @@ int main(void)
 }
 #endif
 
-#endif
+#endif /* RUN_TESTS */

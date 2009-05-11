@@ -36,18 +36,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   @brief implementation of crypt_buf
 */
 
-#ifndef CSL_RX_CRYPT_BUF_GEN_ITEM_SZ
-#define CSL_RX_CRYPT_BUF_GEN_ITEM_SZ 8
-#endif /* CSL_RX_CRYPT_BUF_GEN_ITEM_SZ */
-
-#ifndef CSL_RX_CRYPT_HEAD_LEN
-#define CSL_RX_CRYPT_HEAD_LEN 8
-#endif /* CSL_RX_CRYPT_HEAD_LEN */
-
-#ifndef CSL_RX_CRYPT_MAC_LEN
-#define CSL_RX_CRYPT_MAC_LEN SHA_DIGEST_LENGTH
-#endif /* CSL_RX_CRYPT_HEAD_LEN */
-
 namespace csl
 {
   namespace sec
@@ -57,7 +45,7 @@ namespace csl
     {
       /* variables */
       int             bf_num_;
-      unsigned char   tail_[CSL_RX_CRYPT_MAC_LEN];
+      unsigned char   tail_[CSL_SEC_CRYPT_BUF_MAC_LEN];
       unsigned char   initvec_[SHA_DIGEST_LENGTH];
       BF_KEY          key_;
 
@@ -73,30 +61,30 @@ namespace csl
       /* internal */
 
       /* interface */
-      size_t get_header_len() { return CSL_RX_CRYPT_HEAD_LEN; }
-      size_t get_mac_len()    { return CSL_RX_CRYPT_MAC_LEN; }
+      size_t get_header_len() { return CSL_SEC_CRYPT_BUF_HEAD_LEN; }
+      size_t get_mac_len()    { return CSL_SEC_CRYPT_BUF_MAC_LEN; }
 
-      bool init_crypt(
-          unsigned char * buf, const unsigned char * key, bool encrypt)
+      bool init_crypt( unsigned char * buf,
+                       const char * key,
+                       bool encrypt,
+                       const unsigned char * rndata )
       {
         if( !key ) return false;
-        return init_crypt( buf, key, strlen((char *)key), encrypt );
+        return init_crypt( buf, (const unsigned char *)key, strlen(key), encrypt, rndata );
       }
 
-      bool init_crypt(
-          unsigned char * buf, const unsigned char * key,
-          size_t keylen, bool encrypt)
+      bool init_crypt( unsigned char * buf,
+                       const unsigned char * key,
+                       size_t keylen,
+                       bool encrypt,
+                       const unsigned char * rndata )
       {
-        if( !key || !buf )
-          return false; /* invalid values */
+        if( !key || !buf ) { return false; } /* invalid values */
 
         size_t l = (keylen/4)*4;
 
-        if( l<12 )
-          return false; /* at least 96 bits needed */
-
-        if( l>56 )
-          return false; /* max 448 bits can be used */
+        if( l<12 ) { return false; } /* at least 96 bits needed */
+        if( l>56 ) { return false; } /* max 448 bits can be used */
 
         BF_set_key(&key_,l,key);
         SHA1(key, l, initvec_ );
@@ -104,9 +92,20 @@ namespace csl
         if( encrypt )
         {
           /* init random value */
-          if( RAND_bytes(buf,get_header_len()) != 1 )
-            if( RAND_pseudo_bytes(buf,get_header_len()) != 1 )
-              return false;
+          if( rndata == 0 )
+          {
+            if( RAND_bytes(buf,get_header_len()) != 1 )
+            {
+              if( RAND_pseudo_bytes(buf,get_header_len()) != 1 )
+              {
+                return false;
+              }
+            }
+          }
+          else
+          {
+            ::memcpy(buf,rndata,get_header_len());
+          }
 
           SHA1(buf, get_header_len(), tail_);
           BF_cfb64_encrypt(buf,buf,get_header_len(),&key_,initvec_,&bf_num_,BF_ENCRYPT);
@@ -140,22 +139,22 @@ namespace csl
     size_t crypt_buf::get_mac_len()    { return impl_->get_mac_len();    }
 
     bool
-    crypt_buf::init_crypt(
-                    unsigned char * buf,
-                    const unsigned char * key,
-                    bool encrypt )
+    crypt_buf::init_crypt( unsigned char * buf,
+                           const char * key,
+                           bool encrypt,
+                           const unsigned char * rndata )
     {
-      return impl_->init_crypt( buf, key, encrypt );
+      return impl_->init_crypt( buf, key, encrypt, rndata );
     }
 
     bool
-    crypt_buf::init_crypt(
-                    unsigned char * buf,
-                    const unsigned char * key,
-                    size_t keylen,
-                    bool encrypt )
+    crypt_buf::init_crypt( unsigned char * buf,
+                           const unsigned char * key,
+                           size_t keylen,
+                           bool encrypt,
+                           const unsigned char * rndata )
     {
-      return impl_->init_crypt( buf, key, keylen, encrypt );
+      return impl_->init_crypt( buf, key, keylen, encrypt, rndata );
     }
 
     bool

@@ -51,7 +51,9 @@ IF(WIN32)
 
 ELSE(WIN32)
 
-  ADD_DEFINITIONS( -Wall -g3 )
+  ADD_DEFINITIONS( -Wall
+                   -g3 )
+
   INCLUDE_DIRECTORIES(
       ../src
       ../../common/src
@@ -71,7 +73,9 @@ ELSE(WIN32)
 
 ENDIF(WIN32)
 
+ADD_EXECUTABLE(t__umac               t__umac.cc)
 ADD_EXECUTABLE(t__crypt_buf          t__crypt_buf.cc)
+ADD_EXECUTABLE(t__crypt_pkt          t__crypt_pkt.cc)
 ADD_EXECUTABLE(t__derive_ec_params   t__derive_ec_params.c)
 ADD_EXECUTABLE(t__ecdh_pkt           t__ecdh_pkt.cc)
 ADD_EXECUTABLE(t__read_x509_cert     t__read_x509_cert.c)

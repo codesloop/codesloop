@@ -41,23 +41,31 @@ namespace csl
 {
   namespace sec
   {
-    class crypt_buf
+    class crypt_pkt
     {
       public:
-        typedef common::tbuf<32>   buf32_t;
-        typedef common::tbuf<1024> buf1024_t;
+        typedef common::tbuf<8>       buf8_t;
+        typedef common::tbuf<16>      buf16_t;
+        typedef common::tbuf<64>      buf64_t;
+        typedef common::tbuf<1024>    buf1024_t;
 
-        bool encrypt( const buf32_t & salt,
-                      const buf32_t & key,
-                      buf32_t & header,
-                      buf1024_t & data,
-                      buf32_t & footer );
+        typedef buf8_t      saltbuf_t;
+        typedef buf16_t     keybuf_t;
+        typedef buf8_t      headbuf_t;
+        typedef buf1024_t   databuf_t;
+        typedef buf16_t     footbuf_t;
 
-        bool decrypt( const buf32_t & salt,
-                      const buf32_t & key,
-                      buf32_t & header,
-                      buf1024_t & data,
-                      buf32_t & footer );
+        bool encrypt( const saltbuf_t & salt,
+                      const keybuf_t & key,
+                      headbuf_t & header,
+                      databuf_t & data,
+                      footbuf_t & footer );
+
+        bool decrypt( const saltbuf_t & salt,
+                      const keybuf_t & key,
+                      const headbuf_t & header,
+                      databuf_t & data,
+                      const footbuf_t & footer );
 
         inline crypt_pkt() {}
         inline virtual ~crypt_pkt() {}
