@@ -48,7 +48,7 @@ namespace csl
     {
       if( salt.size() != 8 )    return false;
       if( key.size() == 0 )     return false;
-      if( data.size() > 65400 ) return false;
+      if( data.size() > 65200 ) return false;
 
       umac_ae_ctx_t * ctx = (umac_ae_ctx_t *)::malloc(sizeof(umac_ae_ctx_t));
 
@@ -56,8 +56,8 @@ namespace csl
 
       tbuf<saltbuf_t::preallocated_size+56>  salt0;
       tbuf<keybuf_t::preallocated_size+48>   key0;
-      tbuf<databuf_t::preallocated_size+48>  data0;
-      tbuf<databuf_t::preallocated_size+48>  res0;
+      tbuf<65536>                            data0;
+      tbuf<65536>                            res0;
 
       /* aligned buffers */
       char * salt2 = (char *)salt0.allocate(16+32+8+8); // alignment+padding+salt+MAC
@@ -121,7 +121,7 @@ namespace csl
       if( header.size() != 8 )  return false;
       if( footer.size() != 16 ) return false;
       if( key.size() == 0 )     return false;
-      if( data.size() > 65400 ) return false;
+      if( data.size() > 65200 ) return false;
 
       if( memcmp(header.data(),footer.data(),8) != 0 ) return false;
 
@@ -131,8 +131,8 @@ namespace csl
 
       tbuf<saltbuf_t::preallocated_size+56>  salt0;
       tbuf<keybuf_t::preallocated_size+48>   key0;
-      tbuf<databuf_t::preallocated_size+48>  data0;
-      tbuf<databuf_t::preallocated_size+48>  res0;
+      tbuf<65536>                            data0;
+      tbuf<65536>                            res0;
 
       /* aligned buffers */
       char * salt2 = (char *)salt0.allocate(16+32+8+8); // alignment+padding+salt+MAC

@@ -30,17 +30,17 @@ IF(WIN32)
                    -DFORCE_C_ONLY=1
                  )
 
-  INCLUDE_DIRECTORIES(
-      ../../common/src 
-      $ENV{OPENSSL_DEV_ENV}/include
-      ../../../3rdparty/OpenSSL/include
-      $ENV{ZLIB_DEV_ENV}/include
-      ../../../3rdparty/zlib/GnuWin32/include )
+  INCLUDE_DIRECTORIES( ../../common/src
+                       $ENV{OPENSSL_DEV_ENV}/include
+                       ../../../3rdparty/OpenSSL/include
+                       $ENV{ZLIB_DEV_ENV}/include
+                       ../../../3rdparty/zlib/GnuWin32/include
+                     )
 
-  LINK_DIRECTORIES(
-      ../../common/src
-      $ENV{OPENSSL_DEV_ENV}/lib/VC/static
-      $ENV{ZLIB_DEV_ENV}/lib )
+  LINK_DIRECTORIES( ../../common/src
+                    $ENV{OPENSSL_DEV_ENV}/lib/VC/static
+                    $ENV{ZLIB_DEV_ENV}/lib
+                  )
 
 ELSE(WIN32)
 

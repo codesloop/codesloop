@@ -25,51 +25,56 @@
 
 IF(WIN32)
 
-  LINK_LIBRARIES(
-      csl_sec
-      csl_common
-      ssleay32MT
-      libeay32MT
-      zlib
-      wsock32 )
-  INCLUDE_DIRECTORIES(
-      ../src
-      ../../common/src 
-      $ENV{OPENSSL_DEV_ENV}/include
-      ../../../3rdparty/OpenSSL/include
-      $ENV{ZLIB_DEV_ENV}/include
-      ../../../3rdparty/zlib/GnuWin32/include
-      $ENV{AFS_DEV_ENV}/include )
-  LINK_DIRECTORIES(
-      ../src
-      ../../common/src
-      $ENV{OPENSSL_DEV_ENV}/lib/VC/static
-      ../../../3rdparty/OpenSSL/lib/VC/static
-      $ENV{ZLIB_DEV_ENV}/lib
-      ../../../3rdparty/zlib/GnuWin32/lib
-      $ENV{AFS_DEV_ENV}/lib )
+  LINK_LIBRARIES( csl_sec
+                  csl_common
+                  ssleay32MT
+                  libeay32MT
+                  zlib
+                  wsock32
+                )
+
+  INCLUDE_DIRECTORIES( ../src
+                       ../../common/src 
+                       $ENV{OPENSSL_DEV_ENV}/include
+                       ../../../3rdparty/OpenSSL/include
+                       $ENV{ZLIB_DEV_ENV}/include
+                       ../../../3rdparty/zlib/GnuWin32/include
+                       $ENV{AFS_DEV_ENV}/include
+                     )
+
+  LINK_DIRECTORIES( ../src
+                    ../../common/src
+                    $ENV{OPENSSL_DEV_ENV}/lib/VC/static
+                    ../../../3rdparty/OpenSSL/lib/VC/static
+                    $ENV{ZLIB_DEV_ENV}/lib
+                    ../../../3rdparty/zlib/GnuWin32/lib
+                    $ENV{AFS_DEV_ENV}/lib
+                    )
 
 ELSE(WIN32)
 
   ADD_DEFINITIONS( -Wall
-                   -g3 )
+                   -g3
+                 )
 
-  INCLUDE_DIRECTORIES(
-      ../src
-      ../../common/src
-      /usr/local/ssl/include )
-  LINK_LIBRARIES(
-      csl_sec
-      csl_common
-      ssl
-      crypto
-      z
-      stdc++
-      dl )
-  LINK_DIRECTORIES(
-      ../src
-      ../../common/src
-       /usr/local/ssl/lib )
+  INCLUDE_DIRECTORIES( ../src
+                       ../../common/src
+                       /usr/local/ssl/include
+                     )
+
+  LINK_LIBRARIES( csl_sec
+                  csl_common
+                  ssl
+                  crypto
+                  z
+                  stdc++
+                  dl
+                )
+
+  LINK_DIRECTORIES( ../src
+                    ../../common/src
+                    /usr/local/ssl/lib
+                  )
 
 ENDIF(WIN32)
 

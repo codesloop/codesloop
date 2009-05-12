@@ -40,8 +40,19 @@ ELSE(NOT WIN32)
 ENDIF(NOT WIN32)
 
 ADD_LIBRARY( csl_comm STATIC
-             chann.cc   chann.hh
-             lstnr.cc   lstnr.hh
-             udp.cc     udp.hh
+             chann.cc             chann.hh
+             lstnr.cc             lstnr.hh
+             udp.cc               udp.hh
+             udp_ack_rand.cc      udp_ack_rand.hh
+             udp_data.cc          udp_data.hh
+             udp_hello.cc         udp_hello.hh
+             udp_mc_auth.cc       udp_mc_auth.hh
+             udp_mc_auth_res.cc   udp_mc_auth_res.hh
+             udp_olleh.cc         udp_olleh.hh
+             udp_pkt.cc           udp_pkt.hh
+             udp_reslt.cc         udp_reslt.hh
+             udp_uc_auth.cc       udp_uc_auth.hh
+             udp_uc_auth_res.cc   udp_uc_auth_res.hh
 	     )
 # -- EOF --
+

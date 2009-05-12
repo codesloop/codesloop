@@ -23,17 +23,18 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_comm_lstnr_hh_included_
-#define _csl_comm_lstnr_hh_included_
+#ifndef _csl_comm_udp_pkt_hh_included_
+#define _csl_comm_udp_pkt_hh_included_
 
 #include "common.h"
+#include "tbuf.hh"
 #ifdef __cplusplus
 
 namespace csl
 {
   namespace comm
   {
-    class lstnr
+    class udp_pkt
     {
       public:
       private:
@@ -42,4 +43,4 @@ namespace csl
 }
 
 #endif /* __cplusplus */
-#endif /* _csl_comm_lstnr_hh_included_ */
+#endif /* _csl_comm_udp_pkt_hh_included_ */

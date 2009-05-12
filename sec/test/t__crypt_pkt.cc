@@ -220,6 +220,98 @@ namespace test_crypt_pkt {
     }
   }
 
+  void old_crypt63k0(int dbg)
+  {
+    char buf[63*1024+CSL_SEC_CRYPT_BUF_HEAD_LEN+CSL_SEC_CRYPT_BUF_MAC_LEN];
+
+    memset(buf,'A',sizeof(buf));
+
+    crypt_buf cre;
+
+    assert( cre.init_crypt( (unsigned char *)buf,
+            (const unsigned char *)"Hello World 012345678",
+             22,
+             true,
+             (const unsigned char *)"012345678") == true );
+
+    assert( cre.add_data((unsigned char *)buf+8,63*1024,true) == true );
+    assert( cre.finalize((unsigned char *)buf+(63*1024)+8) == true );
+  }
+
+  void new_crypt63k0(int dbg)
+  {
+    char buf[63*1024];
+
+    memset(buf,'A',sizeof(buf));
+
+    crypt_pkt::saltbuf_t salt;
+    crypt_pkt::keybuf_t  key;
+    crypt_pkt::headbuf_t head;
+    crypt_pkt::databuf_t data;
+    crypt_pkt::footbuf_t foot;
+
+    salt.set((const unsigned char *)"012345678",8);
+    key.set((const unsigned char *)"Hello World 012345678",22);
+    data.set((const unsigned char *)buf,sizeof(buf));
+
+    crypt_pkt pk;
+
+    assert( pk.encrypt( salt,key,head,data,foot ) == true );
+  }
+
+  void old_crypt63k(int dbg)
+  {
+    char buf[63*1024+CSL_SEC_CRYPT_BUF_HEAD_LEN+CSL_SEC_CRYPT_BUF_MAC_LEN];
+    char buf2[63*1024+CSL_SEC_CRYPT_BUF_HEAD_LEN+CSL_SEC_CRYPT_BUF_MAC_LEN];
+
+    memset(buf,'A',sizeof(buf));
+    memset(buf2,'A',sizeof(buf2));
+
+    crypt_buf cre;
+
+    assert( cre.init_crypt( (unsigned char *)buf,
+            (const unsigned char *)"Hello World 012345678",
+             22,
+             true,
+             (const unsigned char *)"012345678") == true );
+
+    assert( cre.add_data((unsigned char *)buf+8,63*1024,true) == true );
+    assert( cre.finalize((unsigned char *)buf+(63*1024)+8) == true );
+
+    crypt_buf crd;
+
+    assert( crd.init_crypt( (unsigned char *)buf,
+            (const unsigned char *)"Hello World 012345678",
+             22,
+             false,
+             (const unsigned char *)"012345678") == true );
+
+    assert( crd.add_data((unsigned char *)buf+8,63*1024,false) == true );
+    assert( crd.finalize((unsigned char *)buf+(63*1024)+8) == true );
+  }
+
+  void new_crypt63k(int dbg)
+  {
+    char buf[63*1024];
+
+    memset(buf,'A',sizeof(buf));
+
+    crypt_pkt::saltbuf_t salt;
+    crypt_pkt::keybuf_t  key;
+    crypt_pkt::headbuf_t head;
+    crypt_pkt::databuf_t data;
+    crypt_pkt::footbuf_t foot;
+
+    salt.set((const unsigned char *)"012345678",8);
+    key.set((const unsigned char *)"Hello World 012345678",22);
+    data.set((const unsigned char *)buf,63*1024);
+
+    crypt_pkt pk;
+
+    assert( pk.encrypt( salt,key,head,data,foot ) == true );
+    assert( pk.decrypt( key,head,data,foot ) == true );
+  }
+
   struct rndata
   {
     size_t len_;
@@ -285,6 +377,12 @@ int main()
 
   csl_common_print_results( "old_crypt2    ", csl_common_test_timer_i1(old_crypt2,0),"" );
   csl_common_print_results( "new_crypt2    ", csl_common_test_timer_i1(new_crypt2,0),"" );
+
+  csl_common_print_results( "old_crypt63k0 ", csl_common_test_timer_i1(old_crypt63k0,0),"" );
+  csl_common_print_results( "new_crypt63k0 ", csl_common_test_timer_i1(new_crypt63k0,0),"" );
+
+  csl_common_print_results( "old_crypt63k  ", csl_common_test_timer_i1(old_crypt63k,0),"" );
+  csl_common_print_results( "new_crypt63k  ", csl_common_test_timer_i1(new_crypt63k,0),"" );
 
   csl_common_print_results( "random_test   ", csl_common_test_timer_v0(random_test),"" );
 
