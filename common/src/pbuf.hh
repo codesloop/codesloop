@@ -99,6 +99,17 @@ namespace csl
 
         pbuf & operator<<(const char * str) { append(str); return *this; }
 
+        template <typename T> bool t_copy_to(T & t,unsigned int max_size=0)
+        {
+          if( !max_size ) max_size = size();
+          if( max_size )
+          {
+            unsigned char * bf = t.allocate(max_size);
+            return copy_to(bf,max_size);
+          }
+          return false;
+        }
+
         /**
         @brief copies the internal data to the specified location
         @param ptr is the location
@@ -106,7 +117,7 @@ namespace csl
 
         this function assumes that the caller allocated the neccessary amount of memory
          */
-        bool copy_to(unsigned char * ptr) const;
+        bool copy_to(unsigned char * ptr, unsigned int max_size=0) const;
 
         /** @brief returns the amount of data stored */
         inline unsigned int size() const   { return size_; }
@@ -137,6 +148,7 @@ namespace csl
           pool_.free_all();
           size_ = 0;
         }
+
 
         /** @brief tests if equal
 

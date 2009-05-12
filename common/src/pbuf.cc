@@ -56,19 +56,31 @@ namespace csl
       else         return true;
     }
 
-    bool pbuf::copy_to(unsigned char * ptr) const
+    bool pbuf::copy_to(unsigned char * ptr, unsigned int max_size) const
     {
       if( !ptr ) return false;
       const_iterator it(begin());
       const_iterator ee(end());
+
+      if( !max_size ) max_size = size();
 
       for( ;it!=ee;++it )
       {
         const buf * bp = *it;
         if( bp->size_ && bp->data_ )
         {
-          ::memcpy( ptr,bp->data_,bp->size_ );
-          ptr += bp->size_;
+          if( max_size >= bp->size_ )
+          {
+            ::memcpy( ptr,bp->data_,bp->size_ );
+            ptr += bp->size_;
+            max_size -= bp->size_;
+          }
+          else if( max_size == 0 ) { break; }
+          else
+          {
+            ::memcpy( ptr,bp->data_,max_size );
+            break;
+          }
         }
       }
       return true;

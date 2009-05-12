@@ -22,25 +22,26 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 LINK_DIRECTORIES( ../../nthread/src
-                  ../../common/src 
-                  ../../sec/src 
-		 )
+                  ../../common/src
+                  ../../sec/src
+                )
 
 INCLUDE_DIRECTORIES( ../../nthread/src
                      ../../common/src 
                      ../../sec/src 
-		   )
+                   )
 
 IF(NOT WIN32)
-  ADD_DEFINITIONS(
-    -Wall
-    -g3
-# -O3 -Os
-    )
+  ADD_DEFINITIONS( -Wall
+                   -g3
+                 )
+
 ELSE(NOT WIN32)
 ENDIF(NOT WIN32)
 
 ADD_LIBRARY( csl_comm STATIC
-	     channel.cc channel.hh
+             chann.cc   chann.hh
+             lstnr.cc   lstnr.hh
+             udp.cc     udp.hh
 	     )
 # -- EOF --

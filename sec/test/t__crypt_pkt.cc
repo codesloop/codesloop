@@ -28,6 +28,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify crypt_pkt
  */
 
+#include "pbuf.hh"
+#include "zfile.hh"
 #include "crypt_pkt.hh"
 #include "crypt_buf.hh"
 #include "test_timer.h"
@@ -38,6 +40,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using csl::sec::crypt_pkt;
 using csl::sec::crypt_buf;
+using csl::common::zfile;
+using csl::common::pbuf;
 
 /** @brief contains tests related to crypt_pkt */
 namespace test_crypt_pkt {
@@ -65,10 +69,10 @@ namespace test_crypt_pkt {
 
     crypt_buf cre;
     assert( cre.init_crypt( (unsigned char *)buf,
-            (const unsigned char *)"Hello World 012345678",
-             22,
-             true,
-             (const unsigned char *)"012345678") == true );
+           (const unsigned char *)"Hello World 012345678",
+            22,
+            true,
+           (const unsigned char *)"012345678") == true );
 
     assert( cre.add_data((unsigned char *)buf+8,48,true) == true );
     assert( cre.finalize((unsigned char *)buf+56) == true );
@@ -97,6 +101,46 @@ namespace test_crypt_pkt {
 
     crypt_pkt pk;
     assert( pk.encrypt( salt,key,head,data,foot ) == true );
+
+    if( dbg )
+    {
+      print_hex("N HEAD: ",head.data(),head.size());
+      print_hex("N D0:   ",d0.data(),  d0.size());
+      print_hex("N DATA: ",data.data(),data.size());
+      print_hex("N FOOT: ",foot.data(),foot.size());
+    }
+  }
+
+  void bad_crypt(int dbg)
+  {
+    crypt_pkt::saltbuf_t salt;
+    crypt_pkt::keybuf_t  key;
+    crypt_pkt::headbuf_t head;
+    crypt_pkt::databuf_t data,d0;
+    crypt_pkt::footbuf_t foot;
+
+    salt.set((const unsigned char *)"012345678",8);
+    key.set((const unsigned char *)"Hello World 012345678",22);
+    data.set((const unsigned char *)"Hello World Hello World Hello World Hello World",48);
+    d0 = data;
+
+    crypt_pkt pk;
+    assert( pk.encrypt( salt,key,head,data,foot ) == true );
+
+    if( dbg )
+    {
+      print_hex("N HEAD: ",head.data(),head.size());
+      print_hex("N D0:   ",d0.data(),  d0.size());
+      print_hex("N DATA: ",data.data(),data.size());
+      print_hex("N FOOT: ",foot.data(),foot.size());
+    }
+
+    data.private_data()[4]=0xbd;
+    data.private_data()[5]=0xbd;
+    data.private_data()[6]=0xbd;
+    data.private_data()[7]=0xbd;
+
+    assert( pk.decrypt( key,head,data,foot ) == false );
 
     if( dbg )
     {
@@ -137,7 +181,8 @@ namespace test_crypt_pkt {
     assert( crd.add_data((unsigned char *)buf+8,900,false) == true );
     assert( crd.finalize((unsigned char *)buf+900+8) == true );
 
-    //assert( memcmp(buf+8,buf2+8,900) == 0 );
+    assert( memcmp(buf+8,buf2+8,900) == 0 );
+
     if( dbg )
     {
       print_hex("B  : ",buf+8,900);
@@ -164,7 +209,9 @@ namespace test_crypt_pkt {
     crypt_pkt pk;
 
     assert( pk.encrypt( salt,key,head,data,foot ) == true );
-    assert( pk.decrypt( salt,key,head,data,foot ) == true );
+    assert( pk.decrypt( key,head,data,foot ) == true );
+
+    assert( memcmp(buf,data.data(),900) == 0 );
 
     if( dbg )
     {
@@ -173,6 +220,56 @@ namespace test_crypt_pkt {
     }
   }
 
+  struct rndata
+  {
+    size_t len_;
+    const char * filename_;
+  };
+
+  static rndata random_files[] = {
+    { 27,     "random.27" },
+    { 99,     "random.99" },
+    { 119,    "random.119" },
+    { 279,    "random.279" },
+    { 589,    "random.589" },
+    { 1123,   "random.1123" },
+    { 1934,   "random.1934" },
+    { 28901,  "random.28901" },
+    { 31965,  "random.31965" },
+    { 112678, "random.112678" },
+    { 0, 0 }
+  };
+
+  void random_test()
+  {
+    rndata * p = random_files;
+    while( p->len_ )
+    {
+      zfile zf;
+      assert( zf.read_file(p->filename_) == true );
+      assert( zf.get_size() == p->len_ );
+      pbuf pb;
+      assert( zf.get_data(pb) == true );
+
+      crypt_pkt::keybuf_t  key;
+      crypt_pkt::saltbuf_t salt;
+      crypt_pkt::headbuf_t head;
+      crypt_pkt::databuf_t data;
+      crypt_pkt::footbuf_t foot;
+
+      key.set((const unsigned char *)"Hello World 012345678",22);
+      pb.t_copy_to( salt,8 );
+      pb.t_copy_to( head,8 );
+      pb.t_copy_to( data );
+      pb.t_copy_to( foot,16 );
+
+      crypt_pkt pk;
+
+      assert( pk.decrypt( key,head,data,foot ) == false );
+
+      ++p;
+    };
+  }
 
 } // end of test_crypt_pkt
 
@@ -180,12 +277,16 @@ using namespace test_crypt_pkt;
 
 int main()
 {
+  bad_crypt(1);
+
   csl_common_print_results( "baseline      ", csl_common_test_timer_v0(baseline),"" );
   csl_common_print_results( "old_crypt     ", csl_common_test_timer_i1(old_crypt,0),"" );
   csl_common_print_results( "new_crypt     ", csl_common_test_timer_i1(new_crypt,0),"" );
 
   csl_common_print_results( "old_crypt2    ", csl_common_test_timer_i1(old_crypt2,0),"" );
   csl_common_print_results( "new_crypt2    ", csl_common_test_timer_i1(new_crypt2,0),"" );
+
+  csl_common_print_results( "random_test   ", csl_common_test_timer_v0(random_test),"" );
 
   return 0;
 }

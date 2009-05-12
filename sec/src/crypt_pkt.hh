@@ -61,8 +61,7 @@ namespace csl
                       databuf_t & data,
                       footbuf_t & footer );
 
-        bool decrypt( const saltbuf_t & salt,
-                      const keybuf_t & key,
+        bool decrypt( const keybuf_t & key,
                       const headbuf_t & header,
                       databuf_t & data,
                       const footbuf_t & footer );

@@ -25,31 +25,32 @@ LINK_DIRECTORIES( ../src
                   ../../nthread/src
                   ../../sec/src
                   ../../common/src 
-		)
+                )
 
 INCLUDE_DIRECTORIES( ../src
                      ../../nthread/src
                      ../../sec/src
                      ../../common/src 
-		   )
+                   )
 
 IF(WIN32)
   LINK_LIBRARIES( csl_comm
                   csl_sec
                   csl_nthread
-                  csl_common 
-		)
+                  csl_common
+                )
+
 ELSE(WIN32)
   ADD_DEFINITIONS( -Wall -g3 -pthread )
   LINK_LIBRARIES( csl_comm
                   csl_sec
-                  csl_nthread 
+                  csl_nthread
                   csl_common
-                  pthread 
+                  pthread
                   dl
                 )
 ENDIF(WIN32)
 
-# ADD_EXECUTABLE(t__conn         t__conn.cc)
+ADD_EXECUTABLE(t__comm_iface  t__comm_iface.cc)
 
 # -- EOF --
