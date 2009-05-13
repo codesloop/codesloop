@@ -27,6 +27,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "csl_sec.hh"
 #include "tbuf.hh"
 #include "umac_ae.h"
+#include <openssl/rand.h>
 #include <string.h>
 
 /**
@@ -62,8 +63,9 @@ namespace csl
       /* aligned buffers */
       char * salt2 = (char *)salt0.allocate(16+32+8+8); // alignment+padding+salt+MAC
       char * key2  = (char *)key.private_data();
-      char * data2 = (char *)data.private_data();
-      char * res2  = (char *)res0.allocate(data.size()+48);
+      //char * data2 = (char *)data.private_data();
+      char * data2 = (char *)data0.allocate(data.size()+16+32+4); // alignment+padding+random4
+      char * res2  = (char *)res0.allocate(data.size()+16+32+4);  // alignment+padding+random4
 
       /* align salt if needed */
       if( (unsigned long long)salt2 & ~(15ULL) )
@@ -76,17 +78,25 @@ namespace csl
       if( (unsigned long long)key2 & ~(15ULL) )
       {
         char * key1  = (char *)key0.allocate(key.size()+48);
-        key2  = key1  + (16-(((unsigned long long)key1)&15));
+        key2  = key1  + (16-(((unsigned long long)key1)&15ULL));
         memcpy( key2,key.data(),key.size() );
       }
 
       /* align data if needed */
       if( (unsigned long long)data2 & ~(15ULL) )
       {
-        char * data1 = (char *)data0.allocate(data.size()+48);
-        data2 = data1 + (16-(((unsigned long long)data1)&15));
-        memcpy( data2,data.data(),data.size() );
+        data2 += (16-(((unsigned long long)data2)&15ULL));
       }
+
+      if( RAND_bytes((unsigned char *)data2,4) != 1 )
+      {
+        /* fallback */
+        if( RAND_pseudo_bytes((unsigned char *)data2,4) != 1 )
+        {
+          return false;
+        }
+      }
+      memcpy( data2+4,data.data(),data.size() );
 
       /* align output data if needed */
       if( (unsigned long long)res2 & ~(15ULL) )
@@ -100,14 +110,13 @@ namespace csl
       /* encrypt and calculate mac */
       umac_ae_set_key(key2, ctx);
       umac_ae_header(salt2, 8, ctx);
-      umac_ae_encrypt(data2, res2, data.size(), salt2, ctx);
-      umac_ae_footer(salt2, 8, ctx);
-      umac_ae_finalize(salt2+8, ctx);
+      umac_ae_encrypt(data2, res2, data.size()+4, salt2, ctx);
+      umac_ae_finalize(salt2, ctx);
       umac_ae_done(ctx);
 
       /* copy out data */
-      data.set((const unsigned char *)res2,data.size());
-      footer.set((const unsigned char *)salt2,16);
+      data.set((const unsigned char *)res2,data.size()+4);
+      footer.set((const unsigned char *)salt2,8);
 
       free( ctx );
       return true;
@@ -119,11 +128,10 @@ namespace csl
                              const footbuf_t & footer )
     {
       if( header.size() != 8 )  return false;
-      if( footer.size() != 16 ) return false;
+      if( footer.size() != 8 )  return false;
       if( key.size() == 0 )     return false;
       if( data.size() > 65200 ) return false;
-
-      if( memcmp(header.data(),footer.data(),8) != 0 ) return false;
+      if( data.size() < 4 )     return false;
 
       umac_ae_ctx_t * ctx = (umac_ae_ctx_t *)::malloc(sizeof(umac_ae_ctx_t));
 
@@ -138,7 +146,7 @@ namespace csl
       char * salt2 = (char *)salt0.allocate(16+32+8+8); // alignment+padding+salt+MAC
       char * key2  = (char *)key.private_data();
       char * data2 = (char *)data.private_data();
-      char * res2  = (char *)res0.allocate(data.size()+48);
+      char * res2  = (char *)res0.allocate(data.size()+16+32); // alignment+padding
 
       /* align salt if needed */
       if( (unsigned long long)salt2 & ~(15ULL) )
@@ -169,20 +177,21 @@ namespace csl
         res2  += (16-(((unsigned long long)res2)&15ULL));
       }
 
-      /* encrypt and calculate mac */
+      /* deecrypt and calculate mac */
       umac_ae_set_key(key2, ctx);
       umac_ae_header(salt2, 8, ctx);
       umac_ae_decrypt(data2, res2, data.size(), salt2, ctx);
-      umac_ae_footer(salt2, 8, ctx);
-      umac_ae_finalize(salt2+8, ctx);
+      umac_ae_finalize(salt2, ctx);
       umac_ae_done(ctx);
 
       /* copy out data */
       bool ret = false;
 
-      if( memcmp(footer.data(),salt2,16) == 0 )
+      if( memcmp(footer.data(),salt2,8) == 0 )
       {
-        data.set((const unsigned char *)res2,data.size());
+        if( data.size() > 4 ) { data.set((const unsigned char *)res2+4,data.size()-4); }
+        else                  { data.reset(); }
+
         ret = true;
       }
 

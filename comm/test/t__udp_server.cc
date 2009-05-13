@@ -23,23 +23,59 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_comm_udp_hh_included_
-#define _csl_comm_udp_hh_included_
+/**
+   @file t__udp_server.cc
+   @brief Tests to verify udp_server routines
+ */
 
-#include "common.h"
-#ifdef __cplusplus
+#include "udp_srv.hh"
+#include "test_timer.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
 
-namespace csl
-{
-  namespace comm
+using namespace csl::common;
+using namespace csl::comm;
+using namespace csl::sec;
+
+/** @brief contains tests related to udp servers */
+namespace test_udp_server {
+
+  void basic()
   {
-    class udp
-    {
-      public:
-      private:
-    };
+    udp_srv s;
+    s.host("localhost");
+    s.port(48781);
+
+    ecdh_key pubkey;
+    bignum   privkey;
+
+    pubkey.algname("prime192v3");
+
+    /* generate keypair */
+    assert( pubkey.gen_keypair(privkey) == true );
+
+    udp_srv_info info;
+    info.public_key(pubkey);
+
+    s.private_key(privkey);
+    s.server_info(info);
+
+    assert( s.start() );
+
+    SleepSeconds( 30 );
   }
+
+} // end of test_udp_server
+
+using namespace test_udp_server;
+
+int main()
+{
+  //csl_common_print_results( "simplest      ", csl_common_test_timer_i1(simplest,0),"" );
+  basic();
+  return 0;
 }
 
-#endif /* __cplusplus */
-#endif /* _csl_comm_udp_hh_included_ */
+/* EOF */

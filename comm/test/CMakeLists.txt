@@ -38,6 +38,10 @@ IF(WIN32)
                   csl_sec
                   csl_nthread
                   csl_common
+                  ssleay32MT
+                  libeay32MT
+                  zlib
+                  wsock32
                 )
 
 ELSE(WIN32)
@@ -46,11 +50,16 @@ ELSE(WIN32)
                   csl_sec
                   csl_nthread
                   csl_common
+                  ssl
+                  crypto
+                  z
                   pthread
                   dl
                 )
 ENDIF(WIN32)
 
 ADD_EXECUTABLE(t__comm_iface  t__comm_iface.cc)
+ADD_EXECUTABLE(t__udp_client  t__udp_client.cc)
+ADD_EXECUTABLE(t__udp_server  t__udp_server.cc)
 
 # -- EOF --

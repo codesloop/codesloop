@@ -23,13 +23,14 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "chann.hh"
+#ifndef _csl_comm_csl_comm_included_
+#define _csl_comm_csl_comm_included_
 
-namespace csl
-{
-  namespace comm
-  {
-  };
-};
+#include "session_data.hh"
+#include "cb.hh"
+#include "udp_cli.hh"
+#include "udp_srv.hh"
 
-/* EOF */
+#ifdef __cplusplus
+#endif /* __cplusplus */
+#endif /* _csl_comm_csl_comm_included_ */

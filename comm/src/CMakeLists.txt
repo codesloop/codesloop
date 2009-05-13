@@ -27,8 +27,8 @@ LINK_DIRECTORIES( ../../nthread/src
                 )
 
 INCLUDE_DIRECTORIES( ../../nthread/src
-                     ../../common/src 
-                     ../../sec/src 
+                     ../../common/src
+                     ../../sec/src
                    )
 
 IF(NOT WIN32)
@@ -40,9 +40,11 @@ ELSE(NOT WIN32)
 ENDIF(NOT WIN32)
 
 ADD_LIBRARY( csl_comm STATIC
-             chann.cc             chann.hh
-             lstnr.cc             lstnr.hh
-             udp.cc               udp.hh
+             udp_chann.cc         udp_chann.hh
+             udp_chann_queue.cc   udp_chann_queue.hh
+             udp_cli.cc           udp_cli.hh
+             udp_srv.cc           udp_srv.hh
+             udp_srv_info.cc      udp_srv_info.hh
              udp_ack_rand.cc      udp_ack_rand.hh
              udp_data.cc          udp_data.hh
              udp_hello.cc         udp_hello.hh
@@ -53,6 +55,7 @@ ADD_LIBRARY( csl_comm STATIC
              udp_reslt.cc         udp_reslt.hh
              udp_uc_auth.cc       udp_uc_auth.hh
              udp_uc_auth_res.cc   udp_uc_auth_res.hh
+             cb.hh                csl_comm.hh
 	     )
 # -- EOF --
 

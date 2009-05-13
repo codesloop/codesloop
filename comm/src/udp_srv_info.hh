@@ -23,13 +23,44 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "lstnr.hh"
+#ifndef _csl_comm_udp_srv_info_hh_included_
+#define _csl_comm_udp_srv_info_hh_included_
+
+#include "ecdh_key.hh"
+#include "common.h"
+#ifdef __cplusplus
 
 namespace csl
 {
+  using sec::ecdh_key;
+
   namespace comm
   {
-  };
-};
+    class udp_srv_info
+    {
+      public:
+        /* public key */
+        inline const ecdh_key & public_key() const   { return public_key_; }
+        inline void public_key(const ecdh_key & pk)  { public_key_ = pk; }
 
-/* EOF */
+        /* need login ? */
+        inline bool need_login() const      { return need_login_; }
+        inline void need_login(bool yesno)  { need_login_ = yesno; }
+
+        /* need pass ? */
+        inline bool need_pass() const      { return need_pass_; }
+        inline void need_pass(bool yesno)  { need_pass_ = yesno; }
+
+        inline udp_srv_info() : need_login_(true), need_pass_(true) {}
+        virtual ~udp_srv_info() {}
+
+      private:
+        ecdh_key public_key_;
+        bool need_login_;
+        bool need_pass_;
+    };
+  }
+}
+
+#endif /* __cplusplus */
+#endif /* _csl_comm_udp_srv_info_hh_included_ */

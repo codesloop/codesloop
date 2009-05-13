@@ -23,58 +23,21 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_sec_crypt_pkt_hh_included_
-#define _csl_sec_crypt_pkt_hh_included_
+#ifndef _csl_comm_session_data_hh_included_
+#define _csl_comm_session_data_hh_included_
 
-/**
-   @file crypt_pkt.hh
-
-   Encryption is based on AES and UMAC
- */
-
-#include "common.h"
-#include "tbuf.hh"
 #ifdef __cplusplus
-#include <memory>
 
 namespace csl
 {
-  namespace sec
+  namespace comm
   {
-    class crypt_pkt
+    class session_data
     {
       public:
-        typedef common::tbuf<8>       buf8_t;
-        typedef common::tbuf<16>      buf16_t;
-        typedef common::tbuf<64>      buf64_t;
-        typedef common::tbuf<1024>    buf1024_t;
-
-        typedef buf8_t      saltbuf_t;
-        typedef buf16_t     keybuf_t;
-        typedef buf8_t      headbuf_t;
-        typedef buf1024_t   databuf_t;
-        typedef buf8_t      footbuf_t;
-
-        bool encrypt( const saltbuf_t & salt,
-                      const keybuf_t & key,
-                      headbuf_t & header,
-                      databuf_t & data,
-                      footbuf_t & footer );
-
-        bool decrypt( const keybuf_t & key,
-                      const headbuf_t & header,
-                      databuf_t & data,
-                      const footbuf_t & footer );
-
-        inline crypt_pkt() {}
-        inline virtual ~crypt_pkt() {}
-
-      private:
-        crypt_pkt(const crypt_pkt & other) {}
-        crypt_pkt & operator=(const crypt_pkt & other) { return *this; }
     };
   }
 }
 
 #endif /* __cplusplus */
-#endif /* _csl_sec_crypt_pkt_hh_included_ */
+#endif /* _csl_comm_session_data_hh_included_ */
