@@ -26,18 +26,61 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_comm_udp_pkt_hh_included_
 #define _csl_comm_udp_pkt_hh_included_
 
+#include "ecdh_key.hh"
+#include "bignum.hh"
+#include "crypt_pkt.hh"
+#include "pbuf.hh"
 #include "common.h"
-#include "tbuf.hh"
 #ifdef __cplusplus
 
 namespace csl
 {
+  using common::tbuf;
+  using sec::crypt_pkt;
+  using sec::bignum;
+  using sec::ecdh_key;
+
   namespace comm
   {
     class udp_pkt
     {
       public:
+        typedef tbuf<64>               prolog_t;
+        typedef crypt_pkt::headbuf_t   headbuf_t;
+        typedef crypt_pkt::databuf_t   databuf_t;
+        typedef crypt_pkt::footbuf_t   footbuf_t;
+
+        // virtual bool encrypt();
+        // virtual bool decrypt();
+
+      protected:
+        prolog_t   prolog_;
+        headbuf_t  header_;
+        databuf_t  data_;
+        footbuf_t  footer_;
+
       private:
+#if 0
+        const bignum   * privk_;
+        const ecdh_key * peerpub_;
+        const ecdh_key * ownpub_;
+#endif
+      public:
+#if 0
+        /* own private key */
+        virtual inline const bignum & privk() const { return *privk_; }
+        virtual inline void privk(const bignum & pk) { privk_ = pk; }
+
+        /* peer public key */
+        virtual inline const ecdh_key & peerpub() const { return peerpub_; }
+        virtual inline void peerpub(const ecdh_key & pk) { peerpub_ = pk; }
+
+        /* own public key */
+        virtual inline const ecdh_key & ownpub() const { return ownpub_; }
+        virtual inline void ownpub(const ecdh_key & pk) { ownpub_ = pk; }
+#endif
+
+        virtual inline ~udp_pkt() {}
     };
   }
 }

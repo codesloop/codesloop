@@ -26,6 +26,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_comm_udp_mc_auth_hh_included_
 #define _csl_comm_udp_mc_auth_hh_included_
 
+#include "udp_pkt.hh"
 #include "common.h"
 #ifdef __cplusplus
 
@@ -33,7 +34,7 @@ namespace csl
 {
   namespace comm
   {
-    class udp_mc_auth
+    class udp_mc_auth : public udp_pkt
     {
       public:
       private:
