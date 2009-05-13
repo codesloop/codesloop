@@ -63,7 +63,6 @@ namespace csl
       /* aligned buffers */
       char * salt2 = (char *)salt0.allocate(16+32+8+8); // alignment+padding+salt+MAC
       char * key2  = (char *)key.private_data();
-      //char * data2 = (char *)data.private_data();
       char * data2 = (char *)data0.allocate(data.size()+16+32+4); // alignment+padding+random4
       char * res2  = (char *)res0.allocate(data.size()+16+32+4);  // alignment+padding+random4
 
@@ -177,7 +176,7 @@ namespace csl
         res2  += (16-(((unsigned long long)res2)&15ULL));
       }
 
-      /* deecrypt and calculate mac */
+      /* decrypt and calculate mac */
       umac_ae_set_key(key2, ctx);
       umac_ae_header(salt2, 8, ctx);
       umac_ae_decrypt(data2, res2, data.size(), salt2, ctx);

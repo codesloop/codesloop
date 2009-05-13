@@ -28,7 +28,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
   @file csl_common/src/exc.cc
-  @brief implementation of slt3::exc
+  @brief implementation of common::exc
  */
 
 namespace csl

@@ -64,7 +64,7 @@ namespace csl
       srv_addr.sin_addr.s_addr = htonl(INADDR_ANY); // TODO resolve hostname
       srv_addr.sin_port = htons(port_);
 
-      if( bind(sock,(struct sockaddr *)&srv_addr, sizeof(srv_addr)) == -1 )
+      if( bind(sock,(struct sockaddr *)&srv_addr, sizeof(srv_addr)) )
       {
         close( sock );
         return false;

@@ -47,7 +47,6 @@ ADD_LIBRARY( csl_comm STATIC
              udp_srv_info.cc      udp_srv_info.hh
              udp_ack_rand.cc      udp_ack_rand.hh
              udp_data.cc          udp_data.hh
-             udp_hello.cc         udp_hello.hh
              udp_mc_auth.cc       udp_mc_auth.hh
              udp_mc_auth_res.cc   udp_mc_auth_res.hh
              udp_olleh.cc         udp_olleh.hh

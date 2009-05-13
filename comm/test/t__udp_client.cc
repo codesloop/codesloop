@@ -37,12 +37,29 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace csl::common;
 using namespace csl::sec;
+using namespace csl::comm;
 
 /** @brief contains tests related to udp clients */
 namespace test_udp_client {
 
   void basic()
   {
+    udp_cli c;
+    c.host("localhost");
+    c.port(48781);
+
+    ecdh_key pubkey;
+    bignum   privkey;
+
+    pubkey.algname("prime192v3");
+
+    /* generate keypair */
+    assert( pubkey.gen_keypair(privkey) == true );
+
+    c.private_key(privkey);
+    c.public_key(pubkey);
+
+    assert( c.hello( 3000 ) == true );
   }
 
 } // end of test_udp_client

@@ -45,6 +45,18 @@ namespace csl
     class udp_pkt
     {
       public:
+        enum {
+          hello_p = 1,
+          olleh_p,
+          result_p,
+          unicast_auth_p,
+          unicast_auth_resp_p,
+          multicast_auth_p,
+          multicast_auth_resp_p,
+          data_p,
+          ack_rand_p
+        };
+
         typedef tbuf<64>               prolog_t;
         typedef crypt_pkt::headbuf_t   headbuf_t;
         typedef crypt_pkt::databuf_t   databuf_t;

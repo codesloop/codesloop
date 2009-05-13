@@ -73,6 +73,8 @@ namespace csl
         unsigned char      server_rand_[8][8];
         string             session_key_;
 
+        bool init();
+
       public:
 
         /* inline accessors and manipulators */
