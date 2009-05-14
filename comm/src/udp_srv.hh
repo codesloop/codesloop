@@ -26,6 +26,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_comm_udp_srv_hh_included_
 #define _csl_comm_udp_srv_hh_included_
 
+#include "exc.hh"
 #include "thread.hh"
 #include "cb.hh"
 #include "ecdh_key.hh"
@@ -54,11 +55,15 @@ namespace csl
         : port_(0), valid_key_cb_(0), hello_cb_(0), valid_creds_cb_(0), server_entry_(*this) {}
 
       private:
+        /* internal */
+        bool use_exc_;
 
+        /* user should fill these */
         string             host_;
         unsigned short     port_;
         bignum             private_key_;
         udp_srv_info       server_info_;
+
         /* callbacks */
         cb::valid_key    * valid_key_cb_;
         cb::hello        * hello_cb_;
@@ -110,6 +115,18 @@ namespace csl
         /* info */
         inline const udp_srv_info & server_info() const { return server_info_; }
         inline void server_info(const udp_srv_info & v) { server_info_ = v; }
+
+
+        /** @brief Specifies whether param should throw comm::exc exceptions
+        @param yesno is the desired value to be set
+
+        the default value for use_exc() is true, so it throws exceptions by default */
+        inline void use_exc(bool yesno) { use_exc_ = yesno; }
+
+        /** @brief Returns the current value of use_exc
+        @return true if exc exceptions are used */
+        inline bool use_exc() const { return use_exc_; }
+
     };
   }
 }

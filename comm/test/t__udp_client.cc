@@ -45,6 +45,7 @@ namespace test_udp_client {
   void basic()
   {
     udp_cli c;
+    c.use_exc(false);
     c.host("localhost");
     c.port(48781);
 

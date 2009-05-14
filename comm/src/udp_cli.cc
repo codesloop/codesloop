@@ -23,6 +23,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "exc.hh"
 #include "udp_pkt.hh"
 #include "xdrbuf.hh"
 #include "pbuf.hh"
@@ -47,13 +48,13 @@ namespace csl
       if( sock_ > 0 ) return true;
 
       /* host name has been set ? */
-      if( host_.empty() ) return false;
+      if( host_.empty() ) { THR(exc::rs_host_not_set,exc::cm_udp_cli,false); }
 
       /* port has been set ? */
-      if( port_ == 0 ) return false;
+      if( port_ == 0 ) { THR(exc::rs_port_not_set,exc::cm_udp_cli,false); }
 
       int sock = ::socket( AF_INET, SOCK_DGRAM, 0 );
-      if( sock <= 0 ) return false;
+      if( sock <= 0 ) { THRC(exc::rs_socket_failed,exc::cm_udp_cli,false); }
 
       struct sockaddr_in srv_addr;
       bzero( &srv_addr,sizeof(srv_addr) );
@@ -64,21 +65,24 @@ namespace csl
 
       socklen_t len = sizeof(srv_addr);
 
-      if( ::connect(sock, (struct sockaddr *)&srv_addr, len) )
+      if( ::connect(sock, (struct sockaddr *)&srv_addr, len) == -1 )
       {
         ::close(sock);
-        return false;
+        THRC(exc::rs_connect_failed,exc::cm_udp_cli,false);
       }
 
+      sock_ = sock;
       return true;
     }
 
     bool udp_cli::hello( unsigned int timeout_ms )
     {
+      int err = 0;
+
       if( !init() ) return false;
 
       /* public_key has been set ? */
-      if( public_key_.is_empty() ) return false;
+      if( public_key_.is_empty() ) { THR(exc::rs_pubkey_empty,exc::cm_udp_cli,false); }
 
       pbuf pb;
       xdrbuf xb(pb);
@@ -87,23 +91,24 @@ namespace csl
       {
         /* compile packet */
         xb << (int32_t)udp_pkt::hello_p;
-        if( !public_key_.to_xdr(xb) ) return false;
+        if( !public_key_.to_xdr(xb) ) { THR(exc::rs_xdr_error,exc::cm_udp_cli,false); }
       }
       catch( common::exc e)
       {
-        return false;
+        THR(exc::rs_xdr_error,exc::cm_udp_cli,false);
       }
 
       /* should not happen */
-      if( pb.size() == 0 ) return false;
+      if( pb.size() == 0 ) { THR(exc::rs_internal_error,exc::cm_udp_cli,false); }
 
       pbuf::const_iterator it = pb.const_begin();
 
-      if( ::send( sock_, (*it)->data_, (*it)->size_, 0 ) != (int)(*it)->size_ )
+      if( (err=::send( sock_, (*it)->data_, (*it)->size_ , 0 )) != (int)(*it)->size_ )
       {
-        return false;
+        perror("write");
+        fprintf(stderr,"send(%d, '%d bytes') => %d\n",sock_,(*it)->size_,err);
+        THRC(exc::rs_send_failed,exc::cm_udp_cli,false);
       }
-
 
       fd_set rfds;
       struct timeval tv = { 0,0 };
@@ -119,25 +124,32 @@ namespace csl
       FD_ZERO(&rfds);
       FD_SET(sock_,&rfds);
 
-      int err = ::select(sock_+1,&rfds,NULL,NULL,ptv);
+      err = ::select(sock_+1,&rfds,NULL,NULL,ptv);
 
       if( err > 0 )
       {
         unsigned char tmp[65536];
         err = ::recv(sock_,tmp,sizeof(tmp),0);
         //
-        if( err > 0 ) { return true;  } // TODO
-        else          { return false; }
+        if( err > 0 )
+        {
+           // TODO
+          return true;
+        }
+        else
+        {
+          THRC(exc::rs_recv_failed,exc::cm_udp_cli,false);
+        }
       }
       else if( err == 0 )
       {
         /* timed out */
-        return false;
+        THR(exc::rs_timeout,exc::cm_udp_cli,false);
       }
       else
       {
         /* error */
-        return false;
+        THRC(exc::rs_select_failed,exc::cm_udp_cli,false);
       }
     }
 

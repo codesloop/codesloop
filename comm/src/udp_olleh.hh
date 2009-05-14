@@ -26,17 +26,27 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_comm_udp_olleh_hh_included_
 #define _csl_comm_udp_olleh_hh_included_
 
+#include "udp_hello.hh"
+#include "udp_srv_info.hh"
+#include "bignum.hh"
+#include "ecdh_key.hh"
 #include "udp_pkt.hh"
 #include "common.h"
 #ifdef __cplusplus
 
 namespace csl
 {
+  using sec::bignum;
+  using sec::ecdh_key;
+
   namespace comm
   {
     class udp_olleh : public udp_pkt
     {
       public:
+        bool init( const udp_hello & hello,
+                   const udp_srv_info & info,
+                   const bignum & privk );
       private:
     };
   }

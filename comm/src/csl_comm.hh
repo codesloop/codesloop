@@ -28,6 +28,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "session_data.hh"
 #include "cb.hh"
+#include "exc.hh"
 #include "udp_cli.hh"
 #include "udp_srv.hh"
 

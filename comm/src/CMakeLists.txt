@@ -45,16 +45,18 @@ ADD_LIBRARY( csl_comm STATIC
              udp_cli.cc           udp_cli.hh
              udp_srv.cc           udp_srv.hh
              udp_srv_info.cc      udp_srv_info.hh
-             udp_ack_rand.cc      udp_ack_rand.hh
-             udp_data.cc          udp_data.hh
+             udp_pkt.cc           udp_pkt.hh
+             udp_hello.cc         udp_hello.hh
+             udp_olleh.cc         udp_olleh.hh
              udp_mc_auth.cc       udp_mc_auth.hh
              udp_mc_auth_res.cc   udp_mc_auth_res.hh
-             udp_olleh.cc         udp_olleh.hh
-             udp_pkt.cc           udp_pkt.hh
+             udp_data.cc          udp_data.hh
+             udp_ack_rand.cc      udp_ack_rand.hh
              udp_reslt.cc         udp_reslt.hh
              udp_uc_auth.cc       udp_uc_auth.hh
              udp_uc_auth_res.cc   udp_uc_auth_res.hh
              cb.hh                csl_comm.hh
+             exc.cc               exc.hh
 	     )
 # -- EOF --
 

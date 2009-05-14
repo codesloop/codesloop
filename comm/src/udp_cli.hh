@@ -26,6 +26,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_comm_udp_cli_hh_included_
 #define _csl_comm_udp_cli_hh_included_
 
+#include "exc.hh"
 #include "pbuf.hh"
 #include "ecdh_key.hh"
 #include "bignum.hh"
@@ -56,6 +57,9 @@ namespace csl
         inline udp_cli() : port_(0), sock_(-1) {}
 
       private:
+        /* internal */
+        bool use_exc_;
+
         /* user should fill these */
         string             host_;
         unsigned short     port_;
@@ -105,6 +109,17 @@ namespace csl
         /* info */
         inline const udp_srv_info & server_info() const { return server_info_; }
         inline void server_info(const udp_srv_info & v) { server_info_ = v; }
+
+
+        /** @brief Specifies whether param should throw common::exc exceptions
+        @param yesno is the desired value to be set
+
+        the default value for use_exc() is true, so it throws exceptions by default */
+        inline void use_exc(bool yesno) { use_exc_ = yesno; }
+
+        /** @brief Returns the current value of use_exc
+        @return true if exc exceptions are used */
+        inline bool use_exc() const { return use_exc_; }
     };
   }
 }

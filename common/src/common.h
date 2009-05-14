@@ -109,6 +109,21 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         return RET; } } while(false);
 #endif /*THR*/
 
+#ifndef THRC
+#define THRC(REASON,COMPONENT,RET) \
+    do { \
+      if( this->use_exc() ) { \
+        char errstr[256]; \
+        throw exc(REASON,COMPONENT,strerror_r(errno,errstr,sizeof(errstr)),__FILE__,__LINE__); \
+        return RET; } \
+      else { \
+        fprintf(stderr,"Exception(%s:%d): [%s] [%s]\n", \
+            __FILE__,__LINE__, \
+            exc::component_string(COMPONENT), \
+            exc::reason_string(REASON)); \
+        return RET; } } while(false);
+#endif /*THRC*/
+
 #ifndef THREX
 #define THREX(E,RET) \
     do { \
@@ -180,6 +195,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # define CSL_STRING_H_INCLUDED
 # include <string.h>
 #endif /*CSL_STRING_H_INCLUDED*/
+
+#ifndef CSL_ERRNO_H_INCLUDED
+# define CSL_ERRNO_H_INCLUDED
+# include <errno.h>
+#endif /*CSL_ERRNO_H_INCLUDED*/
 
 #endif /* _csl_common_common_h_included_ */
 

@@ -23,17 +23,48 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "udp_olleh.hh"
+#include "udp_pkt.hh"
+#include "pbuf.hh"
+#include "xdrbuf.hh"
+#include "udp_hello.hh"
+#include "common.h"
 
 namespace csl
 {
+  using common::pbuf;
+  using common::xdrbuf;
+
   namespace comm
   {
-    bool udp_olleh::init( const udp_hello & hello,
-                          const udp_srv_info & info,
-                          const bignum & privk )
+    bool udp_hello::init( const unsigned char * buf,
+                          unsigned int size )
     {
-      return false; // TODO
+      if( !buf || !size )          { THR(exc::rs_empty_buffer,exc::cm_udp_hello,false); }
+
+      try
+      {
+        pbuf pb;
+        pb.append(buf,size);
+        xdrbuf xb(pb);
+
+        int32_t packet_type;
+        xb >> packet_type;
+
+        if( packet_type != udp_pkt::hello_p )
+        {
+          THR(exc::rs_internal_error,exc::cm_udp_hello,false);
+        }
+
+        if( !public_key_.from_xdr(xb) )
+        {
+          THR(exc::rs_xdr_error,exc::cm_udp_hello,false);
+        }
+      }
+      catch( common::exc e )
+      {
+        THR(exc::rs_xdr_error,exc::cm_udp_hello,false);
+      }
+      return true;
     }
   };
 };

@@ -47,13 +47,30 @@ namespace csl
     {
       public:
         enum {
-          rs_unknown,        ///<Unknown error.
+          rs_unknown,          ///<Unknown error.
+          rs_host_not_set,     ///<Required host parameter not set.
+          rs_port_not_set,     ///<Required port parameter not set.
+          rs_socket_failed,    ///<socket() call failed
+          rs_bind_failed,      ///<bind() call failed
+          rs_connect_failed,   ///<connect() call failed
+          rs_pubkey_empty,     ///<Required public key parameter not set.
+          rs_privkey_empty,    ///<Required private key parameter not set.
+          rs_xdr_error,        ///<XDR error.
+          rs_internal_error,   ///<Internal error.
+          rs_send_failed,      ///<send() call failed.
+          rs_recv_failed,      ///<recv() call failed.
+          rs_timeout,          ///<Timed out.
+          rs_select_failed,    ///<select() call failed.
+          rs_already_started,  ///<Already started.
+          rs_thread_start,     ///<Thread start failed.
+          rs_empty_buffer,     ///<Empty buffer supplied.
         };
 
         enum {
-          cm_unknown, ///<Unknown component
-          cm_udp_srv, ///<UDP server component
-          cm_udp_cli, ///<UDP client component
+          cm_unknown,    ///<Unknown component
+          cm_udp_srv,    ///<UDP server component
+          cm_udp_cli,    ///<UDP client component
+          cm_udp_hello,  ///<UDP Hello packet class
         };
 
         /** @brief converts reason code to string */

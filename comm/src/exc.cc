@@ -39,6 +39,22 @@ namespace csl
     {
       switch( rc )
       {
+        case rs_host_not_set:       return "Required host parameter not set.";
+        case rs_port_not_set:       return "Required port parameter not set.";
+        case rs_socket_failed:      return "<socket() call failed";
+        case rs_connect_failed:     return "connect() call failed";
+        case rs_bind_failed:        return "bind() call failed";
+        case rs_pubkey_empty:       return "Required public key parameter not set.";
+        case rs_privkey_empty:      return "Required private key parameter not set.";
+        case rs_xdr_error:          return "XDR error.";
+        case rs_internal_error:     return "Internal error.";
+        case rs_send_failed:        return "send() call failed.";
+        case rs_recv_failed:        return "recv() call failed.";
+        case rs_timeout:            return "Timed out.";
+        case rs_select_failed:      return "select() call failed.";
+        case rs_already_started:    return "Already started";
+        case rs_thread_start:       return "Thread start failed.";
+        case rs_empty_buffer:       return "Empty buffer supplied.";
         case rs_unknown:
           default:               return "Unknown reason";
       };
@@ -50,8 +66,9 @@ namespace csl
       {
         case cm_udp_srv:     return "comm::udp_srv";
         case cm_udp_cli:     return "comm::udp_cli";
+        case cm_udp_hello:   return "comm::udp_hello";
         case cm_unknown:
-          default:         return "unknown component";
+          default:           return "unknown component";
       };
     }
 

@@ -26,6 +26,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_comm_cb_hh_included_
 #define _csl_comm_cb_hh_included_
 
+#include "udp_srv_info.hh"
+#include "bignum.hh"
 #include "ecdh_key.hh"
 #ifdef __cplusplus
 #include <string>
@@ -33,6 +35,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace csl
 {
   using csl::sec::ecdh_key;
+  using csl::sec::bignum;
   using std::string;
 
   namespace comm
@@ -53,11 +56,10 @@ namespace csl
           public:
             virtual ~hello() {}
             virtual bool operator()( const ecdh_key & peer_public_key, // in
-                                  const string & host,              // in
-                                  unsigned short port,              // in
-                                  ecdh_key & my_public_key,         // out
-                                  bool & login_required,            // out
-                                  bool & pass_required ) = 0;       // out
+                                     const string & host,              // in
+                                     unsigned short port,              // in
+                                     udp_srv_info & info,              // out
+                                     bignum & my_private_key ) = 0;    // out
         };
 
         class valid_creds
