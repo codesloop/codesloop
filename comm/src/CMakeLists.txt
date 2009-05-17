@@ -56,6 +56,9 @@ ADD_LIBRARY( csl_comm STATIC
              udp_uc_auth.cc       udp_uc_auth.hh
              udp_uc_auth_res.cc   udp_uc_auth_res.hh
              cb.hh                csl_comm.hh
+             sock.cc              sock.hh
+             synchsock.cc         synchsock.hh
+             sockthr.cc           sockthr.hh
              exc.cc               exc.hh
 	     )
 # -- EOF --

@@ -61,5 +61,6 @@ ENDIF(WIN32)
 ADD_EXECUTABLE(t__comm_iface  t__comm_iface.cc)
 ADD_EXECUTABLE(t__udp_client  t__udp_client.cc)
 ADD_EXECUTABLE(t__udp_server  t__udp_server.cc)
+ADD_EXECUTABLE(t__synchsock   t__synchsock.cc)
 
 # -- EOF --

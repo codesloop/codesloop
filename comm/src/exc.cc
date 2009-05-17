@@ -67,6 +67,7 @@ namespace csl
         case cm_udp_srv:     return "comm::udp_srv";
         case cm_udp_cli:     return "comm::udp_cli";
         case cm_udp_hello:   return "comm::udp_hello";
+        case cm_synchsock:   return "comm::synchsock";
         case cm_unknown:
           default:           return "unknown component";
       };

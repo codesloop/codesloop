@@ -71,6 +71,7 @@ namespace csl
           cm_udp_srv,    ///<UDP server component
           cm_udp_cli,    ///<UDP client component
           cm_udp_hello,  ///<UDP Hello packet class
+          cm_synchsock,  ///<Synchronized socket container
         };
 
         /** @brief converts reason code to string */
