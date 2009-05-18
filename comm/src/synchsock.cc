@@ -44,42 +44,63 @@ namespace csl
     {
       socket_ = sck;
 
-      struct sockaddr_in addr;
-      bzero( &addr,sizeof(addr) );
+      bzero( &addr_,sizeof(addr_) );
 
       /* start a loopback UDP socket on a system chosen port */
-      addr.sin_family       = AF_INET;
-      addr.sin_addr.s_addr  = htonl(INADDR_LOOPBACK);
-      addr.sin_port         = 0;
+      addr_.sin_family       = AF_INET;
+      addr_.sin_addr.s_addr  = htonl(INADDR_LOOPBACK);
+      addr_.sin_port         = 0;
 
-      if( siglstnr_ != -1 ) { shutdown(siglstnr_,2); close(siglstnr_); }
-      if( sigsock_  != -1 ) { shutdown(sigsock_,2);  close(sigsock_);  }
+      if( siglstnr_ != -1 ) { ::shutdown(siglstnr_,2); ::close(siglstnr_); }
+      if( sigsock_  != -1 ) { ::shutdown(sigsock_,2);  ::close(sigsock_);  }
 
-      siglstnr_ = ::socket( AF_INET, SOCK_DGRAM, 0 );
-      sigsock_  = ::socket( AF_INET, SOCK_DGRAM, 0 );
+      siglstnr_ = ::socket( AF_INET, SOCK_STREAM, 0 );
+      sigsock_  = ::socket( AF_INET, SOCK_STREAM, 0 );
 
       if( siglstnr_ == -1 ) { THRC(exc::rs_socket_failed,exc::cm_synchsock,false); }
       if( sigsock_ == -1 )  { THRC(exc::rs_socket_failed,exc::cm_synchsock,false); }
 
-      if( bind(siglstnr_,(struct sockaddr *)&addr, sizeof(addr)) )
+      if( ::bind(siglstnr_,(struct sockaddr *)&addr_, sizeof(addr_)) )
       {
-        ::close( siglstnr_ );
+        ::close( siglstnr_ ); siglstnr_ = -1;
         THR(exc::rs_bind_failed,exc::cm_synchsock,false);
       }
 
-      socklen_t len = sizeof(addr);
+      socklen_t len = sizeof(addr_);
+      getsockname( siglstnr_,(struct sockaddr *)&addr_,&len );
 
-      if( ::connect(sigsock_, (struct sockaddr *)&addr, len) == -1 )
+      if( ::listen(siglstnr_,10) )
       {
-          ::close(sigsock_);
-          THRC(exc::rs_connect_failed,exc::cm_synchsock,false);
+        ::close( siglstnr_ ); siglstnr_ = -1;
+        THR(exc::rs_bind_failed,exc::cm_synchsock,false);
       }
 
       return true;
     }
 
+    synchsock::~synchsock()
+    {
+      wait_write();
+      {
+        scoped_mutex m(mtx_);
+        shutdown( siglstnr_, 2 );
+        shutdown( sigsock_, 2 );
+        ::close( siglstnr_ );
+        ::close( sigsock_ );
+        siglstnr_ = -1;
+        sigsock_  = -1;
+      }
+    }
+
+    bool synchsock::unlock()
+    {
+      return false;
+    }
+
     bool synchsock::wait_read(unsigned long ms)
     {
+      bool ret = false;
+
       struct timeval tv, *tvp;
 
       if( !ms ) tvp = 0;
@@ -95,15 +116,25 @@ namespace csl
       FD_SET( socket_, &fds );
       FD_SET( siglstnr_, &fds );
 
+      int max = socket_;
+      if( siglstnr_ > max ) max = siglstnr_;
+
+      if( sigcli_ > 0 )
+      {
+        FD_SET( sigcli_, &fds );
+        if( sigcli_ > max )  max = sigcli_;
+      }
+
       int err = 0;
 
-      {
-        scoped_mutex m(mtx_);
-        ::select( (socket_ > siglstnr_ ? (socket_+1) : (siglstnr_+1)), &fds, NULL, NULL, tvp );
-      }
+      printf("Start wait [%d]\n",mtx_.is_locked());
+      ev_.clear_available();
+      err = ::select( max+1, &fds, NULL, NULL, tvp );
+      printf("End wait [%d] ret=[%d]\n",mtx_.is_locked(),err);
 
       if( err < 0 )
       {
+        /* select error */
         THRC(exc::rs_select_failed,exc::cm_synchsock,false);
       }
       else if( err == 0 )
@@ -111,68 +142,100 @@ namespace csl
         /* timed out */
         return false;
       }
-      else if( FD_ISSET( socket_, &fds ) )
+
+      if( sigcli_ > 0 && FD_ISSET( sigcli_, &fds ) )
       {
-        /* the read descriptor is ready */
+        /* notify waiting writer */
+        ev_.notify();
 
-        /* check for the signal descriptor */
-        if( FD_ISSET( siglstnr_, &fds ) )
-        {
-          char t;
-          struct sockaddr_in addr;
-          socklen_t len = sizeof(addr);
-
-          if( ::recvfrom(siglstnr_, &t, 1, 0, (struct sockaddr *)&addr, &len) != 1 )
-          {
-            THRC(exc::rs_recv_failed,exc::cm_synchsock,false);
-          }
-        }
-
-        return true;
-      }
-      else if( FD_ISSET( siglstnr_, &fds ) )
-      {
-        /* the read descriptor is not ready but a signal was received */
+        /* notification received from the writer */
         char t;
-        struct sockaddr_in addr;
-        socklen_t len = sizeof(addr);
-
-        if( ::recvfrom(siglstnr_, &t, 1, 0, (struct sockaddr *)&addr, &len) != 1 )
+        printf("start recv\n");
+        if( (err=::recv( sigcli_, &t, 1, 0 )) != 1 )
         {
           THRC(exc::rs_recv_failed,exc::cm_synchsock,false);
         }
-        return false;
+        printf("end recv: %d\n",err);
       }
-      else
+
+      if( FD_ISSET( siglstnr_, &fds ) )
       {
-        return false;
+        /* notify waiting writer */
+        ev_.notify();
+
+        /* new connection to be accepted */
+        struct sockaddr_in cla;
+        socklen_t sl = sizeof(cla);
+        bzero( &cla,sizeof(cla) );
+
+        printf("start accept\n");
+        {
+          scoped_mutex m(mtx_);
+          sigcli_ = ::accept( siglstnr_,(struct sockaddr *)&cla,&sl );
+        }
+
+        printf("end accept: %d\n",sigcli_);
+
+        if( sigcli_ <= 0 )
+        {
+          THRC(exc::rs_accept_failed,exc::cm_synchsock,false);
+        }
       }
+
+      if( FD_ISSET( socket_, &fds ) )
+      {
+        printf("data arrived\n");
+        /* the read descriptor is ready */
+        ret = true;
+      }
+
+      SleepSeconds(0);
+      return ret;
     }
 
     bool synchsock::wait_write(unsigned long ms)
     {
-      if( mtx_.is_locked() )
+      int err = 0;
+
+      if( ev_.available_count() > 0 )
       {
-        // other thread is doing something with it
-        char t='?';
-        if( ::send(sigsock_, &t, 1, 0 ) != 1 )
-        {
-          THRC(exc::rs_send_failed,exc::cm_synchsock,false);
-        }
-        //
-        if( mtx_.lock(ms) == false )
-        {
-          return false;
-        }
-        else
-        {
-          mtx_.unlock();
-          return true;
-        }
+        return ev_.wait(ms);
       }
       else
       {
-        return true;
+        printf("sigcli: %d.\n",sigcli_);
+
+        if( sigcli_ == -1 )
+        {
+          printf("start connect\n");
+
+          if( ::connect(sigsock_, (struct sockaddr *)&addr_, sizeof(addr_)) == -1 )
+          {
+            ::close( sigsock_ );
+            THRC(exc::rs_connect_failed,exc::cm_synchsock,false);
+          }
+          else
+          {
+            printf("connected.\n");
+          }
+        }
+        else
+        {
+          char t='?';
+          printf("start send\n");
+
+          if( (err=::send(sigsock_, &t, 1, 0 )) != 1 )
+          {
+            printf("Send returned: %d\n",err);
+            perror("S");
+            THRC(exc::rs_send_failed,exc::cm_synchsock,false);
+          }
+          else
+          {
+            printf("sent.\n");
+          }
+        }
+        return ev_.wait(ms);
       }
     }
   };

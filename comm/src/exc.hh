@@ -52,6 +52,8 @@ namespace csl
           rs_port_not_set,     ///<Required port parameter not set.
           rs_socket_failed,    ///<socket() call failed
           rs_bind_failed,      ///<bind() call failed
+          rs_listen_failed,    ///<listen() call failed
+          rs_accept_failed,    ///<accept() call failed
           rs_connect_failed,   ///<connect() call failed
           rs_pubkey_empty,     ///<Required public key parameter not set.
           rs_privkey_empty,    ///<Required private key parameter not set.

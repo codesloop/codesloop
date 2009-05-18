@@ -44,6 +44,8 @@ namespace csl
         case rs_socket_failed:      return "<socket() call failed";
         case rs_connect_failed:     return "connect() call failed";
         case rs_bind_failed:        return "bind() call failed";
+        case rs_listen_failed:      return "listen() call failed";
+        case rs_accept_failed:      return "accept() call failed";
         case rs_pubkey_empty:       return "Required public key parameter not set.";
         case rs_privkey_empty:      return "Required private key parameter not set.";
         case rs_xdr_error:          return "XDR error.";

@@ -27,14 +27,14 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _csl_comm_synchsock_hh_included_
 
 #include "mutex.hh"
-//#include "event.hh"
+#include "event.hh"
 #include "common.h"
 #ifdef __cplusplus
 
 namespace csl
 {
   using nthread::mutex;
-//  using nthread::event;
+  using nthread::event;
 
   namespace comm
   {
@@ -44,17 +44,25 @@ namespace csl
         bool init(int sck);
         bool wait_read(unsigned long ms=0);
         bool wait_write(unsigned long ms=0);
+        bool unlock();
 
         inline int socket() const { return socket_; }
         inline mutex & mtx() { return mtx_; }
-        inline synchsock() : socket_(-1), siglstnr_(-1), sigsock_(-1), use_exc_(true) {}
+        inline synchsock() : socket_(-1), siglstnr_(-1), sigsock_(-1), sigcli_(-1), use_exc_(true) {}
+
+        virtual ~synchsock();
 
       private:
         mutex          mtx_;
+        event          ev_;
 
         int            socket_;     // working socket
         int            siglstnr_;   // notif listener
         int            sigsock_;    // notif sender
+        int            sigcli_;     // notif client
+
+        // internal events
+        struct sockaddr_in addr_;
 
         /* exceptions ?? */
         bool           use_exc_;
