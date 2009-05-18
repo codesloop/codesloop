@@ -57,6 +57,7 @@ namespace csl
         case rs_already_started:    return "Already started";
         case rs_thread_start:       return "Thread start failed.";
         case rs_empty_buffer:       return "Empty buffer supplied.";
+		case rs_wsa_startup:        return "WSAStartup failed.";
         case rs_unknown:
           default:               return "Unknown reason";
       };
@@ -70,6 +71,7 @@ namespace csl
         case cm_udp_cli:     return "comm::udp_cli";
         case cm_udp_hello:   return "comm::udp_hello";
         case cm_synchsock:   return "comm::synchsock";
+		case cm_wsa:         return "comm::wsa";
         case cm_unknown:
           default:           return "unknown component";
       };

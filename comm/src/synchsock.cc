@@ -27,9 +27,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mutex.hh"
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/time.h>
+#include <string.h>
 #include <sys/types.h>
-#include <sys/socket.h>
 #include "common.h"
 #include "synchsock.hh"
 
@@ -44,15 +43,15 @@ namespace csl
     {
       socket_ = sck;
 
-      bzero( &addr_,sizeof(addr_) );
+      memset( &addr_,0,sizeof(addr_) );
 
       /* start a loopback UDP socket on a system chosen port */
       addr_.sin_family       = AF_INET;
       addr_.sin_addr.s_addr  = htonl(INADDR_LOOPBACK);
       addr_.sin_port         = 0;
 
-      if( siglstnr_ != -1 ) { ::shutdown(siglstnr_,2); ::close(siglstnr_); }
-      if( sigsock_  != -1 ) { ::shutdown(sigsock_,2);  ::close(sigsock_);  }
+      if( siglstnr_ != -1 ) { ShutdownCloseSocket(siglstnr_); }
+      if( sigsock_  != -1 ) { ShutdownCloseSocket(sigsock_);  }
 
       siglstnr_ = ::socket( AF_INET, SOCK_STREAM, 0 );
       sigsock_  = ::socket( AF_INET, SOCK_STREAM, 0 );
@@ -62,7 +61,7 @@ namespace csl
 
       if( ::bind(siglstnr_,(struct sockaddr *)&addr_, sizeof(addr_)) )
       {
-        ::close( siglstnr_ ); siglstnr_ = -1;
+        ShutdownCloseSocket( siglstnr_ ); siglstnr_ = -1;
         THR(exc::rs_bind_failed,exc::cm_synchsock,false);
       }
 
@@ -71,7 +70,7 @@ namespace csl
 
       if( ::listen(siglstnr_,10) )
       {
-        ::close( siglstnr_ ); siglstnr_ = -1;
+        ShutdownCloseSocket( siglstnr_ ); siglstnr_ = -1;
         THR(exc::rs_bind_failed,exc::cm_synchsock,false);
       }
 
@@ -83,10 +82,8 @@ namespace csl
       wait_write();
       {
         scoped_mutex m(mtx_);
-        shutdown( siglstnr_, 2 );
-        shutdown( sigsock_, 2 );
-        ::close( siglstnr_ );
-        ::close( sigsock_ );
+        ShutdownCloseSocket( siglstnr_ );
+        ShutdownCloseSocket( sigsock_ );
         siglstnr_ = -1;
         sigsock_  = -1;
       }
@@ -166,7 +163,7 @@ namespace csl
         /* new connection to be accepted */
         struct sockaddr_in cla;
         socklen_t sl = sizeof(cla);
-        bzero( &cla,sizeof(cla) );
+        memset( &cla,0,sizeof(cla) );
 
         printf("start accept\n");
         {
@@ -211,7 +208,7 @@ namespace csl
 
           if( ::connect(sigsock_, (struct sockaddr *)&addr_, sizeof(addr_)) == -1 )
           {
-            ::close( sigsock_ );
+            ShutdownCloseSocket( sigsock_ );
             THRC(exc::rs_connect_failed,exc::cm_synchsock,false);
           }
           else

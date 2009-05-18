@@ -114,7 +114,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     do { \
       if( this->use_exc() ) { \
         char errstr[256]; \
-        throw exc(REASON,COMPONENT,strerror_r(errno,errstr,sizeof(errstr)),__FILE__,__LINE__); \
+		strncpy(errstr,strerror(errno),255); errstr[255]=0; \
+        throw exc(REASON,COMPONENT,errstr,__FILE__,__LINE__); \
         return RET; } \
       else { \
         fprintf(stderr,"Exception(%s:%d): [%s] [%s]\n", \
@@ -156,17 +157,35 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #  define CSL_ARPA_INET_H_INCLUDED
 #  include <arpa/inet.h>
 # endif /*CSL_ARPA_INET_H_INCLUDED*/
+# ifndef CSL_NETINET_IN_H_INCLUDED
+#  define CSL_NETINET_IN_H_INCLUDED
+#  include <netinet/in.h>
+# endif /*CSL_NETINET_IN_H_INCLUDED*/
 # ifndef CSL_UNISTD_H_INCLUDED
 #  define CSL_UNISTD_H_INCLUDED
 #  include <unistd.h>
 # endif /*CSL_UNISTD_H_INCLUDED*/
+# ifndef CSL_SYS_SOCKET_H_INCLUDED
+# define CSL_SYS_SOCKET_H_INCLUDED
+#include <sys/socket.h>
+# endif /*CSL_SYS_SOCKET_H_INCLUDED*/
+# ifndef CSL_SYS_TIME_H_INCLUDED
+# define CSL_SYS_TIME_H_INCLUDED
+#include <sys/time.h>
+#endif /*CSL_SYS_TIME_H_INCLUDED*/
 # ifndef SleepSeconds
 #  define SleepSeconds(A) ::sleep(A)
 # endif /*SleepSeconds*/
 # ifndef SleepMiliseconds
 #  define SleepMiliseconds(A) ::usleep(A*1000)
 # endif /*SleepMiliseconds*/
+# ifndef ShutdownCloseSocket
+#  define ShutdownCloseSocket(S) { ::shutdown(S,2); ::close(S); }
+# endif /*SleepMiliseconds*/
 #else
+# ifndef ShutdownCloseSocket
+#  define ShutdownCloseSocket(S) { ::shutdown(S,2); ::closesocket(S); }
+# endif /*SleepMiliseconds*/
 # ifndef CSL_WINDOWS_H_INCLUDED
 #  define CSL_WINDOWS_H_INCLUDED
 #  include <windows.h>
@@ -189,6 +208,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #  define CSL_UINT32_T_DEFINED
    typedef DWORD32 uint32_t;
 # endif /*CSL_UINT32_T_DEFINED*/
+# ifndef CSL_SOCKLEN_T_DEFINED
+# define CSL_SOCKLEN_T_DEFINED
+   typedef int socklen_t;
+# endif /*CSL_SOCKLEN_T_DEFINED*/
 #endif /* WIN32 */
 
 #ifndef CSL_STRING_H_INCLUDED

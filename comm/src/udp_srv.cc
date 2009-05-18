@@ -32,9 +32,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "udp_olleh.hh"
 #include "common.h"
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include <string.h>
 
 
@@ -60,7 +57,7 @@ namespace csl
       // wait packets
       while( true )
       {
-        recvd = recvfrom( socket_, buffer, sizeof(buffer), 0, (struct sockaddr *)&cliaddr, &len );
+        recvd = recvfrom( socket_, (char *)buffer, sizeof(buffer), 0, (struct sockaddr *)&cliaddr, &len );
         fprintf( stderr,"Received %d bytes [%s]\n",recvd,buffer);
 
         try
@@ -135,7 +132,7 @@ namespace csl
 
     udp_srv::server_entry::~server_entry()
     {
-      if( socket_ > 0 ) close( socket_ );
+      if( socket_ > 0 ) ShutdownCloseSocket( socket_ );
       socket_ = -1;
     }
 
@@ -165,7 +162,7 @@ namespace csl
       if( sock <= 0 ) { THR(exc::rs_socket_failed,exc::cm_udp_srv,false); }
 
       struct sockaddr_in srv_addr;
-      bzero( &srv_addr,sizeof(srv_addr) );
+      memset( &srv_addr,0,sizeof(srv_addr) );
 
       srv_addr.sin_family = AF_INET;
       srv_addr.sin_addr.s_addr = htonl(INADDR_ANY); // TODO resolve hostname
@@ -173,7 +170,7 @@ namespace csl
 
       if( bind(sock,(struct sockaddr *)&srv_addr, sizeof(srv_addr)) )
       {
-        close( sock );
+        ShutdownCloseSocket( sock );
         THR(exc::rs_bind_failed,exc::cm_udp_srv,false);
       }
 

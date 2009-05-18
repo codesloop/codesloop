@@ -30,9 +30,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "udp_cli.hh"
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/time.h>
+#include <string.h>
 #include <sys/types.h>
-#include <sys/socket.h>
 #include "common.h"
 
 namespace csl
@@ -57,7 +56,7 @@ namespace csl
       if( sock <= 0 ) { THRC(exc::rs_socket_failed,exc::cm_udp_cli,false); }
 
       struct sockaddr_in srv_addr;
-      bzero( &srv_addr,sizeof(srv_addr) );
+      memset( &srv_addr,0,sizeof(srv_addr) );
 
       srv_addr.sin_family = AF_INET;
       srv_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK); // TODO resolve hostname
@@ -67,7 +66,7 @@ namespace csl
 
       if( ::connect(sock, (struct sockaddr *)&srv_addr, len) == -1 )
       {
-        ::close(sock);
+        ShutdownCloseSocket(sock);
         THRC(exc::rs_connect_failed,exc::cm_udp_cli,false);
       }
 
@@ -103,7 +102,7 @@ namespace csl
 
       pbuf::const_iterator it = pb.const_begin();
 
-      if( (err=::send( sock_, (*it)->data_, (*it)->size_ , 0 )) != (int)(*it)->size_ )
+      if( (err=::send( sock_, (const char *)(*it)->data_, (*it)->size_ , 0 )) != (int)(*it)->size_ )
       {
         perror("write");
         fprintf(stderr,"send(%d, '%d bytes') => %d\n",sock_,(*it)->size_,err);
@@ -129,7 +128,7 @@ namespace csl
       if( err > 0 )
       {
         unsigned char tmp[65536];
-        err = ::recv(sock_,tmp,sizeof(tmp),0);
+        err = ::recv(sock_,(char *)tmp,sizeof(tmp),0);
         //
         if( err > 0 )
         {

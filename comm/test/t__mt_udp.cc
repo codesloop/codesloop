@@ -28,10 +28,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify multithreading and udp socket interworking
  */
 
+#include "wsa.hh"
 #include "thread.hh"
 #include "event.hh"
 #include "mutex.hh"
 #include "test_timer.h"
+#include "common.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,7 +41,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <list>
 
 using namespace csl::nthread;
-//using namespace csl::comm;
+using namespace csl::comm;
 
 /** @brief contains tests related to comm interface */
 namespace test_mt_udp {
@@ -61,7 +63,7 @@ namespace test_mt_udp {
 
       virtual ~entry()
       {
-        if( socket_ > 0 ) { ::shutdown(socket_,2); ::close(socket_); }
+        if( socket_ > 0 ) { ShutdownCloseSocket(socket_); }
         socket_ = -1;
       }
 
@@ -137,7 +139,7 @@ namespace test_mt_udp {
         {
           char t;
           struct sockaddr_in addr;
-          socklen_t  len=sizeof(addr);
+          socklen_t len=sizeof(addr);
           memset( &addr,0,sizeof(addr) );
 
           fd_set fds;
@@ -211,8 +213,7 @@ namespace test_mt_udp {
         if( reader_thread_.exit_event().wait(2000) == false )
         {
            printf("X, Closing sockets\n");
-           shutdown( socket_, 2 );
-           close( socket_ );
+           ShutdownCloseSocket( socket_ );
            socket_ = -1;
         }
         printf("3, End\n");
@@ -241,8 +242,33 @@ namespace test_mt_udp {
         while( stop_me_ == false )
         {
           char t='0';
-          if( send( socket_,&t,1,0 ) == 1 ) { ++sent_; }
-          if( recv( socket_,&t,1,0 ) == 1 ) { ++recvd_; }
+		  int err;
+
+          fd_set fds;
+          FD_ZERO( &fds );
+          FD_SET( socket_,&fds );
+
+          struct timeval tv = { 0,600000 };
+
+          if( (err=send( socket_,&t,1,0 )) == 1 ) { ++sent_; }
+		  else
+		  {
+			  printf("Send error.\n");
+			  break;
+		  }
+
+          if( (err=select(socket_+1,&fds,NULL,NULL,&tv)) > 0 &&
+			  (err=recv( socket_,&t,1,0 )) == 1 )
+		  {
+			  ++recvd_;
+		  }
+		  else if( err == 0 ) { /* timeout */ }
+		  else
+		  {
+			  printf("Select error.\n");
+			  break;
+		  }
+
         }
         printf("%p client sent:     %d\n",this,sent_);
         printf("%p client received: %d\n",this,recvd_);
@@ -296,11 +322,11 @@ namespace test_mt_udp {
     client_entry4.stop();
     server_entry.stop();
 
-    assert( cli1.exit_event().wait(3000) == true );
-    assert( cli2.exit_event().wait(3000) == true );
-    assert( cli3.exit_event().wait(3000) == true );
-    assert( cli4.exit_event().wait(3000) == true );
-    assert( srv.exit_event().wait(3000) == true );
+    assert( cli1.exit_event().wait(30000) == true );
+    assert( cli2.exit_event().wait(30000) == true );
+    assert( cli3.exit_event().wait(30000) == true );
+    assert( cli4.exit_event().wait(30000) == true );
+    assert( srv.exit_event().wait(30000) == true );
   }
 
 } // end of test_mt_udp
@@ -309,6 +335,7 @@ using namespace test_mt_udp;
 
 int main()
 {
+  wsa w;
   basic();
   return 0;
 }

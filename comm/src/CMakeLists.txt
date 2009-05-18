@@ -60,6 +60,7 @@ ADD_LIBRARY( csl_comm STATIC
              synchsock.cc         synchsock.hh
              sockthr.cc           sockthr.hh
              exc.cc               exc.hh
+             wsa.cc               wsa.hh
 	     )
 # -- EOF --
 

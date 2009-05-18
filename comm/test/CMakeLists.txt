@@ -21,19 +21,28 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-LINK_DIRECTORIES( ../src
-                  ../../nthread/src
-                  ../../sec/src
-                  ../../common/src 
-                )
-
-INCLUDE_DIRECTORIES( ../src
-                     ../../nthread/src
-                     ../../sec/src
-                     ../../common/src 
-                   )
-
 IF(WIN32)
+
+  LINK_DIRECTORIES( ../src
+                    ../../nthread/src
+                    ../../sec/src
+                    ../../common/src
+                    $ENV{OPENSSL_DEV_ENV}/lib/VC/static
+                    ../../../3rdparty/OpenSSL/lib/VC/static
+                    $ENV{ZLIB_DEV_ENV}/lib
+                    ../../../3rdparty/zlib/GnuWin32/lib
+                  )
+
+  INCLUDE_DIRECTORIES( ../src
+                       ../../nthread/src
+                       ../../sec/src
+                       ../../common/src
+                       $ENV{OPENSSL_DEV_ENV}/include
+                       ../../../3rdparty/OpenSSL/include
+                       $ENV{ZLIB_DEV_ENV}/include
+                       ../../../3rdparty/zlib/GnuWin32/include
+                     )
+
   LINK_LIBRARIES( csl_comm
                   csl_sec
                   csl_nthread
@@ -45,6 +54,19 @@ IF(WIN32)
                 )
 
 ELSE(WIN32)
+
+  LINK_DIRECTORIES( ../src
+                    ../../nthread/src
+                    ../../sec/src
+                    ../../common/src 
+                  )
+
+  INCLUDE_DIRECTORIES( ../src
+                       ../../nthread/src
+                       ../../sec/src
+                       ../../common/src 
+                     )
+
   ADD_DEFINITIONS( -Wall -g3 -pthread )
   LINK_LIBRARIES( csl_comm
                   csl_sec

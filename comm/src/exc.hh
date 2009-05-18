@@ -66,6 +66,7 @@ namespace csl
           rs_already_started,  ///<Already started.
           rs_thread_start,     ///<Thread start failed.
           rs_empty_buffer,     ///<Empty buffer supplied.
+		  rs_wsa_startup,      ///<Windows WSA Startup failed
         };
 
         enum {
@@ -74,6 +75,7 @@ namespace csl
           cm_udp_cli,    ///<UDP client component
           cm_udp_hello,  ///<UDP Hello packet class
           cm_synchsock,  ///<Synchronized socket container
+		  cm_wsa,        ///<WSA
         };
 
         /** @brief converts reason code to string */
