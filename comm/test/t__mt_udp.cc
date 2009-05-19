@@ -130,8 +130,9 @@ namespace test_mt_udp {
       int      socket_;
       writer * w_;
       int      recvd_;
+      int      timeout_;
 
-      reader() : stop_me_(false), socket_(-1), w_(0), recvd_(0) {}
+      reader() : stop_me_(false), socket_(-1), w_(0), recvd_(0), timeout_(0) {}
 
       virtual void operator()(void)
       {
@@ -150,14 +151,26 @@ namespace test_mt_udp {
 
           int err = 0;
 
-          if( select(socket_+1,&fds,NULL,NULL,&tv) > 0 &&
-              (err=recvfrom( socket_,&t,1,0,(struct sockaddr *)&addr,&len )) == 1 )
+          if( (err=select(socket_+1,&fds,NULL,NULL,&tv)) > 0 )
           {
-            ++recvd_;
-            w_->add( addr );
+            if( (err=recvfrom( socket_,&t,1,0,(struct sockaddr *)&addr,&len )) == 1 )
+            {
+              ++recvd_;
+              w_->add( addr );
+            }
+            else
+            {
+              /* recv error */
+              break;
+            }
           }
           else if( err == 0 )
           {
+            ++timeout_;
+          }
+          else
+          {
+            /* select error */
             break;
           }
         }
@@ -201,6 +214,7 @@ namespace test_mt_udp {
 
         printf("Server received: %d\n",reader_entry_.recvd_);
         printf("Server sent:     %d\n",writer_entry_.sent_);
+        printf("Server timeout:  %d\n",reader_entry_.timeout_);
 
         writer_entry_.stop_me_ = true;
         reader_entry_.stop_me_ = true;
@@ -242,7 +256,7 @@ namespace test_mt_udp {
         while( stop_me_ == false )
         {
           char t='0';
-		  int err;
+          int err;
 
           fd_set fds;
           FD_ZERO( &fds );
@@ -251,35 +265,46 @@ namespace test_mt_udp {
           struct timeval tv = { 0,600000 };
 
           if( (err=send( socket_,&t,1,0 )) == 1 ) { ++sent_; }
-		  else
-		  {
-			  printf("Send error.\n");
-			  break;
-		  }
+          else
+          {
+            printf("Send error.\n");
+            break;
+          }
 
-          if( (err=select(socket_+1,&fds,NULL,NULL,&tv)) > 0 &&
-			  (err=recv( socket_,&t,1,0 )) == 1 )
-		  {
-			  ++recvd_;
-		  }
-		  else if( err == 0 ) { /* timeout */ }
-		  else
-		  {
-			  printf("Select error.\n");
-			  break;
-		  }
-
+          if( (err=select(socket_+1,&fds,NULL,NULL,&tv)) > 0 )
+          {
+            if( (err=recv( socket_,&t,1,0 )) == 1 )
+            {
+              ++recvd_;
+            }
+            else
+            {
+              /* recv error */
+              break;
+            }
+          }
+          else if( err == 0 )
+          {
+            ++timeout_;
+          }
+          else
+          {
+            printf("Select error.\n");
+            break;
+          }
         }
         printf("%p client sent:     %d\n",this,sent_);
         printf("%p client received: %d\n",this,recvd_);
+        printf("%p client timeout:  %d\n",this,timeout_);
       }
 
-      client() : sent_(0), recvd_(0) {}
+      client() : sent_(0), recvd_(0), timeout_(0) {}
 
     private:
       struct sockaddr_in addr_;
       int sent_;
       int recvd_;
+      int timeout_;
   };
 
   void basic()

@@ -23,51 +23,29 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_comm_udp_hello_hh_included_
-#define _csl_comm_udp_hello_hh_included_
+#ifndef _csl_comm_udp_data_entry_hh_included_
+#define _csl_comm_udp_data_entry_hh_included_
 
-#include "exc.hh"
-#include "ecdh_key.hh"
+#include "udp_srv_entry.hh"
+#include "cb.hh"
 #include "common.h"
 #ifdef __cplusplus
 
 namespace csl
 {
-  using sec::ecdh_key;
-
   namespace comm
   {
-    class udp_hello
+    class udp_srv;
+
+    class udp_data_entry : public udp_srv_entry
     {
       public:
-        bool init( const unsigned char * buf,
-                   unsigned int size );
-
-        inline udp_hello() : use_exc_(true) {}
-
-      private:
-        /* internal */
-        bool use_exc_;
-
-        /* to be init()-ed */
-        ecdh_key public_key_;
-
-      public:
-        /* public key */
-        inline const ecdh_key & public_key() const { return public_key_; }
-
-        /** @brief Specifies whether param should throw comm::exc exceptions
-        @param yesno is the desired value to be set
-
-        the default value for use_exc() is true, so it throws exceptions by default */
-        inline void use_exc(bool yesno) { use_exc_ = yesno; }
-
-        /** @brief Returns the current value of use_exc
-        @return true if exc exceptions are used */
-        inline bool use_exc() const { return use_exc_; }
+        virtual void operator()(void);
+        virtual ~udp_data_entry();
+        udp_data_entry(udp_srv & srv);
     };
   }
 }
 
 #endif /* __cplusplus */
-#endif /* _csl_comm_udp_hello_hh_included_ */
+#endif /* _csl_comm_udp_data_entry_hh_included_ */

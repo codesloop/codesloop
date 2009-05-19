@@ -1,9 +1,9 @@
 # Copyright (c) 2008,2009, David Beck
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
-# 
+#
 # 1. Redistributions of source code must retain the above copyright
 #    notice, this list of conditions and the following disclaimer.
 # 2. Redistributions in binary form must reproduce the above copyright
@@ -44,10 +44,12 @@ ADD_LIBRARY( csl_comm STATIC
              udp_chann_queue.cc   udp_chann_queue.hh
              udp_cli.cc           udp_cli.hh
              udp_srv.cc           udp_srv.hh
+             udp_srv_entry.cc     udp_srv_entry.hh
+             udp_hello_entry.cc   udp_hello_entry.hh
+             udp_auth_entry.cc    udp_auth_entry.hh
+             udp_data_entry.cc    udp_data_entry.hh
              udp_srv_info.cc      udp_srv_info.hh
              udp_pkt.cc           udp_pkt.hh
-             udp_hello.cc         udp_hello.hh
-             udp_olleh.cc         udp_olleh.hh
              udp_mc_auth.cc       udp_mc_auth.hh
              udp_mc_auth_res.cc   udp_mc_auth_res.hh
              udp_data.cc          udp_data.hh
@@ -56,9 +58,6 @@ ADD_LIBRARY( csl_comm STATIC
              udp_uc_auth.cc       udp_uc_auth.hh
              udp_uc_auth_res.cc   udp_uc_auth_res.hh
              cb.hh                csl_comm.hh
-             sock.cc              sock.hh
-             synchsock.cc         synchsock.hh
-             sockthr.cc           sockthr.hh
              exc.cc               exc.hh
              wsa.cc               wsa.hh
 	     )

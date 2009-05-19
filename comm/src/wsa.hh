@@ -36,11 +36,12 @@ namespace csl
     class wsa
     {
       public:
-	    wsa();
-		~wsa();
-	  private:
-		wsa(const wsa & other) {}
-		wsa & operator=(const wsa & other) { return *this; }
+        wsa();
+        ~wsa();
+
+      private:
+        wsa(const wsa & other) {}
+        wsa & operator=(const wsa & other) { return *this; }
     };
   }
 }

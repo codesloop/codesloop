@@ -23,50 +23,37 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "udp_pkt.hh"
-#include "pbuf.hh"
-#include "xdrbuf.hh"
-#include "udp_hello.hh"
+#ifndef _csl_comm_udp_hello_entry_hh_included_
+#define _csl_comm_udp_hello_entry_hh_included_
+
+#include "udp_srv_entry.hh"
+#include "cb.hh"
 #include "common.h"
+#ifdef __cplusplus
 
 namespace csl
 {
-  using common::pbuf;
-  using common::xdrbuf;
-
   namespace comm
   {
-    bool udp_hello::init( const unsigned char * buf,
-                          unsigned int size )
+    class udp_srv;
+
+    class udp_hello_entry : public udp_srv_entry
     {
-      if( !buf || !size )          { THR(exc::rs_empty_buffer,exc::cm_udp_hello,false); }
+      public:
+        virtual void operator()(void);
+        virtual ~udp_hello_entry();
 
-      try
-      {
-        pbuf pb;
-        pb.append(buf,size);
-        xdrbuf xb(pb);
+        udp_hello_entry( udp_srv & srv );
 
-        int32_t packet_type;
-        xb >> packet_type;
+        void valid_key_cb( cb::valid_key & vkcb );
+        void hello_cb( cb::hello & hcb );
 
-        if( packet_type != udp_pkt::hello_p )
-        {
-          THR(exc::rs_internal_error,exc::cm_udp_hello,false);
-        }
+      private:
+        cb::valid_key    * valid_key_cb_;
+        cb::hello        * hello_cb_;
+    };
+  }
+}
 
-        if( !public_key_.from_xdr(xb) )
-        {
-          THR(exc::rs_xdr_error,exc::cm_udp_hello,false);
-        }
-      }
-      catch( common::exc e )
-      {
-        THR(exc::rs_xdr_error,exc::cm_udp_hello,false);
-      }
-      return true;
-    }
-  };
-};
-
-/* EOF */
+#endif /* __cplusplus */
+#endif /* _csl_comm_udp_hello_entry_hh_included_ */

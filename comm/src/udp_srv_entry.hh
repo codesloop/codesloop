@@ -23,46 +23,66 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_comm_synchsock_hh_included_
-#define _csl_comm_synchsock_hh_included_
+#ifndef _csl_comm_udp_srv_entry_hh_included_
+#define _csl_comm_udp_srv_entry_hh_included_
 
+#include "exc.hh"
+#include "thread.hh"
 #include "mutex.hh"
-#include "event.hh"
+#include "cb.hh"
+#include "udp_srv_info.hh"
 #include "common.h"
 #ifdef __cplusplus
+#include <string>
 
 namespace csl
 {
+  using std::string;
+  using nthread::thread;
+  using nthread::mutex;
+
   namespace comm
   {
-    class synchsock
+    class udp_srv;
+
+    class udp_srv_entry : public thread::callback
     {
       public:
+        /* typedefs */
         typedef struct sockaddr_in SAI;
 
-        bool init(int sck);
-        bool wait_read(unsigned int ms);
-        bool wait_write(unsigned int ms);
+        virtual void operator()(void) = 0;
+        virtual ~udp_srv_entry();
+        virtual bool start();
 
-        inline mutex & mtx() { return mtx_; }
-        inline synchsock() : socket_(-1), siglstnr_(-1), sigsock_(-1) {}
+        udp_srv_entry(udp_srv & srv);
+
+        virtual bool stop_me();
+        virtual void stop_me(bool yesno);
+
+        /* addr */
+        virtual const SAI & addr() const;
+        virtual void addr(const SAI & a);
+
+        /* socket */
+        virtual int socket() const;
+
+        /* parent: udp_srv */
+        virtual udp_srv & srv();
+
+        /* exc */
+        bool use_exc() const;
 
       private:
-        mutex          mtx_;
-        event          read_evt_;
-        event          write_evt_;
-
-        int            socket_;     // working socket
-        int            siglstnr_;   // notif listener
-        int            sigsock_;    // notif sender
-        SAI            addr_;       // address of notif socket
-
-        /* no copy */
-        synchsock & operator(const synchsock & other) { return *this; }
-        synchsock(const synchsock & other) {}
+        udp_srv *       srv_;
+        SAI             addr_;
+        int             socket_;
+        bool            stop_me_;
+        bool            use_exc_;
+        mutex           mtx_;
     };
   }
 }
 
 #endif /* __cplusplus */
-#endif /* _csl_comm_synchsock_hh_included_ */
+#endif /* _csl_comm_udp_srv_entry_hh_included_ */

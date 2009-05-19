@@ -149,7 +149,6 @@ namespace csl
           size_ = 0;
         }
 
-
         /** @brief tests if equal
 
         iterates over each buffer and compares them one by one

@@ -28,8 +28,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "xdrbuf.hh"
 #include "udp_srv.hh"
 #include "udp_pkt.hh"
-#include "udp_hello.hh"
-#include "udp_olleh.hh"
 #include "common.h"
 #include <sys/types.h>
 #include <string.h>
@@ -42,6 +40,7 @@ namespace csl
     using common::pbuf;
     using common::xdrbuf;
 
+#if 0
     void udp_srv::server_entry::operator()(void)
     {
       struct sockaddr_in   cliaddr;
@@ -130,58 +129,86 @@ namespace csl
       }
     }
 
-    udp_srv::server_entry::~server_entry()
-    {
-      if( socket_ > 0 ) ShutdownCloseSocket( socket_ );
-      socket_ = -1;
-    }
+
+#endif
 
     bool udp_srv::start()
     {
-      server_thread_.set_entry(server_entry_);
-
-      /* already started ( TODO may be finished too ) */
-      if( server_thread_.is_started() ) { THR(exc::rs_already_started,exc::cm_udp_srv,false); }
-
-      /* host name has been set ? */
-      if( host_.empty() ) { THR(exc::rs_host_not_set,exc::cm_udp_srv,false); }
-
-      /* port has been set ? */
-      if( port_ == 0 ) { THR(exc::rs_port_not_set,exc::cm_udp_srv,false); }
-
       /* private_key has been set ? */
       if( private_key_.is_empty() ) { THR(exc::rs_privkey_empty,exc::cm_udp_srv,false); }
 
       /* server_info_.public_key has been set ? */
       if( server_info_.public_key().is_empty() ) { THR(exc::rs_pubkey_empty,exc::cm_udp_srv,false); }
 
-      /* is already running ? */
-      if( server_entry_.socket_ != -1 ) { THR(exc::rs_already_started,exc::cm_udp_srv,false); }
-
-      int sock = socket( AF_INET, SOCK_DGRAM, 0 );
-      if( sock <= 0 ) { THR(exc::rs_socket_failed,exc::cm_udp_srv,false); }
-
-      struct sockaddr_in srv_addr;
-      memset( &srv_addr,0,sizeof(srv_addr) );
-
-      srv_addr.sin_family = AF_INET;
-      srv_addr.sin_addr.s_addr = htonl(INADDR_ANY); // TODO resolve hostname
-      srv_addr.sin_port = htons(port_);
-
-      if( bind(sock,(struct sockaddr *)&srv_addr, sizeof(srv_addr)) )
+      /* already started ( TODO may be finished too ) */
+      if( hello_thread_.is_started() || auth_thread_.is_started() || data_thread_.is_started() )
       {
-        ShutdownCloseSocket( sock );
-        THR(exc::rs_bind_failed,exc::cm_udp_srv,false);
+        THR(exc::rs_already_started,exc::cm_udp_srv,false);
       }
 
-      server_entry_.socket_ = sock;
+      /* init threads */
+      hello_thread_.set_entry(hello_entry_);
+      auth_thread_.set_entry(auth_entry_);
+      data_thread_.set_entry(data_entry_);
 
-      /* launch thread */
-      if( !server_thread_.start() ) { THR(exc::rs_thread_start,exc::cm_udp_srv,false); }
+      /* init entries */
+      if( !hello_entry_.start() || !auth_entry_.start() || !data_entry_.start() )
+      {
+        return false;
+      }
 
-      /* wait for thread to be started */
-      return server_thread_.start_event().wait( 10000 );
+      /* start hello thread */
+      if( hello_thread_.start() == false ) { THR(exc::rs_thread_start,exc::cm_udp_srv,false); }
+
+      /* start auth thread */
+      if( auth_thread_.start() == false ) { THR(exc::rs_thread_start,exc::cm_udp_srv,false); }
+
+      /* start data thread */
+      if( data_thread_.start() == false ) { THR(exc::rs_thread_start,exc::cm_udp_srv,false); }
+
+      return ( hello_thread_.start_event().wait( 3000 ) &&
+          data_thread_.start_event().wait( 3000 ) &&
+          auth_thread_.start_event().wait( 3000 ) );
     }
+
+    udp_srv::udp_srv() : hello_entry_(*this), auth_entry_(*this), data_entry_(*this)
+    {
+    }
+
+    udp_srv::~udp_srv()
+    {
+      hello_entry_.stop_me();
+      auth_entry_.stop_me();
+      data_entry_.stop_me();
+
+      hello_thread_.exit_event().wait( 1500 );
+      data_thread_.exit_event().wait( 1500 );
+      auth_thread_.exit_event().wait( 1500 );
+    }
+
+    void udp_srv::valid_key_cb(cb::valid_key & c)
+    {
+      hello_entry_.valid_key_cb( c );
+      // TODO
+    }
+
+    void udp_srv::hello_cb(cb::hello & c)
+    {
+      hello_entry_.hello_cb( c );
+    }
+
+    void udp_srv::valid_creds_cb(cb::valid_creds & c)
+    {
+      // TODO
+    }
+
+    const udp_srv::SAI & udp_srv::hello_addr() const { return hello_entry_.addr(); }
+    const udp_srv::SAI & udp_srv::auth_addr() const  { return auth_entry_.addr();  }
+    const udp_srv::SAI & udp_srv::data_addr() const  { return data_entry_.addr();  }
+
+    void udp_srv::hello_addr(const udp_srv::SAI & a) { return hello_entry_.addr(a); }
+    void udp_srv::auth_addr(const udp_srv::SAI & a)  { return auth_entry_.addr(a);  }
+    void udp_srv::data_addr(const udp_srv::SAI & a)  { return data_entry_.addr(a);  }
   };
 };
 

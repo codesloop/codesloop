@@ -23,24 +23,31 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "sockthr.hh"
+#include "exc.hh"
+#include "udp_srv.hh"
+#include "udp_auth_entry.hh"
+#include "common.h"
+#include <sys/types.h>
+#include <string.h>
 
 namespace csl
 {
   namespace comm
   {
-    void sockthr::entry::operator()(void) {}
-    bool sockthr::entry::send(const item & it) { return false; }
-    bool sockthr::entry::recv(item & it) { return false; }
-    void sockthr::entry::conn_loop() {}
-    void sockthr::entry::noconn_loop() {}
-
-    bool sockthr::entry::init(int sock, bool is_connected)
+    void udp_auth_entry::operator()(void)
     {
-      socket_ = sock;
-      connected_ = is_connected;
+      while( stop_me() == false )
+      {
+        SleepSeconds( 1 );
+      }
+    }
 
-      return false;
+    udp_auth_entry::~udp_auth_entry()
+    {
+    }
+
+    udp_auth_entry::udp_auth_entry( udp_srv & srv ) : udp_srv_entry(srv)
+    {
     }
   };
 };

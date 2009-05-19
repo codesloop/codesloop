@@ -23,17 +23,31 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "udp_olleh.hh"
+#include "exc.hh"
+#include "udp_srv.hh"
+#include "udp_data_entry.hh"
+#include "common.h"
+#include <sys/types.h>
+#include <string.h>
 
 namespace csl
 {
   namespace comm
   {
-    bool udp_olleh::init( const udp_hello & hello,
-                          const udp_srv_info & info,
-                          const bignum & privk )
+    void udp_data_entry::operator()(void)
     {
-      return false; // TODO
+      while( stop_me() == false )
+      {
+        SleepSeconds( 1 );
+      }
+    }
+
+    udp_data_entry::~udp_data_entry()
+    {
+    }
+
+    udp_data_entry::udp_data_entry( udp_srv & srv ) : udp_srv_entry(srv)
+    {
     }
   };
 };

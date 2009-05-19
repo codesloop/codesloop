@@ -58,7 +58,7 @@ ELSE(WIN32)
   LINK_DIRECTORIES( ../src
                     ../../nthread/src
                     ../../sec/src
-                    ../../common/src 
+                    ../../common/src
                   )
 
   INCLUDE_DIRECTORIES( ../src
@@ -84,6 +84,5 @@ ADD_EXECUTABLE(t__comm_iface  t__comm_iface.cc)
 ADD_EXECUTABLE(t__mt_udp      t__mt_udp.cc)
 ADD_EXECUTABLE(t__udp_client  t__udp_client.cc)
 ADD_EXECUTABLE(t__udp_server  t__udp_server.cc)
-ADD_EXECUTABLE(t__synchsock   t__synchsock.cc)
 
 # -- EOF --

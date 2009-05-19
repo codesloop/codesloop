@@ -45,8 +45,20 @@ namespace test_udp_server {
   void basic()
   {
     udp_srv s;
-    s.host("localhost");
-    s.port(48781);
+    udp_srv::SAI h,a,d;
+
+    memset( &h,0,sizeof(h) );
+    h.sin_family       = AF_INET;
+    h.sin_addr.s_addr  = htonl(INADDR_LOOPBACK);
+    h.sin_port         = htons(47781);
+
+    a = d = h;
+    a.sin_port = htons(47782);
+    d.sin_port = htons(47783);
+
+    s.hello_addr( h );
+    s.auth_addr( a );
+    s.data_addr( d );
 
     ecdh_key pubkey;
     bignum   privkey;

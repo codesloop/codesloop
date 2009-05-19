@@ -50,7 +50,7 @@ namespace csl
         typedef common::tbuf<1024>    buf1024_t;
 
         typedef buf8_t      saltbuf_t;
-        typedef buf16_t     keybuf_t;
+        typedef buf64_t     keybuf_t;
         typedef buf8_t      headbuf_t;
         typedef buf1024_t   databuf_t;
         typedef buf8_t      footbuf_t;

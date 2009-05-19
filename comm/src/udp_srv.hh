@@ -28,10 +28,14 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "exc.hh"
 #include "thread.hh"
+#include "mutex.hh"
 #include "cb.hh"
 #include "ecdh_key.hh"
 #include "bignum.hh"
 #include "udp_srv_info.hh"
+#include "udp_hello_entry.hh"
+#include "udp_auth_entry.hh"
+#include "udp_data_entry.hh"
 #include "common.h"
 #ifdef __cplusplus
 #include <string>
@@ -42,71 +46,59 @@ namespace csl
   using sec::bignum;
   using std::string;
   using nthread::thread;
+  using nthread::mutex;
 
   namespace comm
   {
     class udp_srv
     {
       public:
+        /* typedefs */
+        typedef struct sockaddr_in SAI;
 
         bool start();
-
-        inline udp_srv()
-        : port_(0), valid_key_cb_(0), hello_cb_(0), valid_creds_cb_(0), server_entry_(*this) {}
+        udp_srv();
+        virtual ~udp_srv();
 
       private:
         /* internal */
         bool use_exc_;
 
         /* user should fill these */
-        string             host_;
-        unsigned short     port_;
         bignum             private_key_;
         udp_srv_info       server_info_;
 
+#if 0
         /* callbacks */
         cb::valid_key    * valid_key_cb_;
         cb::hello        * hello_cb_;
         cb::valid_creds  * valid_creds_cb_;
+#endif
 
-        /* server thread */
-        class server_entry : public thread::callback
-        {
-          public:
-            virtual void operator()(void);
-            virtual ~server_entry();
+        /* worker threads */
+        thread hello_thread_;
+        thread auth_thread_;
+        thread data_thread_;
 
-            inline server_entry(udp_srv & srv) : srv_(&srv), socket_(-1) {}
-
-            udp_srv * srv_;
-            int       socket_;
-
-          private:
-            /* no default construct */
-            server_entry() {}
-        };
-
-        thread             server_thread_;
-        server_entry       server_entry_;
-
-        /* no copy */
-        inline udp_srv(const udp_srv & other) : server_entry_(*this) {}
-        inline udp_srv & operator=(const udp_srv & other) { return *this; }
+        /* worker entries */
+        udp_hello_entry hello_entry_;
+        udp_auth_entry  auth_entry_;
+        udp_data_entry  data_entry_;
 
       public:
+        /* accessors and manipulators */
+        void valid_key_cb(cb::valid_key & c);
+        void hello_cb(cb::hello & c);
+        void valid_creds_cb(cb::valid_creds & c);
 
-        /* inline accessors and manipulators */
-        void valid_key_cb(cb::valid_key & c)      { valid_key_cb_ = &c;    }
-        void hello_cb(cb::hello & c)              { hello_cb_ = &c;        }
-        void valid_creds_cb(cb::valid_creds & c)  { valid_creds_cb_ = &c;  }
+        /* addresses */
+        const SAI & hello_addr() const;
+        const SAI & auth_addr() const;
+        const SAI & data_addr() const;
 
-        /* host */
-        inline const std::string & host() const { return host_; }
-        inline void host(const std::string & v) { host_ = v; }
-
-        /* port */
-        inline unsigned short port() const { return port_; }
-        inline void port(unsigned short v) { port_ = v; }
+        void hello_addr(const SAI & a);
+        void auth_addr(const SAI & a);
+        void data_addr(const SAI & a);
 
         /* private key */
         inline const bignum & private_key() const { return private_key_; }
@@ -116,17 +108,18 @@ namespace csl
         inline const udp_srv_info & server_info() const { return server_info_; }
         inline void server_info(const udp_srv_info & v) { server_info_ = v; }
 
-
-        /** @brief Specifies whether param should throw comm::exc exceptions
-        @param yesno is the desired value to be set
-
-        the default value for use_exc() is true, so it throws exceptions by default */
+        /* use exceptions ? */
         inline void use_exc(bool yesno) { use_exc_ = yesno; }
+        inline bool use_exc() const     { return use_exc_; }
 
-        /** @brief Returns the current value of use_exc
-        @return true if exc exceptions are used */
-        inline bool use_exc() const { return use_exc_; }
+      private:
+        /* no copy */
+#if 0
+        inline udp_srv(const udp_srv & other) :
+            hello_entry_(*this, *(new SAI)), auth_entry_(*this, *(new SAI)), data_entry_(*this, *(new SAI)) {}
 
+        inline udp_srv & operator=(const udp_srv & other) { return *this; }
+#endif
     };
   }
 }

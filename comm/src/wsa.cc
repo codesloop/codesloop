@@ -30,35 +30,34 @@ namespace csl
 {
   namespace comm
   {
-	  wsa::wsa()
-	  {
+    wsa::wsa()
+    {
 #ifdef WIN32
-        WORD    Version;
-        WSADATA WData;
-        int err;
+      WORD    Version;
+      WSADATA WData;
+      int err;
 
-        Version = MAKEWORD(2, 2);
+      Version = MAKEWORD(2, 2);
 
-        err = WSAStartup(Version, &WData);
-        if (err != 0)
-		{
-			throw comm::exc(
-				comm::exc::rs_wsa_startup,
-				comm::exc::cm_wsa,
-				"",
-				__FILE__,
-				__LINE__
-				);
-        }
+      err = WSAStartup(Version, &WData);
+
+      if (err != 0)
+      {
+        throw comm::exc( comm::exc::rs_wsa_startup,
+                         comm::exc::cm_wsa,
+                         "",
+                         __FILE__,
+                         __LINE__ );
+      }
 #endif
-	  }
+    }
 
-	  wsa::~wsa()
-	  {
+    wsa::~wsa()
+    {
 #ifdef WIN32
-		  WSACleanup();
+      WSACleanup();
 #endif
-	  }
+    }
   };
 };
 
