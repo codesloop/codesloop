@@ -80,13 +80,14 @@ namespace csl
         unsigned char * prepare_uc_htua(unsigned int & len);
 
         /* variables */
+        void peer_pubkey(const ecdh_key & pk);
         ecdh_key & peer_pubkey();
 
         void own_pubkey(const ecdh_key & pk);
         ecdh_key & own_pubkey();
 
-        void srv_info(const udp_srv_info & info);
-        udp_srv_info & srv_info();
+        void server_info(const udp_srv_info & info);
+        udp_srv_info & server_info();
 
         void own_privkey(const bignum & pk);
         bignum & own_privkey();

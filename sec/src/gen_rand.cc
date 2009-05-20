@@ -23,52 +23,27 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_sec_csl_sec_h_included_
-#define _csl_sec_csl_sec_h_included_
+#include <openssl/rand.h>
+#include <stdio.h>
+#include "csl_sec.h"
 
 /**
-   @file csl_sec.h
-   @brief Some common security related functions
-*/
-
-#include "common.h"
-
-/* sha1 support functions */
-
-#ifndef SHA1_HEX_DIGEST_STR_LENGTH
-#  define SHA1_HEX_DIGEST_STR_LENGTH 41
-#endif /*SHA1_HEX_DIGEST_STR_LENGTH*/
-
-#ifndef CSL_EC_STRENGTH_MIN
-#  define CSL_EC_STRENGTH_MIN 192
-#endif /*CSL_EC_STRENGTH_MIN*/
-
-#ifndef CSL_EC_STRENGTH_MAX
-#  define CSL_EC_STRENGTH_MAX 521
-#endif /*CSL_EC_STRENGTH_MAX*/
-
-/**
-    @brief Generates an SHA1 hexdigest of the given buffer
-    @param in input buffer to be used
-    @param inlen the length of the input buffer
-    @param out where to place the result
-    @param outlen the length of the generated data placed here (always SHA1_HEX_DIGEST_STR_LENGTH)
-    @return the same as out or NULL if failed
-*/
-CSL_CDECL
-void * csl_sec_sha1_conv(
-        const void *in,
-        size_t inlen,
-        void *out,
-        size_t *outlen);
-
-/**
-    @brief Generates random data
-    @param buf is the pointer to memory region to be filled with random data
-    @param len is the amount of random data to be generated
+   @file gen_rand.cc
+   @brief the implementation of random generator
  */
 CSL_CDECL
-void csl_sec_gen_rand( void * buf, size_t len );
+void csl_sec_gen_rand( void * buf, size_t len )
+{
+  if( !buf || !len ) return;
 
+  if( RAND_bytes((unsigned char *)buf,len) != 1 )
+  {
+    /* fallback */
+    if( RAND_pseudo_bytes((unsigned char *)buf,len) != 1 )
+    {
+      return;
+    }
+  }
+}
 
-#endif /* _csl_sec_csl_sec_h_included_ */
+/* EOF */

@@ -28,9 +28,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "xdrbuf.hh"
 #include "pbuf.hh"
 #include "udp_cli.hh"
+#include "csl_sec.hh"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <sys/types.h>
 #include "common.h"
 
@@ -147,7 +149,7 @@ namespace csl
             THR(exc::rs_pkt_error,exc::cm_udp_cli,false);
           }
 
-          server_info_ = pkt.srv_info();
+          server_info_ = pkt.server_info();
           return true;
         }
         else
@@ -167,10 +169,98 @@ namespace csl
       }
     }
 
+    namespace
+    {
+      static void gen_sess_key(std::string & k)
+      {
+        char s[64];
+        csl_sec_gen_rand(s,sizeof(s));
+        char   res[SHA1_HEX_DIGEST_STR_LENGTH];
+        size_t ol = 0;
+        csl_sec_sha1_conv( &s, sizeof(s), res, &ol );
+        k = res;
+      }
+    }
+
     bool udp_cli::start( unsigned int timeout_ms )
     {
-      // TODO
-      return false;
+      int err = 0;
+
+      if( !init() ) return false;
+
+      if( server_info_.public_key().is_empty() ) { THR(exc::rs_hello_nocall,exc::cm_udp_cli,false); }
+
+      gen_sess_key(session_key_);
+      csl_sec_gen_rand(client_rand_,sizeof(client_rand_));
+
+      udp_pkt pkt;
+      pkt.server_info(server_info_);
+      pkt.peer_pubkey(server_info_.public_key());
+      pkt.own_privkey(private_key_);
+      pkt.own_pubkey(public_key_);
+
+      if( server_info_.need_login() ) pkt.login(login_);
+      if( server_info_.need_pass()  ) pkt.pass(pass_);
+
+      pkt.session_key(session_key_);
+      memcpy( pkt.rand(),client_rand_,sizeof(client_rand_) );
+
+      /* prepare auth packet */
+      unsigned int auth_len = 0;
+      unsigned char * auth = pkt.prepare_uc_auth(auth_len);
+
+      if( !auth_len || !auth ) { THR(exc::rs_pkt_error,exc::cm_udp_cli,false); }
+
+      if( (err=::send( auth_sock_, (const char *)auth, auth_len , 0 )) != (int)auth_len )
+      {
+        THRC(exc::rs_send_failed,exc::cm_udp_cli,false);
+      }
+
+      fd_set rfds;
+      struct timeval tv = { 0,0 };
+      struct timeval * ptv = 0;
+
+      if( timeout_ms )
+      {
+        ptv = &tv;
+        tv.tv_sec  = timeout_ms/1000;
+        tv.tv_usec = (timeout_ms%1000)*1000;
+      }
+
+      FD_ZERO(&rfds);
+      FD_SET(auth_sock_,&rfds);
+
+      err = ::select(auth_sock_+1,&rfds,NULL,NULL,ptv);
+
+      if( err > 0 )
+      {
+        err = ::recv(auth_sock_,(char *)pkt.data(), pkt.maxlen(), 0);
+        //
+        if( err > 0 )
+        {
+          if( pkt.init_uc_htua( err ) == false )
+          {
+            THR(exc::rs_pkt_error,exc::cm_udp_cli,false);
+          }
+
+          memcpy(server_rand_,pkt.rand(),sizeof(server_rand_));
+          return true;
+        }
+        else
+        {
+          THRC(exc::rs_recv_failed,exc::cm_udp_cli,false);
+        }
+      }
+      else if( err == 0 )
+      {
+        /* timed out */
+        THR(exc::rs_timeout,exc::cm_udp_cli,false);
+      }
+      else
+      {
+        /* error */
+        THRC(exc::rs_select_failed,exc::cm_udp_cli,false);
+      }
     }
 
     bool udp_cli::send( pbuf & pb, bool synched, unsigned int timeout_ms )

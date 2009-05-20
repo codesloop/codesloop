@@ -77,6 +77,11 @@ namespace test_udp_client {
     assert( global_client_->hello( 3000 ) == true );
   }
 
+  void start()
+  {
+    assert( global_client_->start( 3000 ) == true );
+  }
+
 } // end of test_udp_client
 
 using namespace test_udp_client;
@@ -91,9 +96,12 @@ int main()
   memset( &h,0,sizeof(h) );
   h.sin_family       = AF_INET;
   h.sin_addr.s_addr  = htonl(INADDR_LOOPBACK);
-  h.sin_port         = htons(47781);
 
+  h.sin_port         = htons(47781);
   c_global.hello_addr(h);
+
+  h.sin_port         = htons(47782);
+  c_global.auth_addr(h);
 
   ecdh_key pubkey;
   bignum   privkey;
@@ -105,11 +113,14 @@ int main()
 
   c_global.private_key(privkey);
   c_global.public_key(pubkey);
+  c_global.login("LLL");
+  c_global.pass("PPP");
 
   global_client_ = &c_global;
 
   csl_common_print_results( "basic      ", csl_common_test_timer_v0(basic),"" );
   csl_common_print_results( "hello      ", csl_common_test_timer_v0(hello),"" );
+  csl_common_print_results( "start      ", csl_common_test_timer_v0(start),"" );
 
   return 0;
 }

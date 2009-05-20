@@ -117,7 +117,7 @@ namespace test_udp_pkt {
     srv.debug(dbg == 1);
     srv.own_pubkey(srv_pubk);
     srv.own_privkey(srv_privk);
-    srv.srv_info(info);
+    srv.server_info(info);
 
     memcpy( srv.data(),cli.data(),hello_len );
     assert( srv.init_hello(hello_len) == true );

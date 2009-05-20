@@ -54,14 +54,15 @@ namespace csl
     unsigned int udp_pkt::maxlen()  { return max_length_v; }
 
     /* public key */
-    ecdh_key & udp_pkt::peer_pubkey() { return peer_pubkey_; }
+    void udp_pkt::peer_pubkey(const ecdh_key & pk)  { peer_pubkey_ = pk; }
+    ecdh_key & udp_pkt::peer_pubkey()               { return peer_pubkey_; }
 
     void udp_pkt::own_pubkey(const ecdh_key & pk) { own_pubkey_ = pk; }
     ecdh_key & udp_pkt::own_pubkey()              { return own_pubkey_; }
 
     /* info */
-    void udp_pkt::srv_info(const udp_srv_info & info) { info_ = info;      }
-    udp_srv_info & udp_pkt::srv_info()                { return info_;      }
+    void udp_pkt::server_info(const udp_srv_info & info) { info_ = info;      }
+    udp_srv_info & udp_pkt::server_info()                { return info_;      }
 
     /* private key */
     void udp_pkt::own_privkey(const bignum & pk)  { own_privkey_ = pk; }
@@ -457,9 +458,23 @@ namespace csl
         /* generate session key */
         std::string session_key;
 
-        if( !peer_pubkey_.gen_sha1hex_shared_key(own_privkey_,session_key) )
+        if( peer_pubkey_.is_empty() == false )
         {
-          THR(comm::exc::rs_sec_error,comm::exc::cm_udp_pkt,NULL);
+          if( peer_pubkey_.gen_sha1hex_shared_key(own_privkey_,session_key) == false )
+          {
+            THR(comm::exc::rs_sec_error,comm::exc::cm_udp_pkt,NULL);
+          }
+        }
+        else if( info_.public_key().is_empty() == false )
+        {
+          if( info_.public_key().gen_sha1hex_shared_key(own_privkey_,session_key) == false )
+          {
+            THR(comm::exc::rs_sec_error,comm::exc::cm_udp_pkt,NULL);
+          }
+        }
+        else
+        {
+          THR(comm::exc::rs_pubkey_empty,comm::exc::cm_udp_pkt,NULL);
         }
 
         if( debug() ) { printf("  ++ Session Key: '%s'\n",session_key.c_str()); }

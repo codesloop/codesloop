@@ -50,6 +50,8 @@ namespace csl
 
   namespace comm
   {
+    class udp_pkt;
+
     class udp_srv
     {
       public:
@@ -106,6 +108,8 @@ namespace csl
         inline bool use_exc() const     { return use_exc_; }
 
       private:
+        friend class udp_auth_entry;
+
         /* internal functions */
         bool on_accept_auth( udp_pkt & pkt, SAI & addr );
 

@@ -44,7 +44,7 @@ namespace csl
 
       /* init packet handler */
       pkt.use_exc(false);
-      pkt.srv_info(srv().server_info());
+      pkt.server_info(srv().server_info());
       pkt.own_privkey(srv().private_key());
 
       /* packet loop */
@@ -99,7 +99,7 @@ namespace csl
               (*hello_cb_)(
                 pkt.peer_pubkey(),
                 cliaddr,
-                pkt.srv_info(),
+                pkt.server_info(),
                 pkt.own_privkey()) == false )
           {
             fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);

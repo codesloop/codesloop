@@ -83,10 +83,10 @@ namespace csl
     bool udp_srv::on_accept_auth( udp_pkt & pkt, SAI & addr )
     {
       // TODO
-      return false;
+      return true;
     }
 
-    udp_srv(const udp_srv & other) : hello_entry_(*this), auth_entry_(*this), data_entry_(*this)
+    udp_srv::udp_srv(const udp_srv & other) : hello_entry_(*this), auth_entry_(*this), data_entry_(*this)
     {
     }
 

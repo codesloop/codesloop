@@ -44,7 +44,7 @@ namespace csl
 
       /* init packet handler */
       pkt.use_exc(false);
-      pkt.srv_info(srv().server_info());
+      pkt.server_info(srv().server_info());
       pkt.own_privkey(srv().private_key());
 
       /* packet loop */

@@ -74,6 +74,7 @@ namespace csl
           rs_crypt_pkt_error,     ///<Error in crypt pkt
           rs_too_big,             ///<Too big data to be placed into the given buffer
           rs_pkt_error,           ///<Cannot encode/decode packet
+          rs_hello_nocall,        ///<Hello not called and/or server_info not filled
         };
 
         enum {
