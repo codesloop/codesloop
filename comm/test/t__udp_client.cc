@@ -54,7 +54,7 @@ namespace test_udp_client {
     h.sin_addr.s_addr  = htonl(INADDR_LOOPBACK);
     h.sin_port         = htons(47781);
 
-    c.addr(h);
+    c.hello_addr(h);
 
     ecdh_key pubkey;
     bignum   privkey;
@@ -93,7 +93,7 @@ int main()
   h.sin_addr.s_addr  = htonl(INADDR_LOOPBACK);
   h.sin_port         = htons(47781);
 
-  c_global.addr(h);
+  c_global.hello_addr(h);
 
   ecdh_key pubkey;
   bignum   privkey;

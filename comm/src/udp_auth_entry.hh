@@ -43,6 +43,13 @@ namespace csl
         virtual void operator()(void);
         virtual ~udp_auth_entry();
         udp_auth_entry(udp_srv & srv);
+
+        void valid_key_cb( cb::valid_key & vkcb );
+        void valid_creds_cb( cb::valid_creds & vccb );
+
+      private:
+        cb::valid_key    * valid_key_cb_;
+        cb::valid_creds  * valid_creds_cb_;
     };
   }
 }

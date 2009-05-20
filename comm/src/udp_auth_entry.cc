@@ -24,6 +24,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "exc.hh"
+#include "udp_pkt.hh"
 #include "udp_srv.hh"
 #include "udp_auth_entry.hh"
 #include "common.h"
@@ -36,9 +37,109 @@ namespace csl
   {
     void udp_auth_entry::operator()(void)
     {
+      SAI             cliaddr;
+      socklen_t       len = sizeof(cliaddr);
+      int             recvd;
+      udp_pkt         pkt;
+
+      /* init packet handler */
+      pkt.use_exc(false);
+      pkt.srv_info(srv().server_info());
+      pkt.own_privkey(srv().private_key());
+
+      /* packet loop */
       while( stop_me() == false )
       {
-        SleepSeconds( 1 );
+        /* wait for incoming packets */
+        fd_set fds;
+        FD_ZERO( &fds );
+        FD_SET( socket(), &fds );
+        struct timeval tv = { 1, 0 };
+
+        int err = ::select( socket()+1,&fds,NULL,NULL,&tv );
+
+        if( err < 0 )
+        {
+          fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);
+          break;    // TODO : error handling
+        }
+        else if( err == 0 )
+        {
+          // select timed out
+          continue;
+        }
+
+        /* receive packet */
+        recvd = recvfrom( socket(), (char *)pkt.data(), pkt.maxlen(), 0, (struct sockaddr *)&cliaddr, &len );
+
+        if( !recvd )
+        {
+          fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);
+          continue; // TODO : error handling
+        }
+
+        try
+        {
+          /* process incoming auth packet */
+          if( pkt.init_uc_auth(recvd) == false )
+          {
+            fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);
+            continue; // TODO : error handling
+          }
+
+          /* check peer key */
+          if( valid_key_cb_ && (*valid_key_cb_)(pkt.peer_pubkey()) == false )
+          {
+            fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);
+            continue; // TODO error handling
+          }
+
+          /* valid creds callback */
+          if( valid_creds_cb_ &&
+              (*valid_creds_cb_)(
+                pkt.peer_pubkey(),
+                cliaddr,
+                pkt.login(),
+                pkt.pass()) == false )
+          {
+            fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);
+            continue; // TODO error handling
+          }
+
+          /* register authenticated client */
+          if( srv().on_accept_auth( pkt, cliaddr ) == false )
+          {
+            fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);
+            continue; // TODO error handling
+          }
+
+          /* prepare response htua packet */
+          unsigned int htua_len = 0;
+          unsigned char * htua = pkt.prepare_uc_htua(htua_len);
+
+          if( !htua_len || !htua )
+          {
+            fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);
+            continue; // TODO error handling
+          }
+
+          /* send data back */
+          if( sendto( socket(),
+              (const char *)htua, htua_len, 0,
+               (struct sockaddr *)&cliaddr, len ) != (int)htua_len )
+          {
+            fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);
+            continue; // TODO error
+          }
+        }
+        catch( common::exc e )
+        {
+          fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);
+        }
+        catch( comm::exc e )
+        {
+          fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);
+        }
       }
     }
 
@@ -46,8 +147,19 @@ namespace csl
     {
     }
 
-    udp_auth_entry::udp_auth_entry( udp_srv & srv ) : udp_srv_entry(srv)
+    udp_auth_entry::udp_auth_entry( udp_srv & srv )
+    : udp_srv_entry(srv), valid_key_cb_(0), valid_creds_cb_(0)
     {
+    }
+
+    void udp_auth_entry::valid_key_cb( cb::valid_key & vkcb )
+    {
+      valid_key_cb_ = &vkcb;
+    }
+
+    void udp_auth_entry::valid_creds_cb( cb::valid_creds & vccb )
+    {
+      valid_creds_cb_ = &vccb;
     }
   };
 };

@@ -57,13 +57,16 @@ namespace csl
         bool recv( pbuf & pb, unsigned int timeout_ms=0 );
 
         udp_cli();
+        virtual ~udp_cli();
 
       private:
         /* internal */
         bool use_exc_;
 
         /* user should fill these */
-        SAI                addr_;
+        SAI                hello_addr_;
+        SAI                auth_addr_;
+        SAI                data_addr_;
         string             login_;
         string             pass_;
         ecdh_key           public_key_;
@@ -73,7 +76,9 @@ namespace csl
         udp_srv_info       server_info_;
 
         /* connection related */
-        int                sock_;
+        int                hello_sock_;
+        int                auth_sock_;
+        int                data_sock_;
         unsigned char      client_rand_[8][8];
         unsigned char      server_rand_[8][8];
         string             session_key_;
@@ -83,9 +88,18 @@ namespace csl
       public:
 
         /* inline accessors and manipulators */
-        /* addr */
-        inline const SAI & addr() const { return addr_; }
-        inline void addr(const SAI & a) { addr_ = a;    }
+
+        /* hello_addr */
+        inline const SAI & hello_addr() const { return hello_addr_; }
+        inline void hello_addr(const SAI & a) { hello_addr_ = a;    }
+
+        /* auth_addr */
+        inline const SAI & auth_addr() const { return auth_addr_; }
+        inline void auth_addr(const SAI & a) { auth_addr_ = a;    }
+
+        /* data_addr */
+        inline const SAI & data_addr() const { return data_addr_; }
+        inline void data_addr(const SAI & a) { data_addr_ = a;    }
 
         /* login */
         inline const std::string & login() const { return login_; }

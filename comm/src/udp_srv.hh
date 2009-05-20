@@ -68,13 +68,6 @@ namespace csl
         bignum             private_key_;
         udp_srv_info       server_info_;
 
-#if 0
-        /* callbacks */
-        cb::valid_key    * valid_key_cb_;
-        cb::hello        * hello_cb_;
-        cb::valid_creds  * valid_creds_cb_;
-#endif
-
         /* worker threads */
         thread hello_thread_;
         thread auth_thread_;
@@ -113,13 +106,12 @@ namespace csl
         inline bool use_exc() const     { return use_exc_; }
 
       private:
-        /* no copy */
-#if 0
-        inline udp_srv(const udp_srv & other) :
-            hello_entry_(*this, *(new SAI)), auth_entry_(*this, *(new SAI)), data_entry_(*this, *(new SAI)) {}
+        /* internal functions */
+        bool on_accept_auth( udp_pkt & pkt, SAI & addr );
 
+        /* no copy */
+        udp_srv(const udp_srv & other);
         inline udp_srv & operator=(const udp_srv & other) { return *this; }
-#endif
     };
   }
 }

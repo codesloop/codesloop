@@ -47,11 +47,11 @@ namespace csl
 
   namespace comm
   {
-    udp_pkt::udp_pkt() : use_exc_(true) {}
+    udp_pkt::udp_pkt() : use_exc_(true), debug_(false) {}
 
     /* internal buffer */
-    unsigned char * udp_pkt::data()   { return data_;        }
-    unsigned int udp_pkt::maxlen()    { return max_length_v; }
+    unsigned char * udp_pkt::data() { return data_;        }
+    unsigned int udp_pkt::maxlen()  { return max_length_v; }
 
     /* public key */
     ecdh_key & udp_pkt::peer_pubkey() { return peer_pubkey_; }
@@ -64,8 +64,26 @@ namespace csl
     udp_srv_info & udp_pkt::srv_info()                { return info_;      }
 
     /* private key */
-    void udp_pkt::own_privkey(const bignum & pk)      { own_privkey_ = pk; }
-    bignum & udp_pkt::own_privkey()                   { return own_privkey_; }
+    void udp_pkt::own_privkey(const bignum & pk)  { own_privkey_ = pk; }
+    bignum & udp_pkt::own_privkey()               { return own_privkey_; }
+
+    /* login */
+    const std::string & udp_pkt::login() const  { return login_; }
+    void udp_pkt::login(const std::string & l)  { login_ = l; }
+
+    /* pass */
+    const std::string & udp_pkt::pass() const  { return pass_; }
+    void udp_pkt::pass(const std::string & p)  { pass_ = p; }
+
+    /* rand */
+    unsigned char * udp_pkt::rand() { return (unsigned char *)rand_; }
+
+    /* salt */
+    unsigned char * udp_pkt::salt() { return (unsigned char *)salt_; }
+
+    /* session key */
+    const std::string & udp_pkt::session_key() const { return session_key_; }
+    void udp_pkt::session_key(const std::string & k) { session_key_ = k; }
 
     /* hello packet */
     bool udp_pkt::init_hello(unsigned int len)
@@ -108,7 +126,7 @@ namespace csl
 
         if( debug() ) { printf(" ++ [%ld] : packet_type : %d\n",xb.position(),hello_p ); }
 
-        if( !own_pubkey_.to_xdr(xb) ) { THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_pkt,false); }
+        if( own_pubkey_.to_xdr(xb) == false ) { THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_pkt,false); }
 
         if( debug() ) { printf(" ++ [%ld] : ",xb.position()); own_pubkey_.print(); }
 
@@ -159,7 +177,7 @@ namespace csl
           THR(comm::exc::rs_sec_error,comm::exc::cm_udp_pkt,false);
         }
 
-        if( debug() ) { printf("  -- Session Key %s\n",session_key.c_str()); }
+        if( debug() ) { printf("  -- Session Key: '%s'\n",session_key.c_str()); }
 
         /* de-compile packet */
         crypt_pkt::keybuf_t   key;
@@ -172,7 +190,7 @@ namespace csl
         data.set(ptrp+(crypt_pkt::header_len()),
                  lenp-crypt_pkt::footer_len()-crypt_pkt::header_len());
 
-        key.set((unsigned char *)session_key.c_str(),session_key.size());
+        key.set((unsigned char *)session_key.c_str(),session_key.size()+1);
 
         crypt_pkt pk;
 
@@ -200,7 +218,7 @@ namespace csl
         info_.need_login(need_login == 1);
         info_.need_pass(need_pass == 1);
 
-        // fprintf(stderr,"Decoded: need_login: %d need_pass: %d\n",need_login,need_pass);
+        return true;
       }
       catch( common::exc e )
       {
@@ -209,7 +227,7 @@ namespace csl
         fprintf(stderr,"Exception caught: %s\n",s.c_str());
         THR(comm::exc::rs_common_error,comm::exc::cm_udp_pkt,false);
       }
-      return true;
+      return false;
     }
 
     unsigned char * udp_pkt::prepare_olleh(unsigned int & len)
@@ -249,7 +267,7 @@ namespace csl
           THR(comm::exc::rs_sec_error,comm::exc::cm_udp_pkt,NULL);
         }
 
-        if( debug() ) { printf("  ++ Session Key %s\n",session_key.c_str()); }
+        if( debug() ) { printf("  ++ Session Key: '%s'\n",session_key.c_str()); }
 
         /* compile packet */
         crypt_pkt::saltbuf_t  salt;
@@ -259,7 +277,7 @@ namespace csl
         crypt_pkt::footbuf_t  foot;
 
         salt.set((unsigned char *)"00000000",8);
-        key.set((unsigned char *)session_key.c_str(),session_key.size());
+        key.set((unsigned char *)session_key.c_str(),session_key.size()+1);
         inner.t_copy_to(data);
 
         crypt_pkt pk;
@@ -302,6 +320,349 @@ namespace csl
       return 0;
     }
 
+    /* auth packet */
+    bool udp_pkt::init_uc_auth(unsigned int len)
+    {
+      try
+      {
+        /* unencrypted part */
+        pbuf    outer;
+        outer.append(data_,len);
+        xdrbuf  xbo(outer);
+
+        int32_t packet_type = 0;
+        xbo >> packet_type;
+
+        if( debug() ) { printf(" -- [%ld] : packet_type : %d\n",xbo.position(),packet_type ); }
+
+        if( packet_type != unicast_auth_p ) { THR(comm::exc::rs_invalid_packet_type,comm::exc::cm_udp_pkt,false); }
+
+        if( peer_pubkey_.from_xdr(xbo) == false ) { THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_pkt,false); }
+
+        if( debug() ) { printf(" -- [%ld] : ",xbo.position()); peer_pubkey_.print(); }
+
+        unsigned char * ptrp = data_ + xbo.position();
+        unsigned int    lenp = len - xbo.position();
+
+        /* encrypted part */
+
+        /* generate session key */
+        std::string session_key;
+
+        if( !peer_pubkey_.gen_sha1hex_shared_key(own_privkey_,session_key) )
+        {
+          THR(comm::exc::rs_sec_error,comm::exc::cm_udp_pkt,false);
+        }
+
+        if( debug() ) { printf("  -- Session Key: '%s'\n",session_key.c_str()); }
+
+        /* de-compile packet */
+        crypt_pkt::keybuf_t   key;
+        crypt_pkt::headbuf_t  head;
+        crypt_pkt::databuf_t  data;
+        crypt_pkt::footbuf_t  foot;
+
+        head.set(ptrp,crypt_pkt::header_len());
+        foot.set(ptrp+(lenp-crypt_pkt::footer_len()),crypt_pkt::footer_len());
+        data.set(ptrp+(crypt_pkt::header_len()),
+                 lenp-crypt_pkt::footer_len()-crypt_pkt::header_len());
+
+        key.set((unsigned char *)session_key.c_str(),session_key.size()+1);
+
+        crypt_pkt pk;
+
+        if( pk.decrypt( key,head,data,foot ) == false )
+        {
+          THR(comm::exc::rs_crypt_pkt_error,comm::exc::cm_udp_pkt,false);
+        }
+
+        /* xdr deserialize */
+        pbuf inner;
+        inner.append( data.data(), data.size() );
+        xdrbuf xbi(inner);
+
+        unsigned int sz=0;
+
+        if( xbi.get_data( (unsigned char *)rand_,sz,64 ) == false )
+        {
+          THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_pkt,false);
+        }
+
+        if( sz != 64 )
+        {
+          THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_pkt,false);
+        }
+
+        if( debug() ) { print_hex("  -- RAND ",rand_,64); }
+
+        xbi >> login_;
+
+        if( debug() ) { printf("  -- [%ld] login: '%s'\n",xbi.position(),login_.c_str()); }
+
+        xbi >> pass_;
+
+        if( debug() ) { printf("  -- [%ld] pass: '%s'\n",xbi.position(),pass_.c_str()); }
+
+        xbi >> session_key_;
+
+        if( debug() ) { printf("  -- [%ld] sesskey: '%s'\n",xbi.position(),session_key_.c_str()); }
+
+        return true;
+      }
+      catch( common::exc e )
+      {
+        std::string s;
+        e.to_string(s);
+        fprintf(stderr,"Exception caught: %s\n",s.c_str());
+        THR(comm::exc::rs_common_error,comm::exc::cm_udp_pkt,false);
+      }
+      return false;
+    }
+
+    unsigned char * udp_pkt::prepare_uc_auth(unsigned int & len)
+    {
+      try
+      {
+        /* unencrypted part */
+        pbuf    outer;
+        xdrbuf  xbo(outer);
+
+        xbo << (int32_t)unicast_auth_p;
+
+        if( debug() ) { printf(" ++ [%ld] : packet_type : %d\n",xbo.position(),unicast_auth_p ); }
+
+        if( own_pubkey_.to_xdr(xbo) == false ) { THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_pkt,false); }
+
+        if( debug() ) { printf(" ++ [%ld] : ",xbo.position()); own_pubkey_.print(); }
+
+        if( outer.size() > maxlen() ) { THR(comm::exc::rs_too_big,comm::exc::cm_udp_pkt,NULL); }
+
+        outer.copy_to(data_,maxlen());
+
+        /* encrypted part */
+        pbuf inner;
+        xdrbuf xbi(inner);
+
+        xbi << xdrbuf::bindata_t( (const unsigned char *)rand_,(unsigned int)sizeof(rand_) );
+        xbi << login_;
+        xbi << pass_;
+        xbi << session_key_;
+
+        if( debug() )
+        {
+          printf("  ++ login: '%s' pass: '%s' sesskey: '%s'\n",
+                 login_.c_str(),pass_.c_str(),session_key_.c_str());
+        }
+
+        /* generate session key */
+        std::string session_key;
+
+        if( !peer_pubkey_.gen_sha1hex_shared_key(own_privkey_,session_key) )
+        {
+          THR(comm::exc::rs_sec_error,comm::exc::cm_udp_pkt,NULL);
+        }
+
+        if( debug() ) { printf("  ++ Session Key: '%s'\n",session_key.c_str()); }
+
+        /* compile packet */
+        crypt_pkt::saltbuf_t  salt;
+        crypt_pkt::keybuf_t   key;
+        crypt_pkt::headbuf_t  head;
+        crypt_pkt::databuf_t  data;
+        crypt_pkt::footbuf_t  foot;
+
+        salt.set((unsigned char *)"11111111",8);
+        key.set((unsigned char *)session_key.c_str(),session_key.size()+1);
+        inner.t_copy_to(data);
+
+        crypt_pkt pk;
+
+        if( !pk.encrypt( salt,key,head,data,foot ) )
+        {
+          THR(comm::exc::rs_crypt_pkt_error,comm::exc::cm_udp_pkt,NULL);
+        }
+
+        /* output packet */
+        unsigned char * outputp = data_+outer.size();
+        unsigned int retlen = outer.size()+head.size()+data.size()+foot.size();
+
+        if( retlen > maxlen() ) { THR(comm::exc::rs_too_big,comm::exc::cm_udp_pkt,NULL); }
+
+        memcpy( outputp, head.data(), head.size() ); outputp += head.size();
+        memcpy( outputp, data.data(), data.size() ); outputp += data.size();
+        memcpy( outputp, foot.data(), foot.size() ); outputp += foot.size();
+
+        if( debug() )
+        {
+          print_hex("  ++ UCAUTH PROL ",data_,outer.size());
+          print_hex("  ++ UCAUTH HEAD ",head.data(),head.size() );
+          print_hex("  ++ UCAUTH DATA ",data.data(),data.size() );
+          print_hex("  ++ UCAUTH FOOT ",foot.data(),foot.size() );
+        }
+
+        /* return the data */
+        len = retlen;
+        return data_;
+      }
+      catch( common::exc e )
+      {
+        std::string s;
+        e.to_string(s);
+        fprintf(stderr,"Exception caught: %s\n",s.c_str());
+        THR(comm::exc::rs_common_error,comm::exc::cm_udp_pkt,false);
+      }
+      return 0;
+    }
+
+    /* htua packet */
+    bool udp_pkt::init_uc_htua(unsigned int len)
+    {
+      try
+      {
+        /* unencrypted part */
+        pbuf    outer;
+        outer.append(data_,len);
+        xdrbuf  xbo(outer);
+
+        int32_t packet_type = 0;
+        xbo >> packet_type;
+
+        if( debug() ) { printf(" -- [%ld] : packet_type : %d\n",xbo.position(),packet_type ); }
+
+        if( packet_type != unicast_htua_p ) { THR(comm::exc::rs_invalid_packet_type,comm::exc::cm_udp_pkt,false); }
+
+        unsigned char * ptrp = data_ + xbo.position();
+        unsigned int    lenp = len - xbo.position();
+
+        /* encrypted part */
+        if( debug() ) { printf("  -- Session Key: '%s'\n",session_key_.c_str()); }
+
+        /* de-compile packet */
+        crypt_pkt::keybuf_t   key;
+        crypt_pkt::headbuf_t  head;
+        crypt_pkt::databuf_t  data;
+        crypt_pkt::footbuf_t  foot;
+
+        head.set(ptrp,crypt_pkt::header_len());
+        foot.set(ptrp+(lenp-crypt_pkt::footer_len()),crypt_pkt::footer_len());
+        data.set(ptrp+(crypt_pkt::header_len()),
+                 lenp-crypt_pkt::footer_len()-crypt_pkt::header_len());
+
+        key.set((unsigned char *)session_key_.c_str(),session_key_.size()+1);
+
+        crypt_pkt pk;
+
+        if( pk.decrypt( key,head,data,foot ) == false )
+        {
+          THR(comm::exc::rs_crypt_pkt_error,comm::exc::cm_udp_pkt,false);
+        }
+
+        /* xdr deserialize */
+        pbuf inner;
+        inner.append( data.data(), data.size() );
+        xdrbuf xbi(inner);
+
+        unsigned int sz=0;
+
+        if( xbi.get_data( (unsigned char *)rand_,sz,64 ) == false )
+        {
+          THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_pkt,false);
+        }
+
+        if( sz != 64 )
+        {
+          THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_pkt,false);
+        }
+
+        if( debug() ) { print_hex("  -- RAND ",rand_,64); }
+
+        memcpy( salt_,head.data(),crypt_pkt::header_len() );
+
+        return true;
+      }
+      catch( common::exc e )
+      {
+        std::string s;
+        e.to_string(s);
+        fprintf(stderr,"Exception caught: %s\n",s.c_str());
+        THR(comm::exc::rs_common_error,comm::exc::cm_udp_pkt,false);
+      }
+      return false;
+    }
+
+    unsigned char * udp_pkt::prepare_uc_htua(unsigned int & len)
+    {
+      try
+      {
+        /* unencrypted part */
+        pbuf    outer;
+        xdrbuf  xbo(outer);
+
+        xbo << (int32_t)unicast_htua_p;
+
+        if( debug() ) { printf(" ++ [%ld] : packet_type : %d\n",xbo.position(),unicast_htua_p ); }
+
+        if( outer.size() > maxlen() ) { THR(comm::exc::rs_too_big,comm::exc::cm_udp_pkt,NULL); }
+
+        outer.copy_to(data_,maxlen());
+
+        /* encrypted part */
+        pbuf inner;
+        xdrbuf xbi(inner);
+
+        xbi << xdrbuf::bindata_t( (const unsigned char *)rand_,(unsigned int)sizeof(rand_) );
+
+        if( debug() ) { printf("  ++ Session Key: '%s'\n",session_key_.c_str()); }
+
+        /* compile packet */
+        crypt_pkt::saltbuf_t  salt;
+        crypt_pkt::keybuf_t   key;
+        crypt_pkt::headbuf_t  head;
+        crypt_pkt::databuf_t  data;
+        crypt_pkt::footbuf_t  foot;
+
+        salt.set((unsigned char *)salt_,8);
+        key.set((unsigned char *)session_key_.c_str(),session_key_.size()+1);
+        inner.t_copy_to(data);
+
+        crypt_pkt pk;
+
+        if( !pk.encrypt( salt,key,head,data,foot ) )
+        {
+          THR(comm::exc::rs_crypt_pkt_error,comm::exc::cm_udp_pkt,NULL);
+        }
+
+        /* output packet */
+        unsigned char * outputp = data_+outer.size();
+        unsigned int retlen = outer.size()+head.size()+data.size()+foot.size();
+
+        if( retlen > maxlen() ) { THR(comm::exc::rs_too_big,comm::exc::cm_udp_pkt,NULL); }
+
+        memcpy( outputp, head.data(), head.size() ); outputp += head.size();
+        memcpy( outputp, data.data(), data.size() ); outputp += data.size();
+        memcpy( outputp, foot.data(), foot.size() ); outputp += foot.size();
+
+        if( debug() )
+        {
+          print_hex("  ++ UCHTUA PROL ",data_,outer.size());
+          print_hex("  ++ UCHTUA HEAD ",head.data(),head.size() );
+          print_hex("  ++ UCHTUA DATA ",data.data(),data.size() );
+          print_hex("  ++ UCHTUA FOOT ",foot.data(),foot.size() );
+        }
+
+        /* return the data */
+        len = retlen;
+        return data_;
+      }
+      catch( common::exc e )
+      {
+        std::string s;
+        e.to_string(s);
+        fprintf(stderr,"Exception caught: %s\n",s.c_str());
+        THR(comm::exc::rs_common_error,comm::exc::cm_udp_pkt,false);
+      }
+      return 0;
+    }
   };
 };
 

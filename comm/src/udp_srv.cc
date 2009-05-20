@@ -79,6 +79,17 @@ namespace csl
           auth_thread_.start_event().wait( 3000 ) );
     }
 
+    /* internal function to be called on new, authenticated clients */
+    bool udp_srv::on_accept_auth( udp_pkt & pkt, SAI & addr )
+    {
+      // TODO
+      return false;
+    }
+
+    udp_srv(const udp_srv & other) : hello_entry_(*this), auth_entry_(*this), data_entry_(*this)
+    {
+    }
+
     udp_srv::udp_srv() : hello_entry_(*this), auth_entry_(*this), data_entry_(*this)
     {
     }
@@ -97,7 +108,7 @@ namespace csl
     void udp_srv::valid_key_cb(cb::valid_key & c)
     {
       hello_entry_.valid_key_cb( c );
-      // TODO
+      auth_entry_.valid_key_cb( c );
     }
 
     void udp_srv::hello_cb(cb::hello & c)
@@ -107,7 +118,7 @@ namespace csl
 
     void udp_srv::valid_creds_cb(cb::valid_creds & c)
     {
-      // TODO
+      auth_entry_.valid_creds_cb( c );
     }
 
     const udp_srv::SAI & udp_srv::hello_addr() const { return hello_entry_.addr(); }

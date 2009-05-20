@@ -72,8 +72,16 @@ namespace test_udp_pkt {
   void print_hex(const char * prefix,const void * vp,size_t len)
   {
     unsigned char * hx = (unsigned char *)vp;
-    printf("%s: ",prefix);
-    for(size_t i=0;i<len;++i) printf("%.2X",hx[i]);
+    printf("%s [%ld]: ",prefix,(unsigned long)len);
+    for(size_t i=0;i<len;++i)
+    {
+      if( (hx[i]<='Z' && hx[i]>='A') ||
+           (hx[i]<='9' && hx[i]>='0') ||
+           (hx[i]<='z' && hx[i]>='A') )
+        printf(".%c",hx[i]);
+      else
+        printf("%.2X",hx[i]);
+    }
     printf("\n");
   }
 
@@ -100,7 +108,7 @@ namespace test_udp_pkt {
 
     if( dbg )
     {
-      print_hex(">HELLO: ",cli.data(),hello_len);
+      print_hex(">HELLO",cli.data(),hello_len);
     }
 
     info.public_key(srv_pubk);
@@ -119,11 +127,43 @@ namespace test_udp_pkt {
 
     if( dbg )
     {
-      print_hex(">OLLEH: ",srv.data(),olleh_len);
+      print_hex(">OLLEH",srv.data(),olleh_len);
     }
 
     memcpy( cli.data(),srv.data(),olleh_len );
     assert( cli.init_olleh(olleh_len) == true );
+
+    /* check auth packets */
+    memset( cli.rand(),'A',64 );
+    cli.login("Scho:n Ubul");
+    cli.pass("Futrinka utca");
+    cli.session_key("Lukas csokolade");
+
+    unsigned int auth_len = 0;
+    assert( cli.prepare_uc_auth(auth_len) != 0 );
+
+    if( dbg )
+    {
+      print_hex(">AUTH",cli.data(),auth_len);
+    }
+
+    memcpy( srv.data(),cli.data(),auth_len );
+    assert( srv.init_uc_auth(auth_len) == true );
+
+    /* check auth response: htua */
+    memset( srv.rand(),'B',64 );
+    memset( srv.salt(),'A',8 );
+
+    unsigned int htua_len = 0;
+    assert( srv.prepare_uc_htua(htua_len) != 0 );
+
+    if( dbg )
+    {
+      print_hex(">HTUA",srv.data(),htua_len);
+    }
+
+    memcpy( cli.data(),srv.data(),htua_len );
+    assert( cli.init_uc_htua(htua_len) == true );
   }
 
 } // end of test_udp_pkt

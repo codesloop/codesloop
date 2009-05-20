@@ -66,10 +66,10 @@ namespace csl
         {
           public:
             virtual ~valid_creds() {}
-            virtual bool operator()( const ecdh_key & peer_public_key, // in
-                                     const SAI & addr,                 // in
-                                     const string & login,             // in
-                                     const string & pass ) = 0;        // in
+            virtual bool operator()( const ecdh_key & peer_public_key,    // in
+                                     const SAI & addr,                    // in
+                                     const string & login,                // in
+                                     const string & pass) = 0;            // in
         };
 
         class accept

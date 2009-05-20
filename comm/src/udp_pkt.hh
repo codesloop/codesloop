@@ -71,7 +71,6 @@ namespace csl
         bool init_olleh(unsigned int len);
         unsigned char * prepare_olleh(unsigned int & len);
 
-#if 0
         /* auth packet */
         bool init_uc_auth(unsigned int len);
         unsigned char * prepare_uc_auth(unsigned int & len);
@@ -79,7 +78,6 @@ namespace csl
         /* htua packet */
         bool init_uc_htua(unsigned int len);
         unsigned char * prepare_uc_htua(unsigned int & len);
-#endif
 
         /* variables */
         ecdh_key & peer_pubkey();
@@ -93,6 +91,18 @@ namespace csl
         void own_privkey(const bignum & pk);
         bignum & own_privkey();
 
+        const std::string & login() const;
+        void login(const std::string & l);
+
+        const std::string & pass() const;
+        void pass(const std::string & p);
+
+        unsigned char * rand();
+        unsigned char * salt();
+
+        const std::string & session_key() const;
+        void session_key(const std::string & k);
+
         virtual inline ~udp_pkt() {}
         udp_pkt();
 
@@ -101,6 +111,11 @@ namespace csl
         bignum         own_privkey_;
         ecdh_key       own_pubkey_;
         ecdh_key       peer_pubkey_;
+        std::string    login_;
+        std::string    pass_;
+        unsigned char  rand_[8][8];
+        unsigned char  salt_[8];
+        std::string    session_key_;
         unsigned char  data_[max_length_v];
         bool           use_exc_;
         bool           debug_;

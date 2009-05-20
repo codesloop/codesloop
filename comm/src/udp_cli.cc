@@ -41,33 +41,61 @@ namespace csl
 
   namespace comm
   {
-
-    udp_cli::udp_cli() : sock_(-1)
+    udp_cli::udp_cli() : hello_sock_(-1), auth_sock_(-1), data_sock_(-1)
     {
-      memset( &addr_,0,sizeof(addr_) );
-      addr_.sin_family        = AF_INET;
-      addr_.sin_addr.s_addr   = htonl(INADDR_LOOPBACK);
+      memset( &hello_addr_,0,sizeof(hello_addr_) );
+      hello_addr_.sin_family        = AF_INET;
+      hello_addr_.sin_addr.s_addr   = htonl(INADDR_LOOPBACK);
+
+      auth_addr_ = data_addr_ = hello_addr_;
+    }
+
+    udp_cli::~udp_cli()
+    {
+      if( hello_sock_ > 0 ) ShutdownCloseSocket( hello_sock_ );
+      if( auth_sock_ > 0  ) ShutdownCloseSocket( auth_sock_ );
+      if( data_sock_ > 0 )  ShutdownCloseSocket( data_sock_ );
+
+      hello_sock_ = auth_sock_ = data_sock_ = -1;
+    }
+
+    namespace
+    {
+      int init_sock(udp_cli::SAI & addr)
+      {
+        int sock = ::socket( AF_INET, SOCK_DGRAM, 0 );
+        if( sock <= 0 ) { return sock; }
+
+        socklen_t len = sizeof(addr);
+
+        if( ::connect(sock, (struct sockaddr *)&addr, len) == -1 )
+        {
+          ShutdownCloseSocket(sock);
+          return -1;
+        }
+        return sock;
+      }
     }
 
     bool udp_cli::init()
     {
-      if( sock_ > 0 ) return true;
+      if( hello_sock_ > 0 && auth_sock_ > 0 && data_sock_ > 0 ) return true;
 
       /* public_key has been set ? */
       if( public_key_.is_empty() ) { THR(exc::rs_pubkey_empty,exc::cm_udp_cli,false); }
 
-      int sock = ::socket( AF_INET, SOCK_DGRAM, 0 );
-      if( sock <= 0 ) { THRC(exc::rs_socket_failed,exc::cm_udp_cli,false); }
+      hello_sock_ = init_sock( hello_addr_ );
 
-      socklen_t len = sizeof(addr_);
+      if( hello_sock_ <= 0 ) { THRC(exc::rs_socket_failed,exc::cm_udp_cli,false); }
 
-      if( ::connect(sock, (struct sockaddr *)&addr_, len) == -1 )
-      {
-        ShutdownCloseSocket(sock);
-        THRC(exc::rs_connect_failed,exc::cm_udp_cli,false);
-      }
+      auth_sock_  = init_sock( auth_addr_ );
 
-      sock_ = sock;
+      if( auth_sock_ <= 0 ) { THRC(exc::rs_socket_failed,exc::cm_udp_cli,false); }
+
+      data_sock_  = init_sock( data_addr_ );
+
+      if( data_sock_ <= 0 ) { THRC(exc::rs_socket_failed,exc::cm_udp_cli,false); }
+
       return true;
     }
 
@@ -87,7 +115,7 @@ namespace csl
 
       if( !hello_len || !hello ) { THR(exc::rs_pkt_error,exc::cm_udp_cli,false); }
 
-      if( (err=::send( sock_, (const char *)hello, hello_len , 0 )) != (int)hello_len )
+      if( (err=::send( hello_sock_, (const char *)hello, hello_len , 0 )) != (int)hello_len )
       {
         THRC(exc::rs_send_failed,exc::cm_udp_cli,false);
       }
@@ -104,13 +132,13 @@ namespace csl
       }
 
       FD_ZERO(&rfds);
-      FD_SET(sock_,&rfds);
+      FD_SET(hello_sock_,&rfds);
 
-      err = ::select(sock_+1,&rfds,NULL,NULL,ptv);
+      err = ::select(hello_sock_+1,&rfds,NULL,NULL,ptv);
 
       if( err > 0 )
       {
-        err = ::recv(sock_,(char *)pkt.data(), pkt.maxlen(), 0);
+        err = ::recv(hello_sock_,(char *)pkt.data(), pkt.maxlen(), 0);
         //
         if( err > 0 )
         {

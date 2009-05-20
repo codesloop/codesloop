@@ -27,20 +27,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "udp_pkt.hh"
 #include "udp_srv.hh"
 #include "udp_hello_entry.hh"
-#include "csl_common.hh"
-#include "ecdh_key.hh"
-#include "crypt_pkt.hh"
 #include "common.h"
 #include <sys/types.h>
 #include <string.h>
 
 namespace csl
 {
-  using common::pbuf;
-  using common::xdrbuf;
-  using sec::ecdh_key;
-  using sec::crypt_pkt;
-
   namespace comm
   {
     void udp_hello_entry::operator()(void)
