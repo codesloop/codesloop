@@ -462,6 +462,31 @@ namespace csl
       if( n == 0 ) return true;
       else         return false;
     }
+
+    void xdrbuf::rewind()
+    {
+      pos_ = 0;
+      it_  = b_->begin();
+    }
+
+    unsigned long xdrbuf::position()
+    {
+      unsigned long ret = 0;
+      pbuf::iterator it = b_->begin();
+
+      while( it != it_ )
+      {
+        ret += (*it)->size_;
+        ++it;
+      }
+
+      if( it != b_->end() )
+      {
+        ret += pos_;
+      }
+
+      return ret;
+    }
   }
 }
 

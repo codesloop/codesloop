@@ -68,6 +68,12 @@ namespace csl
           rs_empty_buffer,        ///<Empty buffer supplied.
           rs_wsa_startup,         ///<Windows WSA Startup failed
           rs_getsockname_failed,  ///<getsockname() call failed.
+          rs_invalid_packet_type, ///<invalid packet type
+          rs_common_error,        ///<Error from common:: routines
+          rs_sec_error,           ///<Error from sec:: routines
+          rs_crypt_pkt_error,     ///<Error in crypt pkt
+          rs_too_big,             ///<Too big data to be placed into the given buffer
+          rs_pkt_error,           ///<Cannot encode/decode packet
         };
 
         enum {
@@ -76,7 +82,7 @@ namespace csl
           cm_udp_cli,          ///<UDP client component
           cm_udp_hello,        ///<UDP Hello packet class
           cm_udp_hello_entry,  ///<UDP Hello thread entry class
-          cm_synchsock,        ///<Synchronized socket container
+          cm_udp_pkt,          ///<UDP packet helper
           cm_wsa,              ///<WSA
         };
 

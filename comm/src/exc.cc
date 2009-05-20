@@ -39,28 +39,34 @@ namespace csl
     {
       switch( rc )
       {
-        case rs_host_not_set:       return "Required host parameter not set.";
-        case rs_port_not_set:       return "Required port parameter not set.";
-        case rs_socket_failed:      return "<socket() call failed";
-        case rs_connect_failed:     return "connect() call failed";
-        case rs_bind_failed:        return "bind() call failed";
-        case rs_listen_failed:      return "listen() call failed";
-        case rs_accept_failed:      return "accept() call failed";
-        case rs_pubkey_empty:       return "Required public key parameter not set.";
-        case rs_privkey_empty:      return "Required private key parameter not set.";
-        case rs_xdr_error:          return "XDR error.";
-        case rs_internal_error:     return "Internal error.";
-        case rs_send_failed:        return "send() call failed.";
-        case rs_recv_failed:        return "recv() call failed.";
-        case rs_timeout:            return "Timed out.";
-        case rs_select_failed:      return "select() call failed.";
-        case rs_already_started:    return "Already started";
-        case rs_thread_start:       return "Thread start failed.";
-        case rs_empty_buffer:       return "Empty buffer supplied.";
-        case rs_wsa_startup:        return "WSAStartup failed.";
-        case rs_getsockname_failed: return "getsockname() call failed.";
+        case rs_host_not_set:         return "Required host parameter not set.";
+        case rs_port_not_set:         return "Required port parameter not set.";
+        case rs_socket_failed:        return "<socket() call failed";
+        case rs_connect_failed:       return "connect() call failed";
+        case rs_bind_failed:          return "bind() call failed";
+        case rs_listen_failed:        return "listen() call failed";
+        case rs_accept_failed:        return "accept() call failed";
+        case rs_pubkey_empty:         return "Required public key parameter not set.";
+        case rs_privkey_empty:        return "Required private key parameter not set.";
+        case rs_xdr_error:            return "XDR error.";
+        case rs_internal_error:       return "Internal error.";
+        case rs_send_failed:          return "send() call failed.";
+        case rs_recv_failed:          return "recv() call failed.";
+        case rs_timeout:              return "Timed out.";
+        case rs_select_failed:        return "select() call failed.";
+        case rs_already_started:      return "Already started";
+        case rs_thread_start:         return "Thread start failed.";
+        case rs_empty_buffer:         return "Empty buffer supplied.";
+        case rs_wsa_startup:          return "WSAStartup failed.";
+        case rs_getsockname_failed:   return "getsockname() call failed.";
+        case rs_invalid_packet_type:  return "invalid packet type";
+        case rs_common_error:         return "common:: error";
+        case rs_sec_error:            return "sec:: error";
+        case rs_crypt_pkt_error:      return "error in crypt_pkt";
+        case rs_too_big:              return "data too big for the given buffer";
+        case rs_pkt_error:            return "Cannot encode/decode packet";
         case rs_unknown:
-          default:               return "Unknown reason";
+          default:                    return "Unknown reason";
       };
     }
 
@@ -71,8 +77,8 @@ namespace csl
         case cm_udp_srv:          return "comm::udp_srv";
         case cm_udp_cli:          return "comm::udp_cli";
         case cm_udp_hello:        return "comm::udp_hello";
-        case cm_synchsock:        return "comm::synchsock";
         case cm_udp_hello_entry:  return "comm::udp_hello_entry";
+        case cm_udp_pkt:          return "comm::udp_pkt";
         case cm_wsa:              return "comm::wsa";
         case cm_unknown:
           default:                return "unknown component";

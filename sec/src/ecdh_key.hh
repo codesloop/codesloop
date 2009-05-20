@@ -69,7 +69,7 @@ namespace csl
         @param buf is the XDR buffer that will contain the data
         @return true if successful
         */
-        bool to_xdr(xdrbuf & buf);
+        bool to_xdr(xdrbuf & buf) const;
 
         /**
         @brief deserialize the instance from the given XDR buf
@@ -133,7 +133,7 @@ namespace csl
 
 
         /** @brief print debug info */
-        void print();
+        void print() const;
 
         /* inline functions */
         inline void x(const bignum & v)             { x_ = v; }        ///<sets x

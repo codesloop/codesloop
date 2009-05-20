@@ -55,6 +55,14 @@ namespace csl
         typedef buf1024_t   databuf_t;
         typedef buf8_t      footbuf_t;
 
+        enum {
+          header_sz = 8,
+          footer_sz = 8
+        };
+
+        static inline unsigned int header_len() { return header_sz; }
+        static inline unsigned int footer_len() { return footer_sz; }
+
         bool encrypt( const saltbuf_t & salt,
                       const keybuf_t & key,
                       headbuf_t & header,

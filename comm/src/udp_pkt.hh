@@ -26,9 +26,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_comm_udp_pkt_hh_included_
 #define _csl_comm_udp_pkt_hh_included_
 
+#include "udp_srv_info.hh"
 #include "ecdh_key.hh"
 #include "bignum.hh"
-#include "crypt_pkt.hh"
 #include "pbuf.hh"
 #include "common.h"
 #ifdef __cplusplus
@@ -36,7 +36,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace csl
 {
   using common::tbuf;
-  using sec::crypt_pkt;
   using sec::bignum;
   using sec::ecdh_key;
 
@@ -50,49 +49,68 @@ namespace csl
           olleh_p,
           result_p,
           unicast_auth_p,
-          unicast_auth_resp_p,
+          unicast_htua_p,
           multicast_auth_p,
-          multicast_auth_resp_p,
+          multicast_htua_p,
           data_p,
           ack_rand_p
         };
 
-        typedef tbuf<64>               prolog_t;
-        typedef crypt_pkt::headbuf_t   headbuf_t;
-        typedef crypt_pkt::databuf_t   databuf_t;
-        typedef crypt_pkt::footbuf_t   footbuf_t;
+        enum {
+          max_length_v = 65536
+        };
 
-        // virtual bool encrypt();
-        // virtual bool decrypt();
+        unsigned char * data();
+        unsigned int maxlen();
 
-      protected:
-        prolog_t   prolog_;
-        headbuf_t  header_;
-        databuf_t  data_;
-        footbuf_t  footer_;
+        /* hello packet */
+        bool init_hello(unsigned int len);
+        unsigned char * prepare_hello(unsigned int & len);
 
-      private:
+        /* olleh packet */
+        bool init_olleh(unsigned int len);
+        unsigned char * prepare_olleh(unsigned int & len);
+
 #if 0
-        const bignum   * privk_;
-        const ecdh_key * peerpub_;
-        const ecdh_key * ownpub_;
-#endif
-      public:
-#if 0
-        /* own private key */
-        virtual inline const bignum & privk() const { return *privk_; }
-        virtual inline void privk(const bignum & pk) { privk_ = pk; }
+        /* auth packet */
+        bool init_uc_auth(unsigned int len);
+        unsigned char * prepare_uc_auth(unsigned int & len);
 
-        /* peer public key */
-        virtual inline const ecdh_key & peerpub() const { return peerpub_; }
-        virtual inline void peerpub(const ecdh_key & pk) { peerpub_ = pk; }
-
-        /* own public key */
-        virtual inline const ecdh_key & ownpub() const { return ownpub_; }
-        virtual inline void ownpub(const ecdh_key & pk) { ownpub_ = pk; }
+        /* htua packet */
+        bool init_uc_htua(unsigned int len);
+        unsigned char * prepare_uc_htua(unsigned int & len);
 #endif
+
+        /* variables */
+        ecdh_key & peer_pubkey();
+
+        void own_pubkey(const ecdh_key & pk);
+        ecdh_key & own_pubkey();
+
+        void srv_info(const udp_srv_info & info);
+        udp_srv_info & srv_info();
+
+        void own_privkey(const bignum & pk);
+        bignum & own_privkey();
 
         virtual inline ~udp_pkt() {}
+        udp_pkt();
+
+      private:
+        udp_srv_info   info_;
+        bignum         own_privkey_;
+        ecdh_key       own_pubkey_;
+        ecdh_key       peer_pubkey_;
+        unsigned char  data_[max_length_v];
+        bool           use_exc_;
+        bool           debug_;
+
+      public:
+        inline bool use_exc() const      { return use_exc_;  }
+        inline void use_exc(bool yesno)  { use_exc_ = yesno; }
+
+        inline bool debug() const      { return debug_; }
+        inline void debug(bool yesno)  { debug_ = yesno; }
     };
   }
 }

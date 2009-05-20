@@ -48,6 +48,7 @@ namespace test_xdrbuf {
   {
     pbuf pb;
     xdrbuf xb(pb);
+    assert( xb.position() == 0 );
   }
 
   /** @test copy constructor */
@@ -72,6 +73,7 @@ namespace test_xdrbuf {
 
     xb >> b;
     assert( a == b );
+    assert( xb.position() == sizeof(int32_t) );
 
     bool caught = false;
     try
@@ -110,6 +112,8 @@ namespace test_xdrbuf {
       assert( hw.size() > 10 );
       assert( hw == "Hello World" );
     }
+
+    assert( xb.position() > 10 );
 
     /* save position */
     xdrbuf xx(xb);
@@ -173,6 +177,7 @@ namespace test_xdrbuf {
     xb.rewind();
     unsigned int sz;
     assert( xb.get_data(ptr2,sz,204808) == true );
+    assert( xb.position() >= 204800 ); // TODO ??? == 204800
     assert( sz == zf.get_size() );
     assert( sz == 204800 );
     assert( ::memcmp(ptr,ptr2,sz) == 0 );
@@ -249,11 +254,14 @@ namespace test_xdrbuf {
     try
     {
       xb.rewind();
+      unsigned long j = 0;
 
       while( true )
       {
         unsigned int i;
         xb >> i;
+        j += sizeof(int32_t);
+        assert( xb.position() == j );
       };
     }
     catch( csl::common::exc e )
@@ -374,6 +382,7 @@ namespace test_xdrbuf {
       {
         pbuf i;
         xb >> i;
+        assert( i.size() == xb.position() );
       };
     }
     catch( csl::common::exc e )

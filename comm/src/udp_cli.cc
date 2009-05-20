@@ -42,29 +42,26 @@ namespace csl
   namespace comm
   {
 
+    udp_cli::udp_cli() : sock_(-1)
+    {
+      memset( &addr_,0,sizeof(addr_) );
+      addr_.sin_family        = AF_INET;
+      addr_.sin_addr.s_addr   = htonl(INADDR_LOOPBACK);
+    }
+
     bool udp_cli::init()
     {
       if( sock_ > 0 ) return true;
 
-      /* host name has been set ? */
-      if( host_.empty() ) { THR(exc::rs_host_not_set,exc::cm_udp_cli,false); }
-
-      /* port has been set ? */
-      if( port_ == 0 ) { THR(exc::rs_port_not_set,exc::cm_udp_cli,false); }
+      /* public_key has been set ? */
+      if( public_key_.is_empty() ) { THR(exc::rs_pubkey_empty,exc::cm_udp_cli,false); }
 
       int sock = ::socket( AF_INET, SOCK_DGRAM, 0 );
       if( sock <= 0 ) { THRC(exc::rs_socket_failed,exc::cm_udp_cli,false); }
 
-      struct sockaddr_in srv_addr;
-      memset( &srv_addr,0,sizeof(srv_addr) );
+      socklen_t len = sizeof(addr_);
 
-      srv_addr.sin_family = AF_INET;
-      srv_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK); // TODO resolve hostname
-      srv_addr.sin_port = htons(port_);
-
-      socklen_t len = sizeof(srv_addr);
-
-      if( ::connect(sock, (struct sockaddr *)&srv_addr, len) == -1 )
+      if( ::connect(sock, (struct sockaddr *)&addr_, len) == -1 )
       {
         ShutdownCloseSocket(sock);
         THRC(exc::rs_connect_failed,exc::cm_udp_cli,false);
@@ -80,32 +77,18 @@ namespace csl
 
       if( !init() ) return false;
 
-      /* public_key has been set ? */
-      if( public_key_.is_empty() ) { THR(exc::rs_pubkey_empty,exc::cm_udp_cli,false); }
+      udp_pkt pkt;
+      pkt.own_privkey(private_key_);
+      pkt.own_pubkey(public_key_);
 
-      pbuf pb;
-      xdrbuf xb(pb);
+      /* prepare hello packet */
+      unsigned int hello_len = 0;
+      unsigned char * hello = pkt.prepare_hello(hello_len);
 
-      try
+      if( !hello_len || !hello ) { THR(exc::rs_pkt_error,exc::cm_udp_cli,false); }
+
+      if( (err=::send( sock_, (const char *)hello, hello_len , 0 )) != (int)hello_len )
       {
-        /* compile packet */
-        xb << (int32_t)udp_pkt::hello_p;
-        if( !public_key_.to_xdr(xb) ) { THR(exc::rs_xdr_error,exc::cm_udp_cli,false); }
-      }
-      catch( common::exc e)
-      {
-        THR(exc::rs_xdr_error,exc::cm_udp_cli,false);
-      }
-
-      /* should not happen */
-      if( pb.size() == 0 ) { THR(exc::rs_internal_error,exc::cm_udp_cli,false); }
-
-      pbuf::const_iterator it = pb.const_begin();
-
-      if( (err=::send( sock_, (const char *)(*it)->data_, (*it)->size_ , 0 )) != (int)(*it)->size_ )
-      {
-        perror("write");
-        fprintf(stderr,"send(%d, '%d bytes') => %d\n",sock_,(*it)->size_,err);
         THRC(exc::rs_send_failed,exc::cm_udp_cli,false);
       }
 
@@ -127,12 +110,16 @@ namespace csl
 
       if( err > 0 )
       {
-        unsigned char tmp[65536];
-        err = ::recv(sock_,(char *)tmp,sizeof(tmp),0);
+        err = ::recv(sock_,(char *)pkt.data(), pkt.maxlen(), 0);
         //
         if( err > 0 )
         {
-           // TODO
+          if( pkt.init_olleh( err ) == false )
+          {
+            THR(exc::rs_pkt_error,exc::cm_udp_cli,false);
+          }
+
+          server_info_ = pkt.srv_info();
           return true;
         }
         else

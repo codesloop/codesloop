@@ -45,9 +45,16 @@ namespace test_udp_client {
   void basic()
   {
     udp_cli c;
+    udp_cli::SAI h;
+
     c.use_exc(false);
-    c.host("localhost");
-    c.port(47781);
+
+    memset( &h,0,sizeof(h) );
+    h.sin_family       = AF_INET;
+    h.sin_addr.s_addr  = htonl(INADDR_LOOPBACK);
+    h.sin_port         = htons(47781);
+
+    c.addr(h);
 
     ecdh_key pubkey;
     bignum   privkey;
@@ -63,14 +70,47 @@ namespace test_udp_client {
     assert( c.hello( 3000 ) == true );
   }
 
+  static udp_cli * global_client_ = 0;
+
+  void hello()
+  {
+    assert( global_client_->hello( 3000 ) == true );
+  }
+
 } // end of test_udp_client
 
 using namespace test_udp_client;
 
 int main()
 {
-  //csl_common_print_results( "simplest      ", csl_common_test_timer_i1(simplest,0),"" );
-  basic();
+  udp_cli c_global;
+  udp_cli::SAI h;
+
+  c_global.use_exc(false);
+
+  memset( &h,0,sizeof(h) );
+  h.sin_family       = AF_INET;
+  h.sin_addr.s_addr  = htonl(INADDR_LOOPBACK);
+  h.sin_port         = htons(47781);
+
+  c_global.addr(h);
+
+  ecdh_key pubkey;
+  bignum   privkey;
+
+  pubkey.algname("prime192v3");
+
+  /* generate keypair */
+  assert( pubkey.gen_keypair(privkey) == true );
+
+  c_global.private_key(privkey);
+  c_global.public_key(pubkey);
+
+  global_client_ = &c_global;
+
+  csl_common_print_results( "basic      ", csl_common_test_timer_v0(basic),"" );
+  csl_common_print_results( "hello      ", csl_common_test_timer_v0(hello),"" );
+
   return 0;
 }
 

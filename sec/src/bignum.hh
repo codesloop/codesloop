@@ -105,7 +105,7 @@ namespace csl
         @param buf is the XDR buffer that will contain the data
         @return true if successful
          */
-        bool to_xdr(xdrbuf & buf);
+        bool to_xdr(xdrbuf & buf) const;
 
         /**
         @brief deserialize the instance from the given XDR buf
@@ -114,7 +114,7 @@ namespace csl
          */
         bool from_xdr(xdrbuf & buf);
 
-        void print();                                 ///<print debug data
+        void print() const;                                 ///<print debug data
 
         bool operator==(const bignum & other) const  ///<checks for equality
         {

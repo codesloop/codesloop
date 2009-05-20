@@ -38,7 +38,7 @@ namespace csl
 {
   namespace sec
   {
-    bool bignum::to_xdr(xdrbuf & buf)
+    bool bignum::to_xdr(xdrbuf & buf) const
     {
       bool ret = true;
       try
@@ -76,11 +76,11 @@ namespace csl
       return ret;
     }
 
-    void bignum::print()
+    void bignum::print() const
     {
       const unsigned char * d = data();
       unsigned int len = size();
-      printf("BIGNUM[%d bytes]: ",len);
+      printf("BIGNUM[%d bytes]: neg[%d]: ",len,is_negative());
       for( unsigned int i=0;i<len;++i )
       {
         printf("%02x",d[i] );

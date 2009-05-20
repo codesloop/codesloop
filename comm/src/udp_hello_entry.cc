@@ -48,10 +48,17 @@ namespace csl
       SAI             cliaddr;
       socklen_t       len = sizeof(cliaddr);
       int             recvd;
-      unsigned char   buffer[65536];
+      udp_pkt         pkt;
 
+      /* init packet handler */
+      pkt.use_exc(false);
+      pkt.srv_info(srv().server_info());
+      pkt.own_privkey(srv().private_key());
+
+      /* packet loop */
       while( stop_me() == false )
       {
+        /* wait for incoming packets */
         fd_set fds;
         FD_ZERO( &fds );
         FD_SET( socket(), &fds );
@@ -59,115 +66,80 @@ namespace csl
 
         int err = ::select( socket()+1,&fds,NULL,NULL,&tv );
 
-        if( err < 0 )       break;    // TODO : error handling
-        else if( err == 0 ) continue; // TODO : error handling
+        if( err < 0 )
+        {
+          fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);
+          break;    // TODO : error handling
+        }
+        else if( err == 0 )
+        {
+          // select timed out
+          continue;
+        }
 
         /* receive packet */
-        recvd = recvfrom( socket(), (char *)buffer, sizeof(buffer), 0, (struct sockaddr *)&cliaddr, &len );
-        fprintf( stderr,"Received %d bytes [%s]\n",recvd,buffer);
+        recvd = recvfrom( socket(), (char *)pkt.data(), pkt.maxlen(), 0, (struct sockaddr *)&cliaddr, &len );
 
-        if( !recvd ) continue; // error handling
+        if( !recvd )
+        {
+          fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);
+          continue; // TODO : error handling
+        }
 
         try
         {
-          /* decode packet */
-          ecdh_key peer_public_key;
-
-          pbuf pb;
-          pb.append(buffer,recvd);
-          xdrbuf xb(pb);
-
-          int32_t packet_type;
-          xb >> packet_type;
-
-          if( packet_type != udp_pkt::hello_p ) continue; // TODO error handling
-          if( !peer_public_key.from_xdr(xb) ) continue; // TODO error handling
+          /* process incoming hello packet */
+          if( pkt.init_hello(recvd) == false )
+          {
+            fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);
+            continue; // TODO : error handling
+          }
 
           /* check peer key */
-          if( valid_key_cb_ &&
-              (*valid_key_cb_)(peer_public_key) == false ) continue; // TODO error handling
-
-          /* gather packet data */
-          udp_srv_info   inf(srv().server_info());
-          ecdh_key       public_key(srv().server_info().public_key());
-          bignum         private_key(srv().private_key());
-          string         peer_host(inet_ntoa(cliaddr.sin_addr));
+          if( valid_key_cb_ && (*valid_key_cb_)(pkt.peer_pubkey()) == false )
+          {
+            fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);
+            continue; // TODO error handling
+          }
 
           /* hello callback */
           if( hello_cb_ &&
               (*hello_cb_)(
-                peer_public_key,
-                peer_host,
-                cliaddr.sin_port,
-                inf,
-                private_key) == false ) continue; // TODO error handling
-
-          /* generate session key */
-          std::string session_key;
-
-          if( !peer_public_key.gen_sha1hex_shared_key(private_key,session_key) )
+                pkt.peer_pubkey(),
+                cliaddr,
+                pkt.srv_info(),
+                pkt.own_privkey()) == false )
           {
+            fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);
             continue; // TODO error handling
           }
 
-          /* unencrypted part */
-          crypt_pkt::databuf_t odta;
-          pbuf   outer;
-          xdrbuf xbo(outer);
+          /* prepare response olleh packet */
+          unsigned int olleh_len = 0;
+          unsigned char * olleh = pkt.prepare_olleh(olleh_len);
 
-          xbo << (int32_t)udp_pkt::olleh_p;
-          public_key.to_xdr(xbo);
-          outer.t_copy_to(odta);
-
-          /* encrypted part */
-          pbuf inner;
-          xdrbuf xbi(inner);
-
-          xbi << (int32_t)inf.need_login();
-          xbi << (int32_t)inf.need_pass();
-
-          /* compile packet */
-          crypt_pkt::saltbuf_t  salt;
-          crypt_pkt::keybuf_t   key;
-          crypt_pkt::headbuf_t  head;
-          crypt_pkt::databuf_t  data;
-          crypt_pkt::footbuf_t  foot;
-
-          salt.set((unsigned char *)"00000000",8);
-          key.set((unsigned char *)session_key.c_str(),session_key.size());
-          inner.t_copy_to(data);
-
-          crypt_pkt pk;
-          if( !pk.encrypt( salt,key,head,data,foot ) )
+          if( !olleh_len || !olleh )
           {
+            fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);
             continue; // TODO error handling
           }
-
-          /* output packet */
-          crypt_pkt::databuf_t output;
-
-          unsigned char * outputp = output.allocate( odta.size()+head.size()+data.size()+foot.size() );
-
-          memcpy( outputp, odta.data(), odta.size() ); outputp += odta.size();
-          memcpy( outputp, head.data(), head.size() ); outputp += head.size();
-          memcpy( outputp, data.data(), data.size() ); outputp += data.size();
-          memcpy( outputp, foot.data(), foot.size() ); outputp += foot.size();
 
           /* send data back */
           if( sendto( socket(),
-              (const char *)output.data(), output.size(), 0,
-               (struct sockaddr *)&cliaddr, len ) != (int)output.size() )
+              (const char *)olleh, olleh_len, 0,
+               (struct sockaddr *)&cliaddr, len ) != (int)olleh_len )
           {
+            fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);
             continue; // TODO error
           }
         }
         catch( common::exc e )
         {
-          printf("Error [%s:%d]\n",__FILE__,__LINE__);
+          fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);
         }
         catch( comm::exc e )
         {
-          printf("Error [%s:%d]\n",__FILE__,__LINE__);
+          fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);
         }
       }
     }

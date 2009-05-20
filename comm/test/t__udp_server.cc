@@ -47,6 +47,8 @@ namespace test_udp_server {
     udp_srv s;
     udp_srv::SAI h,a,d;
 
+    s.use_exc(false);
+
     memset( &h,0,sizeof(h) );
     h.sin_family       = AF_INET;
     h.sin_addr.s_addr  = htonl(INADDR_LOOPBACK);

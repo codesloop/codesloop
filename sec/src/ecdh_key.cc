@@ -449,7 +449,7 @@ namespace csl
       return false;
     }
 
-    bool ecdh_key::to_xdr(xdrbuf & buf)
+    bool ecdh_key::to_xdr(xdrbuf & buf) const
     {
       bool ret = true;
       try
@@ -503,7 +503,7 @@ namespace csl
       return *this;
     }
 
-    void ecdh_key::print()
+    void ecdh_key::print() const
     {
       printf("ECDH_KEY[%s]:\n",(algname_.size() > 0 ? algname_.c_str() : "EMPTY ALG"));
       printf("  X key: "); x_.print();

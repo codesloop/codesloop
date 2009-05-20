@@ -43,6 +43,7 @@ namespace csl
     class cb
     {
       public:
+        typedef struct sockaddr_in SAI;
 
         class valid_key
         {
@@ -56,8 +57,7 @@ namespace csl
           public:
             virtual ~hello() {}
             virtual bool operator()( const ecdh_key & peer_public_key, // in
-                                     const string & host,              // in
-                                     unsigned short port,              // in
+                                     const SAI & addr,                 // in
                                      udp_srv_info & info,              // out
                                      bignum & my_private_key ) = 0;    // out
         };
@@ -67,8 +67,7 @@ namespace csl
           public:
             virtual ~valid_creds() {}
             virtual bool operator()( const ecdh_key & peer_public_key, // in
-                                     const string & host,              // in
-                                     unsigned short port,              // in
+                                     const SAI & addr,                 // in
                                      const string & login,             // in
                                      const string & pass ) = 0;        // in
         };

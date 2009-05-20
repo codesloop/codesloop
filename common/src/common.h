@@ -114,7 +114,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     do { \
       if( this->use_exc() ) { \
         char errstr[256]; \
-		strncpy(errstr,strerror(errno),255); errstr[255]=0; \
+        strncpy(errstr,strerror(errno),255); errstr[255]=0; \
         throw exc(REASON,COMPONENT,errstr,__FILE__,__LINE__); \
         return RET; } \
       else { \

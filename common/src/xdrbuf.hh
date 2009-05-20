@@ -83,7 +83,7 @@ namespace csl
         @brief serialize val to pbuf
         @param val is the value to be serialized
         @return reference to xdrbuf
-		@throw common::exc
+        @throw common::exc
 
         puts a 32 bit integer to pbuf
         */
@@ -93,7 +93,7 @@ namespace csl
         @brief serialize val to pbuf
         @param val is the value to be serialized
         @return reference to xdrbuf
-		@throw common::exc
+        @throw common::exc
 
         puts a 32 bit integer to stream
         */
@@ -103,7 +103,7 @@ namespace csl
         @brief serialize val to pbuf
         @param val is the value to be serialized
         @return reference to xdrbuf
-		@throw common::exc
+        @throw common::exc
 
         @li puts a 32 bit integer to stream as size
         @li puts size bytes of val C string to pbuf
@@ -115,7 +115,7 @@ namespace csl
         @brief serialize val to pbuf
         @param val is the value to be serialized
         @return reference to xdrbuf
-		@throw common::exc
+        @throw common::exc
 
         @li puts a 32 bit integer to stream as size
         @li puts size bytes of val string to pbuf
@@ -127,7 +127,7 @@ namespace csl
         @brief serialize val to pbuf
         @param val is the value to be serialized
         @return reference to xdrbuf
-		@throw common::exc
+        @throw common::exc
 
         @li puts a 32 bit integer to stream as size (val.second)
         @li puts (val.second) bytes from val to pbuf (val.first)
@@ -139,7 +139,7 @@ namespace csl
         @brief serialize val to pbuf
         @param val is the value to be serialized
         @return reference to xdrbuf
-		@throw common::exc
+        @throw common::exc
 
         @li puts a 32 bit integer to stream as size (val.size())
         @li puts (val.size()) bytes from val to pbuf
@@ -151,7 +151,7 @@ namespace csl
         @brief deserialize val from pbuf
         @param val is the value to be deserialized
         @return reference to xdrbuf
-		@throw common::exc
+        @throw common::exc
 
         @li reads a 32 bit integer from stream to val
         */
@@ -161,7 +161,7 @@ namespace csl
         @brief deserialize val from pbuf
         @param val is the value to be deserialized
         @return reference to xdrbuf
-		@throw common::exc
+        @throw common::exc
 
         @li reads a 32 bit integer from stream to val
         */
@@ -171,7 +171,7 @@ namespace csl
         @brief deserialize val from pbuf
         @param val is the value to be deserialized
         @return reference to xdrbuf
-		@throw common::exc
+        @throw common::exc
 
         @li reads a 32 bit integer from stream as size
         @li reads size bytes from pbuf to val
@@ -183,7 +183,7 @@ namespace csl
         @brief deserialize val from pbuf
         @param val is the value to be deserialized
         @return reference to xdrbuf
-		@throw common::exc
+        @throw common::exc
 
         @li reads a 32 bit integer from stream as size
         @li reads size bytes from pbuf to val
@@ -196,7 +196,7 @@ namespace csl
         @param where is a location where to put data
         @param size is the expected length to be read
         @return the successful data size read
-		@throw common::exc
+        @throw common::exc
 
         @note this function reads from the stream 'asis' without decoding any
         size information. to decode that with the size use the 3 parameter form of get_data
@@ -214,7 +214,7 @@ namespace csl
         @param size is a reference to the read size
         @param max_size is the maximum size to be read
         @return true if successful
-		@throw common::exc
+        @throw common::exc
 
         @li where is expected to be allocated by the caller
         @li first reads 32 bit integer from stream as sizei
@@ -232,7 +232,7 @@ namespace csl
         @param size is a reference to the read size
         @param max_size is the maximum size to be read
         @return true if successful
-		@throw common::exc
+        @throw common::exc
 
         @li where is expected to be allocated by the caller
         @li first reads 32 bit integer from stream as sizei
@@ -275,11 +275,10 @@ namespace csl
         }
 
         /** @brief sets the iterator position to the beginning of the stream */
-        inline void rewind()
-        {
-          pos_ = 0;
-          it_  = b_->begin();
-        }
+        void rewind();
+
+        /** @brief returns the number of bytes consumed from the stream */
+        unsigned long position();
 
       private:
         bool use_exc_;

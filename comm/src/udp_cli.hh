@@ -47,6 +47,8 @@ namespace csl
     class udp_cli
     {
       public:
+        /* typedefs */
+        typedef struct sockaddr_in SAI;
 
         bool hello( unsigned int timeout_ms=0 );
         bool start( unsigned int timeout_ms=0 );
@@ -54,15 +56,14 @@ namespace csl
         bool send( pbuf & pb, bool synched=false, unsigned int timeout_ms=0 );
         bool recv( pbuf & pb, unsigned int timeout_ms=0 );
 
-        inline udp_cli() : port_(0), sock_(-1) {}
+        udp_cli();
 
       private:
         /* internal */
         bool use_exc_;
 
         /* user should fill these */
-        string             host_;
-        unsigned short     port_;
+        SAI                addr_;
         string             login_;
         string             pass_;
         ecdh_key           public_key_;
@@ -82,13 +83,9 @@ namespace csl
       public:
 
         /* inline accessors and manipulators */
-        /* host */
-        inline const std::string & host() const { return host_; }
-        inline void host(const std::string & v) { host_ = v; }
-
-        /* port */
-        inline unsigned short port() const { return port_; }
-        inline void port(unsigned short v) { port_ = v; }
+        /* addr */
+        inline const SAI & addr() const { return addr_; }
+        inline void addr(const SAI & a) { addr_ = a;    }
 
         /* login */
         inline const std::string & login() const { return login_; }
