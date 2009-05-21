@@ -134,7 +134,7 @@ namespace test_udp_pkt {
     assert( cli.init_olleh(olleh_len) == true );
 
     /* check auth packets */
-    memset( cli.rand(),'A',64 );
+    memset( cli.rand(),'A',cli.maxrand() );
     cli.login("Scho:n Ubul");
     cli.pass("Futrinka utca");
     cli.session_key("Lukas csokolade");
@@ -151,8 +151,8 @@ namespace test_udp_pkt {
     assert( srv.init_uc_auth(auth_len) == true );
 
     /* check auth response: htua */
-    memset( srv.rand(),'B',64 );
-    memset( srv.salt(),'A',8 );
+    memset( srv.rand(),'B',srv.maxrand() );
+    memset( srv.salt(),'A',srv.maxsalt() );
 
     unsigned int htua_len = 0;
     assert( srv.prepare_uc_htua(htua_len) != 0 );
@@ -164,6 +164,29 @@ namespace test_udp_pkt {
 
     memcpy( cli.data(),srv.data(),htua_len );
     assert( cli.init_uc_htua(htua_len) == true );
+
+    /* check data packets */
+    unsigned int data_len = 0;
+    assert( cli.prepare_data( 12345678ULL,(const unsigned char *)"Hello World",12,data_len ) != 0 );
+
+    if( dbg )
+    {
+      print_hex(">DATA",cli.data(),data_len);
+    }
+
+    /* check data receive */
+    memcpy( srv.data(),cli.data(),data_len );
+
+    unsigned long long newsalt=0;
+    udp_pkt::b1024_t recvdata;
+
+    assert( srv.init_data(data_len,newsalt,recvdata ) == true );
+
+    if( dbg )
+    {
+      printf(" -- newsalt: %lld\n",newsalt );
+      print_hex(">DATA",recvdata.data(),recvdata.size());
+    }
   }
 
 } // end of test_udp_pkt

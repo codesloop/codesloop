@@ -24,8 +24,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "exc.hh"
+#include "udp_pkt.hh"
 #include "udp_srv.hh"
-#include "udp_data_entry.hh"
+#include "udp_auth_entry.hh"
 #include "common.h"
 #include <sys/types.h>
 #include <string.h>
@@ -36,9 +37,48 @@ namespace csl
   {
     void udp_data_entry::operator()(void)
     {
+      SAI             cliaddr;
+      socklen_t       len = sizeof(cliaddr);
+      int             recvd;
+      udp_pkt         pkt;
+
+      /* init packet handler */
+      pkt.use_exc(false);
+      pkt.server_info(srv().server_info());
+      pkt.own_privkey(srv().private_key());
+
+      /* packet loop */
       while( stop_me() == false )
       {
-        SleepSeconds( 1 );
+        /* wait for incoming packets */
+        fd_set fds;
+        FD_ZERO( &fds );
+        FD_SET( socket(), &fds );
+        struct timeval tv = { 1, 0 };
+
+        int err = ::select( socket()+1,&fds,NULL,NULL,&tv );
+
+        if( err < 0 )
+        {
+          fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);
+          break;    // TODO : error handling
+        }
+        else if( err == 0 )
+        {
+          // select timed out
+          continue;
+        }
+
+        /* receive packet */
+        recvd = recvfrom( socket(), (char *)pkt.data(), pkt.maxlen(), 0, (struct sockaddr *)&cliaddr, &len );
+
+        if( !recvd )
+        {
+          fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);
+          continue; // TODO : error handling
+        }
+
+        // try-catch
       }
     }
 

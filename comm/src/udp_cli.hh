@@ -31,6 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ecdh_key.hh"
 #include "bignum.hh"
 #include "udp_srv_info.hh"
+#include "udp_pkt.hh"
 #include "common.h"
 #ifdef __cplusplus
 #include <string>
@@ -53,8 +54,8 @@ namespace csl
         bool hello( unsigned int timeout_ms=0 );
         bool start( unsigned int timeout_ms=0 );
 
-        bool send( pbuf & pb, bool synched=false, unsigned int timeout_ms=0 );
-        bool recv( pbuf & pb, unsigned int timeout_ms=0 );
+        bool send( unsigned char * data, unsigned int sz );
+        bool recv( unsigned char * data, unsigned int & sz, unsigned int timeout_ms=0 );
 
         udp_cli();
         virtual ~udp_cli();
@@ -64,24 +65,20 @@ namespace csl
         bool use_exc_;
 
         /* user should fill these */
-        SAI                hello_addr_;
-        SAI                auth_addr_;
-        SAI                data_addr_;
-        string             login_;
-        string             pass_;
-        ecdh_key           public_key_;
-        bignum             private_key_;
+        SAI                    hello_addr_;
+        SAI                    auth_addr_;
+        SAI                    data_addr_;
 
         /* user or server fills this */
-        udp_srv_info       server_info_;
+        udp_pkt                pkt_;
 
         /* connection related */
-        int                hello_sock_;
-        int                auth_sock_;
-        int                data_sock_;
-        unsigned char      client_rand_[8][8];
-        unsigned char      server_rand_[8][8];
-        string             session_key_;
+        int                    hello_sock_;
+        int                    auth_sock_;
+        int                    data_sock_;
+        unsigned long long     client_rand_;
+        unsigned long long     server_rand_;
+        string                 session_key_;
 
         bool init();
 
@@ -102,24 +99,24 @@ namespace csl
         inline void data_addr(const SAI & a) { data_addr_ = a;    }
 
         /* login */
-        inline const std::string & login() const { return login_; }
-        inline void login(const std::string & v) { login_ = v; }
+        inline const std::string & login() const { return pkt_.login(); }
+        inline void login(const std::string & v) { pkt_.login(v);       }
 
         /* pass */
-        inline const std::string & pass() const { return pass_; }
-        inline void pass(const std::string & v) { pass_ = v; }
+        inline const std::string & pass() const { return pkt_.pass(); }
+        inline void pass(const std::string & v) { pkt_.pass(v);       }
 
         /* private key */
-        inline const bignum & private_key() const { return private_key_; }
-        inline void private_key(const bignum & v) { private_key_ = v; }
+        inline const bignum & private_key() const { return pkt_.own_privkey_const(); }
+        inline void private_key(const bignum & v) { pkt_.own_privkey(v);       }
 
         /* public key */
-        inline const ecdh_key & public_key() const { return public_key_; }
-        inline void public_key(const ecdh_key & v) { public_key_ = v; }
+        inline const ecdh_key & public_key() const { return pkt_.own_pubkey_const(); }
+        inline void public_key(const ecdh_key & v) { pkt_.own_pubkey(v);       }
 
         /* info */
-        inline const udp_srv_info & server_info() const { return server_info_; }
-        inline void server_info(const udp_srv_info & v) { server_info_ = v; }
+        inline const udp_srv_info & server_info() const { return pkt_.server_info_const(); }
+        inline void server_info(const udp_srv_info & v) { pkt_.server_info(v); }
 
 
         /** @brief Specifies whether param should throw common::exc exceptions

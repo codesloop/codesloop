@@ -58,13 +58,16 @@ namespace csl
         /* typedefs */
         typedef struct sockaddr_in SAI;
 
+        /* interface */
         bool start();
+
         udp_srv();
         virtual ~udp_srv();
 
       private:
         /* internal */
         bool use_exc_;
+        unsigned long long msg_counter_;
 
         /* user should fill these */
         bignum             private_key_;
@@ -80,11 +83,20 @@ namespace csl
         udp_auth_entry  auth_entry_;
         udp_data_entry  data_entry_;
 
+        /* session callbacks */
+        cb::create_session   * create_session_cb_;
+        cb::cleanup_session  * cleanup_session_cb_;
+        cb::data_arrival     * data_arrival_cb_;
+
       public:
         /* accessors and manipulators */
         void valid_key_cb(cb::valid_key & c);
         void hello_cb(cb::hello & c);
         void valid_creds_cb(cb::valid_creds & c);
+
+        void create_session_cb(cb::create_session & c);
+        void cleanup_session_cb(cb::cleanup_session & c);
+        void data_arrival_cb(cb::data_arrival & c);
 
         /* addresses */
         const SAI & hello_addr() const;
@@ -112,6 +124,7 @@ namespace csl
 
         /* internal functions */
         bool on_accept_auth( udp_pkt & pkt, SAI & addr );
+        bool on_data_arrival( udp_pkt & pkt, SAI & addr );
 
         /* no copy */
         udp_srv(const udp_srv & other);

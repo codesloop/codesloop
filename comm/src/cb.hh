@@ -29,6 +29,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "udp_srv_info.hh"
 #include "bignum.hh"
 #include "ecdh_key.hh"
+#include "session_data.hh"
 #ifdef __cplusplus
 #include <string>
 
@@ -72,10 +73,33 @@ namespace csl
                                      const string & pass) = 0;            // in
         };
 
-        class accept
+        class create_session
         {
           public:
-            virtual ~accept() {}
+            virtual ~create_session() {}
+            virtual session_data * operator()( const ecdh_key & peer_public_key,  // in
+                                               const ecdh_key & own_public_key,   // in
+                                               const bignum & own_private_key,    // in
+                                               const SAI & addr,                  // in
+                                               const string & login,              // in
+                                               const string & pass,               // in
+                                               const string & session_key ) = 0;  // in
+        };
+
+        class cleanup_session
+        {
+          public:
+            virtual ~cleanup_session() {}
+            virtual void operator()( session_data * sess ) = 0;   // in
+        };
+
+        class data_arrival
+        {
+          public:
+            virtual ~data_arrival() {}
+            virtual bool operator()( session_data * sess,         // in
+                                     const unsigned char * data,  // in
+                                     unsigned int len ) = 0;      // in
         };
     };
   }

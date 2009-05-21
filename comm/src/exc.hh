@@ -75,6 +75,10 @@ namespace csl
           rs_too_big,             ///<Too big data to be placed into the given buffer
           rs_pkt_error,           ///<Cannot encode/decode packet
           rs_hello_nocall,        ///<Hello not called and/or server_info not filled
+          rs_null_param,          ///<NULL parameter supplied.
+          rs_not_inited,          ///<Not initialized.
+          rs_need_login,          ///<Need login.
+          rs_need_pass,           ///<Need pass.
         };
 
         enum {

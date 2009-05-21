@@ -23,24 +23,28 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_comm_udp_reslt_hh_included_
-#define _csl_comm_udp_reslt_hh_included_
-
-#include "udp_pkt.hh"
+#include "exc.hh"
+#include "udp_chann_entry.hh"
 #include "common.h"
-#ifdef __cplusplus
+#include <sys/types.h>
+#include <string.h>
 
 namespace csl
 {
   namespace comm
   {
-    class udp_reslt : public udp_pkt
+    void udp_chann_entry::operator()(void)
     {
-      public:
-      private:
-    };
-  }
-}
+      while( true )
+      {
+        SleepSeconds( 1 );
+      }
+    }
 
-#endif /* __cplusplus */
-#endif /* _csl_comm_udp_reslt_hh_included_ */
+    udp_chann_entry::~udp_chann_entry()
+    {
+    }
+  };
+};
+
+/* EOF */

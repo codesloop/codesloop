@@ -29,7 +29,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "udp_srv_info.hh"
 #include "ecdh_key.hh"
 #include "bignum.hh"
-#include "pbuf.hh"
+#include "tbuf.hh"
 #include "common.h"
 #ifdef __cplusplus
 
@@ -53,15 +53,21 @@ namespace csl
           multicast_auth_p,
           multicast_htua_p,
           data_p,
-          ack_rand_p
+          salt_p
         };
 
         enum {
-          max_length_v = 65536
+          max_length_v = 65496,
+          max_rand_v = 8,
+          max_salt_v = 8
         };
 
-        unsigned char * data();
-        unsigned int maxlen();
+        typedef common::tbuf<1024> b1024_t;
+
+        inline unsigned char * data() { return data_; }
+        inline unsigned int maxlen()  { return max_length_v; }
+        inline unsigned int maxrand() { return max_rand_v; }
+        inline unsigned int maxsalt() { return max_salt_v; }
 
         /* hello packet */
         bool init_hello(unsigned int len);
@@ -79,18 +85,35 @@ namespace csl
         bool init_uc_htua(unsigned int len);
         unsigned char * prepare_uc_htua(unsigned int & len);
 
+        /* data packet */
+        bool init_data( unsigned int len,
+                        unsigned long long & newsalt, // TODO
+                        b1024_t & data ); // process received
+
+        unsigned char * prepare_data( unsigned long long newsalt, // TODO
+                                      const unsigned char * dta, // prepare before send
+                                      unsigned int dsize,
+                                      unsigned int & len );
+
+        /* salt packet */
+        bool init_salt(unsigned int len);
+        unsigned char * prepare_salt(unsigned int & len);
+
         /* variables */
         void peer_pubkey(const ecdh_key & pk);
         ecdh_key & peer_pubkey();
 
         void own_pubkey(const ecdh_key & pk);
         ecdh_key & own_pubkey();
+        const ecdh_key & own_pubkey_const() const;
 
         void server_info(const udp_srv_info & info);
         udp_srv_info & server_info();
+        const udp_srv_info & server_info_const() const;
 
         void own_privkey(const bignum & pk);
         bignum & own_privkey();
+        const bignum & own_privkey_const() const;
 
         const std::string & login() const;
         void login(const std::string & l);
@@ -98,8 +121,8 @@ namespace csl
         const std::string & pass() const;
         void pass(const std::string & p);
 
-        unsigned char * rand();
-        unsigned char * salt();
+        unsigned long long * rand();
+        unsigned long long * salt();
 
         const std::string & session_key() const;
         void session_key(const std::string & k);
@@ -108,18 +131,18 @@ namespace csl
         udp_pkt();
 
       private:
-        udp_srv_info   info_;
-        bignum         own_privkey_;
-        ecdh_key       own_pubkey_;
-        ecdh_key       peer_pubkey_;
-        std::string    login_;
-        std::string    pass_;
-        unsigned char  rand_[8][8];
-        unsigned char  salt_[8];
-        std::string    session_key_;
-        unsigned char  data_[max_length_v];
-        bool           use_exc_;
-        bool           debug_;
+        udp_srv_info           info_;
+        bignum                 own_privkey_;
+        ecdh_key               own_pubkey_;
+        ecdh_key               peer_pubkey_;
+        std::string            login_;
+        std::string            pass_;
+        unsigned long long     rand_;
+        unsigned long long     salt_;
+        std::string            session_key_;
+        unsigned char          data_[max_length_v];
+        bool                   use_exc_;
+        bool                   debug_;
 
       public:
         inline bool use_exc() const      { return use_exc_;  }

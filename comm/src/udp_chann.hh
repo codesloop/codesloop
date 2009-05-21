@@ -36,7 +36,16 @@ namespace csl
     class udp_chann
     {
       public:
+
       private:
+        struct key
+        {
+          unsigned long long rnd_;
+          unsigned long long when_;
+        };
+
+        key client_keys_[8];
+        key server_keys_[8];
     };
   }
 }

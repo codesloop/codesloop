@@ -106,7 +106,11 @@ namespace csl
             continue; // TODO error handling
           }
 
-          /* register authenticated client */
+          /* register authenticated client, its roles are:
+             - generate server random
+             - set salt for response
+             - register client (including its random keys)
+           */
           if( srv().on_accept_auth( pkt, cliaddr ) == false )
           {
             fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);

@@ -84,7 +84,7 @@ namespace csl
       if( hello_sock_ > 0 && auth_sock_ > 0 && data_sock_ > 0 ) return true;
 
       /* public_key has been set ? */
-      if( public_key_.is_empty() ) { THR(exc::rs_pubkey_empty,exc::cm_udp_cli,false); }
+      if( public_key().is_empty() ) { THR(exc::rs_pubkey_empty,exc::cm_udp_cli,false); }
 
       hello_sock_ = init_sock( hello_addr_ );
 
@@ -107,13 +107,9 @@ namespace csl
 
       if( !init() ) return false;
 
-      udp_pkt pkt;
-      pkt.own_privkey(private_key_);
-      pkt.own_pubkey(public_key_);
-
       /* prepare hello packet */
       unsigned int hello_len = 0;
-      unsigned char * hello = pkt.prepare_hello(hello_len);
+      unsigned char * hello = pkt_.prepare_hello(hello_len);
 
       if( !hello_len || !hello ) { THR(exc::rs_pkt_error,exc::cm_udp_cli,false); }
 
@@ -140,16 +136,14 @@ namespace csl
 
       if( err > 0 )
       {
-        err = ::recv(hello_sock_,(char *)pkt.data(), pkt.maxlen(), 0);
+        err = ::recv(hello_sock_,(char *)pkt_.data(), pkt_.maxlen(), 0);
         //
         if( err > 0 )
         {
-          if( pkt.init_olleh( err ) == false )
+          if( pkt_.init_olleh( err ) == false )
           {
             THR(exc::rs_pkt_error,exc::cm_udp_cli,false);
           }
-
-          server_info_ = pkt.server_info();
           return true;
         }
         else
@@ -188,26 +182,20 @@ namespace csl
 
       if( !init() ) return false;
 
-      if( server_info_.public_key().is_empty() ) { THR(exc::rs_hello_nocall,exc::cm_udp_cli,false); }
+      if( server_info().public_key().is_empty() ) { THR(exc::rs_hello_nocall,exc::cm_udp_cli,false); }
 
       gen_sess_key(session_key_);
-      csl_sec_gen_rand(client_rand_,sizeof(client_rand_));
+      csl_sec_gen_rand(&client_rand_,sizeof(client_rand_));
 
-      udp_pkt pkt;
-      pkt.server_info(server_info_);
-      pkt.peer_pubkey(server_info_.public_key());
-      pkt.own_privkey(private_key_);
-      pkt.own_pubkey(public_key_);
+      if( server_info().need_login() && pkt_.login().size() == 0 ) { THR(exc::rs_need_login,exc::cm_udp_cli,false); }
+      if( server_info().need_pass()  && pkt_.pass().size() == 0 )  { THR(exc::rs_need_pass,exc::cm_udp_cli,false); }
 
-      if( server_info_.need_login() ) pkt.login(login_);
-      if( server_info_.need_pass()  ) pkt.pass(pass_);
-
-      pkt.session_key(session_key_);
-      memcpy( pkt.rand(),client_rand_,sizeof(client_rand_) );
+      pkt_.session_key(session_key_);
+      memcpy( pkt_.rand(),&client_rand_,sizeof(client_rand_) );
 
       /* prepare auth packet */
       unsigned int auth_len = 0;
-      unsigned char * auth = pkt.prepare_uc_auth(auth_len);
+      unsigned char * auth = pkt_.prepare_uc_auth(auth_len);
 
       if( !auth_len || !auth ) { THR(exc::rs_pkt_error,exc::cm_udp_cli,false); }
 
@@ -234,16 +222,16 @@ namespace csl
 
       if( err > 0 )
       {
-        err = ::recv(auth_sock_,(char *)pkt.data(), pkt.maxlen(), 0);
+        err = ::recv(auth_sock_,(char *)pkt_.data(), pkt_.maxlen(), 0);
         //
         if( err > 0 )
         {
-          if( pkt.init_uc_htua( err ) == false )
+          if( pkt_.init_uc_htua( err ) == false )
           {
             THR(exc::rs_pkt_error,exc::cm_udp_cli,false);
           }
 
-          memcpy(server_rand_,pkt.rand(),sizeof(server_rand_));
+          memcpy(&server_rand_,pkt_.rand(),sizeof(server_rand_));
           return true;
         }
         else
@@ -263,13 +251,18 @@ namespace csl
       }
     }
 
-    bool udp_cli::send( pbuf & pb, bool synched, unsigned int timeout_ms )
+    bool udp_cli::send( unsigned char * data, unsigned int sz )
     {
+      if( sz > pkt_.maxlen() )   { THR(exc::rs_too_big,exc::cm_udp_cli,false);    }
+      if( !data || !sz )         { THR(exc::rs_null_param,exc::cm_udp_cli,false); }
+      if( data_sock_ <= 0 )      { THR(exc::rs_not_inited,exc::cm_udp_cli,false); }
+
       // TODO
+
       return false;
     }
 
-    bool udp_cli::recv( pbuf & pb, unsigned int timeout_ms )
+    bool udp_cli::recv( unsigned char * data, unsigned int & sz, unsigned int timeout_ms )
     {
       // TODO
       return false;

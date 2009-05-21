@@ -82,15 +82,23 @@ namespace csl
     /* internal function to be called on new, authenticated clients */
     bool udp_srv::on_accept_auth( udp_pkt & pkt, SAI & addr )
     {
+      /*  register authenticated client, its roles are:
+          - generate server random
+          - set salt for response
+          - register client (including its random keys)
+      */
       // TODO
       return true;
     }
 
-    udp_srv::udp_srv(const udp_srv & other) : hello_entry_(*this), auth_entry_(*this), data_entry_(*this)
+    bool udp_srv::on_data_arrival( udp_pkt & pkt, SAI & addr )
     {
+      // TODO
+      return true;
     }
 
-    udp_srv::udp_srv() : hello_entry_(*this), auth_entry_(*this), data_entry_(*this)
+    udp_srv::udp_srv()
+    : use_exc_(true), msg_counter_(0), hello_entry_(*this), auth_entry_(*this), data_entry_(*this)
     {
     }
 
@@ -103,6 +111,12 @@ namespace csl
       hello_thread_.exit_event().wait( 1500 );
       data_thread_.exit_event().wait( 1500 );
       auth_thread_.exit_event().wait( 1500 );
+    }
+
+    /* private: not used */
+    udp_srv::udp_srv(const udp_srv & other)
+    : use_exc_(true), msg_counter_(0), hello_entry_(*this), auth_entry_(*this), data_entry_(*this)
+    {
     }
 
     void udp_srv::valid_key_cb(cb::valid_key & c)
@@ -119,6 +133,21 @@ namespace csl
     void udp_srv::valid_creds_cb(cb::valid_creds & c)
     {
       auth_entry_.valid_creds_cb( c );
+    }
+
+    void udp_srv::create_session_cb(cb::create_session & c)
+    {
+      create_session_cb_ = &c;
+    }
+
+    void udp_srv::cleanup_session_cb(cb::cleanup_session & c)
+    {
+      cleanup_session_cb_ = &c;
+    }
+
+    void udp_srv::data_arrival_cb(cb::data_arrival & c)
+    {
+      data_arrival_cb_ = &c;
     }
 
     const udp_srv::SAI & udp_srv::hello_addr() const { return hello_entry_.addr(); }

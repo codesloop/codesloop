@@ -66,6 +66,10 @@ namespace csl
         case rs_too_big:              return "data too big for the given buffer";
         case rs_pkt_error:            return "Cannot encode/decode packet";
         case rs_hello_nocall:         return "Hello not called and/or server_info not filled.";
+        case rs_null_param:           return "NULL parameter supplied.";
+        case rs_not_inited:           return "Not initialized.";
+        case rs_need_login:           return "Need login.";
+        case rs_need_pass:            return "Need pass.";
         case rs_unknown:
           default:                    return "Unknown reason";
       };

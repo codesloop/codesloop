@@ -30,6 +30,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "udp_cli.hh"
 #include "udp_srv.hh"
+#include "udp_pkt.hh"
 #include "test_timer.h"
 #include <stdio.h>
 #include <stdlib.h>
