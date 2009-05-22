@@ -30,19 +30,18 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "thread.hh"
 #include "mutex.hh"
 #include "cb.hh"
-#include "ecdh_key.hh"
 #include "bignum.hh"
 #include "udp_srv_info.hh"
 #include "udp_hello_entry.hh"
 #include "udp_auth_entry.hh"
 #include "udp_data_entry.hh"
+#include "udp_pkt.hh"
 #include "common.h"
 #ifdef __cplusplus
 #include <string>
 
 namespace csl
 {
-  using sec::ecdh_key;
   using sec::bignum;
   using std::string;
   using nthread::thread;
@@ -50,8 +49,6 @@ namespace csl
 
   namespace comm
   {
-    class udp_pkt;
-
     class udp_srv
     {
       public:
@@ -67,7 +64,6 @@ namespace csl
       private:
         /* internal */
         bool use_exc_;
-        unsigned long long msg_counter_;
 
         /* user should fill these */
         bignum             private_key_;
@@ -121,10 +117,11 @@ namespace csl
 
       private:
         friend class udp_auth_entry;
+        friend class udp_data_entry;
 
         /* internal functions */
         bool on_accept_auth( udp_pkt & pkt, SAI & addr );
-        bool on_data_arrival( udp_pkt & pkt, SAI & addr );
+        bool on_data_arrival( udp_pkt & pkt, udp_pkt::b1024_t & dta, SAI & addr );
 
         /* no copy */
         udp_srv(const udp_srv & other);

@@ -91,14 +91,14 @@ namespace csl
       return true;
     }
 
-    bool udp_srv::on_data_arrival( udp_pkt & pkt, SAI & addr )
+    bool udp_srv::on_data_arrival( udp_pkt & pkt, udp_pkt::b1024_t & dta, SAI & addr )
     {
       // TODO
       return true;
     }
 
     udp_srv::udp_srv()
-    : use_exc_(true), msg_counter_(0), hello_entry_(*this), auth_entry_(*this), data_entry_(*this)
+    : use_exc_(true), hello_entry_(*this), auth_entry_(*this), data_entry_(*this)
     {
     }
 
@@ -115,7 +115,7 @@ namespace csl
 
     /* private: not used */
     udp_srv::udp_srv(const udp_srv & other)
-    : use_exc_(true), msg_counter_(0), hello_entry_(*this), auth_entry_(*this), data_entry_(*this)
+    : use_exc_(true), hello_entry_(*this), auth_entry_(*this), data_entry_(*this)
     {
     }
 

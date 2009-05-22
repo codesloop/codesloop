@@ -37,10 +37,11 @@ namespace csl
   {
     void udp_data_entry::operator()(void)
     {
-      SAI             cliaddr;
-      socklen_t       len = sizeof(cliaddr);
-      int             recvd;
-      udp_pkt         pkt;
+      SAI                 cliaddr;
+      socklen_t           len = sizeof(cliaddr);
+      int                 recvd;
+      udp_pkt             pkt;
+      udp_pkt::b1024_t    dtabuf;
 
       /* init packet handler */
       pkt.use_exc(false);
@@ -78,7 +79,29 @@ namespace csl
           continue; // TODO : error handling
         }
 
-        // try-catch
+        try
+        {
+          /* process incoming data packet */
+          if( pkt.init_data(recvd,dtabuf) == false ) // TODO this may got to a separate thread
+          {
+            fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);
+            continue; // TODO : error handling
+          }
+
+          if( srv().on_data_arrival( pkt, dtabuf, cliaddr ) == false )
+          {
+            fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);
+            continue; // TODO error handling
+          }
+        }
+        catch( common::exc e )
+        {
+          fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);
+        }
+        catch( comm::exc e )
+        {
+          fprintf(stderr,"Error [%s:%d]\n",__FILE__,__LINE__);
+        }
       }
     }
 

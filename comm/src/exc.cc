@@ -70,6 +70,7 @@ namespace csl
         case rs_not_inited:           return "Not initialized.";
         case rs_need_login:           return "Need login.";
         case rs_need_pass:            return "Need pass.";
+        case rs_channel_init:         return "Channel init failed.";
         case rs_unknown:
           default:                    return "Unknown reason";
       };
@@ -85,6 +86,7 @@ namespace csl
         case cm_udp_hello_entry:  return "comm::udp_hello_entry";
         case cm_udp_pkt:          return "comm::udp_pkt";
         case cm_wsa:              return "comm::wsa";
+        case cm_udp_chann:        return "comm::udp_chann";
         case cm_unknown:
           default:                return "unknown component";
       };

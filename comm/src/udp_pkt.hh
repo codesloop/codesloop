@@ -58,7 +58,6 @@ namespace csl
 
         enum {
           max_length_v = 65496,
-          max_rand_v = 8,
           max_salt_v = 8
         };
 
@@ -66,7 +65,6 @@ namespace csl
 
         inline unsigned char * data() { return data_; }
         inline unsigned int maxlen()  { return max_length_v; }
-        inline unsigned int maxrand() { return max_rand_v; }
         inline unsigned int maxsalt() { return max_salt_v; }
 
         /* hello packet */
@@ -87,17 +85,14 @@ namespace csl
 
         /* data packet */
         bool init_data( unsigned int len,
-                        unsigned long long & newsalt, // TODO
                         b1024_t & data ); // process received
 
-        unsigned char * prepare_data( unsigned long long newsalt, // TODO
-                                      const unsigned char * dta, // prepare before send
-                                      unsigned int dsize,
+        unsigned char * prepare_data( const b1024_t & data, // prepare before send
                                       unsigned int & len );
 
         /* salt packet */
-        bool init_salt(unsigned int len);
-        unsigned char * prepare_salt(unsigned int & len);
+        bool init_salt(unsigned int len); // TODO
+        unsigned char * prepare_salt(unsigned int & len); // TODO
 
         /* variables */
         void peer_pubkey(const ecdh_key & pk);
@@ -121,7 +116,7 @@ namespace csl
         const std::string & pass() const;
         void pass(const std::string & p);
 
-        unsigned long long * rand();
+        unsigned long long * newsalt();
         unsigned long long * salt();
 
         const std::string & session_key() const;
@@ -137,7 +132,7 @@ namespace csl
         ecdh_key               peer_pubkey_;
         std::string            login_;
         std::string            pass_;
-        unsigned long long     rand_;
+        unsigned long long     newsalt_;
         unsigned long long     salt_;
         std::string            session_key_;
         unsigned char          data_[max_length_v];

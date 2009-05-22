@@ -184,14 +184,17 @@ namespace csl
 
       if( server_info().public_key().is_empty() ) { THR(exc::rs_hello_nocall,exc::cm_udp_cli,false); }
 
-      gen_sess_key(session_key_);
-      csl_sec_gen_rand(&client_rand_,sizeof(client_rand_));
+      unsigned long long client_salt = 0;
+      std::string session_key;
+
+      gen_sess_key(session_key);
+      csl_sec_gen_rand(&client_salt,sizeof(client_salt));
 
       if( server_info().need_login() && pkt_.login().size() == 0 ) { THR(exc::rs_need_login,exc::cm_udp_cli,false); }
       if( server_info().need_pass()  && pkt_.pass().size() == 0 )  { THR(exc::rs_need_pass,exc::cm_udp_cli,false); }
 
-      pkt_.session_key(session_key_);
-      memcpy( pkt_.rand(),&client_rand_,sizeof(client_rand_) );
+      pkt_.session_key(session_key);
+      memcpy( pkt_.newsalt(),&client_salt,sizeof(client_salt) );
 
       /* prepare auth packet */
       unsigned int auth_len = 0;
@@ -231,7 +234,15 @@ namespace csl
             THR(exc::rs_pkt_error,exc::cm_udp_cli,false);
           }
 
-          memcpy(&server_rand_,pkt_.rand(),sizeof(server_rand_));
+          unsigned long long server_salt = 0;
+          memcpy(&server_salt,pkt_.newsalt(),sizeof(server_salt));
+
+          chann_.use_exc(this->use_exc());
+
+          if( chann_.init(pkt_, data_sock_, data_addr_, client_salt, server_salt) == false )
+          {
+            THR(exc::rs_channel_init,exc::cm_udp_cli,false);
+          }
           return true;
         }
         else
@@ -251,18 +262,16 @@ namespace csl
       }
     }
 
-    bool udp_cli::send( unsigned char * data, unsigned int sz )
+    bool udp_cli::send( const udp_pkt::b1024_t & dta )
     {
-      if( sz > pkt_.maxlen() )   { THR(exc::rs_too_big,exc::cm_udp_cli,false);    }
-      if( !data || !sz )         { THR(exc::rs_null_param,exc::cm_udp_cli,false); }
-      if( data_sock_ <= 0 )      { THR(exc::rs_not_inited,exc::cm_udp_cli,false); }
+      if( dta.size() > pkt_.maxlen() ) { THR(exc::rs_too_big,exc::cm_udp_cli,false);    }
+      if( dta.size() == 0 )            { THR(exc::rs_null_param,exc::cm_udp_cli,false); }
+      if( data_sock_ <= 0 )            { THR(exc::rs_not_inited,exc::cm_udp_cli,false); }
 
-      // TODO
-
-      return false;
+      return chann_.send( dta );
     }
 
-    bool udp_cli::recv( unsigned char * data, unsigned int & sz, unsigned int timeout_ms )
+    bool udp_cli::recv( udp_pkt::b1024_t & dta, unsigned int timeout_ms )
     {
       // TODO
       return false;

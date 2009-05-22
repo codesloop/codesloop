@@ -78,8 +78,8 @@ namespace csl
     const std::string & udp_pkt::pass() const  { return pass_; }
     void udp_pkt::pass(const std::string & p)  { pass_ = p; }
 
-    /* rand */
-    unsigned long long * udp_pkt::rand() { return (unsigned long long *)&rand_; }
+    /* newsalt */
+    unsigned long long * udp_pkt::newsalt() { return (unsigned long long *)&newsalt_; }
 
     /* salt */
     unsigned long long * udp_pkt::salt() { return (unsigned long long *)&salt_; }
@@ -394,7 +394,7 @@ namespace csl
 
         unsigned int sz=0;
 
-        if( xbi.get_data( (unsigned char *)this->rand(),sz,maxrand() ) == false )
+        if( xbi.get_data( (unsigned char *)this->newsalt(),sz,maxsalt() ) == false )
         {
           THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_pkt,false);
         }
@@ -404,7 +404,7 @@ namespace csl
           THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_pkt,false);
         }
 
-        if( debug() ) { print_hex("  -- RAND ",this->rand(),maxrand()); }
+        if( debug() ) { print_hex("  -- RAND ",this->newsalt(),maxsalt()); }
 
         xbi >> login_;
 
@@ -454,7 +454,7 @@ namespace csl
         pbuf inner;
         xdrbuf xbi(inner);
 
-        xbi << xdrbuf::bindata_t( (const unsigned char *)this->rand(),(unsigned int)maxrand() );
+        xbi << xdrbuf::bindata_t( (const unsigned char *)this->newsalt(),(unsigned int)maxsalt() );
         xbi << login_;
         xbi << pass_;
         xbi << session_key_;
@@ -590,17 +590,17 @@ namespace csl
 
         unsigned int sz=0;
 
-        if( xbi.get_data( (unsigned char *)this->rand(),sz,maxrand() ) == false )
+        if( xbi.get_data( (unsigned char *)this->newsalt(),sz,maxsalt() ) == false )
         {
           THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_pkt,false);
         }
 
-        if( sz != maxrand() )
+        if( sz != maxsalt() )
         {
           THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_pkt,false);
         }
 
-        if( debug() ) { print_hex("  -- RAND ",this->rand(),maxrand()); }
+        if( debug() ) { print_hex("  -- RAND ",this->newsalt(),maxsalt()); }
 
         memcpy( this->salt(), head.data(), crypt_pkt::header_len() );
 
@@ -636,7 +636,7 @@ namespace csl
         pbuf inner;
         xdrbuf xbi(inner);
 
-        xbi << xdrbuf::bindata_t( (const unsigned char *)this->rand(),(unsigned int)maxrand() );
+        xbi << xdrbuf::bindata_t( (const unsigned char *)this->newsalt(),(unsigned int)maxsalt() );
 
         if( debug() ) { printf("  ++ Session Key: '%s'\n",session_key_.c_str()); }
 
@@ -692,7 +692,6 @@ namespace csl
 
     /* data packet */
     bool udp_pkt::init_data( unsigned int len,
-                             unsigned long long & newsalt,
                              b1024_t & dta )
     {
       try
@@ -742,7 +741,7 @@ namespace csl
 
         unsigned int sz=0;
 
-        if( xbi.get_data( (unsigned char *)&(newsalt),sz,maxsalt() ) == false )
+        if( xbi.get_data( (unsigned char *)newsalt(),sz,maxsalt() ) == false )
         {
           THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_pkt,false);
         }
@@ -752,7 +751,7 @@ namespace csl
           THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_pkt,false);
         }
 
-        if( debug() ) { print_hex("  -- newsalt ",&newsalt,maxsalt()); }
+        if( debug() ) { print_hex("  -- newsalt ",newsalt(),maxsalt()); }
 
         if( xbi.get_data( dta,sz,maxlen() ) == false )
         {
@@ -775,9 +774,7 @@ namespace csl
       return false;
     }
 
-    unsigned char * udp_pkt::prepare_data( unsigned long long newsalt,
-                                           const unsigned char * dta,
-                                           unsigned int dsize,
+    unsigned char * udp_pkt::prepare_data( const b1024_t & dta, // prepare before send
                                            unsigned int & len )
     {
       try
@@ -791,7 +788,7 @@ namespace csl
         if( debug() ) { printf(" ++ [%ld] : packet_type : %d\n",xbo.position(),data_p ); }
 
         if( outer.size() > maxlen() ) { THR(comm::exc::rs_too_big,comm::exc::cm_udp_pkt,NULL); }
-        if( !dta || !dsize )          { THR(comm::exc::rs_null_param,comm::exc::cm_udp_pkt,NULL); }
+        if( dta.size() == 0 )         { THR(comm::exc::rs_null_param,comm::exc::cm_udp_pkt,NULL); }
 
         outer.copy_to(data_,maxlen());
 
@@ -799,8 +796,8 @@ namespace csl
         pbuf inner;
         xdrbuf xbi(inner);
 
-        xbi << xdrbuf::bindata_t( (const unsigned char *)&newsalt,maxsalt() );
-        xbi << xdrbuf::bindata_t( dta,dsize );
+        xbi << xdrbuf::bindata_t( (const unsigned char *)newsalt(),maxsalt() );
+        xbi << xdrbuf::bindata_t( dta.data(),dta.size() );
 
         if( debug() ) { printf("  ++ Session Key: '%s'\n",session_key_.c_str()); }
 

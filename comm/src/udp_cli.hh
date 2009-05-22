@@ -32,6 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "bignum.hh"
 #include "udp_srv_info.hh"
 #include "udp_pkt.hh"
+#include "udp_chann.hh"
 #include "common.h"
 #ifdef __cplusplus
 #include <string>
@@ -54,8 +55,8 @@ namespace csl
         bool hello( unsigned int timeout_ms=0 );
         bool start( unsigned int timeout_ms=0 );
 
-        bool send( unsigned char * data, unsigned int sz );
-        bool recv( unsigned char * data, unsigned int & sz, unsigned int timeout_ms=0 );
+        bool send( const udp_pkt::b1024_t & dta );
+        bool recv( udp_pkt::b1024_t & dta, unsigned int timeout_ms=0 );
 
         udp_cli();
         virtual ~udp_cli();
@@ -71,14 +72,15 @@ namespace csl
 
         /* user or server fills this */
         udp_pkt                pkt_;
+        udp_chann              chann_;
 
         /* connection related */
         int                    hello_sock_;
         int                    auth_sock_;
         int                    data_sock_;
-        unsigned long long     client_rand_;
-        unsigned long long     server_rand_;
-        string                 session_key_;
+        //unsigned long long     client_salt_;
+        //unsigned long long     server_salt_;
+        //string                 session_key_;
 
         bool init();
 

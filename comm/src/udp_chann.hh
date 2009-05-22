@@ -26,6 +26,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_comm_udp_chann_hh_included_
 #define _csl_comm_udp_chann_hh_included_
 
+#include "udp_pkt.hh"
 #include "common.h"
 #ifdef __cplusplus
 
@@ -36,16 +37,44 @@ namespace csl
     class udp_chann
     {
       public:
+        typedef struct sockaddr_in SAI;
+
+        bool send( );
+        bool send( const udp_pkt::b1024_t & buffer );
+
+        bool init( const udp_pkt & pk,
+                   int sock,
+                   SAI & peer_addr,
+                   unsigned long long my_salt,
+                   unsigned long long peer_salt );
+
+        udp_chann();
+
+        /* return internal buffer */
+        inline udp_pkt::b1024_t & buf()  { return buf_; }
+
+        /* server may disable receiving */
+        void disable_receive()           { can_receive_ = false; }
+        inline bool can_receive() const  { return can_receive_;  }
+
+        /* use exceptions ? */
+        inline bool use_exc() const       { return use_exc_; }
+        inline void use_exc(bool yesno)   { use_exc_ = yesno; }
 
       private:
-        struct key
-        {
-          unsigned long long rnd_;
-          unsigned long long when_;
-        };
+        bool                 use_exc_;
+        int                  sock_;
+        SAI                  peer_addr_;
+        bool                 can_receive_;
+        bool                 is_connected_;
+        udp_pkt              pkt_;
+        udp_pkt::b1024_t     buf_;
+        unsigned long long   my_salt_;
+        unsigned long long   peer_salt_;
 
-        key client_keys_[8];
-        key server_keys_[8];
+        /* no copy */
+        udp_chann & operator=(const udp_chann & other) { return *this; }
+        udp_chann(const udp_chann & other) {}
     };
   }
 }

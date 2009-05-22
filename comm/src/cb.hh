@@ -30,6 +30,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "bignum.hh"
 #include "ecdh_key.hh"
 #include "session_data.hh"
+#include "udp_pkt.hh"
 #ifdef __cplusplus
 #include <string>
 
@@ -97,9 +98,8 @@ namespace csl
         {
           public:
             virtual ~data_arrival() {}
-            virtual bool operator()( session_data * sess,         // in
-                                     const unsigned char * data,  // in
-                                     unsigned int len ) = 0;      // in
+            virtual bool operator()( session_data * sess,                  // in
+                                     const udp_pkt::b1024_t & data ) = 0;  // in
         };
     };
   }

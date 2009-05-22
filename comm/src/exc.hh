@@ -79,6 +79,7 @@ namespace csl
           rs_not_inited,          ///<Not initialized.
           rs_need_login,          ///<Need login.
           rs_need_pass,           ///<Need pass.
+          rs_channel_init,        ///<Channel init failed.
         };
 
         enum {
@@ -88,6 +89,7 @@ namespace csl
           cm_udp_hello,        ///<UDP Hello packet class
           cm_udp_hello_entry,  ///<UDP Hello thread entry class
           cm_udp_pkt,          ///<UDP packet helper
+          cm_udp_chann,        ///<UDP channel
           cm_wsa,              ///<WSA
         };
 
