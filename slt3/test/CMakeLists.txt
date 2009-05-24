@@ -50,8 +50,6 @@ ADD_EXECUTABLE(t__tran         t__tran.cc)
 ADD_EXECUTABLE(t__synqry       t__synqry.cc)
 ADD_EXECUTABLE(t__reg          t__reg.cc)
 ADD_EXECUTABLE(t__var          t__var.cc)
-ADD_EXECUTABLE(t__obj          t__obj.cc)
-ADD_EXECUTABLE(t__mapper       t__mapper.cc)
 ADD_EXECUTABLE(t__sql_helper   t__sql_helper.cc)
 
 # -- EOF --

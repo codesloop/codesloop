@@ -273,8 +273,9 @@ namespace csl
 
     bool udp_cli::recv( udp_pkt::b1024_t & dta, unsigned int timeout_ms )
     {
-      // TODO
-      return false;
+      if( data_sock_ <= 0 )            { THR(exc::rs_not_inited,exc::cm_udp_cli,false); }
+
+      return chann_.recv( dta, timeout_ms );
     }
 
   };

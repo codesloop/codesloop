@@ -177,7 +177,7 @@ namespace test_xdrbuf {
     xb.rewind();
     unsigned int sz;
     assert( xb.get_data(ptr2,sz,204808) == true );
-    assert( xb.position() >= 204800 ); // TODO ??? == 204800
+    assert( xb.position() == 204804 );
     assert( sz == zf.get_size() );
     assert( sz == 204800 );
     assert( ::memcmp(ptr,ptr2,sz) == 0 );

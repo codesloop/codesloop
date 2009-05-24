@@ -78,9 +78,6 @@ namespace csl
         int                    hello_sock_;
         int                    auth_sock_;
         int                    data_sock_;
-        //unsigned long long     client_salt_;
-        //unsigned long long     server_salt_;
-        //string                 session_key_;
 
         bool init();
 

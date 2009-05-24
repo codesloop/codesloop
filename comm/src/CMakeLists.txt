@@ -40,6 +40,7 @@ ELSE(NOT WIN32)
 ENDIF(NOT WIN32)
 
 ADD_LIBRARY( csl_comm STATIC
+             udp.cc               udp.hh
              udp_chann.cc         udp_chann.hh
              udp_cli.cc           udp_cli.hh
              udp_srv.cc           udp_srv.hh

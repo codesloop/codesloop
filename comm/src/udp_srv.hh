@@ -119,6 +119,13 @@ namespace csl
         friend class udp_auth_entry;
         friend class udp_data_entry;
 
+        struct session // TODO
+        {
+          session_data *    sessdata_;
+          udp_chann         chann_;
+          udp_pkt::b1024_t  data_;
+        };
+
         /* internal functions */
         bool on_accept_auth( udp_pkt & pkt, SAI & addr );
         bool on_data_arrival( udp_pkt & pkt, udp_pkt::b1024_t & dta, SAI & addr );

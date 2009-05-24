@@ -41,13 +41,13 @@ using namespace csl::slt3;
 /** @brief contains tests related to slt3::reg */
 namespace test_reg {
 
-  /** @todo document me */
+  /** @test baseline for performance comparison */
   void baseline()
   {
     reg & r(reg::instance("test.db"));
   }
 
-  /** @todo document me */
+  /** @test registers and gets an item from database registry */
   void usage1()
   {
     reg & r(reg::instance("test.db"));
@@ -58,7 +58,7 @@ namespace test_reg {
     assert( h.close() == true );
   }
 
-  /** @todo document me */
+  /** @test simple usage scenario */
   void usage2()
   {
     reg & r(reg::instance("test.db"));
@@ -69,7 +69,7 @@ namespace test_reg {
     assert( std::string("hello.db") == i.path_ );
   }
 
-  /** @todo double insert */
+  /** @test how double inserting the same values behave */
   void usage3()
   {
     reg & r(reg::instance("test.db"));
@@ -78,7 +78,7 @@ namespace test_reg {
     assert( r.set( i ) == false );
   }
 
-  /** @todo nonexistent value */
+  /** @test how lookup of nonexistent values behave */
   void usage4()
   {
     reg & r(reg::instance("test.db"));

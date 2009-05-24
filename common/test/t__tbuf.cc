@@ -62,21 +62,21 @@ namespace test_tbuf {
     std::string b;
   }
 
-  /** @test @todo */
+  /** @test adds 6 bytes to tbuf (for performance comparison) */
   void tbuf_hello()
   {
     tbuf<128> b;
     b.set((unsigned char *)"Hello",6);
   }
 
-  /** @test @todo */
+  /** @test adds 6 bytes to pbuf (for performance comparison) */
   void pbuf_hello()
   {
     pbuf b;
     b.append((unsigned char *)"Hello",6);
   }
 
-  /** @test @todo */
+  /** @test adds 6 bytes to std::string (for performance comparison) */
   void string_hello()
   {
     std::string b;

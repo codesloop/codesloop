@@ -42,6 +42,9 @@ namespace csl
         bool send( );
         bool send( const udp_pkt::b1024_t & buffer );
 
+        bool recv( unsigned int timeout_ms );
+        bool recv( udp_pkt::b1024_t & dta, unsigned int timeout_ms );
+
         bool init( const udp_pkt & pk,
                    int sock,
                    SAI & peer_addr,

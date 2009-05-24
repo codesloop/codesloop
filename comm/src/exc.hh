@@ -80,6 +80,7 @@ namespace csl
           rs_need_login,          ///<Need login.
           rs_need_pass,           ///<Need pass.
           rs_channel_init,        ///<Channel init failed.
+          rs_recv_disabled,       ///<recv disabled.
         };
 
         enum {

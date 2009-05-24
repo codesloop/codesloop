@@ -71,6 +71,7 @@ namespace csl
         case rs_need_login:           return "Need login.";
         case rs_need_pass:            return "Need pass.";
         case rs_channel_init:         return "Channel init failed.";
+        case rs_recv_disabled:        return "recv() disabled.";
         case rs_unknown:
           default:                    return "Unknown reason";
       };

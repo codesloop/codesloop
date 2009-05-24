@@ -272,7 +272,7 @@ namespace csl
     }
 
     void intvar::set_param(param & p)    { p.set(value_); }
-    void strvar::set_param(param & p)    { p.set((const char *)value_.data()); } /// @todo UNICODE
+    void strvar::set_param(param & p)    { p.set((const char *)value_.data()); }
     void doublevar::set_param(param & p) { p.set(value_); }
     void blobvar::set_param(param & p)   { p.set(value_.data(),value_.size()); }
 

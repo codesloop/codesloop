@@ -45,7 +45,7 @@ using namespace csl::slt3;
 /** @brief contains tests related to slt3::var */
 namespace test_var {
 
-  /** @todo document me */
+  /** Helper base class */
   class TestBase : public obj
   {
     public:
@@ -56,7 +56,7 @@ namespace test_var {
 
   reg::helper TestBase::reg_("test_var","test_var.db");
 
-  /** @todo document me */
+  /** SingleInt tests a single integer to be stored in an SQLite DB by the ORM mapper (sql_helper) */
   class SingleInt : public TestBase
   {
     public:
@@ -72,7 +72,7 @@ namespace test_var {
 
   sql::helper SingleInt::sql_helper_("single_int");
 
-  /** @todo document me */
+  /** SingleString tests a single string to be stored in an SQLite DB by the ORM mapper (sql_helper) */
   class SingleString : public TestBase
   {
     public:
@@ -88,7 +88,7 @@ namespace test_var {
 
   sql::helper SingleString::sql_helper_("single_string");
 
-  /** @todo document me */
+  /** SingleDouble tests a double precision value to be stored in an SQLite DB by the ORM mapper (sql_helper) */
   class SingleDouble : public TestBase
   {
     public:
@@ -104,7 +104,7 @@ namespace test_var {
 
   sql::helper SingleDouble::sql_helper_("single_dbl");
 
-  /** @todo document me */
+  /** SingleBlob tests a single blob to be stored in an SQLite DB by the ORM mapper (sql_helper) */
   class SingleBlob : public TestBase
   {
     public:
@@ -120,25 +120,25 @@ namespace test_var {
 
   sql::helper SingleBlob::sql_helper_("single_blob");
 
-  /** @todo document me */
+  /** @test baseline for performance comparison */
   void baseline()
   {
   }
 
-  /** @todo document me */
+  /** @test to see how much time needed to declare an instance of SingleInt */
   void single_int0()
   {
     SingleInt i0;
   }
 
-  /** @todo document me */
+  /** @test to see how long init() takes */
   void single_int1()
   {
     SingleInt i0;
     assert( i0.init() == true );
   }
 
-  /** @todo document me */
+  /** @test to see how long create() and remove() takes */
   void single_int2()
   {
     SingleInt i0;
@@ -149,7 +149,7 @@ namespace test_var {
     assert( i0.remove(t) == true );
   }
 
-  /** @todo document me */
+  /** @test to verify find() and get() */
   void single_int3()
   {
     SingleInt i0;
@@ -172,20 +172,20 @@ namespace test_var {
     }
   }
 
-  /** @todo document me */
+  /** @test to see how much time needed to declare an instance of SingleString */
   void single_str0()
   {
     SingleString s0;
   }
 
-  /** @todo document me */
+  /** @test to see how long init() takes */
   void single_str1()
   {
     SingleString s0;
     assert( s0.init() == true );
   }
 
-  /** @todo document me */
+  /** @test to see how long create() and remove() takes */
   void single_str2()
   {
     SingleString s0;
@@ -194,7 +194,7 @@ namespace test_var {
     assert( s0.remove(t) == true );
   }
 
-  /** @todo document me */
+  /** @test to verify find() and get() */
   void single_str3()
   {
     SingleString s0;
@@ -215,20 +215,20 @@ namespace test_var {
     }
   }
 
-  /** @todo document me */
+  /** @test to see how much time needed to declare an instance of SingleDouble */
   void single_dbl0()
   {
     SingleDouble v0;
   }
 
-  /** @todo document me */
+  /** @test to see how long init() takes */
   void single_dbl1()
   {
     SingleDouble v0;
     assert( v0.init() == true );
   }
 
-  /** @todo document me */
+  /** @test to see how long create() and remove() takes */
   void single_dbl2()
   {
     SingleDouble v0;
@@ -237,7 +237,7 @@ namespace test_var {
     assert( v0.remove(t) == true );
   }
 
-  /** @todo document me */
+  /** @test to verify find() and get() */
   void single_dbl3()
   {
     SingleDouble v0;
@@ -258,20 +258,20 @@ namespace test_var {
     }
   }
 
-  /** @todo document me */
+  /** @test to see how much time needed to declare an instance of SingleBlob */
   void single_blb0()
   {
     SingleBlob v0;
   }
 
-  /** @todo document me */
+  /** @test to see how long init() takes */
   void single_blb1()
   {
     SingleBlob v0;
     assert( v0.init() == true );
   }
 
-  /** @todo document me */
+  /** @test to see how long create() and remove() takes */
   void single_blb2()
   {
     SingleBlob v0;
@@ -280,7 +280,7 @@ namespace test_var {
     assert( v0.remove(t) == true );
   }
 
-  /** @todo document me */
+  /** @test to verify find() and get() */
   void single_blb3()
   {
     std::vector<unsigned char> ve;

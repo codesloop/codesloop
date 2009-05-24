@@ -43,13 +43,14 @@ using namespace csl::slt3;
 /** @brief contains tests related to slt3::sql::helper */
 namespace test_sql_helper {
 
-  /** @todo document me */
+  /** @test baseline for comparison */
   void baseline()
   {
     sql::helper h("xtable");
     (void)h.init_sql();
   }
 
+  /** tester class for basic ORM functionality */
   class X : public obj
   {
     public:
@@ -72,14 +73,14 @@ namespace test_sql_helper {
   sql::helper X::sql_helper_("Xtable");
   reg::helper X::reg_("test_mapper","test_mapper.db");
 
-  /** @todo document me */
+  /** @test calls init_sql() */
   void usage1()
   {
     X x;
     (void)x.sql_helper().init_sql();
   }
 
-  /** @todo document me */
+  /** @test verifies a more complex ORM scenario */
   void usage2()
   {
     X x,x2,x3;
@@ -114,7 +115,7 @@ namespace test_sql_helper {
     }
   }
 
-  /** @todo document me */
+  /** @test verify create() and remove() object to/from database */
   void crdelete()
   {
     X x;

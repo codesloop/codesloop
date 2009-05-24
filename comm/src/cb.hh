@@ -27,10 +27,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _csl_comm_cb_hh_included_
 
 #include "udp_srv_info.hh"
+#include "udp_chann.hh"
 #include "bignum.hh"
 #include "ecdh_key.hh"
 #include "session_data.hh"
-#include "udp_pkt.hh"
+#include "tbuf.hh"
 #ifdef __cplusplus
 #include <string>
 
@@ -97,9 +98,12 @@ namespace csl
         class data_arrival
         {
           public:
+            typedef common::tbuf<1024> b1024_t;
+
             virtual ~data_arrival() {}
-            virtual bool operator()( session_data * sess,                  // in
-                                     const udp_pkt::b1024_t & data ) = 0;  // in
+            virtual bool operator()( session_data * sess,         // in
+                                     udp_chann & channel_,        // in
+                                     const b1024_t & data ) = 0;  // in
         };
     };
   }
