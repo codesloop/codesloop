@@ -23,12 +23,12 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_common_exc_hh_included_
-#define _csl_common_exc_hh_included_
+#ifndef _csl_nthread_exc_hh_included_
+#define _csl_nthread_exc_hh_included_
 
 /**
-   @file csl_common/src/exc.hh
-   @brief common exception class for common
+   @file csl_nthread/src/exc.hh
+   @brief common exception class for nthread
  */
 
 #ifdef __cplusplus
@@ -36,12 +36,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace csl
 {
-  namespace common
+  namespace nthread
   {
     /**
-    @brief common exception class used by common classes
+    @brief common exception class used by nthread classes
 
-    this class is used by the common classes as an exception to be thrown
+    this class is used by the nthread classes as an exception to be thrown
      */
     class exc
     {
@@ -49,19 +49,13 @@ namespace csl
         enum {
           rs_unknown,        ///<Unknown error.
           rs_invalid_param,  ///<Invalid parameter received
-          rs_cannot_append,  ///<Cannot append to pbuf
-          rs_cannot_get,     ///<Cannot get data
-          rs_xdr_eof,        ///<End of xdr data.
-          rs_xdr_invalid,    ///<Invald xdr data
-          rs_empty,          ///<Empty container
+          rs_start_error,    ///<Cannot start thread
+          rs_stop_error,     ///<Cannot stop thread
         };
 
         enum {
-          cm_unknown, ///<Unknown component
-          cm_pbuf,    ///<pbuf component
-          cm_zfile,   ///<zfile component
-          cm_xdrbuf,  ///<xdrbuf component
-          cm_circbuf, ///<circbuf component
+          cm_unknown,  ///<Unknown component
+          cm_thrpool,  ///<thrpool component
         };
 
         /** @brief converts reason code to string */
@@ -87,9 +81,9 @@ namespace csl
         : reason_(reason), component_(component), line_(0) {}
 
         /** @brief constructor
-        *   @param reason is to tell why
-        *   @param component that cause the exception
-        *   @param txt provides some explanation
+        *    @param reason is to tell why
+        *    @param component that cause the exception
+        *    @param txt provides some explanation
         */
         exc(int reason, int component, const char * txt)
         : reason_(reason), component_(component), text_(txt), line_(0) {}
@@ -119,4 +113,4 @@ namespace csl
 }
 
 #endif /* __cplusplus */
-#endif /* _csl_common_exc_hh_included_ */
+#endif /* _csl_nthread_exc_hh_included_ */

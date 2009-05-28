@@ -31,17 +31,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "test_timer.h"
 #include "thread.hh"
 #include "mutex.hh"
+#include "common.h"
 #include <assert.h>
 #include <stdio.h>
-#ifndef WIN32
-# include <unistd.h>
-# define SleepSeconds(A) ::sleep(A)
-# define SleepMiliseconds(A) ::usleep(A*1000)
-#else
-# include <windows.h>
-# define SleepSeconds(A) ::Sleep(A*1000)
-# define SleepMiliseconds(A) ::Sleep(A)
-#endif /* WIN32 */
 
 using namespace csl::nthread;
 

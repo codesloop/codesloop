@@ -23,34 +23,33 @@
 
 IF(WIN32)
 
-  LINK_LIBRARIES(
-      csl_common 
-      csl_nthread
-      zlib )
-  INCLUDE_DIRECTORIES(
-      ../src
-      ../../common/src 
-      $ENV{ZLIB_DEV_ENV}/include
-      ../../../3rdparty/zlib/GnuWin32/include )
-  LINK_DIRECTORIES(
-      ../src
-      ../../common/src
-      $ENV{ZLIB_DEV_ENV}/lib
-      ../../../3rdparty/zlib/GnuWin32/lib )
+  LINK_LIBRARIES( csl_common
+                  csl_nthread
+                  zlib )
+
+  INCLUDE_DIRECTORIES( ../src
+                       ../../common/src
+                       $ENV{ZLIB_DEV_ENV}/include
+                       ../../../3rdparty/zlib/GnuWin32/include )
+
+  LINK_DIRECTORIES( ../src
+                    ../../common/src
+                    $ENV{ZLIB_DEV_ENV}/lib
+                    ../../../3rdparty/zlib/GnuWin32/lib )
 
 ELSE(WIN32)
 
-  ADD_DEFINITIONS( -Wall -O3 -pthread )
-  INCLUDE_DIRECTORIES(
-      ../src
-      ../../common/src )
-  LINK_LIBRARIES(
-      csl_common
-      csl_nthread
-      pthread
-      z )
+  ADD_DEFINITIONS( -Wall -g3 -pthread )
 
-  LINK_DIRECTORIES( ../src 
+  INCLUDE_DIRECTORIES( ../src
+                       ../../common/src )
+
+  LINK_LIBRARIES( csl_common
+                  csl_nthread
+                  pthread
+                  z )
+
+  LINK_DIRECTORIES( ../src
                     ../../common/src )
 
   ADD_EXECUTABLE( t__pt_mutex      t__pt_mutex.cc )
@@ -62,5 +61,6 @@ ADD_EXECUTABLE( t__mutex         t__mutex.cc )
 ADD_EXECUTABLE( t__thread        t__thread.cc )
 ADD_EXECUTABLE( t__event         t__event.cc )
 ADD_EXECUTABLE( t__pevent        t__pevent.cc )
+ADD_EXECUTABLE( t__thrpool       t__thrpool.cc )
 
 # -- EOF --

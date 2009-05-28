@@ -92,6 +92,7 @@ namespace csl
           cm_udp_pkt,          ///<UDP packet helper
           cm_udp_chann,        ///<UDP channel
           cm_wsa,              ///<WSA
+          cm_udp_recvr,        ///<UDP receiver
         };
 
         /** @brief converts reason code to string */

@@ -88,6 +88,7 @@ namespace csl
         case cm_udp_pkt:          return "comm::udp_pkt";
         case cm_wsa:              return "comm::wsa";
         case cm_udp_chann:        return "comm::udp_chann";
+        case cm_udp_recvr:        return "comm::udp::recvr";
         case cm_unknown:
           default:                return "unknown component";
       };

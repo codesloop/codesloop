@@ -27,24 +27,21 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common.h"
 
 /**
-  @file csl_common/src/exc.cc
-  @brief implementation of common::exc
+  @file csl_nthread/src/exc.cc
+  @brief implementation of nthread::exc
  */
 
 namespace csl
 {
-  namespace common
+  namespace nthread
   {
     const char * exc::reason_string(int rc)
     {
       switch( rc )
       {
-        case rs_invalid_param:   return "Invalid parameter received";
-        case rs_cannot_append:   return "Cannot append data to pbuf";
-        case rs_cannot_get:      return "Cannot get data from pbuf";
-        case rs_xdr_eof:         return "End of XDR data";
-        case rs_xdr_invalid:     return "Invalid XDR data";
-        case rs_empty:           return "Empty container.";
+        case rs_invalid_param:   return "Invalid parameter received.";
+        case rs_start_error:     return "Cannot start thread.";
+        case rs_stop_error:      return "Cannot stop thread.";
         case rs_unknown:
           default:               return "Unknown reason";
       };
@@ -54,10 +51,7 @@ namespace csl
     {
       switch( cm )
       {
-        case cm_pbuf:      return "common::pbuf";
-        case cm_zfile:     return "common::zfile";
-        case cm_xdrbuf:    return "common::xdrbuf";
-        case cm_circbuf:   return "common::circbuf";
+        case cm_thrpool:   return "nthread::thrpool";
         case cm_unknown:
           default:         return "unknown component";
       };

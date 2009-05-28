@@ -24,24 +24,26 @@
 IF(WIN32)
 
   INCLUDE_DIRECTORIES(
-      ../../common/src 
+      ../../common/src
       ../../sec/src )
 
 ELSE(WIN32)
 
-  ADD_DEFINITIONS( -Wall -O3 -pthread )
- 
-  INCLUDE_DIRECTORIES( 
-      ../src 
+  ADD_DEFINITIONS( -Wall -g3 -pthread )
+
+  INCLUDE_DIRECTORIES(
+      ../src
       ../../common/src )
 
 ENDIF(WIN32)
 
 ADD_LIBRARY(
     csl_nthread STATIC
-    mutex.cc   mutex.hh
-    event.cc   event.hh
-    pevent.cc  pevent.hh
-    thread.cc  thread.hh )
+    exc.cc       exc.hh
+    mutex.cc     mutex.hh
+    event.cc     event.hh
+    pevent.cc    pevent.hh
+    thread.cc    thread.hh
+    thrpool.cc   thrpool.hh )
 
 # -- EOF --
