@@ -59,7 +59,7 @@ namespace test_udp_server {
     d.sin_port = htons(47783);
 
     //s.hello_addr( h );
-    s.auth_addr( a );
+    //s.auth_addr( a );
     s.data_addr( d );
 
     ecdh_key pubkey;

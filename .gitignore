@@ -78,3 +78,8 @@ slt3/test/t__tran
 slt3/test/t__var
 comm/test/t__udp_client2
 comm/test/t__udp_server2
+comm/test/t__udp_auth_client
+comm/test/t__udp_auth_server
+comm/test/t__udp_hello_client
+comm/test/t__udp_hello_server
+

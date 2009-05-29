@@ -83,8 +83,6 @@ namespace csl
       {
         case cm_udp_srv:            return "comm::udp_srv";
         case cm_udp_cli:            return "comm::udp_cli";
-        case cm_udp_hello:          return "comm::udp_hello";
-        case cm_udp_hello_entry:    return "comm::udp_hello_entry";
         case cm_udp_pkt:            return "comm::udp_pkt";
         case cm_wsa:                return "comm::wsa";
         case cm_udp_chann:          return "comm::udp_chann";

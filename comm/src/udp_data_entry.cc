@@ -26,7 +26,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "exc.hh"
 #include "udp_pkt.hh"
 #include "udp_srv.hh"
-#include "udp_auth_entry.hh"
+#include "udp_data_entry.hh"
 #include "common.h"
 #include <sys/types.h>
 #include <string.h>

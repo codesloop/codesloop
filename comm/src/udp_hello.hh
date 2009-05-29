@@ -109,16 +109,22 @@ namespace csl
             virtual ~hello_srv();
 
             /* addresses */
-            SAI addr() { return receiver_.addr(); }
+            SAI addr()               { return receiver_.addr(); }
             void addr(const SAI & a) { receiver_.addr(a); }
 
             /* private key */
-            const bignum & private_key()       { return handler_.private_key(); }
+            const bignum & private_key() const { return handler_.private_key(); }
             void private_key(const bignum & v) { handler_.private_key(v);       }
 
             /* public key */
-            const ecdh_key & public_key()       { return handler_.public_key(); }
+            const ecdh_key & public_key() const { return handler_.public_key(); }
             void public_key(const ecdh_key & v) { handler_.public_key(v);       }
+
+            /* valid key callback */
+            void valid_key_cb(valid_key_callback & cb) { handler_.valid_key_cb_ = &cb; }
+
+            /* hello callback */
+            void hello_cb(hello_callback & cb) { handler_.hello_cb_ = &cb; }
 
             /* use exceptions ? */
             inline void use_exc(bool yesno) { use_exc_ = yesno; }

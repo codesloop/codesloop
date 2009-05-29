@@ -87,8 +87,6 @@ namespace csl
           cm_unknown,            ///<Unknown component
           cm_udp_srv,            ///<UDP server component
           cm_udp_cli,            ///<UDP client component
-          cm_udp_hello,          ///<UDP Hello packet class
-          cm_udp_hello_entry,    ///<UDP Hello thread entry class
           cm_udp_pkt,            ///<UDP packet helper
           cm_udp_chann,          ///<UDP channel
           cm_wsa,                ///<WSA

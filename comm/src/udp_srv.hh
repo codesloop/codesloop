@@ -33,7 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "bignum.hh"
 #include "udp_srv_info.hh"
 //#include "udp_hello_entry.hh"
-#include "udp_auth_entry.hh"
+//#include "udp_auth_entry.hh"
 #include "udp_data_entry.hh"
 #include "udp_pkt.hh"
 #include "common.h"
@@ -71,12 +71,12 @@ namespace csl
 
         /* worker threads */
         //thread hello_thread_;
-        thread auth_thread_;
+        //thread auth_thread_;
         thread data_thread_;
 
         /* worker entries */
         //udp_hello_entry hello_entry_;
-        udp_auth_entry  auth_entry_;
+        //udp_auth_entry  auth_entry_;
         udp_data_entry  data_entry_;
 
         /* session callbacks */
@@ -96,11 +96,11 @@ namespace csl
 
         /* addresses */
         //const SAI & hello_addr() const;
-        const SAI & auth_addr() const;
+        //const SAI & auth_addr() const;
         const SAI & data_addr() const;
 
         //void hello_addr(const SAI & a);
-        void auth_addr(const SAI & a);
+        //void auth_addr(const SAI & a);
         void data_addr(const SAI & a);
 
         /* private key */
@@ -116,7 +116,7 @@ namespace csl
         inline bool use_exc() const     { return use_exc_; }
 
       private:
-        friend class udp_auth_entry;
+        //friend class udp_auth_entry;
         friend class udp_data_entry;
 
         struct session // TODO
