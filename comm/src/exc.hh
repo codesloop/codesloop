@@ -84,15 +84,22 @@ namespace csl
         };
 
         enum {
-          cm_unknown,          ///<Unknown component
-          cm_udp_srv,          ///<UDP server component
-          cm_udp_cli,          ///<UDP client component
-          cm_udp_hello,        ///<UDP Hello packet class
-          cm_udp_hello_entry,  ///<UDP Hello thread entry class
-          cm_udp_pkt,          ///<UDP packet helper
-          cm_udp_chann,        ///<UDP channel
-          cm_wsa,              ///<WSA
-          cm_udp_recvr,        ///<UDP receiver
+          cm_unknown,            ///<Unknown component
+          cm_udp_srv,            ///<UDP server component
+          cm_udp_cli,            ///<UDP client component
+          cm_udp_hello,          ///<UDP Hello packet class
+          cm_udp_hello_entry,    ///<UDP Hello thread entry class
+          cm_udp_pkt,            ///<UDP packet helper
+          cm_udp_chann,          ///<UDP channel
+          cm_wsa,                ///<WSA
+          cm_udp_recvr,          ///<UDP receiver
+          cm_udp_hello_handler,  ///<UDP hello handler
+          cm_udp_hello_cli,      ///<UDP hello client
+          cm_udp_hello_srv,      ///<UDP hello server
+          cm_udp_auth_handler,   ///<UDP auth handler
+          cm_udp_auth_cli,       ///<UDP auth client
+          cm_udp_auth_srv,       ///<UDP auth server
+
         };
 
         /** @brief converts reason code to string */

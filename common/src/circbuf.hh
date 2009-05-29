@@ -67,7 +67,7 @@ namespace csl
         };
 
       public:
-        inline circbuf() : n_items_(0)
+        inline circbuf() : n_items_(0), size_(0)
         {
           head_.next_ = &head_;
           head_.prev_ = &head_;
@@ -100,10 +100,9 @@ namespace csl
           {
             if( n_items_ < MaxSize )
             {
-              ++n_items_;
+              ++size_;
               ret = new item();
               ret->item_ = new T();
-              if( n_items_ > MaxSize ) on_full();
             }
             else
             {
@@ -124,6 +123,13 @@ namespace csl
             {
               it = it->next_->unlink_before();
               head_.link_after( it );
+
+              ++n_items_;
+              if( n_items_ > MaxSize )
+              {
+                n_items_ = MaxSize;
+                on_full();
+              }
               on_new_item();
               break;
             }
@@ -161,6 +167,7 @@ namespace csl
             ret = freelist_.unlink_before();
             if( !ret )
             {
+              ++size_;
               ret = new item();
               ret->item_ = new T();
             }
@@ -176,14 +183,13 @@ namespace csl
 
           if( n_items_ == 0 )
           {
+            ++size_;
             item * x = new item();
             freelist_.link_after(x);
             THR(common::exc::rs_empty,common::exc::cm_circbuf,*(x->item_));
           }
-          if( n_items_ == 1 )
-          {
-            on_empty();
-          }
+
+          if( n_items_ == 1 ) { on_empty(); }
 
           --n_items_;
 
@@ -193,6 +199,7 @@ namespace csl
           }
           else
           {
+            ++size_;
             item * x = new item();
             freelist_.link_after(x);
             THR(common::exc::rs_empty,common::exc::cm_circbuf,*(x->item_));
@@ -207,6 +214,7 @@ namespace csl
         {
           if( n_items_ == 0 )
           {
+            ++size_;
             item * x = new item();
             freelist_.link_after(x);
             THR(common::exc::rs_empty,common::exc::cm_circbuf,*(x->item_));
@@ -218,6 +226,7 @@ namespace csl
         {
           if( n_items_ == 0 )
           {
+            ++size_;
             item * x = new item();
             freelist_.link_after(x);
             THR(common::exc::rs_empty,common::exc::cm_circbuf,*(x->item_));
@@ -226,7 +235,7 @@ namespace csl
         }
 
         unsigned int n_items() { return n_items_; }
-        unsigned int size() { return n_items_; }
+        unsigned int size()    { return size_;    } // TODO test this
 
         /* event upcalls */
         inline virtual void on_new_item() {}
@@ -238,11 +247,12 @@ namespace csl
         inline bool use_exc() const     { return use_exc_; }
 
       private:
-        unsigned int n_items_;
-        item         head_;
-        item         freelist_;
-        item         preplist_;
-        bool         use_exc_;
+        unsigned int  n_items_;
+        unsigned int  size_;
+        item          head_;
+        item          freelist_;
+        item          preplist_;
+        bool          use_exc_;
     };
   }
 }

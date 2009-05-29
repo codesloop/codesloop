@@ -32,7 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cb.hh"
 #include "bignum.hh"
 #include "udp_srv_info.hh"
-#include "udp_hello_entry.hh"
+//#include "udp_hello_entry.hh"
 #include "udp_auth_entry.hh"
 #include "udp_data_entry.hh"
 #include "udp_pkt.hh"
@@ -70,12 +70,12 @@ namespace csl
         udp_srv_info       server_info_;
 
         /* worker threads */
-        thread hello_thread_;
+        //thread hello_thread_;
         thread auth_thread_;
         thread data_thread_;
 
         /* worker entries */
-        udp_hello_entry hello_entry_;
+        //udp_hello_entry hello_entry_;
         udp_auth_entry  auth_entry_;
         udp_data_entry  data_entry_;
 
@@ -87,7 +87,7 @@ namespace csl
       public:
         /* accessors and manipulators */
         void valid_key_cb(cb::valid_key & c);
-        void hello_cb(cb::hello & c);
+        //void hello_cb(cb::hello & c);
         void valid_creds_cb(cb::valid_creds & c);
 
         void create_session_cb(cb::create_session & c);
@@ -95,11 +95,11 @@ namespace csl
         void data_arrival_cb(cb::data_arrival & c);
 
         /* addresses */
-        const SAI & hello_addr() const;
+        //const SAI & hello_addr() const;
         const SAI & auth_addr() const;
         const SAI & data_addr() const;
 
-        void hello_addr(const SAI & a);
+        //void hello_addr(const SAI & a);
         void auth_addr(const SAI & a);
         void data_addr(const SAI & a);
 

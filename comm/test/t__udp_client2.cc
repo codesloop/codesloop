@@ -24,11 +24,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
-   @file t__udp_server.cc
-   @brief Tests to verify udp_server routines
+   @file t__udp_client2.cc
+   @brief Tests to verify udp::cli routines
  */
 
-#include "udp_srv.hh"
+#include "udp_hello.hh"
 #include "test_timer.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,31 +36,25 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <assert.h>
 
 using namespace csl::common;
-using namespace csl::comm;
 using namespace csl::sec;
+using namespace csl::comm;
 
-/** @brief contains tests related to udp servers */
-namespace test_udp_server {
+/** @brief contains tests related to udp clients */
+namespace test_udp_client {
 
   void basic()
   {
-    udp_srv s;
-    udp_srv::SAI h,a,d;
+    udp::hello_cli c;
+    udp::SAI h;
 
-    s.use_exc(false);
+    c.use_exc(false);
 
     memset( &h,0,sizeof(h) );
     h.sin_family       = AF_INET;
     h.sin_addr.s_addr  = htonl(INADDR_LOOPBACK);
     h.sin_port         = htons(47781);
 
-    a = d = h;
-    a.sin_port = htons(47782);
-    d.sin_port = htons(47783);
-
-    //s.hello_addr( h );
-    s.auth_addr( a );
-    s.data_addr( d );
+    c.addr(h);
 
     ecdh_key pubkey;
     bignum   privkey;
@@ -70,25 +64,60 @@ namespace test_udp_server {
     /* generate keypair */
     assert( pubkey.gen_keypair(privkey) == true );
 
-    udp_srv_info info;
-    info.public_key(pubkey);
+    c.private_key(privkey);
+    c.public_key(pubkey);
 
-    s.private_key(privkey);
-    s.server_info(info);
-
-    assert( s.start() );
-
-    SleepSeconds( 30 );
+    assert( c.hello( 3000 ) == true );
   }
 
-} // end of test_udp_server
+  static udp::hello_cli * global_client_ = 0;
 
-using namespace test_udp_server;
+  void hello()
+  {
+    assert( global_client_->hello( 3000 ) == true );
+  }
+
+#if 0
+  void start()
+  {
+    assert( global_client_->start( 3000 ) == true );
+  }
+#endif
+
+} // end of test_udp_client
+
+using namespace test_udp_client;
 
 int main()
 {
-  //csl_common_print_results( "simplest      ", csl_common_test_timer_i1(simplest,0),"" );
-  basic();
+  udp::hello_cli c_global;
+  udp::SAI h;
+
+  c_global.use_exc(false);
+
+  memset( &h,0,sizeof(h) );
+  h.sin_family       = AF_INET;
+  h.sin_addr.s_addr  = htonl(INADDR_LOOPBACK);
+
+  h.sin_port         = htons(47781);
+  c_global.addr(h);
+
+  ecdh_key pubkey;
+  bignum   privkey;
+
+  pubkey.algname("prime192v3");
+
+  /* generate keypair */
+  assert( pubkey.gen_keypair(privkey) == true );
+
+  c_global.private_key(privkey);
+  c_global.public_key(pubkey);
+
+  global_client_ = &c_global;
+
+  csl_common_print_results( "basic      ", csl_common_test_timer_v0(basic),"" );
+  csl_common_print_results( "hello      ", csl_common_test_timer_v0(hello),"" );
+  //csl_common_print_results( "start      ", csl_common_test_timer_v0(start),"" );
   return 0;
 }
 

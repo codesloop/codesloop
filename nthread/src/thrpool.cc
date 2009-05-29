@@ -60,7 +60,6 @@ namespace csl
           {
             pool_->on_entry();
             unsigned int n_attempts = 0;
-            // fprintf(stderr,"S[%d:%p] ",pool_->count(),this);
 
             while( stop_me() == false )
             {
@@ -74,7 +73,6 @@ namespace csl
                   /* ensure that the minimum amount of threads will run */
                   if( pool_->count() > min_ )
                   {
-                    // fprintf(stderr," X[%d:%d]",pool_->count(),min_);
                     break;
                   }
                 }
@@ -98,7 +96,6 @@ namespace csl
               }
               pool_->cleanup();
             }
-            // fprintf(stderr,"E[%d:%p] ",pool_->count(),this);
             pool_->on_exit();
           }
 

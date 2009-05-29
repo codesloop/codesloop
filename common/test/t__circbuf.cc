@@ -91,7 +91,7 @@ namespace test_circbuf {
     {
       int & it = cb.pop();
       assert( it == i );
-      assert( cb.size() == 40U-1-i );
+      assert( cb.n_items() == 40U-1-i );
     }
   }
 
@@ -126,14 +126,14 @@ namespace test_circbuf {
       cb.commit( it );
       assert( cb.newest() == i );
       assert( cb.oldest() == 0 );
-      assert( cb.size() == (unsigned int)i+1 );
+      assert( cb.n_items() == (unsigned int)i+1 );
     }
 
     for( int i=0;i<40;++i )
     {
       int & it = cb.pop();
       assert( it == i );
-      assert( cb.size() == 40U-1-i );
+      assert( cb.n_items() == 40U-1-i );
     }
   }
 

@@ -49,24 +49,24 @@ namespace csl
       if( server_info_.public_key().is_empty() ) { THR(exc::rs_pubkey_empty,exc::cm_udp_srv,false); }
 
       /* already started ( TODO may be finished too ) */
-      if( hello_thread_.is_started() || auth_thread_.is_started() || data_thread_.is_started() )
-      {
-        THR(exc::rs_already_started,exc::cm_udp_srv,false);
-      }
+      //if( hello_thread_.is_started() || auth_thread_.is_started() || data_thread_.is_started() )
+      //{
+      //  THR(exc::rs_already_started,exc::cm_udp_srv,false);
+      //}
 
       /* init threads */
-      hello_thread_.set_entry(hello_entry_);
+      //hello_thread_.set_entry(hello_entry_);
       auth_thread_.set_entry(auth_entry_);
       data_thread_.set_entry(data_entry_);
 
       /* init entries */
-      if( !hello_entry_.start() || !auth_entry_.start() || !data_entry_.start() )
-      {
-        return false;
-      }
+      //if( !hello_entry_.start() || !auth_entry_.start() || !data_entry_.start() )
+      //{
+      //  return false;
+      //}
 
       /* start hello thread */
-      if( hello_thread_.start() == false ) { THR(exc::rs_thread_start,exc::cm_udp_srv,false); }
+      //if( hello_thread_.start() == false ) { THR(exc::rs_thread_start,exc::cm_udp_srv,false); }
 
       /* start auth thread */
       if( auth_thread_.start() == false ) { THR(exc::rs_thread_start,exc::cm_udp_srv,false); }
@@ -74,7 +74,7 @@ namespace csl
       /* start data thread */
       if( data_thread_.start() == false ) { THR(exc::rs_thread_start,exc::cm_udp_srv,false); }
 
-      return ( hello_thread_.start_event().wait( 3000 ) &&
+      return ( /*hello_thread_.start_event().wait( 3000 ) &&*/
           data_thread_.start_event().wait( 3000 ) &&
           auth_thread_.start_event().wait( 3000 ) );
     }
@@ -98,37 +98,37 @@ namespace csl
     }
 
     udp_srv::udp_srv()
-    : use_exc_(true), hello_entry_(*this), auth_entry_(*this), data_entry_(*this)
+    : use_exc_(true), /*hello_entry_(*this),*/ auth_entry_(*this), data_entry_(*this)
     {
     }
 
     udp_srv::~udp_srv()
     {
-      hello_entry_.stop_me();
+      //hello_entry_.stop_me();
       auth_entry_.stop_me();
       data_entry_.stop_me();
 
-      hello_thread_.exit_event().wait( 1500 );
+      //hello_thread_.exit_event().wait( 1500 );
       data_thread_.exit_event().wait( 1500 );
       auth_thread_.exit_event().wait( 1500 );
     }
 
     /* private: not used */
     udp_srv::udp_srv(const udp_srv & other)
-    : use_exc_(true), hello_entry_(*this), auth_entry_(*this), data_entry_(*this)
+    : use_exc_(true), /*hello_entry_(*this),*/ auth_entry_(*this), data_entry_(*this)
     {
     }
 
     void udp_srv::valid_key_cb(cb::valid_key & c)
     {
-      hello_entry_.valid_key_cb( c );
+      //hello_entry_.valid_key_cb( c );
       auth_entry_.valid_key_cb( c );
     }
 
-    void udp_srv::hello_cb(cb::hello & c)
-    {
-      hello_entry_.hello_cb( c );
-    }
+    //void udp_srv::hello_cb(cb::hello & c)
+    //{
+    //  hello_entry_.hello_cb( c );
+    //}
 
     void udp_srv::valid_creds_cb(cb::valid_creds & c)
     {
@@ -150,11 +150,11 @@ namespace csl
       data_arrival_cb_ = &c;
     }
 
-    const udp_srv::SAI & udp_srv::hello_addr() const { return hello_entry_.addr(); }
+    //const udp_srv::SAI & udp_srv::hello_addr() const { return hello_entry_.addr(); }
     const udp_srv::SAI & udp_srv::auth_addr() const  { return auth_entry_.addr();  }
     const udp_srv::SAI & udp_srv::data_addr() const  { return data_entry_.addr();  }
 
-    void udp_srv::hello_addr(const udp_srv::SAI & a) { return hello_entry_.addr(a); }
+    //void udp_srv::hello_addr(const udp_srv::SAI & a) { return hello_entry_.addr(a); }
     void udp_srv::auth_addr(const udp_srv::SAI & a)  { return auth_entry_.addr(a);  }
     void udp_srv::data_addr(const udp_srv::SAI & a)  { return data_entry_.addr(a);  }
   };

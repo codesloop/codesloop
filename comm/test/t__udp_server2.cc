@@ -24,11 +24,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
-   @file t__udp_server.cc
-   @brief Tests to verify udp_server routines
+   @file t__udp_server2.cc
+   @brief Tests to verify udp::srv routines
  */
 
-#include "udp_srv.hh"
+#include "udp_hello.hh"
 #include "test_timer.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,27 +40,22 @@ using namespace csl::comm;
 using namespace csl::sec;
 
 /** @brief contains tests related to udp servers */
-namespace test_udp_server {
+namespace test_udp_server2 {
 
   void basic()
   {
-    udp_srv s;
-    udp_srv::SAI h,a,d;
+    udp::hello_srv s;
+    udp::SAI h;
 
     s.use_exc(false);
+    s.debug(false);
 
     memset( &h,0,sizeof(h) );
     h.sin_family       = AF_INET;
     h.sin_addr.s_addr  = htonl(INADDR_LOOPBACK);
     h.sin_port         = htons(47781);
 
-    a = d = h;
-    a.sin_port = htons(47782);
-    d.sin_port = htons(47783);
-
-    //s.hello_addr( h );
-    s.auth_addr( a );
-    s.data_addr( d );
+    s.addr( h );
 
     ecdh_key pubkey;
     bignum   privkey;
@@ -70,20 +65,17 @@ namespace test_udp_server {
     /* generate keypair */
     assert( pubkey.gen_keypair(privkey) == true );
 
-    udp_srv_info info;
-    info.public_key(pubkey);
+    s.private_key( privkey );
+    s.public_key( pubkey );
 
-    s.private_key(privkey);
-    s.server_info(info);
+    assert( s.start() == true );
 
-    assert( s.start() );
-
-    SleepSeconds( 30 );
+    SleepSeconds( 60 );
   }
 
 } // end of test_udp_server
 
-using namespace test_udp_server;
+using namespace test_udp_server2;
 
 int main()
 {
