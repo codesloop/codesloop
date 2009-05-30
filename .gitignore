@@ -82,4 +82,6 @@ comm/test/t__udp_auth_client
 comm/test/t__udp_auth_server
 comm/test/t__udp_hello_client
 comm/test/t__udp_hello_server
-
+common/test/test_4_zfile.txt.z1
+sec/test/ecdh_test_creds_cli.xdrbin
+sec/test/ecdh_test_creds_srv.xdrbin

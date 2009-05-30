@@ -175,6 +175,7 @@ namespace csl
           ecdh_key     public_key_;
           ecdh_key     server_public_key_;
           saltbuf_t    server_salt_;
+          saltbuf_t    my_salt_;
 
           string       login_;
           string       pass_;
@@ -190,6 +191,9 @@ namespace csl
 
           /* server salt */
           inline const saltbuf_t & server_salt() const { return server_salt_; }
+
+          /* own salt */
+          inline const saltbuf_t & my_salt() const { return my_salt_; }
 
           /* session_key */
           inline const string & session_key() const { return session_key_; }
@@ -216,7 +220,7 @@ namespace csl
 
           /* pass */
           inline const string & pass() const  { return pass_;  }
-          inline void pass(const string & p)  { login_ = p; }
+          inline void pass(const string & p)  { pass_ = p; }
 
           /* debug ? */
           inline void debug(bool yesno) { debug_ = yesno; }

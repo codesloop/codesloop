@@ -50,7 +50,8 @@ namespace csl
 
         inline tbuf() : data_(preallocated_), size_(0) { }
         inline ~tbuf() { reset(); }
-        inline tbuf(const tbuf & other) { *this = other; }
+
+        inline tbuf(const tbuf & other) { *this = other; } // TODO test copy constructor!!!
 
         inline bool operator==(const tbuf & other) const
         {
@@ -61,7 +62,7 @@ namespace csl
           return (::memcmp(other.data_,data_,size_) == 0);
         }
 
-        tbuf & operator=(const pbuf & other)
+        inline tbuf & operator=(const pbuf & other)
         {
           unsigned long sz = other.size();
 
@@ -75,27 +76,16 @@ namespace csl
           return *this;
         }
 
-        tbuf & operator=(const tbuf & other)
+        inline tbuf & operator=(const tbuf & other) // TODO test copy operator!!!
         {
           /* quick return if empty */
           if( other.is_empty() ) { reset(); return *this; }
 
-          /* may not need to allocate data, so save old pointer */
-          unsigned char * tmp = data_;
+          unsigned char * tmp = allocate_nocopy( other.size_ );
 
-          /* allocate data if needed */
-          if( other.is_static() == false )
-            tmp = (unsigned char *)::malloc(other.size_);
-
-          /* if allocated */
           if( tmp )
           {
-            /* if already have data */
-            if( data_ && data_ != preallocated_ ) ::free( data_ );
-
-            data_ = tmp; size_ = other.size_;
-
-            ::memcpy( data_, other.data_, size_ );
+            ::memcpy( tmp, other.data_, other.size_ );
           }
           return *this;
         }
@@ -117,7 +107,7 @@ namespace csl
             return true;
         }
 
-        bool set(const unsigned char * dta,unsigned int sz)
+        inline bool set(const unsigned char * dta,unsigned int sz)
         {
           /* if no data on the other side we are done */
           if( !sz )  { reset(); return true; }
@@ -138,7 +128,7 @@ namespace csl
         }
 
         /** @todo test: allocate with existing data: should copy the old data!!! */
-        unsigned char * allocate(unsigned int sz)
+        inline unsigned char * allocate(unsigned int sz)
         {
           if( !sz ) { reset(); return data_; }
 
@@ -174,12 +164,47 @@ namespace csl
           }
         }
 
-        void append(unsigned char c)
+        inline unsigned char * allocate_nocopy(unsigned int sz)
+        {
+          if( !sz ) { reset(); return data_; }
+
+          if( sz <= size_ )
+          {
+            /* the requested data is smaller than the allocated */
+            size_ = sz;
+            return data_;
+          }
+          else if( sz <= sizeof(preallocated_) && data_ == preallocated_ )
+          {
+            /* data fits into preallocated size */
+            size_ = sz;
+            return data_;
+          }
+          else
+          {
+            /* cannot use the preallocated space */
+            unsigned char * tmp = (unsigned char *)::malloc(sz);
+            if( !tmp ) return 0;
+
+            /* already have data ? */
+            if( size_ > 0 )
+            {
+              if( data_ != preallocated_ ) ::free(data_);
+            }
+
+            data_ = tmp;
+            size_ = sz;
+
+            return data_;
+          }
+        }
+
+        inline void append(unsigned char c)
         {
           set_at(size_,c);
         }
 
-        void set_at(unsigned int pos,unsigned char c)
+        inline void set_at(unsigned int pos,unsigned char c)
         {
           unsigned char * t = allocate(pos+1);
           t[pos] = c;

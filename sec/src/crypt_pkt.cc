@@ -24,11 +24,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "crypt_pkt.hh"
+#include "exc.hh"
 #include "csl_sec.hh"
+#include "common.h"
 #include "tbuf.hh"
 #include "umac_ae.h"
 #include <openssl/rand.h>
-#include <string.h>
 
 /**
   @file crypt_pkt.cc
@@ -47,9 +48,9 @@ namespace csl
                              databuf_t & data,
                              footbuf_t & footer )
     {
-      if( salt.size() != 8 )    return false;
-      if( key.size() == 0 )     return false;
-      if( data.size() > 65200 ) return false;
+      if( salt.size() != 8 )    { THR(sec::exc::rs_salt_size,sec::exc::cm_crypt_pkt,false); }
+      if( key.size() == 0 )     { THR(sec::exc::rs_null_key,sec::exc::cm_crypt_pkt,false); }
+      if( data.size() > 65200 ) { THR(sec::exc::rs_too_big,sec::exc::cm_crypt_pkt,false); }
 
       umac_ae_ctx_t * ctx = (umac_ae_ctx_t *)::malloc(sizeof(umac_ae_ctx_t));
 
@@ -92,7 +93,7 @@ namespace csl
         /* fallback */
         if( RAND_pseudo_bytes((unsigned char *)data2,4) != 1 )
         {
-          return false;
+          THR(sec::exc::rs_rand_failed,sec::exc::cm_crypt_pkt,false);
         }
       }
       memcpy( data2+4,data.data(),data.size() );
@@ -126,11 +127,11 @@ namespace csl
                              databuf_t & data,
                              const footbuf_t & footer )
     {
-      if( header.size() != 8 )  return false;
-      if( footer.size() != 8 )  return false;
-      if( key.size() == 0 )     return false;
-      if( data.size() > 65200 ) return false;
-      if( data.size() < 4 )     return false;
+      if( header.size() != 8 )  { THR(sec::exc::rs_header_size,sec::exc::cm_crypt_pkt,false); }
+      if( footer.size() != 8 )  { THR(sec::exc::rs_footer_size,sec::exc::cm_crypt_pkt,false); }
+      if( key.size() == 0 )     { THR(sec::exc::rs_null_key,sec::exc::cm_crypt_pkt,false); }
+      if( data.size() > 65200 ) { THR(sec::exc::rs_too_big,sec::exc::cm_crypt_pkt,false); }
+      if( data.size() < 4 )     { THR(sec::exc::rs_null_data,sec::exc::cm_crypt_pkt,false); }
 
       umac_ae_ctx_t * ctx = (umac_ae_ctx_t *)::malloc(sizeof(umac_ae_ctx_t));
 
@@ -192,9 +193,13 @@ namespace csl
         else                  { data.reset(); }
 
         ret = true;
+        free( ctx );
       }
-
-      free( ctx );
+      else
+      {
+        free( ctx );
+        THR(sec::exc::rs_cksum,sec::exc::cm_crypt_pkt,false);
+      }
       return ret;
     }
   };

@@ -42,7 +42,7 @@ using namespace csl::sched;
 /** @brief contains tests related to sched::item */
 namespace test_item {
 
-  /** @todo document me */
+  /** @test baseline for performance comparison */
   void baseline()
   {
     item s;

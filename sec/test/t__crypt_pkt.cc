@@ -28,18 +28,18 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify crypt_pkt
  */
 
+#include "exc.hh"
 #include "pbuf.hh"
 #include "zfile.hh"
 #include "crypt_pkt.hh"
 #include "crypt_buf.hh"
 #include "test_timer.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "common.h"
 #include <assert.h>
 
 using csl::sec::crypt_pkt;
 using csl::sec::crypt_buf;
+using csl::sec::exc;
 using csl::common::zfile;
 using csl::common::pbuf;
 
@@ -140,7 +140,17 @@ namespace test_crypt_pkt {
     data.private_data()[6]=0xbd;
     data.private_data()[7]=0xbd;
 
-    assert( pk.decrypt( key,head,data,foot ) == false );
+    bool caught = false;
+    pk.use_exc(true);
+    try
+    {
+      assert( pk.decrypt( key,head,data,foot ) == false );
+    }
+    catch( csl::sec::exc e )
+    {
+      caught = true;
+    }
+    assert( caught == true );
 
     if( dbg )
     {
@@ -307,6 +317,7 @@ namespace test_crypt_pkt {
     data.set((const unsigned char *)buf,63*1024);
 
     crypt_pkt pk;
+    pk.use_exc(true);
 
     assert( pk.encrypt( salt,key,head,data,foot ) == true );
     assert( pk.decrypt( key,head,data,foot ) == true );
@@ -356,8 +367,19 @@ namespace test_crypt_pkt {
       pb.t_copy_to( foot,16 );
 
       crypt_pkt pk;
+      pk.use_exc(true);
 
-      assert( pk.decrypt( key,head,data,foot ) == false );
+      bool caught = false;
+      pk.use_exc(true);
+      try
+      {
+        assert( pk.decrypt( key,head,data,foot ) == false );
+      }
+      catch( csl::sec::exc e )
+      {
+        caught = true;
+      }
+      assert( caught == true );
 
       ++p;
     };

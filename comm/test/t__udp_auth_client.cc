@@ -24,15 +24,14 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
-   @file t__udp_client.cc
+   @file t__udp_auth_client.cc
    @brief Tests to verify udp_client routines
  */
 
-#include "udp_cli.hh"
+#include "udp_hello.hh"
+#include "udp_auth.hh"
 #include "test_timer.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "common.h"
 #include <assert.h>
 
 using namespace csl::common;
@@ -44,17 +43,23 @@ namespace test_udp_client {
 
   void basic()
   {
-    udp_cli c;
-    udp_cli::SAI h;
+    udp::hello_cli ch;
+    udp::auth_cli ca;
+    udp::SAI h,a;
 
-    c.use_exc(false);
+    ch.use_exc(false);
+    ca.use_exc(false);
+    ca.debug(false);
 
     memset( &h,0,sizeof(h) );
     h.sin_family       = AF_INET;
     h.sin_addr.s_addr  = htonl(INADDR_LOOPBACK);
     h.sin_port         = htons(47781);
+    a = h;
+    a.sin_port         = htons(47782);
 
-    c.hello_addr(h);
+    ch.addr(h);
+    ca.addr(a);
 
     ecdh_key pubkey;
     bignum   privkey;
@@ -64,22 +69,32 @@ namespace test_udp_client {
     /* generate keypair */
     assert( pubkey.gen_keypair(privkey) == true );
 
-    c.private_key(privkey);
-    c.public_key(pubkey);
+    ch.private_key(privkey);
+    ch.public_key(pubkey);
 
-    assert( c.hello( 3000 ) == true );
+    ca.private_key(privkey);
+    ca.public_key(pubkey);
+    ca.login("LLL");
+    ca.pass("PPP");
+
+    assert( ch.hello( 3000 ) == true );
+
+    ca.server_public_key(ch.server_public_key());
+
+    assert( ca.auth( 3000 ) == true );
   }
 
-  static udp_cli * global_client_ = 0;
+  static udp::hello_cli * global_hello_client_ = 0;
+  static udp::auth_cli  * global_auth_client_ = 0;
 
   void hello()
   {
-    assert( global_client_->hello( 3000 ) == true );
+    assert( global_hello_client_->hello( 3000 ) == true );
   }
 
   void start()
   {
-    assert( global_client_->start( 3000 ) == true );
+    assert( global_auth_client_->auth( 3000 ) == true );
   }
 
 } // end of test_udp_client
@@ -88,20 +103,25 @@ using namespace test_udp_client;
 
 int main()
 {
-  udp_cli c_global;
-  udp_cli::SAI h;
+  udp::hello_cli ch_global;
+  udp::auth_cli  ca_global;
 
-  c_global.use_exc(false);
+  udp::SAI h,a;
+
+  ch_global.use_exc(false);
+  ca_global.use_exc(false);
 
   memset( &h,0,sizeof(h) );
   h.sin_family       = AF_INET;
   h.sin_addr.s_addr  = htonl(INADDR_LOOPBACK);
 
   h.sin_port         = htons(47781);
-  c_global.hello_addr(h);
+  ch_global.addr(h);
 
-  h.sin_port         = htons(47782);
-  c_global.auth_addr(h);
+  a = h;
+
+  a.sin_port         = htons(47782);
+  ca_global.addr(a);
 
   ecdh_key pubkey;
   bignum   privkey;
@@ -111,15 +131,21 @@ int main()
   /* generate keypair */
   assert( pubkey.gen_keypair(privkey) == true );
 
-  c_global.private_key(privkey);
-  c_global.public_key(pubkey);
-  c_global.login("LLL");
-  c_global.pass("PPP");
+  ch_global.private_key(privkey);
+  ch_global.public_key(pubkey);
+  ca_global.private_key(privkey);
+  ca_global.public_key(pubkey);
+  ca_global.login("LLL");
+  ca_global.pass("PPP");
 
-  global_client_ = &c_global;
+  global_hello_client_ = &ch_global;
+  global_auth_client_ = &ca_global;
 
   csl_common_print_results( "basic      ", csl_common_test_timer_v0(basic),"" );
   csl_common_print_results( "hello      ", csl_common_test_timer_v0(hello),"" );
+
+  ca_global.server_public_key(ch_global.server_public_key());
+
   csl_common_print_results( "start      ", csl_common_test_timer_v0(start),"" );
 
   return 0;

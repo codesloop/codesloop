@@ -24,43 +24,43 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
-   @file t__udp_server.cc
-   @brief Tests to verify udp_server routines
+   @file t__udp_auth_server.cc
+   @brief Tests to verify udp::auth_srv routines
  */
 
-#include "udp_srv.hh"
+#include "udp_hello.hh"
+#include "udp_auth.hh"
 #include "test_timer.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "common.h"
 #include <assert.h>
 
 using namespace csl::common;
 using namespace csl::comm;
 using namespace csl::sec;
 
-/** @brief contains tests related to udp servers */
-namespace test_udp_server {
+/** @brief contains tests related to udp auth servers */
+namespace test_udp_auth_server {
 
   void basic()
   {
-    udp_srv s;
-    udp_srv::SAI h,a,d;
+    udp::hello_srv hellosrv;
+    udp::auth_srv authsrv;
+    udp::SAI h,a;
 
-    s.use_exc(false);
+    hellosrv.use_exc(false);
+    authsrv.use_exc(false);
+    authsrv.debug(false);
 
     memset( &h,0,sizeof(h) );
     h.sin_family       = AF_INET;
     h.sin_addr.s_addr  = htonl(INADDR_LOOPBACK);
     h.sin_port         = htons(47781);
 
-    a = d = h;
+    a = h;
     a.sin_port = htons(47782);
-    d.sin_port = htons(47783);
 
-    //s.hello_addr( h );
-    //s.auth_addr( a );
-    s.data_addr( d );
+    hellosrv.addr(h);
+    authsrv.addr(a);
 
     ecdh_key pubkey;
     bignum   privkey;
@@ -70,20 +70,21 @@ namespace test_udp_server {
     /* generate keypair */
     assert( pubkey.gen_keypair(privkey) == true );
 
-    udp_srv_info info;
-    info.public_key(pubkey);
+    authsrv.private_key(privkey);
+    authsrv.public_key(pubkey);
 
-    s.private_key(privkey);
-    s.server_info(info);
+    hellosrv.private_key(privkey);
+    hellosrv.public_key(pubkey);
 
-    assert( s.start() );
+    assert( authsrv.start() );
+    assert( hellosrv.start() );
 
-    SleepSeconds( 30 );
+    SleepSeconds( 60 );
   }
 
-} // end of test_udp_server
+} // end of test_udp_auth_server
 
-using namespace test_udp_server;
+using namespace test_udp_auth_server;
 
 int main()
 {

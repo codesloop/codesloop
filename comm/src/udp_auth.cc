@@ -118,6 +118,7 @@ namespace csl
           key.set((unsigned char *)session_key.c_str(),session_key.size()+1);
 
           crypt_pkt pk;
+          pk.use_exc(use_exc());
 
           if( pk.decrypt( key,head,data,foot ) == false )
           {
@@ -205,6 +206,7 @@ namespace csl
           inner.t_copy_to(data);
 
           crypt_pkt pk;
+          pk.use_exc(use_exc());
 
           if( !pk.encrypt( salt,key,head,data,foot ) )
           {
@@ -227,6 +229,7 @@ namespace csl
             print_hex("  ++ UCHTUA HEAD ",head.data(),head.size() );
             print_hex("  ++ UCHTUA DATA ",data.data(),data.size() );
             print_hex("  ++ UCHTUA FOOT ",foot.data(),foot.size() );
+            printf(   "  ++ UCHTUA size: %d\n",retlen );
           }
 
           /* return the data */
@@ -295,8 +298,8 @@ namespace csl
           saltbuf_t  pkt_salt;
           saltbuf_t  my_salt;
 
-          csl_sec_gen_rand( pkt_salt.allocate(8), 8 );
-          csl_sec_gen_rand( my_salt.allocate(8), 8 );
+          csl_sec_gen_rand( pkt_salt.allocate(saltbuf_t::preallocated_size), saltbuf_t::preallocated_size );
+          csl_sec_gen_rand( my_salt.allocate(saltbuf_t::preallocated_size), saltbuf_t::preallocated_size );
 
           /* register authenticated client */
           if( register_auth_cb_ &&
@@ -308,7 +311,7 @@ namespace csl
           /* prepare response htua packet */
           if( prepare_htua( pkt_salt, my_salt, sesskey, ms) == false )
           {
-            fprintf(stderr,"[%s:%d] Error in prepare_olleh()\n",__FILE__,__LINE__);
+            fprintf(stderr,"[%s:%d] Error in prepare_htua()\n",__FILE__,__LINE__);
             return;
           }
 
@@ -419,19 +422,96 @@ namespace csl
       {
         try
         {
-          pbuf pb;
-          xdrbuf xb(pb);
+          /* unencrypted part */
+          pbuf    outer;
+          xdrbuf  xbo(outer);
 
-          xb << (int32_t)msg::unicast_auth_p;
+          xbo << (int32_t)msg::unicast_auth_p;
 
-          if( debug() ) { printf(" ++ [%ld] : packet_type : %d\n",xb.position(),msg::unicast_auth_p ); }
+          if( debug() ) { printf(" ++ [%ld] : packet_type : %d\n",xbo.position(),msg::unicast_auth_p ); }
 
-          if( public_key_.to_xdr(xb) == false ) { THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_auth_cli,false); }
+          if( public_key_.to_xdr(xbo) == false ) { THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_auth_cli,false); }
 
-          if( debug() ) { printf(" ++ [%ld] : ",xb.position()); public_key_.print(); }
+          if( debug() ) { printf(" ++ [%ld] : ",xbo.position()); public_key_.print(); }
 
-          pb.copy_to( m.data_,m.max_len() );
-          m.size_ = pb.size();
+          if( outer.size() > m.max_len() ) { THR(comm::exc::rs_too_big,comm::exc::cm_udp_auth_cli,false); }
+
+          outer.copy_to(m.data_,m.max_len());
+
+          /* encrypted part */
+          pbuf inner;
+          xdrbuf xbi(inner);
+
+          /* salt and session key is generated in auth() */
+          xbi << xdrbuf::bindata_t( (const unsigned char *)my_salt_.data(),(unsigned int)saltbuf_t::preallocated_size );
+          xbi << login_;
+          xbi << pass_;
+          xbi << session_key_;
+
+          if( debug() )
+          {
+            printf("  ++ login: '%s' pass: '%s' sesskey: '%s'\n",
+                   login_.c_str(),pass_.c_str(),session_key_.c_str());
+          }
+
+          /* generate session key */
+          std::string session_key;
+
+          if( server_public_key_.is_empty() == false )
+          {
+            if( server_public_key_.gen_sha1hex_shared_key(private_key_,session_key) == false )
+            {
+              THR(comm::exc::rs_sec_error,comm::exc::cm_udp_auth_cli,false);
+            }
+          }
+          else
+          {
+            THR(comm::exc::rs_pubkey_empty,comm::exc::cm_udp_auth_cli,false);
+          }
+
+          if( debug() ) { printf("  ++ Session Key: '%s'\n",session_key.c_str()); }
+
+          /* compile packet */
+          crypt_pkt::saltbuf_t  salt;
+          crypt_pkt::keybuf_t   key;
+          crypt_pkt::headbuf_t  head;
+          crypt_pkt::databuf_t  data;
+          crypt_pkt::footbuf_t  foot;
+
+          csl_sec_gen_rand( salt.allocate(saltbuf_t::preallocated_size), saltbuf_t::preallocated_size );
+          key.set( (unsigned char *)session_key.c_str(), session_key.size()+1 );
+          inner.t_copy_to(data);
+
+          crypt_pkt pk;
+          pk.use_exc(use_exc());
+
+          if( !pk.encrypt( salt,key,head,data,foot ) )
+          {
+            THR(comm::exc::rs_crypt_pkt_error,comm::exc::cm_udp_auth_cli,false);
+          }
+
+          /* output packet */
+          unsigned char * outputp = m.data_+outer.size();
+          unsigned int retlen = outer.size()+head.size()+data.size()+foot.size();
+
+          if( retlen > m.max_len() ) { THR(comm::exc::rs_too_big,comm::exc::cm_udp_auth_cli,false); }
+
+          memcpy( outputp, head.data(), head.size() ); outputp += head.size();
+          memcpy( outputp, data.data(), data.size() ); outputp += data.size();
+          memcpy( outputp, foot.data(), foot.size() ); outputp += foot.size();
+
+          if( debug() )
+          {
+            print_hex("  ++ UCAUTH PROL ",m.data_,outer.size());
+            print_hex("  ++ UCAUTH HEAD ",head.data(),head.size() );
+            print_hex("  ++ UCAUTH DATA ",data.data(),data.size() );
+            print_hex("  ++ UCAUTH FOOT ",foot.data(),foot.size() );
+            printf(   "  ++ UCAUTH size: %d\n",retlen );
+          }
+
+          /* return the data */
+          m.size_ = retlen;
+          return true;
         }
         catch( common::exc e )
         {
@@ -440,7 +520,7 @@ namespace csl
           fprintf(stderr,"Exception caught: %s\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_auth_cli,false);
         }
-        return true;
+        return false;
       }
 
       bool auth_cli::init_htua( const msg & m )
@@ -455,7 +535,7 @@ namespace csl
           int32_t packet_type = 0;
           xbo >> packet_type;
 
-          if( debug() ) { printf(" -- [%ld] : packet_type : %d\n",xbo.position(),packet_type ); }
+          if( debug() ) { printf(" -- [%ld] : packet_type : %d  size : %d\n",xbo.position(),packet_type,m.size_ ); }
 
           if( packet_type != msg::unicast_htua_p )
           {
@@ -481,7 +561,17 @@ namespace csl
 
           key.set((unsigned char *)session_key_.c_str(),session_key_.size()+1);
 
+          if( debug() )
+          {
+            print_hex("  ++ UCHTUA PROL ",m.data_,outer.size());
+            print_hex("  ++ UCHTUA HEAD ",head.data(),head.size() );
+            print_hex("  ++ UCHTUA DATA ",data.data(),data.size() );
+            print_hex("  ++ UCHTUA FOOT ",foot.data(),foot.size() );
+            print_hex("  ++ UCHTUA KEY  ",key.data(),key.size() );
+          }
+
           crypt_pkt pk;
+          pk.use_exc(use_exc());
 
           if( pk.decrypt( key,head,data,foot ) == false )
           {
@@ -575,10 +665,9 @@ namespace csl
 
         if( public_key().is_empty() ) { THR(exc::rs_hello_nocall,exc::cm_udp_auth_cli,false); }
 
-        saltbuf_t client_salt;
-
+        /* generate salt and session key */
+        csl_sec_gen_rand( my_salt_.allocate(saltbuf_t::preallocated_size), saltbuf_t::preallocated_size );
         gen_sess_key(session_key_);
-        csl_sec_gen_rand( client_salt.allocate(8), client_salt.size() );
 
         /* prepare auth packet */
         msg m;
@@ -612,6 +701,7 @@ namespace csl
           //
           if( err > 0 )
           {
+            m.size_ = err;
             if( init_htua( m ) == false )
             {
               THR(exc::rs_pkt_error,exc::cm_udp_auth_cli,false);

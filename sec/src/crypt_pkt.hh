@@ -41,6 +41,7 @@ namespace csl
 {
   namespace sec
   {
+    /** @todo document me */
     class crypt_pkt
     {
       public:
@@ -74,12 +75,17 @@ namespace csl
                       databuf_t & data,
                       const footbuf_t & footer );
 
-        inline crypt_pkt() {}
+        inline crypt_pkt() : use_exc_(false) {}
         inline virtual ~crypt_pkt() {}
+
+        inline void use_exc(bool yesno) { use_exc_ = yesno; }
+        inline bool use_exc() const     { return use_exc_; }
 
       private:
         crypt_pkt(const crypt_pkt & other) {}
         crypt_pkt & operator=(const crypt_pkt & other) { return *this; }
+
+        bool use_exc_;
     };
   }
 }

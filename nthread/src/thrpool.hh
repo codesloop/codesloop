@@ -41,6 +41,7 @@ namespace csl
 {
   namespace nthread
   {
+    /** @todo document me */
     class thrpool
     {
       public:

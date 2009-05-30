@@ -157,6 +157,7 @@ namespace csl
           inner.t_copy_to( data );
 
           crypt_pkt pk;
+          pk.use_exc(use_exc());
 
           if( !pk.encrypt( salt,key,head,data,foot ) )
           {
@@ -430,6 +431,7 @@ namespace csl
           key.set((unsigned char *)session_key.c_str(),session_key.size()+1);
 
           crypt_pkt pk;
+          pk.use_exc(use_exc());
 
           if( pk.decrypt( key,head,data,foot ) == false )
           {

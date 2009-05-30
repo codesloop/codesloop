@@ -32,6 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "csl_sec.h"
+#include "exc.hh"
 #include "bignum.hh"
 #include "crypt_buf.hh"
 #include "ecdh_key.hh"

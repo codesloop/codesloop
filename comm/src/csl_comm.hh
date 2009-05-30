@@ -26,11 +26,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_comm_csl_comm_included_
 #define _csl_comm_csl_comm_included_
 
-#include "session_data.hh"
-#include "cb.hh"
 #include "exc.hh"
-#include "udp_cli.hh"
-#include "udp_srv.hh"
+#include "udp_hello.hh"
+#include "udp_auth.hh"
 
 #ifdef __cplusplus
 #endif /* __cplusplus */

@@ -66,6 +66,7 @@ ELSE(WIN32)
 ENDIF(WIN32)
 
 ADD_LIBRARY( csl_sec STATIC
+             exc.cc              exc.hh
              bignum.cc           bignum.hh
              ecdh_key.cc         ecdh_key.hh
              xdr_challenge.cc    xdr_challenge.hh

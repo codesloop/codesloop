@@ -44,13 +44,13 @@ using namespace csl::sec;
 /** @brief contains tests related to sched::peer */
 namespace test_peer {
 
-  /** @todo document me */
+  /** @test  baseline for performance comparison */
   void baseline()
   {
     peer p;
   }
 
-  /** @todo document me */
+  /** @test check if exceptions are thrown when misused */
   void usage1()
   {
     peer p;
@@ -73,7 +73,7 @@ namespace test_peer {
     assert( caught == true );
   }
 
-  /** @todo document me */
+  /** @test to see find_by_id and find_by returns false when bad parameter given */
   void usage2()
   {
     peer p;
@@ -86,7 +86,7 @@ namespace test_peer {
     assert( p.find_by(t,1) == false );
   }
 
-  /** @todo document me */
+  /** @test basic db operations for peer class */
   void usage3()
   {
     peer p;
@@ -116,7 +116,7 @@ namespace test_peer {
     assert( p.remove(t) == true );
   }
 
-  /** @todo document me */
+  /** @test basic DB operations of peer */
   void usage3_nodel()
   {
     peer p;
@@ -144,7 +144,7 @@ namespace test_peer {
     assert( p3.private_key().is_empty() == false );
   }
 
-  /** @todo document me */
+  /** @test locating peer in DB that was created by usage3_nodel */
   void usage4()
   {
     peer p2;
@@ -156,7 +156,7 @@ namespace test_peer {
     assert( p2.private_key().is_empty() == false );
   }
 
-  /** @todo document me */
+  /** @test DB ops of peer */
   void usage5()
   {
     peer p2;
