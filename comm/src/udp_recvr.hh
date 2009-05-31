@@ -72,7 +72,7 @@ namespace csl
         unsigned int   size_;
         SAI            sender_;
 
-        inline unsigned int max_len()
+        inline unsigned int max_len() const
         {
           return max_len_v;
         }
@@ -165,7 +165,8 @@ namespace csl
                       unsigned int max_threads,
                       unsigned int timeout_ms,
                       unsigned int attempts,
-                      msg_handler & cb );
+                      msg_handler & cb,
+                      int sock=-1 );
 
           bool stop();
 

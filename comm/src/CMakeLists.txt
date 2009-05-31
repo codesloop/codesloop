@@ -43,6 +43,7 @@ ADD_LIBRARY( csl_comm STATIC
              udp_recvr.cc         udp_recvr.hh
              udp_hello.cc         udp_hello.hh
              udp_auth.cc          udp_auth.hh
+             udp_data.cc          udp_data.hh
              csl_comm.hh
              exc.cc               exc.hh
              wsa.cc               wsa.hh

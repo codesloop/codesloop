@@ -78,16 +78,12 @@ namespace csl
           int32_t packet_type = 0;
           xbo >> packet_type;
 
-          if( debug() ) { printf(" -- [%ld] : packet_type : %d\n",xbo.position(),packet_type ); }
-
           if( packet_type != msg::unicast_auth_p )
           {
             THR(comm::exc::rs_invalid_packet_type,comm::exc::cm_udp_auth_handler,false);
           }
 
           if( peer_public_key.from_xdr(xbo) == false ) { THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_auth_handler,false); }
-
-          if( debug() ) { printf(" -- [%ld] : ",xbo.position()); peer_public_key.print(); }
 
           const unsigned char * ptrp = m.data_ + xbo.position();
           unsigned int          lenp = m.size_ - xbo.position();
@@ -102,7 +98,12 @@ namespace csl
             THR(comm::exc::rs_sec_error,comm::exc::cm_udp_auth_handler,false);
           }
 
-          if( debug() ) { printf("  -- Session Key: '%s'\n",session_key.c_str()); }
+          if( debug() )
+          {
+            printf(" -- [%ld] : packet_type : %d\n",xbo.position(),packet_type );
+            printf(" -- [%ld] : ",xbo.position()); peer_public_key.print();
+            printf("  -- Session Key: '%s'\n",session_key.c_str());
+          }
 
           /* de-compile packet */
           crypt_pkt::keybuf_t   key;
@@ -142,19 +143,17 @@ namespace csl
             THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_auth_handler,false);
           }
 
-          if( debug() ) { print_hex("  -- RAND ",slt.data(),slt.size()); }
-
           xbi >> login;
-
-          if( debug() ) { printf("  -- [%ld] login: '%s'\n",xbi.position(),login.c_str()); }
-
           xbi >> pass;
-
-          if( debug() ) { printf("  -- [%ld] pass: '%s'\n",xbi.position(),pass.c_str()); }
-
           xbi >> sesskey;
 
-          if( debug() ) { printf("  -- [%ld] sesskey: '%s'\n",xbi.position(),sesskey.c_str()); }
+          if( debug() )
+          {
+            print_hex("  -- RAND ",slt.data(),slt.size());
+            printf(   "  -- [%ld] login: '%s'\n",xbi.position(),login.c_str());
+            printf(   "  -- [%ld] pass: '%s'\n",xbi.position(),pass.c_str());
+            printf(   "  -- [%ld] sesskey: '%s'\n",xbi.position(),sesskey.c_str());
+          }
 
           return true;
         }
@@ -175,13 +174,15 @@ namespace csl
       {
         try
         {
+          if( pkt_salt.size() != salt_size_v )  { THR(comm::exc::rs_salt_size,comm::exc::cm_udp_auth_handler,false); }
+          if( comm_salt.size() != salt_size_v ) { THR(comm::exc::rs_salt_size,comm::exc::cm_udp_auth_handler,false); }
+          if( sesskey.size() == 0 ) { THR(comm::exc::rs_sesskey_empty,comm::exc::cm_udp_auth_handler,false); }
+
           /* unencrypted part */
           pbuf    outer;
           xdrbuf  xbo(outer);
 
           xbo << (int32_t)msg::unicast_htua_p;
-
-          if( debug() ) { printf(" ++ [%ld] : packet_type : %d\n",xbo.position(),msg::unicast_htua_p ); }
 
           if( outer.size() > m.max_len() ) { THR(comm::exc::rs_too_big,comm::exc::cm_udp_auth_handler,false); }
 
@@ -193,7 +194,11 @@ namespace csl
 
           xbi << xdrbuf::bindata_t( comm_salt.data(),comm_salt.size() );
 
-          if( debug() ) { printf("  ++ Session Key: '%s'\n",sesskey.c_str()); }
+          if( debug() )
+          {
+            printf(" ++ [%ld] : packet_type : %d\n",xbo.position(),msg::unicast_htua_p );
+            printf("  ++ Session Key: '%s'\n",sesskey.c_str());
+          }
 
           /* compile packet */
           crypt_pkt::saltbuf_t  salt(pkt_salt);
@@ -285,7 +290,10 @@ namespace csl
           if( init_auth(peer_public_key, login, pass, sesskey, peer_salt, ms) == false ) { return; }
 
           /* check peer key */
-          if( valid_key_cb_ && (*valid_key_cb_)(peer_public_key) == false ) { return; }
+          if( valid_key_cb_ && (*valid_key_cb_)(peer_public_key) == false )
+          {
+            return;
+          }
 
           /* validate credentials */
           if( valid_creds_cb_ &&
@@ -360,7 +368,10 @@ namespace csl
         handler_.use_exc(uex);
 
         /* init receivers */
-        if( receiver_.start(1,4,1000,10,handler_) == false ) { THR(exc::rs_thread_start,exc::cm_udp_auth_srv,false); }
+        if( receiver_.start(min_threads_,max_threads_,timeout_ms_,retries_,handler_) == false ) 
+        {
+          THR(exc::rs_thread_start,exc::cm_udp_auth_srv,false);
+        }
 
         /* set thread entries */
         thread_.set_entry( receiver_ );
@@ -390,7 +401,8 @@ namespace csl
         return ret;
       }
 
-      auth_srv::auth_srv() : use_exc_(true), debug_(false)
+      auth_srv::auth_srv()
+        : use_exc_(true), debug_(false), min_threads_(1), max_threads_(4), timeout_ms_(1000), retries_(10)
       {
       }
 
@@ -597,8 +609,6 @@ namespace csl
 
           if( debug() ) { print_hex("  -- RAND ",server_salt_.data(),server_salt_.size()); }
 
-          //memcpy( this->salt(), head.data(), crypt_pkt::header_len() );
-
           return true;
         }
         catch( common::exc e )
@@ -611,10 +621,9 @@ namespace csl
         return false;
       }
 
-
       namespace
       {
-        int init_sock(SAI & addr)
+        static int init_sock(SAI & addr)
         {
           int sock = ::socket( AF_INET, SOCK_DGRAM, 0 );
           if( sock <= 0 ) { return sock; }
@@ -707,14 +716,6 @@ namespace csl
               THR(exc::rs_pkt_error,exc::cm_udp_auth_cli,false);
             }
 
-            /* TODO
-            chann_.use_exc(this->use_exc());
-
-            if( chann_.init(pkt_, data_sock_, data_addr_, client_salt, server_salt) == false )
-            {
-              THR(exc::rs_channel_init,exc::cm_udp_auth_cli,false);
-            }
-            */
             return true;
           }
           else

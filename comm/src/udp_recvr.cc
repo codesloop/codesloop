@@ -40,7 +40,8 @@ namespace csl
                          unsigned int max_threads,
                          unsigned int timeout_ms,
                          unsigned int attempts,
-                         msg_handler & cb )
+                         msg_handler & cb,
+                         int tsock )
       {
         /* init thread pool and handlers */
         cb.set_msgs(msgs_);
@@ -49,34 +50,59 @@ namespace csl
              timeout_ms, attempts,
              msgs_.ev_, cb ) ) return false;
 
-        /* init udp */
-        if( socket_ != -1 ) { ShutdownCloseSocket(socket_); }
-
-        int sock = ::socket( AF_INET, SOCK_DGRAM, 0 );
-        if( sock <= 0 ) { THRC(exc::rs_socket_failed,exc::cm_udp_recvr,false); }
-
         /* copy addr to temporary */
         SAI addr = this->addr();
-
-        /* bind socket */
-        if( ::bind(sock,(struct sockaddr *)&addr, sizeof(addr)) )
-        {
-          ShutdownCloseSocket( sock );
-          THRC(exc::rs_bind_failed,exc::cm_udp_recvr,false);
-        }
-
-        /* check internal address */
         socklen_t len = sizeof(addr);
 
-        if( ::getsockname(sock,(struct sockaddr *)&addr,&len) )
-        {
-          ShutdownCloseSocket( sock );
-          THRC(exc::rs_getsockname_failed,exc::cm_udp_recvr,false);
-        }
+        /* the caller may supply a preinited socket, so we check that first
+           we assume that socket don't need to be bound */
 
-        /* copy the address back, in case of OS chosen port/address */
-        this->addr( addr );
-        socket_ = sock;
+        if( tsock != -1 )
+        {
+          /* check own socket */
+          if( socket_ != -1 && socket_ != tsock ) { ShutdownCloseSocket(socket_); }
+
+          int sock = tsock;
+
+          /* check socket address */
+          if( ::getsockname(sock,(struct sockaddr *)&addr,&len) )
+          {
+            ShutdownCloseSocket( sock );
+            THRC(exc::rs_getsockname_failed,exc::cm_udp_recvr,false);
+          }
+
+          /* copy the address */
+          this->addr( addr );
+          socket_ = sock;
+
+          return true;
+        }
+        else
+        {
+          /* init udp */
+          if( socket_ != -1 ) { ShutdownCloseSocket(socket_); }
+
+          int sock = ::socket( AF_INET, SOCK_DGRAM, 0 );
+          if( sock <= 0 ) { THRC(exc::rs_socket_failed,exc::cm_udp_recvr,false); }
+
+          /* bind socket */
+          if( ::bind(sock,(struct sockaddr *)&addr, sizeof(addr)) )
+          {
+            ShutdownCloseSocket( sock );
+            THRC(exc::rs_bind_failed,exc::cm_udp_recvr,false);
+          }
+
+          /* check internal address */
+          if( ::getsockname(sock,(struct sockaddr *)&addr,&len) )
+          {
+            ShutdownCloseSocket( sock );
+            THRC(exc::rs_getsockname_failed,exc::cm_udp_recvr,false);
+          }
+
+          /* copy the address back, in case of OS chosen port/address */
+          this->addr( addr );
+          socket_ = sock;
+        }
 
         return true;
       }

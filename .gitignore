@@ -84,3 +84,5 @@ comm/test/t__udp_auth_client
 comm/test/t__udp_auth_server
 comm/test/t__udp_hello_client
 comm/test/t__udp_hello_server
+comm/test/t__udp_data_client
+comm/test/t__udp_data_server

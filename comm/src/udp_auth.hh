@@ -88,8 +88,6 @@ namespace csl
           valid_creds_callback     * valid_creds_cb_;
           register_auth_callback   * register_auth_cb_;
 
-          //bool on_accept_auth( udp_pkt & pkt, SAI & addr );
-
           auth_handler() : valid_key_cb_(0), valid_creds_cb_(0), register_auth_cb_(0) {}
 
           /* auth packet */
@@ -145,6 +143,23 @@ namespace csl
           inline void debug(bool yesno) { debug_ = yesno; }
           inline bool debug() const     { return debug_;  }
 
+          /* set threadpool params _before_ start */
+          inline void set_threadpool_params( unsigned int min_th,
+                                             unsigned int max_th,
+                                             unsigned int timeout_ms,
+                                             unsigned int retries )
+          {
+            min_threads_ = min_th;
+            max_threads_ = max_th;
+            timeout_ms_  = timeout_ms;
+            retries_     = retries;
+          }
+
+          inline unsigned int min_threads() const { return min_threads_; }
+          inline unsigned int max_threads() const { return max_threads_; }
+          inline unsigned int timeout_ms() const  { return timeout_ms_;  }
+          inline unsigned int retries() const     { return retries_;     }
+
         private:
           /* */
           thread          thread_;
@@ -154,6 +169,12 @@ namespace csl
           /* internal */
           bool use_exc_;
           bool debug_;
+
+          /* thread pool */
+          unsigned int min_threads_;
+          unsigned int max_threads_;
+          unsigned int timeout_ms_;
+          unsigned int retries_;
       };
 
       class auth_cli

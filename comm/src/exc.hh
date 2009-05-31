@@ -81,14 +81,12 @@ namespace csl
           rs_need_pass,           ///<Need pass.
           rs_channel_init,        ///<Channel init failed.
           rs_recv_disabled,       ///<recv disabled.
+          rs_sesskey_empty,       ///<session key is not set
+          rs_salt_size,           ///<invalid salt size
         };
 
         enum {
           cm_unknown,            ///<Unknown component
-          cm_udp_srv,            ///<UDP server component
-          cm_udp_cli,            ///<UDP client component
-          cm_udp_pkt,            ///<UDP packet helper
-          cm_udp_chann,          ///<UDP channel
           cm_wsa,                ///<WSA
           cm_udp_recvr,          ///<UDP receiver
           cm_udp_hello_handler,  ///<UDP hello handler
@@ -97,7 +95,9 @@ namespace csl
           cm_udp_auth_handler,   ///<UDP auth handler
           cm_udp_auth_cli,       ///<UDP auth client
           cm_udp_auth_srv,       ///<UDP auth server
-
+          cm_udp_data_handler,   ///<UDP data handler
+          cm_udp_data_cli,       ///<UDP data client
+          cm_udp_data_srv,       ///<UDP data server
         };
 
         /** @brief converts reason code to string */

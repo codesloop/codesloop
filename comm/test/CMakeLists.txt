@@ -85,5 +85,7 @@ ADD_EXECUTABLE(t__udp_hello_client    t__udp_hello_client.cc)
 ADD_EXECUTABLE(t__udp_hello_server    t__udp_hello_server.cc)
 ADD_EXECUTABLE(t__udp_auth_client     t__udp_auth_client.cc)
 ADD_EXECUTABLE(t__udp_auth_server     t__udp_auth_server.cc)
+ADD_EXECUTABLE(t__udp_data_client     t__udp_data_client.cc)
+ADD_EXECUTABLE(t__udp_data_server     t__udp_data_server.cc)
 
 # -- EOF --

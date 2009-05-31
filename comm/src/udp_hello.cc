@@ -73,13 +73,14 @@ namespace csl
           int32_t packet_type;
           xb >> packet_type;
 
-          if( debug() ) { printf(" -- [%ld] : packet_type : %d\n",xb.position(),packet_type ); }
-
           if( packet_type != msg::hello_p ) { THR(comm::exc::rs_invalid_packet_type,comm::exc::cm_udp_hello_handler,false); }
-
           if( peer_public_key.from_xdr(xb) == false ) { THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_hello_handler,false); }
 
-          if( debug() ) { printf(" -- [%ld] : ",xb.position()); peer_public_key.print(); }
+          if( debug() )
+          {
+            printf(" -- [%ld] : packet_type : %d\n",xb.position(),packet_type );
+            printf(" -- [%ld] : ",xb.position()); peer_public_key.print();
+          }
         }
         catch( common::exc e )
         {
@@ -107,17 +108,12 @@ namespace csl
 
           xbo << (int32_t)msg::olleh_p;
 
-          if( debug() ) { printf(" ++ [%ld] : packet_type : %d\n",xbo.position(),msg::olleh_p ); }
-
           /* ***
             hello callback may change the server info, and
             thus the public key based on the received public key
           */
 
           if( my_public_key.to_xdr(xbo) == false ) { THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_hello_handler,false); }
-
-          if( debug() ) { printf(" ++ [%ld] : ",xbo.position()); my_public_key.print(); }
-
           if( outer.size() > m.max_len() ) { THR(comm::exc::rs_too_big,comm::exc::cm_udp_hello_handler,false); }
 
           outer.copy_to(m.data_,m.max_len());
@@ -129,7 +125,12 @@ namespace csl
           xbi << (int32_t)need_login;
           xbi << (int32_t)need_pass;
 
-          if( debug() ) { printf("  ++ login: %d pass: %d\n",need_login,need_pass); }
+          if( debug() )
+          {
+            printf(" ++ [%ld] : packet_type : %d\n",xbo.position(),msg::olleh_p );
+            printf(" ++ [%ld] : ",xbo.position()); my_public_key.print();
+            printf("  ++ login: %d pass: %d\n",need_login,need_pass);
+          }
 
           /* generate session key */
           std::string session_key;
@@ -141,8 +142,6 @@ namespace csl
           {
             THR(comm::exc::rs_sec_error,comm::exc::cm_udp_hello_handler,false);
           }
-
-          if( debug() ) { printf("  ++ Session Key: '%s'\n",session_key.c_str()); }
 
           /* compile packet */
           crypt_pkt::saltbuf_t  salt;
@@ -176,6 +175,7 @@ namespace csl
 
           if( debug() )
           {
+            printf(   "  ++ Session Key: '%s'\n",session_key.c_str());
             print_hex("  ++ OLLEH PROL ",m.data_,outer.size());
             print_hex("  ++ OLLEH HEAD ",head.data(),head.size() );
             print_hex("  ++ OLLEH DATA ",data.data(),data.size() );
@@ -296,7 +296,10 @@ namespace csl
         handler_.use_exc(uex);
 
         /* init receivers */
-        if( receiver_.start(1,4,1000,10,handler_) == false ) { THR(exc::rs_thread_start,exc::cm_udp_hello_srv,false); }
+        if( receiver_.start(min_threads_,max_threads_,timeout_ms_,retries_,handler_) == false )
+        {
+          THR(exc::rs_thread_start,exc::cm_udp_hello_srv,false);
+        }
 
         /* set thread entries */
         thread_.set_entry( receiver_ );
@@ -326,7 +329,8 @@ namespace csl
         return ret;
       }
 
-      hello_srv::hello_srv() : use_exc_(true), debug_(false)
+      hello_srv::hello_srv() 
+        : use_exc_(true), debug_(false), min_threads_(1), max_threads_(4), timeout_ms_(1000), retries_(10)
       {
       }
 
@@ -471,7 +475,7 @@ namespace csl
 
       namespace
       {
-        int init_sock(SAI & addr)
+        static int init_sock(SAI & addr)
         {
           int sock = ::socket( AF_INET, SOCK_DGRAM, 0 );
           if( sock <= 0 ) { return sock; }

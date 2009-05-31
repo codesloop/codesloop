@@ -72,6 +72,8 @@ namespace csl
         case rs_need_pass:            return "Need pass.";
         case rs_channel_init:         return "Channel init failed.";
         case rs_recv_disabled:        return "recv() disabled.";
+        case rs_sesskey_empty:        return "session key is not set";
+        case rs_salt_size:            return "invalid salt size";
         case rs_unknown:
           default:                    return "Unknown reason";
       };
@@ -81,11 +83,7 @@ namespace csl
     {
       switch( cm )
       {
-        case cm_udp_srv:            return "comm::udp_srv";
-        case cm_udp_cli:            return "comm::udp_cli";
-        case cm_udp_pkt:            return "comm::udp_pkt";
         case cm_wsa:                return "comm::wsa";
-        case cm_udp_chann:          return "comm::udp_chann";
         case cm_udp_recvr:          return "comm::udp::recvr";
         case cm_udp_hello_handler:  return "comm::udp::hello_handler";
         case cm_udp_hello_cli:      return "comm::udp::hello_cli";
@@ -93,6 +91,9 @@ namespace csl
         case cm_udp_auth_handler:   return "comm::udp::auth_handler";
         case cm_udp_auth_cli:       return "comm::udp::auth_cli";
         case cm_udp_auth_srv:       return "comm::udp::auth_srv";
+        case cm_udp_data_handler:   return "comm::udp::data_handler";
+        case cm_udp_data_cli:       return "comm::udp::data_cli";
+        case cm_udp_data_srv:       return "comm::udp::data_srv";
         case cm_unknown:
           default:                return "unknown component";
       };
