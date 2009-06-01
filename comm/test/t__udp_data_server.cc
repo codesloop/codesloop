@@ -34,13 +34,129 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "test_timer.h"
 #include "common.h"
 #include <assert.h>
+#include <vector>
+#include <map>
 
 using namespace csl::common;
 using namespace csl::comm;
 using namespace csl::sec;
+using namespace csl::nthread;
+using namespace std;
 
 /** @brief contains tests related to udp data servers */
 namespace test_udp_data_server {
+
+  struct SessionStore
+  {
+    typedef vector<unsigned char>   ucharvec_t;
+    typedef map<ucharvec_t,string>  map_t;
+
+    mutex mtx_;
+    map_t m_;
+  };
+
+  class RegisterCB : public udp::register_auth_callback
+  {
+    public:
+      SessionStore * sessions_;
+      RegisterCB(SessionStore & s) : sessions_(&s) {}
+
+      bool operator()( const udp::SAI & addr,
+                       const std::string & login,
+                       const std::string & pass,
+                       const std::string & session_key,
+                       const udp::saltbuf_t & peer_salt,
+                       udp::saltbuf_t & my_salt )
+      {
+        const unsigned char * dp = peer_salt.data();
+        SessionStore::ucharvec_t v(dp,dp+peer_salt.size());
+
+        {
+          scoped_mutex m(sessions_->mtx_);
+          (sessions_->m_)[v] = session_key;
+        }
+
+        return true;
+      }
+  };
+
+  class LookupCB : public udp::lookup_session_callback
+  {
+    public:
+      SessionStore * sessions_;
+      LookupCB(SessionStore & s) : sessions_(&s) {}
+
+      bool operator()( const udp::saltbuf_t & old_salt,
+                       const udp::SAI & addr,
+                       std::string & sesskey )
+      {
+        const unsigned char * dp = old_salt.data();
+        SessionStore::ucharvec_t v(dp,dp+old_salt.size());
+
+        {
+          scoped_mutex m(sessions_->mtx_);
+          SessionStore::map_t::iterator it = sessions_->m_.find(v);
+          if( it == sessions_->m_.end() )
+          {
+            return false;
+          }
+          sesskey = (*it).second;
+        }
+
+        return true;
+      }
+  };
+
+  class HandleCB : public udp::handle_data_callback
+  {
+    public:
+      SessionStore * sessions_;
+      HandleCB(SessionStore & s) : sessions_(&s) {}
+
+      bool operator()( const udp::saltbuf_t & old_salt,  // in: from request
+                       const udp::saltbuf_t & new_salt,  // in: generated
+                       const udp::SAI & addr,            // in: from request
+                       const std::string & sesskey,      // in: looked up in cb
+                       int sock,                         // in: from handler
+                       const udp::b1024_t & data )       // in: decrypted from request
+      {
+        assert( memcmp( data.data(),"hello",6 ) == 0 );
+        udp::b1024_t rep;
+        rep.set((unsigned char *)"HELLO",6);
+        return send_reply(old_salt, new_salt, addr, sesskey, sock, rep);
+      }
+  };
+
+  class UpdateCB : public udp::update_session_callback
+  {
+    public:
+      SessionStore * sessions_;
+      UpdateCB(SessionStore & s) : sessions_(&s) {}
+
+      bool operator()( const udp::saltbuf_t & old_salt,          // in
+                       const udp::saltbuf_t & new_salt,          // in
+                       const udp::SAI & addr,                    // in
+                       const std::string & sesskey )             // in
+      {
+        const unsigned char * dp = old_salt.data();
+        SessionStore::ucharvec_t v(dp,dp+old_salt.size());
+
+        const unsigned char * np = new_salt.data();
+        SessionStore::ucharvec_t n(np,np+new_salt.size());
+
+        {
+          scoped_mutex m(sessions_->mtx_);
+          SessionStore::map_t::iterator it = sessions_->m_.find(v);
+          if( it != sessions_->m_.end() )
+          {
+            sessions_->m_.erase( it );
+          }
+          (sessions_->m_)[n] = sesskey;
+        }
+
+        return true;
+      }
+  };
 
   void basic()
   {
@@ -80,11 +196,16 @@ namespace test_udp_data_server {
     hellosrv.private_key(privkey);
     hellosrv.public_key(pubkey);
 
-    //datasrv.private_key(privkey); // NOT NEEDED, use lookup session cbs instead
-    //datasrv.public_key(pubkey);   // NOT NEEDED, use lookup session cbs instead
+    SessionStore  store;
+    RegisterCB    rcb(store);
+    LookupCB      lcb(store);
+    HandleCB      hcb(store);
+    UpdateCB      ucb(store);
 
-    // TODO set auth callbacks
-    // TODO set data callbacks
+    authsrv.register_auth_cb( rcb );
+    datasrv.lookup_session_cb( lcb );
+    datasrv.handle_data_cb( hcb );
+    datasrv.update_session_cb( ucb );
 
     assert( hellosrv.start() );
     assert( authsrv.start() );

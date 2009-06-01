@@ -51,7 +51,10 @@ namespace csl
         inline tbuf() : data_(preallocated_), size_(0) { }
         inline ~tbuf() { reset(); }
 
-        inline tbuf(const tbuf & other) { *this = other; } // TODO test copy constructor!!!
+        inline tbuf(const tbuf & other) : data_(preallocated_), size_(0) // TODO test copy constructor!!!
+        {
+          *this = other;
+        }
 
         inline bool operator==(const tbuf & other) const
         {
@@ -174,9 +177,12 @@ namespace csl
             size_ = sz;
             return data_;
           }
-          else if( sz <= sizeof(preallocated_) && data_ == preallocated_ )
+          else if( sz <= sizeof(preallocated_) )
           {
             /* data fits into preallocated size */
+            if( size_ > 0 && data_ != preallocated_ ) ::free(data_);
+
+            data_ = preallocated_;
             size_ = sz;
             return data_;
           }
@@ -187,14 +193,10 @@ namespace csl
             if( !tmp ) return 0;
 
             /* already have data ? */
-            if( size_ > 0 )
-            {
-              if( data_ != preallocated_ ) ::free(data_);
-            }
+            if( size_ > 0 && data_ != preallocated_ ) ::free(data_);
 
             data_ = tmp;
             size_ = sz;
-
             return data_;
           }
         }

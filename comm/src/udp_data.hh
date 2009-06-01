@@ -68,7 +68,14 @@ namespace csl
       {
         public:
           virtual ~handle_data_callback() {}
-          // TODO virtual bool send_reply();
+
+          virtual bool send_reply( const saltbuf_t & old_salt,
+                                   const saltbuf_t & new_salt,
+                                   const SAI & addr,
+                                   const std::string & sesskey,
+                                   int sock,
+                                   const b1024_t & data );
+
           virtual bool operator()( const saltbuf_t & old_salt,  // in: from request
                                    const saltbuf_t & new_salt,  // in: generated
                                    const SAI & addr,            // in: from request

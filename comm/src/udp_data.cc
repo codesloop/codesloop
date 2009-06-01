@@ -58,6 +58,38 @@ namespace csl
     {
       /**********************************************************************
       **
+      **                         User Data Handler
+      **
+      **********************************************************************/
+
+      bool handle_data_callback::send_reply( const saltbuf_t & old_salt,
+                                             const saltbuf_t & new_salt,
+                                             const SAI & addr,
+                                             const std::string & sesskey,
+                                             int sock,
+                                             const b1024_t & data )
+      {
+        /* prepare data packet */
+        msg m;
+        data_handler helper;
+
+        if( helper.prepare_data(old_salt,new_salt,sesskey,data,m) == false )
+        {
+          fprintf(stderr,"[%s:%d] prepare_data failed\n",__FILE__,__LINE__);
+          return false;
+        }
+
+        if( (::sendto( sock, (const char *)m.data_, m.size_ , 0, (const struct sockaddr *)&addr, sizeof(addr) )) != (int)(m.size_) )
+        {
+          fprintf(stderr,"[%s:%d] sendto failed\n",__FILE__,__LINE__);
+          return false;
+        }
+
+        return true;
+      }
+
+      /**********************************************************************
+      **
       **                         Data Handler
       **
       **********************************************************************/
@@ -142,7 +174,7 @@ namespace csl
 
           unsigned int sz=0;
 
-          if( xbi.get_data( (unsigned char *)new_salt.data(),sz,salt_size_v) == false )
+          if( xbi.get_data( new_salt,sz,salt_size_v) == false )
           {
             THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_data_handler,false);
           }
@@ -464,6 +496,10 @@ namespace csl
       bool data_cli::send(const b1024_t & data)
       {
         if( init() == false ) { THR(exc::rs_init_failed,exc::cm_udp_data_cli,false); }
+        if( my_salt_.size() != saltbuf_t::preallocated_size )
+        {
+          { THR(exc::rs_salt_size,exc::cm_udp_data_cli,false); }
+        }
 
         /* prepare data packet */
         saltbuf_t new_salt;

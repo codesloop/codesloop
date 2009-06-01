@@ -86,3 +86,4 @@ comm/test/t__udp_hello_client
 comm/test/t__udp_hello_server
 comm/test/t__udp_data_client
 comm/test/t__udp_data_server
+common/test/t__logger

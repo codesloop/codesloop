@@ -25,7 +25,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
    @file t__udp_auth_client.cc
-   @brief Tests to verify udp_client routines
+   @brief Tests to verify udp::auth_client routines
  */
 
 #include "udp_hello.hh"
@@ -39,7 +39,7 @@ using namespace csl::sec;
 using namespace csl::comm;
 
 /** @brief contains tests related to udp clients */
-namespace test_udp_client {
+namespace test_udp_auth_client {
 
   void basic()
   {
@@ -97,9 +97,9 @@ namespace test_udp_client {
     assert( global_auth_client_->auth( 3000 ) == true );
   }
 
-} // end of test_udp_client
+} // end of test_udp_auth_client
 
-using namespace test_udp_client;
+using namespace test_udp_auth_client;
 
 int main()
 {
