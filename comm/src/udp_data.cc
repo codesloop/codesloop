@@ -403,6 +403,89 @@ namespace csl
       **
       **********************************************************************/
 
+      bool data_cli::recv(b1024_t & data,unsigned int timeout_ms)
+      {
+        if( init() == false ) { THR(exc::rs_init_failed,exc::cm_udp_data_cli,false); }
+
+        /* wait for data arrival */
+        fd_set rfds;
+        struct timeval tv = { 0,0 };
+        struct timeval * ptv = 0;
+
+        if( timeout_ms )
+        {
+          ptv = &tv;
+          tv.tv_sec  = timeout_ms/1000;
+          tv.tv_usec = (timeout_ms%1000)*1000;
+        }
+
+        FD_ZERO(&rfds);
+        FD_SET(sock_,&rfds);
+
+        int err = ::select(sock_+1,&rfds,NULL,NULL,ptv);
+
+        if( err > 0 )
+        {
+          msg m;
+
+          err = ::recv(sock_,(char *)m.data_, m.max_len(), 0);
+          //
+          if( err > 0 )
+          {
+            m.size_ = err;
+            data_handler helper;
+            saltbuf_t new_salt;
+
+            if( helper.init_data( new_salt, session_key_, m, data  ) == false )
+            {
+              THR(exc::rs_pkt_error,exc::cm_udp_data_cli,false);
+            }
+
+            server_salt_ = new_salt;
+            return true;
+          }
+          else
+          {
+            THRC(exc::rs_recv_failed,exc::cm_udp_data_cli,false);
+          }
+        }
+        else if( err == 0 )
+        {
+          /* timed out */
+          THR(exc::rs_timeout,exc::cm_udp_data_cli,false);
+        }
+        else
+        {
+          /* error */
+          THRC(exc::rs_select_failed,exc::cm_udp_data_cli,false);
+        }
+      }
+
+      bool data_cli::send(const b1024_t & data)
+      {
+        if( init() == false ) { THR(exc::rs_init_failed,exc::cm_udp_data_cli,false); }
+
+        /* prepare data packet */
+        saltbuf_t new_salt;
+        csl_sec_gen_rand( new_salt.allocate(saltbuf_t::preallocated_size), saltbuf_t::preallocated_size );
+
+        msg m;
+        data_handler helper;
+
+        if( helper.prepare_data(my_salt_,new_salt,session_key_,data,m) == false )
+        {
+          THR(exc::rs_pkt_error,exc::cm_udp_data_cli,false);
+        }
+
+        if( (::send( sock_, (const char *)m.data_, m.size_ , 0 )) != (int)(m.size_) )
+        {
+          THRC(exc::rs_send_failed,exc::cm_udp_data_cli,false);
+        }
+
+        my_salt_ = new_salt;
+        return true;
+      }
+
       data_cli::data_cli() : use_exc_(true), debug_(false), sock_(-1)
       {
         memset( &addr_,0,sizeof(addr_) );
@@ -412,8 +495,8 @@ namespace csl
 
       data_cli::~data_cli()
       {
-        // TODO if( sock_ > 0 ) ShutdownCloseSocket( sock_ );
-        // TODO sock_ = -1;
+        if( sock_ > 0 ) ShutdownCloseSocket( sock_ );
+        sock_ = -1;
       }
 
       namespace

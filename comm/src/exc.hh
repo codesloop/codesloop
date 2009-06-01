@@ -48,8 +48,6 @@ namespace csl
       public:
         enum {
           rs_unknown,             ///<Unknown error.
-          rs_host_not_set,        ///<Required host parameter not set.
-          rs_port_not_set,        ///<Required port parameter not set.
           rs_socket_failed,       ///<socket() call failed
           rs_bind_failed,         ///<bind() call failed
           rs_listen_failed,       ///<listen() call failed
@@ -58,14 +56,11 @@ namespace csl
           rs_pubkey_empty,        ///<Required public key parameter not set.
           rs_privkey_empty,       ///<Required private key parameter not set.
           rs_xdr_error,           ///<XDR error.
-          rs_internal_error,      ///<Internal error.
           rs_send_failed,         ///<send() call failed.
           rs_recv_failed,         ///<recv() call failed.
           rs_timeout,             ///<Timed out.
           rs_select_failed,       ///<select() call failed.
-          rs_already_started,     ///<Already started.
           rs_thread_start,        ///<Thread start failed.
-          rs_empty_buffer,        ///<Empty buffer supplied.
           rs_wsa_startup,         ///<Windows WSA Startup failed
           rs_getsockname_failed,  ///<getsockname() call failed.
           rs_invalid_packet_type, ///<invalid packet type
@@ -74,13 +69,11 @@ namespace csl
           rs_crypt_pkt_error,     ///<Error in crypt pkt
           rs_too_big,             ///<Too big data to be placed into the given buffer
           rs_pkt_error,           ///<Cannot encode/decode packet
-          rs_hello_nocall,        ///<Hello not called and/or server_info not filled
           rs_null_param,          ///<NULL parameter supplied.
           rs_not_inited,          ///<Not initialized.
+          rs_init_failed,         ///<Cannot initialize.
           rs_need_login,          ///<Need login.
           rs_need_pass,           ///<Need pass.
-          rs_channel_init,        ///<Channel init failed.
-          rs_recv_disabled,       ///<recv disabled.
           rs_sesskey_empty,       ///<session key is not set
           rs_salt_size,           ///<invalid salt size
         };

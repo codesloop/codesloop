@@ -27,8 +27,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _csl_comm_csl_comm_included_
 
 #include "exc.hh"
+#include "udp_recvr.hh"
 #include "udp_hello.hh"
 #include "udp_auth.hh"
+#include "udp_data.hh"
 
 #ifdef __cplusplus
 #endif /* __cplusplus */

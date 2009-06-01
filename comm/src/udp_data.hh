@@ -187,7 +187,6 @@ namespace csl
         public:
           bool send(const b1024_t & data);
           bool recv(b1024_t & data,unsigned int timeout_ms=0);
-          bool asynch_launch(handle_data_callback & cb);
 
           data_cli();
           virtual ~data_cli();
@@ -205,20 +204,6 @@ namespace csl
           string       session_key_;
 
           bool init();
-
-          /* if asynch receiver is used */
-          thread          thread_;
-          recvr           receiver_;
-          data_handler    handler_;
-
-          /* thread pool for the asynch receiver */
-          unsigned int min_threads_;
-          unsigned int max_threads_;
-          unsigned int timeout_ms_;
-          unsigned int retries_;
-
-          /* data handler for the asynch receiver */
-          handle_data_callback * handle_data_cb_;
 
         public:
           /* server salt */
@@ -244,23 +229,6 @@ namespace csl
           /* use exceptions ? */
           inline void use_exc(bool yesno) { use_exc_ = yesno; }
           inline bool use_exc() const { return use_exc_; }
-
-          /* set threadpool params _before_ first asynch_launch */
-          inline void set_threadpool_params( unsigned int min_th,
-                                             unsigned int max_th,
-                                             unsigned int timeout_ms,
-                                             unsigned int retries )
-          {
-            min_threads_ = min_th;
-            max_threads_ = max_th;
-            timeout_ms_  = timeout_ms;
-            retries_     = retries;
-          }
-
-          inline unsigned int min_threads() const { return min_threads_; }
-          inline unsigned int max_threads() const { return max_threads_; }
-          inline unsigned int timeout_ms() const  { return timeout_ms_;  }
-          inline unsigned int retries() const     { return retries_;     }
       };
     } /* end of udp namespace */
   } /* end of comm namespace */

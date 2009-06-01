@@ -672,7 +672,7 @@ namespace csl
 
         if( !init() ) return false;
 
-        if( public_key().is_empty() ) { THR(exc::rs_hello_nocall,exc::cm_udp_auth_cli,false); }
+        if( public_key().is_empty() ) { THR(exc::rs_pubkey_empty,exc::cm_udp_auth_cli,false); }
 
         /* generate salt and session key */
         csl_sec_gen_rand( my_salt_.allocate(saltbuf_t::preallocated_size), saltbuf_t::preallocated_size );
