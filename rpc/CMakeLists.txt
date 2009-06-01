@@ -1,4 +1,4 @@
-# Copyright (c) 2008, David Beck
+# Copyright (c) 2008,2009, David Beck, Tamas Foldi
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -21,17 +21,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-PROJECT(codesloop)
-
 # SET(CMAKE_VERBOSE_MAKEFILE ON)
 
-SUBDIRS( common
-         sec
-         nthread
-         slt3
-         sched
-         rpc
-         example )
+SUBDIRS(src test experiment)
 
 # -- EOF --
