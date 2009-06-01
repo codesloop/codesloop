@@ -26,6 +26,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_comm_csl_comm_included_
 #define _csl_comm_csl_comm_included_
 
+/**
+   @file csl_comm.hh
+   @brief Include all comm headers
+ */
+
 #include "exc.hh"
 #include "udp_recvr.hh"
 #include "udp_hello.hh"

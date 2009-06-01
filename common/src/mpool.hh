@@ -43,7 +43,7 @@ namespace csl
 {
   namespace common
   {
-    /** 
+    /**
        @brief collects dinamically allocated memory blocks
 
        mpool is parametrized by the container class that stores the pointers, its

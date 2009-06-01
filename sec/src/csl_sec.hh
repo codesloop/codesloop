@@ -35,6 +35,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "exc.hh"
 #include "bignum.hh"
 #include "crypt_buf.hh"
+#include "crypt_pkt.hh"
 #include "ecdh_key.hh"
 #include "ecdh_pkt.hh"
 #include "xdr_challenge.hh"

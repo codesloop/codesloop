@@ -26,6 +26,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_comm_udp_auth_hh_included_
 #define _csl_comm_udp_auth_hh_included_
 
+/**
+   @file udp_auth.hh
+   @brief the authentication part of the UDP communication layer
+ */
+
 #include "udp_hello.hh"
 #include "udp_recvr.hh"
 #include "bignum.hh"
@@ -52,8 +57,9 @@ namespace csl
   {
     namespace udp
     {
-      typedef tbuf<8> saltbuf_t;
+      typedef tbuf<8> saltbuf_t; ///<type for salt data
 
+      /** @brief server side callback for validating credentials sent by the client */
       class valid_creds_callback
       {
         public:
@@ -64,6 +70,7 @@ namespace csl
                                    const string & pass) = 0;            // in
       };
 
+      /** @brief server side callback for registering authenticated clients */
       class register_auth_callback
       {
         public:
@@ -76,6 +83,7 @@ namespace csl
                                    saltbuf_t & my_salt ) = 0;
       };
 
+      /** @brief handler that is called on new packet arrival */
       class auth_handler : public recvr::msg_handler
       {
         public:
@@ -105,6 +113,7 @@ namespace csl
                              msg & m );
       };
 
+      /** @brief the server class to be started */
       class auth_srv
       {
         public:
@@ -177,6 +186,7 @@ namespace csl
           unsigned int retries_;
       };
 
+      /** @brief the client class */
       class auth_cli
       {
         public:
