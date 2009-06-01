@@ -32,8 +32,10 @@ IF(WIN32)
       ../../../3rdparty/zlib/GnuWin32/include )
 
 ELSE(WIN32)
-  ADD_DEFINITIONS(-Wall -g3)
+  ADD_DEFINITIONS(-Wall -g3 )
 ENDIF(WIN32)
+
+ADD_DEFINITIONS( -DDEBUG) 
 
 ADD_LIBRARY( csl_common STATIC
              exc.cc        exc.hh
@@ -42,6 +44,7 @@ ADD_LIBRARY( csl_common STATIC
              xdrbuf.cc     xdrbuf.hh
              test_timer.c  test_timer.h
              common.h      pvlist.hh
-             mpool.hh      tbuf.hh )
+             mpool.hh      tbuf.hh 
+             logger.cc     logger.hh)
 
 # -- EOF --

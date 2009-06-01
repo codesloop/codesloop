@@ -181,5 +181,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # include <string.h>
 #endif /*CSL_STRING_H_INCLUDED*/
 
+#ifdef WIN32
+# define getpid()  0
+#else
+# include <unistd.h>
+#endif /* WIN32 */
+
+
 #endif /* _csl_common_common_h_included_ */
 
