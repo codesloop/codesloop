@@ -62,6 +62,7 @@ namespace csl
           cm_zfile,   ///<zfile component
           cm_xdrbuf,  ///<xdrbuf component
           cm_circbuf, ///<circbuf component
+          cm_logger,  ///<logger component
         };
 
         /** @brief converts reason code to string */
@@ -70,8 +71,11 @@ namespace csl
         /** @brief converts component code to string */
         static const char * component_string(int cm);
 
-        /** @brief converts exception to string */
+        /** @brief converts exception to string 
+        @param res string to store result */
         void to_string(std::string & res);
+        /** @brief converts exception to string */
+        std::string to_string();
 
         /** @brief constructor 
         *   @param component that caused the exception

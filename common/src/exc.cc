@@ -58,6 +58,7 @@ namespace csl
         case cm_zfile:     return "common::zfile";
         case cm_xdrbuf:    return "common::xdrbuf";
         case cm_circbuf:   return "common::circbuf";
+        case cm_logger:    return "common::logger";
         case cm_unknown:
           default:         return "unknown component";
       };
@@ -79,6 +80,13 @@ namespace csl
       t += "] ";
       if( text_.size() > 0 ) t+= text_;
       res.swap(t);
+    }
+
+    std::string exc::to_string() 
+    {
+      std::string ret;
+      to_string(ret);
+      return ret;
     }
 
     exc::exc() : reason_(rs_unknown), component_(cm_unknown) {}

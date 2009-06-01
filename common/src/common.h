@@ -224,5 +224,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # include <errno.h>
 #endif /*CSL_ERRNO_H_INCLUDED*/
 
-#endif /* _csl_common_common_h_included_ */
+#ifdef WIN32
+# define getpid()  0
+#endif /* WIN32 */
 
+#endif /* _csl_common_common_h_included_ */
