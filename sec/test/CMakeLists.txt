@@ -51,6 +51,14 @@ IF(WIN32)
 
 ELSE(WIN32)
 
+  find_library(DLOPEN_FOUND NAMES dl PATH /usr/lib /lib /usr/local/lib)
+  set(LIBDL)
+
+  if (DLOPEN_FOUND)
+   set(LIBDL dl)
+   set(HAVE_LIBDL TRUE)
+  endif (DLOPEN_FOUND)
+
   ADD_DEFINITIONS( -Wall -g3 )
   INCLUDE_DIRECTORIES(
       ../src
@@ -63,7 +71,7 @@ ELSE(WIN32)
       crypto
       z
       stdc++
-      dl )
+      ${LIBDL} )
   LINK_DIRECTORIES(
       ../src
       ../../common/src
