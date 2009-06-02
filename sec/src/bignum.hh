@@ -133,9 +133,6 @@ namespace csl
         inline const unsigned char * data() const { return buf_.data(); } ///<return the allocated data
 
       private:
-        //unsigned char   preallocated_[128];  ///<the preallocated buffer
-        //unsigned char * data_;               ///<the data
-        //unsigned int    size_;               ///<the allocated size
         buf_t           buf_;
         bool            is_negative_;        ///<set to true if negative
     };
