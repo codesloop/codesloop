@@ -37,18 +37,34 @@ namespace csl
   {
     str& str::operator+=(const str& s)
     {
+      // remove trailing NULL character
+      buf_.allocate( size() * sizeof(wchar_t) ); 
+
+      // append new string 
       buf_.append( s.buffer() );
+
       return *this;
     }
 
     str str::substr(const size_t start, const size_t length) const
     {
-      return *this; // TODO: implement
-    }
+      str s;
+      size_t len = length; 
+      wchar_t t = 0;
 
-    str& str::erase(size_t pos, size_t len)
-    {
-      return *this; // TODO: implement
+      if ( start > size() )
+        throw exc(exc::rs_invalid_param,exc::cm_str,"out of range");
+
+      // shrink length to fit in
+      if ( size() < length + start )
+        len = size() - start;
+
+      // copy string
+      s.buf_.set( (unsigned char *)(data() + start), (len) * sizeof(wchar_t) );
+      // terminate string
+      s.buf_.append( (unsigned char *)&t, sizeof(wchar_t) );
+
+      return s;
     }
 
     /* public interface */

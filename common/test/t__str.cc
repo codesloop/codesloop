@@ -46,8 +46,27 @@ int main()
 {
 
   str s( L"HELLO" );
+  assert( s.size() == 5 );
+  assert( wcscmp(s.c_str(), L"HELLO") == 0 );
 
-  wprintf( L"%ls world\n" , s.c_str() ); 
+  assert( s[0] == L'H' );
+  assert( s[1] == L'E' );
+
+  str s2 = s;
+  assert( s2.size() == 5 );
+  assert( wcscmp(s2.c_str(), L"HELLO") == 0 );
+
+  str s3(s);
+  assert( s3.size() == 5 );
+  assert( wcscmp(s3.c_str(), L"HELLO") == 0 );
+
+  s2 += L" WORLD";
+  assert( s2.size() == 11 );
+  assert( wcscmp(s2.c_str(), L"HELLO WORLD") == 0 );
+
+  s2 = s.substr(1,3) + s2.substr(6,999);
+  assert( s2.size() == 8 );
+  assert( wcscmp(s2.c_str(), L"ELLWORLD") == 0 );
 
   return 0;
 }

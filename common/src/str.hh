@@ -71,20 +71,21 @@ namespace csl
         /** @brief copy constructor */
         inline str(const wchar_t * wcs)
         {
-          buf_.set((unsigned char *)wcs,sizeof(wchar_t) * wcslen(wcs));
+          buf_.set((unsigned char *)wcs,sizeof(wchar_t) * (wcslen(wcs)+1));
         }
         
         /** @brief let equal operator */
         inline str& operator=(const wchar_t * wcs)
         {
-          buf_.set((unsigned char *)wcs,sizeof(wchar_t) * wcslen(wcs));
+          buf_.set((unsigned char *)wcs,sizeof(wchar_t) * (wcslen(wcs)+1));
           return *this; 
         }
 
         /** @brief let equal operator */
-        inline str& operator=(const str&)
+        inline str& operator=(const str& s)
         {
-          return operator=(data());
+          buf_ = s.buffer();
+          return *this;
         }
 
         /** @brief append operator */
@@ -122,7 +123,7 @@ namespace csl
         /** @brief true if empty str ("") is defined */
         inline const bool empty() const
         {
-          return buf_.has_data();
+          return !buf_.has_data();
         } 
         
         /** @brief returns the background c str */
@@ -152,7 +153,7 @@ namespace csl
           return (const wchar_t *)buf_.data(); 
         }
 
-        inline const tbuf<buf_size> buffer() const 
+        inline const tbuf<buf_size> & buffer() const 
         {
           return buf_;
         }
@@ -162,8 +163,6 @@ namespace csl
            @param length take length bytes from origin str
         */
         str substr(const size_t start, const size_t length) const;
-        /** @brief erase from the given position */
-        str& erase(size_t pos, size_t len);          
         
       private:
         tbuf<buf_size> buf_;
