@@ -35,6 +35,22 @@ namespace csl
 {
   namespace common
   {
+    str& str::operator+=(const str& s)
+    {
+      buf_.append( s.buffer() );
+      return *this;
+    }
+
+    str str::substr(const size_t start, const size_t length) const
+    {
+      return *this; // TODO: implement
+    }
+
+    str& str::erase(size_t pos, size_t len)
+    {
+      return *this; // TODO: implement
+    }
+
     /* public interface */
   };
 };

@@ -54,5 +54,6 @@ ADD_EXECUTABLE(t__pbuf     t__pbuf.cc)
 ADD_EXECUTABLE(t__tbuf     t__tbuf.cc)
 ADD_EXECUTABLE(t__xdrbuf   t__xdrbuf.cc)
 ADD_EXECUTABLE(t__logger   t__logger.cc)
+ADD_EXECUTABLE(t__str      t__str.cc)
 
 # -- EOF --

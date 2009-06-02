@@ -39,6 +39,7 @@ Credits: some techniques and code pieces are stolen from Christian
 #include <string.h>
 #include "obj.hh"
 #include "exc.hh"
+#include "tbuf.hh"
 #ifdef __cplusplus
 
 namespace csl
@@ -46,34 +47,49 @@ namespace csl
   namespace common
   {
     /** @todo document me */
-    class str : public obj 
+    class str 
     {      
       public:
-        enum { buf_size = 2048 };
+        enum { buf_size = 128 * sizeof(wchar_t) }; 
 
         /** @brief constructor */
-        str();
+        inline str()  { }
         
         /** @brief destructor 
         since there are not virtual functions, and we do not excpect inherited
         classes from str the destructor is not virtual. this casues a bit
         faster initalization, because no vptr table is required, i guess 
         */
-        ~str();
+        ~str() {}
 
         /** @brief copy constructor */
-        str(const str&);
-        
+        inline str(const str& s) 
+        {
+          buf_ = s.buf_;
+        }
+
         /** @brief copy constructor */
-        str(const char*);
+        inline str(const wchar_t * wcs)
+        {
+          buf_.set((unsigned char *)wcs,sizeof(wchar_t) * wcslen(wcs));
+        }
         
         /** @brief let equal operator */
-        str& operator=(const char*);
+        inline str& operator=(const wchar_t * wcs)
+        {
+          buf_.set((unsigned char *)wcs,sizeof(wchar_t) * wcslen(wcs));
+          return *this; 
+        }
+
         /** @brief let equal operator */
-        str& operator=(const str&);
+        inline str& operator=(const str&)
+        {
+          return operator=(data());
+        }
 
         /** @brief append operator */
         str& operator+=(const str&);
+        
         /** @brief append operator with two parameters */
         inline friend str operator+(const str& lhs, const str& rhs)
         {
@@ -81,73 +97,76 @@ namespace csl
         }
 
         /** @brief is equal operator */
-        inline bool operator==(const char* s) const
+        inline bool operator==(const wchar_t * s) const
         {
-          return !strcmp(p, s);
-        }
+          return !wcscmp( data(), s);
+        }        
         /** @brief is equal operator */
         inline bool operator==(const str& s) const
         {
-          return !strcmp(p, s.c_str());
+          return !wcscmp( data(), s.data());
         }
 
         /** @brief resets str buffer */
-        void clear();
+        inline void clear() {
+          buf_.reset();
+        }
 
         /** @brief gets str size 
-
-          since in the most cases we do not need the size of the
-          str the size is calculated only on the first demand
         */
-        inline size_t size() const
+        inline const size_t size() const
         {
-          return empty() ? 0 : strlen(p);
+          return empty() ? 0 : wcslen( data() );
         }
 
         /** @brief true if empty str ("") is defined */
-        inline bool empty() const
+        inline const bool empty() const
         {
-          return *p == '\0';
+          return buf_.has_data();
         } 
         
         /** @brief returns the background c str */
-        inline const char* c_str() const
+        inline const wchar_t * c_str() const
         {
-          return(p);
-        }
+          return( data() ); // TODO: have a char * version
+        } 
         
+        /**@brief unchecked access to buffer */
+        inline wchar_t operator[](const size_t n) const
+        {
+          return data()[n];
+        }
+
+        /** @brief check access to buffer */
+        inline wchar_t at(const size_t n) const
+        {
+          if ( n > wcslen( data() ) )
+            throw exc(exc::rs_invalid_param,exc::cm_str);
+
+          return data()[n];
+        }
+
+        /** @brief get data as wchar_t */
+        inline const wchar_t * data() const
+        { 
+          return (const wchar_t *)buf_.data(); 
+        }
+
+        inline const tbuf<buf_size> buffer() const 
+        {
+          return buf_;
+        }
+
         /**@brief substr 
            @param start start from this position
            @param length take length bytes from origin str
         */
         str substr(const size_t start, const size_t length) const;
-
-        /**@brief unchecked access to buffer */
-        inline char operator[](const size_t n) const
-        {
-          return p[n];
-        }
-
-        /** @brief check access to buffer */
-        inline char at(const size_t n) const
-        {
-          if ( n > strlen(p) )
-            throw exc(exc::rs_invalid_param,exc::cm_str);
-
-          return p[n];
-        }
-
+        /** @brief erase from the given position */
         str& erase(size_t pos, size_t len);          
-
+        
       private:
-        char* p;
-        char pbuf_[buf_size];  
-       
-        /** @brief true if the str fits into preallocated buffer */
-        inline bool is_prebuf() const
-        {
-          return p == pbuf_;
-        }
+        tbuf<buf_size> buf_;
     };
   }
 }
