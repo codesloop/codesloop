@@ -52,7 +52,7 @@ namespace csl
           rs_cannot_append,  ///<Cannot append to pbuf
           rs_cannot_get,     ///<Cannot get data
           rs_xdr_eof,        ///<End of xdr data.
-          rs_xdr_invalid,    ///<Invald xdr data
+          rs_xdr_invalid     ///<Invald xdr data          
         };
 
         enum {
@@ -60,7 +60,8 @@ namespace csl
           cm_pbuf,    ///<pbuf component
           cm_zfile,   ///<zfile component
           cm_xdrbuf,  ///<xdrbuf component
-          cm_logger   ///<logger component
+          cm_logger,  ///<logger component
+          cm_str      ///<str component
         };
 
         /** @brief converts reason code to string */

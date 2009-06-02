@@ -23,7 +23,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 Credits: some techniques and code pieces are stolen from Christian 
-         Stigen Larsen http://csl.sublevel3.org/programming/my_string/
+         Stigen Larsen http://csl.sublevel3.org/programming/my_str/
 */
 
 #ifndef _csl_common_str_hh_included_
@@ -31,13 +31,14 @@ Credits: some techniques and code pieces are stolen from Christian
 
 /**
    @file str.hh
-   @brief simple but efficient string class
+   @brief simple but efficient str class
    @todo document me
  */
 
 #include <stdlib.h>
 #include <string.h>
 #include "obj.hh"
+#include "exc.hh"
 #ifdef __cplusplus
 
 namespace csl
@@ -51,32 +52,32 @@ namespace csl
         enum { buf_size = 2048 };
 
         /** @brief constructor */
-        string();
+        str();
         
         /** @brief destructor 
         since there are not virtual functions, and we do not excpect inherited
         classes from str the destructor is not virtual. this casues a bit
         faster initalization, because no vptr table is required, i guess 
         */
-        ~string();
+        ~str();
 
         /** @brief copy constructor */
-        string(const string&);
+        str(const str&);
         
         /** @brief copy constructor */
-        string(const char*);
+        str(const char*);
         
         /** @brief let equal operator */
-        string& operator=(const char*);
+        str& operator=(const char*);
         /** @brief let equal operator */
-        string& operator=(const string&);
+        str& operator=(const str&);
 
         /** @brief append operator */
-        string& operator+=(const string&);
+        str& operator+=(const str&);
         /** @brief append operator with two parameters */
-        inline friend string operator+(const string& lhs, const string& rhs)
+        inline friend str operator+(const str& lhs, const str& rhs)
         {
-          return string(lhs) += rhs; 
+          return str(lhs) += rhs; 
         }
 
         /** @brief is equal operator */
@@ -85,41 +86,41 @@ namespace csl
           return !strcmp(p, s);
         }
         /** @brief is equal operator */
-        inline bool operator==(const string& s) const
+        inline bool operator==(const str& s) const
         {
           return !strcmp(p, s.c_str());
         }
 
-        /** @brief resets string buffer */
+        /** @brief resets str buffer */
         void clear();
 
-        /** @brief gets string size 
+        /** @brief gets str size 
 
           since in the most cases we do not need the size of the
-          string the size is calculated only on the first demand
+          str the size is calculated only on the first demand
         */
         inline size_t size() const
         {
           return empty() ? 0 : strlen(p);
         }
 
-        /** @brief true if empty string ("") is defined */
+        /** @brief true if empty str ("") is defined */
         inline bool empty() const
         {
           return *p == '\0';
         } 
         
-        /** @brief returns the background c string */
+        /** @brief returns the background c str */
         inline const char* c_str() const
         {
           return(p);
         }
         
-        /**@brief substring 
+        /**@brief substr 
            @param start start from this position
-           @param length take length bytes from origin string
+           @param length take length bytes from origin str
         */
-        string substr(const size_t start, const size_t length) const;
+        str substr(const size_t start, const size_t length) const;
 
         /**@brief unchecked access to buffer */
         inline char operator[](const size_t n) const
@@ -131,21 +132,21 @@ namespace csl
         inline char at(const size_t n) const
         {
           if ( n > strlen(p) )
-            throw exc(); // TODO: use exception framework
+            throw exc(exc::rs_invalid_param,exc::cm_str);
 
           return p[n];
         }
 
-        string& erase(size_t pos, size_t len);          
+        str& erase(size_t pos, size_t len);          
 
       private:
         char* p;
         char pbuf_[buf_size];  
        
-        /** @brief true if the string fits into preallocated buffer */
+        /** @brief true if the str fits into preallocated buffer */
         inline bool is_prebuf() const
         {
-          return p == pbuf;
+          return p == pbuf_;
         }
     };
   }
