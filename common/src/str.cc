@@ -38,7 +38,11 @@ namespace csl
   {
     void str::ensure_trailing_zero()
     {
-      // TODO
+      buf_.allocate( size() * sizeof(wchar_t) );
+
+      wchar_t c = L'\0';
+
+      buf_.append( (unsigned char *)&c,sizeof(c) );
     }
 
     str& str::operator+=(const str& s)
@@ -57,7 +61,7 @@ namespace csl
       // remove trailing NULL character
       buf_.allocate( size() * sizeof(wchar_t) );
 
-      // append new string 
+      // append new string
       buf_.append( (unsigned char *)s, sizeof(wchar_t) * (wcslen(s)+1) );
 
       return *this;
@@ -87,24 +91,26 @@ namespace csl
     str::str(const char * mbstring) : obj()
     {
       size_t len =  strlen(mbstring)+1;
-      wchar_t wcstring[len];
 
-      if ( mbstowcs( wcstring, mbstring, len ) != size_t(-1) )
+      wchar_t * nptr = (wchar_t *)buf_.allocate( len * sizeof(wchar_t) );
+
+      if ( mbstowcs( nptr, mbstring, len ) != size_t(-1) )
       {
         // wcstring includes trailing zero char
-        buf_.set( (unsigned char *)wcstring, len*sizeof(wchar_t) );
+        nptr[len-1] = L'\0';
       }
     }
 
     str& str::operator=(const char * mbstring )
     {
       size_t len =  strlen(mbstring)+1;
-      wchar_t wcstring[len];
 
-      if ( mbstowcs( wcstring, mbstring, len ) != size_t(-1) )
+      wchar_t * nptr = (wchar_t *)buf_.allocate( len * sizeof(wchar_t) );
+
+      if ( mbstowcs( nptr, mbstring, len ) != size_t(-1) )
       {
         // wcstring includes trailing zero char
-        buf_.set( (unsigned char *)wcstring, len*sizeof(wchar_t) ); 
+        nptr[len-1] = L'\0';
       }
 
       return *this;

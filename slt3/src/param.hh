@@ -31,6 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief parameter class for slt3 queries
  */
 
+#include "tbuf.hh"
 #include "synqry.hh"
 #include "str.hh"
 #ifdef __cplusplus
@@ -57,7 +58,7 @@ namespace csl
     {
       public:
         /** @brief blob values may be passed as unsigned char vectors */
-        typedef std::vector<unsigned char> blob_t;
+        typedef common::tbuf<128> blob_t;
 
         /** @brief returns the param type
             @return the type as in synqry::colhead

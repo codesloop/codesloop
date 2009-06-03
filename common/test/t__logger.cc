@@ -23,6 +23,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// TODO : tovabbi tesztek kellenek
+
 /**
    @file t__logger.cc
    @brief Tests to verify logger

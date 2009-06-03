@@ -101,15 +101,12 @@ namespace test_xdrbuf {
 
     xb.rewind();
 
-    assert( pb.size() == 16 );
+    assert( pb.size() == 48 );
 
     xb >> hw;
 
-    if( hw.size() <= 10 )
-    {
-      assert( hw.size() > 10 );
-      assert( hw == "Hello World" );
-    }
+    assert( hw.size() == 11 );
+    assert( hw == "Hello World" );
 
     assert( xb.position() > 10 );
 
@@ -146,7 +143,7 @@ namespace test_xdrbuf {
     {
       str es;
       e.to_string(es);
-      FPRINTF(stderr,L"Exception caught: %sl\n",es.c_str());
+      FPRINTF(stderr,L"Exception caught: %ls\n",es.c_str());
       caught = true;
     }
     /* this should not throw an exception, will add as zero length string */

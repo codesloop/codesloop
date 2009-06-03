@@ -93,7 +93,8 @@ namespace test_ecdh_key {
     k2.print();
     private_key2.print();
 
-    PRINTF(L"SHARED KEY: %sl\n",shared1.c_str());
+    PRINTF(L"SHARED KEY1: %ls\n",shared1.c_str());
+    PRINTF(L"SHARED KEY2: %ls\n",shared2.c_str());
 
     pbuf pb1,pb2;
 

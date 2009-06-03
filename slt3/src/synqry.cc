@@ -39,7 +39,7 @@ namespace csl
   {
     void synqry::colhead::debug()
     {
-      PRINTF(L"Colhead: Name='%sl' Table='%sl' DB='%sl' Origin='%sl' Type=%d\n",
+      PRINTF(L"Colhead: Name='%ls' Table='%ls' DB='%ls' Origin='%ls' Type=%d\n",
              (name_ ? name_ : L"null"),
              (table_ ? table_ : L"null"),
              (db_ ? db_ : L"null"),

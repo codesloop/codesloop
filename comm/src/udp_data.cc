@@ -44,7 +44,7 @@ namespace csl
     static void print_hex(const wchar_t * prefix,const void * vp,size_t len)
     {
       unsigned char * hx = (unsigned char *)vp;
-      PRINTF(L"%sl [%04d] : ",prefix,len);
+      PRINTF(L"%ls [%04d] : ",prefix,len);
       for(size_t i=0;i<len;++i) PRINTF(L"%.2X",hx[i]);
       PRINTF(L"\n");
     }
@@ -74,7 +74,7 @@ namespace csl
 
         if( helper.prepare_data(old_salt,new_salt,sesskey,data,m) == false )
         {
-          FPRINTF(stderr,L"[%sl:%d] prepare_data failed\n",L""__FILE__,__LINE__);
+          FPRINTF(stderr,L"[%ls:%d] prepare_data failed\n",L""__FILE__,__LINE__);
           return false;
         }
 
@@ -201,7 +201,7 @@ namespace csl
         {
           str s;
           e.to_string(s);
-          FPRINTF(stderr,L"Exception caught: %sl\n",s.c_str());
+          FPRINTF(stderr,L"Exception caught: %ls\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_data_handler,false);
         }
         return false;
@@ -288,7 +288,7 @@ namespace csl
         {
           str s;
           e.to_string(s);
-          FPRINTF(stderr,L"Exception caught: %sl\n",s.c_str());
+          FPRINTF(stderr,L"Exception caught: %ls\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_data_handler,false);
         }
         return false;
@@ -355,13 +355,13 @@ namespace csl
         {
           str s;
           e.to_string(s);
-          FPRINTF(stderr,L"Error [%sl:%d]: %s\n",L""__FILE__,__LINE__,s.c_str());
+          FPRINTF(stderr,L"Error [%ls:%d]: %s\n",L""__FILE__,__LINE__,s.c_str());
         }
         catch( comm::exc e )
         {
           str s;
           e.to_string(s);
-          FPRINTF(stderr,L"Error [%sl:%d]: %s\n",L""__FILE__,__LINE__,s.c_str());
+          FPRINTF(stderr,L"Error [%ls:%d]: %s\n",L""__FILE__,__LINE__,s.c_str());
         }
       }
 

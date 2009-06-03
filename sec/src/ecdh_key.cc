@@ -61,8 +61,11 @@ namespace csl
     struct oEXC
     {
       const char * reason_;
-      oEXC(const char * reason) : reason_(reason) {}
+      unsigned int line_;
+      oEXC(const char * reason,unsigned int l=0) : reason_(reason), line_(l) {}
     };
+
+#define THROWEXC(M) throw oEXC(M,__LINE__)
 
     struct oBIGNUM
     {
@@ -70,7 +73,7 @@ namespace csl
 
       oBIGNUM() : bn_(BN_new())
       {
-        if( !bn_ ) throw oEXC("oBIGNUM cannot allocate memory!");
+        if( !bn_ ) THROWEXC("oBIGNUM cannot allocate memory!");
       }
 
       ~oBIGNUM() { reset(); }
@@ -91,7 +94,7 @@ namespace csl
 
       static void to_bignum(const BIGNUM * from, csl::sec::bignum & to)
       {
-        if( !from ) { throw oEXC("oBIGNUM 'from' is NULL!"); }
+        if( !from ) { THROWEXC("oBIGNUM 'from' is NULL!"); }
         else
         {
           size_t sz = BN_num_bytes(from);
@@ -107,12 +110,12 @@ namespace csl
 
       static void from_bignum(const csl::sec::bignum & from, oBIGNUM * to)
       {
-        if( !to ) { throw oEXC("oBIGNUM 'to' is NULL!"); }
-        else if( !(from.size()) ) { throw oEXC("oBIGNUM 'from' has no data!"); }
+        if( !to ) { THROWEXC("oBIGNUM 'to' is NULL!"); }
+        else if( !(from.size()) ) { THROWEXC("oBIGNUM 'from' has no data!"); }
         {
           to->reset();
           to->bn_ = BN_bin2bn( from.data(), from.size(),NULL );
-          if( !to->bn_ ) { throw oEXC("oBIGNUM cannot convert bignum!"); }
+          if( !to->bn_ ) { THROWEXC("oBIGNUM cannot convert bignum!"); }
           BN_set_negative( to->bn_, from.is_negative() );
         }
       }
@@ -123,7 +126,7 @@ namespace csl
       BN_CTX * ctx_;
       oBIGNUM_CTX() : ctx_(BN_CTX_new())
       {
-        if( !ctx_ ) throw oEXC("oBIGNUM_CTX cannot allocate memory!");
+        if( !ctx_ ) THROWEXC("oBIGNUM_CTX cannot allocate memory!");
       }
       ~oBIGNUM_CTX() { if(ctx_) BN_CTX_free(ctx_); }
     };
@@ -162,7 +165,7 @@ namespace csl
         /* need an algorithm name */
         if( algname.size() == 0 )
         {
-          throw oEXC("oEC_KEY algorithm name is empty!");
+          THROWEXC("oEC_KEY algorithm name is empty!");
         }
 
         /* reset key */
@@ -171,22 +174,23 @@ namespace csl
         /* get algorithm id */
         char algnm[128];
         size_t asz = wcstombs(algnm,algname.c_str(),126);
+        algnm[algname.size()] = 0;
 
         if( asz == 0 )
         {
-          throw oEXC("oEC_KEY cannot convert string!");
+          THROWEXC("oEC_KEY cannot convert string!");
         }
 
         if( (alg_nid = name_to_nid_(algnm)) != NID_undef ) // TODO
         {
           if( (key_=EC_KEY_new_by_curve_name(alg_nid)) == NULL )
           {
-            throw oEXC("oEC_KEY cannot allocate key!");
+            THROWEXC("oEC_KEY cannot allocate key!");
           }
 
           if( (EC_KEY_generate_key(key_)) == 0 )
           {
-            throw oEXC("oEC_KEY key generation failed!");
+            THROWEXC("oEC_KEY key generation failed!");
           }
 
           return true;
@@ -201,7 +205,7 @@ namespace csl
         /* need an algorithm name */
         if( algname.size() == 0 )
         {
-          throw oEXC("oEC_KEY algorithm name is empty!");
+          THROWEXC("oEC_KEY algorithm name is empty!");
         }
 
         /* reset key */
@@ -210,17 +214,18 @@ namespace csl
         /* get algorithm id */
         char algnm[128];
         size_t asz = wcstombs(algnm,algname.c_str(),126);
+        algnm[algname.size()] = 0;
 
         if( asz == 0 )
         {
-          throw oEXC("oEC_KEY cannot convert string!");
+          THROWEXC("oEC_KEY cannot convert string!");
         }
 
         if( (alg_nid = name_to_nid_(algnm)) != NID_undef )
         {
           if( (key_=EC_KEY_new_by_curve_name(alg_nid)) == NULL )
           {
-            throw oEXC("oEC_KEY cannot allocate key!");
+            THROWEXC("oEC_KEY cannot allocate key!");
           }
           return true;
         }
@@ -233,7 +238,7 @@ namespace csl
 
         if( (privk = EC_KEY_get0_private_key(key_)) == NULL )
         {
-          throw oEXC("oEC_KEY cannot get public key!");
+          THROWEXC("oEC_KEY cannot get public key!");
         }
 
         oBIGNUM::to_bignum(privk,bn);
@@ -249,7 +254,7 @@ namespace csl
 
         if( !EC_KEY_set_private_key(key_,bnp.bn_) )
         {
-          throw oEXC("oEC_KEY cannot set private key!");
+          THROWEXC("oEC_KEY cannot set private key!");
         }
 
         return true;
@@ -258,9 +263,13 @@ namespace csl
       const EC_GROUP * get_group()
       {
         const EC_GROUP * group = 0;
+        if( !key_ )
+        {
+          THROWEXC("oEC_KEY empty key!");
+        }
         if( (group = EC_KEY_get0_group(key_))==NULL )
         {
-          throw oEXC("oEC_KEY invalid group!");
+          THROWEXC("oEC_KEY invalid group!");
         }
         return group;
       }
@@ -274,28 +283,28 @@ namespace csl
 
         if( (group = EC_KEY_get0_group(key_))==NULL )
         {
-          throw oEXC("oEC_KEY cannot get group of key!");
+          THROWEXC("oEC_KEY cannot get group of key!");
         }
 
         oBIGNUM_CTX ctx;
 
         if( (public_key = EC_KEY_get0_public_key(key_)) == NULL )
         {
-          throw oEXC("oEC_KEY cannot get public key!");
+          THROWEXC("oEC_KEY cannot get public key!");
         }
 
         if( EC_METHOD_get_field_type(EC_GROUP_method_of(group)) == NID_X9_62_prime_field )
         {
           if( EC_POINT_get_affine_coordinates_GFp(group, public_key, x.bn_, y.bn_, ctx.ctx_) == 0)
           {
-            throw oEXC("oEC_KEY cannot get affine coordinates!");
+            THROWEXC("oEC_KEY cannot get affine coordinates!");
           }
         }
         else
         {
           if( EC_POINT_get_affine_coordinates_GF2m(group, public_key, x.bn_, y.bn_, ctx.ctx_) == 0)
           {
-            throw oEXC("oEC_KEY cannot get affine coordinates!");
+            THROWEXC("oEC_KEY cannot get affine coordinates!");
           }
         }
         return true;
@@ -312,7 +321,7 @@ namespace csl
 
       oEC_POINT(const EC_GROUP * g) : point_(EC_POINT_new(g))
       {
-        if( !point_ ) throw oEXC("oEC_POINT cannot allocate memory!");
+        if( !point_ ) { THROWEXC("oEC_POINT cannot allocate memory!"); }
       }
 
       ~oEC_POINT() { reset(); }
@@ -326,30 +335,33 @@ namespace csl
         oBIGNUM xp, yp;
         oBIGNUM_CTX c;
 
+        if( x.is_empty() ) { THROWEXC("oEC_POINT x-coord empty"); }
+        if( y.is_empty() ) { THROWEXC("oEC_POINT y-coord empty"); }
+
         xp.from_bignum(x);
         yp.from_bignum(y);
 
         const EC_GROUP * group = k.get_group();
 
-        if( !group ) { throw oEXC("oEC_POINT cannot get group!"); return false; }
+        if( !group ) { THROWEXC("oEC_POINT cannot get group!"); }
 
         reset();
 
-        if( (point_=EC_POINT_new(group)) == NULL ) { throw oEXC("oEC_POINT cannot allocate!"); return false; }
+        if( (point_=EC_POINT_new(group)) == NULL ) { THROWEXC("oEC_POINT cannot allocate!"); }
 
         /* convert peer keys */
         if( EC_METHOD_get_field_type(EC_GROUP_method_of(group)) == NID_X9_62_prime_field )
         {
           if( EC_POINT_set_affine_coordinates_GFp(group, point_, xp.bn_, yp.bn_, c.ctx_) == 0)
           {
-            throw oEXC("oEC_POINT cannot convert coordinates!");
+            THROWEXC("oEC_POINT cannot convert coordinates!");
           }
         }
         else
         {
           if( EC_POINT_set_affine_coordinates_GF2m(group, point_, xp.bn_, yp.bn_, c.ctx_) == 0)
           {
-            throw oEXC("oEC_POINT cannot convert coordinates!");
+            THROWEXC("oEC_POINT cannot convert coordinates!");
           }
         }
         return true;
@@ -370,6 +382,7 @@ namespace csl
       /* get algorithm id */
       char algnm[128];
       size_t asz = wcstombs(algnm,algname.c_str(),126);
+      algnm[algname.size()] = 0;
 
       if( asz == 0 )
       {
@@ -410,7 +423,7 @@ namespace csl
       }
       catch(oEXC xc)
       {
-        fprintf(stderr,"ECDH_KEY exception: %s\n",xc.reason_);
+        fprintf(stderr,"ECDH_KEY exception: %s at [%s:%d]\n",xc.reason_,__FILE__,xc.line_);
       }
       return false;
     }
@@ -441,7 +454,7 @@ namespace csl
       }
       catch(oEXC xc)
       {
-        fprintf(stderr,"ECDH_KEY exception: %s\n",xc.reason_);
+        fprintf(stderr,"ECDH_KEY exception: %s at [%s:%d]\n",xc.reason_,__FILE__,xc.line_);
       }
       return false;
     }
@@ -469,7 +482,7 @@ namespace csl
       }
       catch(oEXC xc)
       {
-        fprintf(stderr,"ECDH_KEY exception: %s\n",xc.reason_);
+        fprintf(stderr,"ECDH_KEY exception: %s at [%s:%d]\n",xc.reason_,__FILE__,xc.line_);
       }
       return false;
     }
@@ -496,15 +509,19 @@ namespace csl
       try
       {
         wchar_t tmp[64];
-        tmp[63] = 0;
+        tmp[63] = L'\0';
 
         unsigned int sz = 0;
         bool ret = buf.get_data( (unsigned char *)tmp,sz,64 );
+
         if( ret )
         {
+          tmp[sz] = L'\0';
           algname_ = tmp;
+
           if( !(x_.from_xdr(buf)) ) return false;
           if( !(y_.from_xdr(buf)) ) return false;
+
           return true;
         }
         else
@@ -532,7 +549,7 @@ namespace csl
 
     void ecdh_key::print() const
     {
-      PRINTF(L"ECDH_KEY[%sl]:\n",(algname_.size() > 0 ? algname_.c_str() : L"EMPTY ALG"));
+      PRINTF(L"ECDH_KEY[%ls]:\n",(algname_.size() > 0 ? algname_.c_str() : L"EMPTY ALG"));
       PRINTF(L"  X key: "); x_.print();
       PRINTF(L"  Y key: "); y_.print();
     }

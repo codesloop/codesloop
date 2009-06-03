@@ -446,8 +446,6 @@ namespace csl
       v.add_field(name,*this);
     }
 
-    
-
     /* operators */
     intvar & intvar::operator=(const intvar & other)
     {
@@ -476,7 +474,7 @@ namespace csl
       else
       {
         size_t sz = sizeof(wchar_t)*(wcslen(other)+1);
-        value_.assign( other,other+sz );
+        value_ = other; //.assign( other,other+sz );
       }
       parent()->on_change();
       return *this;

@@ -106,7 +106,7 @@ namespace csl
         {
           unsigned int l=0;
           if( !str || (l=::wcslen(str))== 0 ) return false;
-          return append((unsigned char *)str,l);
+          return append((unsigned char *)str,(l+1)*sizeof(wchar_t));
         }
 
         pbuf & operator<<(const char * str) { append(str); return *this; }

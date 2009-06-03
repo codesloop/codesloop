@@ -311,8 +311,8 @@ namespace test_sqlite {
     param & p1(q.get_param(1));
     param & p2(q.get_param(2));
     //
-    p1.set("'_.\"");
-    p2.set("0123.'\"");
+    p1.set(L"'_.\"");
+    p2.set(L"0123.'\"");
     assert( q.next() == false );
     assert( q.reset() == true );
     //
@@ -321,8 +321,8 @@ namespace test_sqlite {
     synqry::columns_t cols;
     synqry::fields_t  flds;
     //
-    p1.set("'_.\"");
-    p2.set("0123.'\"");
+    p1.set(L"'_.\"");
+    p2.set(L"0123.'\"");
 
     assert( q.next(cols,flds) == true );
 

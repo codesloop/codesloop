@@ -79,12 +79,12 @@ namespace csl
     {
       const unsigned char * d = data();
       unsigned int len = size();
-      printf("BIGNUM[%d bytes]: neg[%d]: ",len,is_negative());
+      PRINTF(L"BIGNUM[%d bytes]: neg[%d]: ",len,is_negative());
       for( unsigned int i=0;i<len;++i )
       {
-        printf("%02x",d[i] );
+        PRINTF(L"%02x",d[i] );
       }
-      printf("\n");
+      PRINTF(L"\n");
     }
   }
 }

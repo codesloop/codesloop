@@ -45,7 +45,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       } \
       else \
       { \
-        FPRINTF(stderr,L"Exception(%sl:%d): [%sl] [%sl] : %sl\n", \
+        FPRINTF(stderr,L"Exception(%ls:%d): [%ls] [%ls] : %ls\n", \
             L""__FILE__,__LINE__, \
             exc::component_string(COMPONENT), \
             exc::reason_string(RC), \
@@ -113,7 +113,7 @@ namespace csl
       sqlite3 * td = 0;
       int rc = 0;
       if( !db ) { return false; }
-      else if( (rc=sqlite3_open16( db, &td )) == SQLITE_OK )
+      else if( (rc=sqlite3_open16( db, &td )) == SQLITE_OK ) // TODO
       {
         name_ = db;
         db_ = td;
@@ -537,7 +537,7 @@ namespace csl
 
       {
         scoped_mutex m2(tran_->cn_->mtx_);
-        rc = sqlite3_prepare16(tran_->cn_->db_, sql, wcslen(sql), &stmt_, &tail_);
+        rc = sqlite3_prepare16(tran_->cn_->db_, sql, wcslen(sql), &stmt_, &tail_); // TODO
       }
 
       if(rc != SQLITE_OK)
@@ -617,7 +617,7 @@ namespace csl
                 break;
 
               case synqry::colhead::t_string:
-                sqlite3_bind_text16( stmt_, which, p->get_string(), p->get_size(), SQLITE_TRANSIENT );
+                sqlite3_bind_text16( stmt_, which, p->get_string(), p->get_size(), SQLITE_TRANSIENT ); // TODO
                 break;
 
               case synqry::colhead::t_blob:
@@ -677,7 +677,7 @@ namespace csl
               break;
 
             case synqry::colhead::t_string:
-              f->stringval_  = data_pool_.wcsdup((const wchar_t *)sqlite3_column_text16(stmt_,ac));
+              f->stringval_  = data_pool_.wcsdup((const wchar_t *)sqlite3_column_text16(stmt_,ac)); // TODO
               f->size_       = sqlite3_column_bytes(stmt_,ac);
               break;
 
@@ -753,7 +753,7 @@ namespace csl
                 break;
 
               case synqry::colhead::t_string:
-                sqlite3_bind_text16( stmt_, which, p->get_string(), p->get_size(), SQLITE_TRANSIENT );
+                sqlite3_bind_text16( stmt_, which, p->get_string(), p->get_size(), SQLITE_TRANSIENT ); // TODO
                 break;
 
               case synqry::colhead::t_blob:
@@ -937,10 +937,10 @@ namespace csl
                 break;
             };
             //
-            h->name_   = coldata_pool_.wcsdup((const wchar_t *)sqlite3_column_name16(stmt_,i));
-            h->table_  = coldata_pool_.wcsdup((const wchar_t *)sqlite3_column_table_name16(stmt_,i));
-            h->db_     = coldata_pool_.wcsdup((const wchar_t *)sqlite3_column_database_name16(stmt_,i));
-            h->origin_ = coldata_pool_.wcsdup((const wchar_t *)sqlite3_column_origin_name16(stmt_,i));
+            h->name_   = coldata_pool_.wcsdup((const wchar_t *)sqlite3_column_name16(stmt_,i)); // TODO
+            h->table_  = coldata_pool_.wcsdup((const wchar_t *)sqlite3_column_table_name16(stmt_,i)); // TODO
+            h->db_     = coldata_pool_.wcsdup((const wchar_t *)sqlite3_column_database_name16(stmt_,i)); // TODO
+            h->origin_ = coldata_pool_.wcsdup((const wchar_t *)sqlite3_column_origin_name16(stmt_,i)); // TODO
             column_pool_.push_back(h);
           }
         }
@@ -1072,7 +1072,7 @@ namespace csl
     bool param::impl::get(blob_t & val) const
     {
       if( !ptr_ ) THR(exc::rs_nullparam,exc::cm_param,false);
-      val.assign( (unsigned char *)ptr_, ((unsigned char *)ptr_)+size_ );
+      val.set( (unsigned char *)ptr_, size_ );
       return true;
     }
 
@@ -1097,7 +1097,7 @@ namespace csl
       if( val.size() > 0 )
       {
         ptr_  = q_->param_pool_.wcsdup(val.c_str());
-        size_ = val.size();
+        size_ = val.nbytes();
       }
       else
       {
@@ -1113,7 +1113,7 @@ namespace csl
       if( val )
       {
         ptr_  = q_->param_pool_.wcsdup(val);
-        size_ = ::wcslen(val);
+        size_ = (::wcslen(val)+1)*sizeof(wchar_t);
       }
       else
       {
@@ -1128,7 +1128,7 @@ namespace csl
     {
       if( val.size() > 0 )
       {
-        ptr_ = q_->param_pool_.memdup(&(val[0]),val.size());
+        ptr_ = q_->param_pool_.memdup(val.data(),val.size());
       }
       size_    = val.size();
       type_    = synqry::colhead::t_blob;

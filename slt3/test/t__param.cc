@@ -81,7 +81,8 @@ namespace test_param {
 
     // int to anything
     long long intval = 123456789ll;
-    param::blob_t b((unsigned char *)(&intval),((unsigned char *)(&intval))+sizeof(intval));
+    param::blob_t b;
+    b.set((unsigned char *)(&intval),sizeof(intval));
 
     test_conv( intval, (double)123456789.0, p );
     test_conv( intval, str(L"123456789"), p );
@@ -89,7 +90,7 @@ namespace test_param {
 
     // double to anything
     double dblval = 357987.12345;
-    b.assign((unsigned char *)(&dblval),((unsigned char *)(&dblval))+sizeof(dblval));
+    b.set((unsigned char *)(&dblval),sizeof(dblval));
 
     test_conv( dblval, (long long)357987ll, p );
     test_conv( dblval, str(L"357987.1234500000"), p );
@@ -97,36 +98,36 @@ namespace test_param {
 
     // string to anything
     str strval(L"Hello world");
-    //b.assign( ()strval.data(),strval.size() ); // TODO ???
+    b.set( (unsigned char *)strval.data(), strval.nbytes() );
 
     test_conv( strval, (long long)0ll, p );
     test_conv( strval, (double)0.0, p );
     test_conv( strval, b, p );
 
     strval = L"12345678";
-    // b.assign(strval.begin(),strval.end());  TODO
+    b.set( (unsigned char *)strval.data(), strval.nbytes() );
 
     test_conv( strval, (long long)12345678ll, p );
     test_conv( strval, (double)12345678.0, p );
     test_conv( strval, b, p );
 
     strval = L"12345678.12345678";
-    // b.assign(strval.begin(),strval.end()); TODO
+    b.set( (unsigned char *)strval.data(), strval.nbytes() );
 
     test_conv( strval, (long long)12345678ll, p );
     test_conv( strval, (double)12345678.12345678, p );
     test_conv( strval, b, p );
 
     // blob to anything (reasonable)
-    b.assign((unsigned char *)(&intval),((unsigned char *)(&intval))+sizeof(intval));
+    b.set( (unsigned char *)(&intval), sizeof(intval) );
 
     test_conv( b, intval, p );
 
-    b.assign((unsigned char *)(&dblval),((unsigned char *)(&dblval))+sizeof(dblval));
+    b.set( (unsigned char *)(&dblval), sizeof(dblval) );
 
     test_conv( b, dblval, p );
 
-    b.assign(strval.c_str(),strval.c_str()+strval.size()+1);
+    b.set( (unsigned char *)strval.data(), strval.nbytes() );
 
     test_conv( b, strval, p );
   }

@@ -23,6 +23,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// TODO : segfault
+
 /**
    @file t__udp_auth_server.cc
    @brief Tests to verify udp::auth_srv routines

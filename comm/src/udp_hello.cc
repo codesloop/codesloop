@@ -44,7 +44,7 @@ namespace csl
     static void print_hex(const wchar_t * prefix,const void * vp,size_t len)
     {
       unsigned char * hx = (unsigned char *)vp;
-      PRINTF(L"%sl [%04d] : ",prefix,len);
+      PRINTF(L"%ls [%04d] : ",prefix,len);
       for(size_t i=0;i<len;++i) PRINTF(L"%.2X",hx[i]);
       PRINTF(L"\n");
     }
@@ -86,7 +86,7 @@ namespace csl
         {
           common::str s;
           e.to_string(s);
-          FPRINTF(stderr,L"Exception caught: %sl\n",s.c_str());
+          FPRINTF(stderr,L"Exception caught: %ls\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_hello_handler,false);
         }
         return true;
@@ -190,7 +190,7 @@ namespace csl
         {
           common::str s;
           e.to_string(s);
-          FPRINTF(stderr,L"Exception caught: %sl\n",s.c_str());
+          FPRINTF(stderr,L"Exception caught: %ls\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_hello_handler,false);
         }
 
@@ -247,7 +247,7 @@ namespace csl
           /* prepare response olleh packet */
           if( prepare_olleh( my_public_key, need_login, need_pass, my_private_key, peer_public_key, ms) == false )
           {
-            FPRINTF(stderr,L"[%sl:%d] Error in prepare_olleh()\n",L""__FILE__,__LINE__);
+            FPRINTF(stderr,L"[%ls:%d] Error in prepare_olleh()\n",L""__FILE__,__LINE__);
             return;
           }
 
@@ -257,7 +257,7 @@ namespace csl
           if( sendto( socket_, (const char *)ms.data_, ms.size_, 0,
               (struct sockaddr *)&(ms.sender_), len ) != (int)(ms.size_) )
           {
-            FPRINTF(stderr,L"[%sl:%d] Error in sendto(%d)\n",L""__FILE__,__LINE__,socket_);
+            FPRINTF(stderr,L"[%ls:%d] Error in sendto(%d)\n",L""__FILE__,__LINE__,socket_);
             perror("sendto");
             return;
           }
@@ -266,13 +266,13 @@ namespace csl
         {
           common::str s;
           e.to_string(s);
-          FPRINTF(stderr,L"Error [%sl:%d]: %s\n",L""__FILE__,__LINE__,s.c_str());
+          FPRINTF(stderr,L"Error [%ls:%d]: %s\n",L""__FILE__,__LINE__,s.c_str());
         }
         catch( comm::exc e )
         {
           common::str s;
           e.to_string(s);
-          FPRINTF(stderr,L"Error [%sl:%d]: %s\n",L""__FILE__,__LINE__,s.c_str());
+          FPRINTF(stderr,L"Error [%ls:%d]: %s\n",L""__FILE__,__LINE__,s.c_str());
         }
       }
 
@@ -380,7 +380,7 @@ namespace csl
         {
           common::str s;
           e.to_string(s);
-          FPRINTF(stderr,L"Exception caught: %sl\n",s.c_str());
+          FPRINTF(stderr,L"Exception caught: %ls\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_hello_cli,false);
         }
         return true;
@@ -466,7 +466,7 @@ namespace csl
         {
           common::str s;
           e.to_string(s);
-          FPRINTF(stderr,L"Exception caught: %sl\n",s.c_str());
+          FPRINTF(stderr,L"Exception caught: %ls\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_hello_cli,false);
         }
         return false;

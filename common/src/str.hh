@@ -134,15 +134,26 @@ namespace csl
           buf_.reset();
         }
 
-        /** @brief gets str size 
-        */
-        inline const size_t size() const
+        /** @brief gets str size  */
+        inline size_t size() const
         {
           return empty() ? 0 : wcslen( data() );
         }
 
+        /** @brief gets the total allocated bytes */
+        inline size_t nbytes() const
+        {
+          return buf_.size();
+        }
+
+        /** @brief return the number of characters in the string, excluding the trailing zero */
+        inline size_t nchars() const
+        {
+          return empty() ? 0 : wcstombs(NULL, data(), 0);
+        }
+
         /** @brief true if empty str ("") is defined */
-        inline const bool empty() const
+        inline bool empty() const
         {
           return !buf_.has_data();
         }
@@ -174,11 +185,11 @@ namespace csl
 
         /** @brief get data as wchar_t */
         inline const wchar_t * data() const
-        { 
-          return (const wchar_t *)buf_.data(); 
+        {
+          return (const wchar_t *)buf_.data();
         }
 
-        inline const tbuf<buf_size> & buffer() const 
+        inline const tbuf<buf_size> & buffer() const
         {
           return buf_;
         }
@@ -216,7 +227,7 @@ namespace csl
         size_t rfind(wchar_t w) const;
 
       private:
-        tbuf<buf_size> buf_;
+        tbuf<buf_size>   buf_;
     };
   }
 }

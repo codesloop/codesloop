@@ -23,6 +23,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// TODO : segfault
+
 /**
    @file t__udp_server2.cc
    @brief Tests to verify udp::srv routines
@@ -46,7 +48,7 @@ namespace test_udp_server2 {
     udp::SAI h;
 
     s.use_exc(false);
-    s.debug(false);
+    s.debug(true);
 
     memset( &h,0,sizeof(h) );
     h.sin_family       = AF_INET;

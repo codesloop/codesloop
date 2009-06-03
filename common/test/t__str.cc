@@ -81,6 +81,9 @@ namespace test_str {
   {
     str b;
     b = L"Hello" + str(L"world");
+    assert( b.size() == 10 );
+    assert( b.nchars() == 10 );
+    assert( b.nbytes() == 44 );
   }
 
   /** @test @todo */
@@ -99,8 +102,21 @@ namespace test_str {
     b += L"Hello";
     b += L" ";
     b += L"world!";
+    assert( b.size() == 12 );
+    assert( b.nchars() == 12 );
+    assert( b.nbytes() == 52 );
   }
 
+  /** @test @todo */
+  void str_opeq()
+  {
+    str b("Hello world");
+    assert( b.size() == 11 );
+    assert( b.empty() == false );
+    assert( b.c_str() != 0 );
+    assert( b.nchars() == 11 );
+    assert( b.nbytes() == 48 );
+  }
 
 } // namespace test_str
 
@@ -158,7 +174,7 @@ int main()
   csl_common_print_results( "string_concat      ", csl_common_test_timer_v0(string_concat),"" );
   csl_common_print_results( "str_append         ", csl_common_test_timer_v0(str_append),"" );
   csl_common_print_results( "string_append      ", csl_common_test_timer_v0(string_append),"" );
-
+  csl_common_print_results( "str_opeq           ", csl_common_test_timer_v0(str_opeq),"" );
 
   return 0;
 }

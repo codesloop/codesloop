@@ -110,7 +110,7 @@ namespace test_synqry {
     assert( pa3.is_empty() == true );
 
     pa1.set(1.0);
-    pa2.set("10000.001");
+    pa2.set(L"10000.001");
     pa3.set(100ll);
 
     param & pb1(q.get_param(1));
@@ -177,7 +177,7 @@ namespace test_synqry {
     catch(exc e)
     {
       str s; e.to_string(s);
-      FPRINTF(stderr,L"ERROR: %sl\n",s.c_str());
+      FPRINTF(stderr,L"ERROR: %ls\n",s.c_str());
     }
   }
 
@@ -269,7 +269,7 @@ namespace test_synqry {
 
       for( unsigned int i=0;i<100;++i )
       {
-        p.set("Hello");
+        p.set(L"Hello");
         assert( q.next(ch,fd) == true );
         assert( q.reset() == true );
         assert( str("Hello") == fd.get_at(0)->stringval_ );

@@ -141,12 +141,14 @@ namespace csl
 
     xdrbuf & xdrbuf::operator<<(const common::str & val)
     {
-      uint32_t sz = val.size();
+      uint32_t sz = val.nbytes();
       if( sz )
       {
         try
         {
-          size_and_buf_to_pbuf( b_, val.data(), val.size() );
+          sz = val.size() * sizeof(wchar_t);
+
+          size_and_buf_to_pbuf( b_, val.data(), sz );
         }
         catch(common::exc e)
         {
@@ -263,14 +265,17 @@ namespace csl
 
       if( !sz ) { val.clear(); return *this; }
 
-      std::auto_ptr<wchar_t> tmp(new wchar_t[sizeof(wchar_t)*sz+1]);
+      size_t nsz = (sz/sizeof(wchar_t));
 
-      if( tmp.get() )
+      std::auto_ptr<wchar_t> tmp(new wchar_t[nsz+1]);
+
+      if( nsz > 0 )
       {
-        tmp.get()[sz] = 0;
+        tmp.get()[nsz] = 0;
+
         if( (szrd=get_data((unsigned char *)tmp.get(),sz)) == sz )
         {
-          val.assign( tmp.get(),tmp.get()+sz );
+          val = tmp.get();
         }
         else if( szrd == 0 && it_==b_->end() )
         {

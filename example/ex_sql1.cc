@@ -56,7 +56,7 @@ int main()
     str s;
     e.to_string(s);
 
-    FPRINTF(stderr,L"Exception caught: %sl\n",s.c_str());
+    FPRINTF(stderr,L"Exception caught: %ls\n",s.c_str());
   }
 
   return 0;
