@@ -34,10 +34,83 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "exc.hh"
 #include "common.h"
 #include "str.hh"
+<<<<<<< HEAD:common/test/t__str.cc
+=======
+#include "test_timer.h"
+#include <stdlib.h>
+#include <string.h>
+>>>>>>> 2b5366b84cf8c5afeac93cc1910e52b792b8cc3f:common/test/t__str.cc
 #include <assert.h>
 #include <sys/stat.h>
 
 using csl::common::str;
+
+/** @brief contains tests related to tbuf */
+namespace test_str {
+
+  /** @test baseline for performance comparison */
+  void string_baseline()
+  {
+    std::string b;
+  }
+
+  /** @test baseline for performance comparison */
+  inline void str_baseline()
+  {
+    str b;
+  }
+
+  /** @test @todo */
+  void string_hello()
+  {
+    std::string b;
+    b = "Hello";
+  }
+
+  /** @test @todo */
+  void str_hello()
+  {
+    str b;
+    b = L"Hello";
+  }
+
+  /** @test @todo */
+  void string_concat()
+  {
+    std::string b;
+    b = "Hello" + std::string("world");
+  }
+
+  /** @test @todo */
+  void str_concat()
+  {
+    str b;
+    b = L"Hello" + str(L"world");
+  }
+
+  /** @test @todo */
+  void string_append()
+  {
+    std::string b;
+    b += "Hello";
+    b += " ";
+    b += "world!";
+  }
+
+  /** @test @todo */
+  void str_append()
+  {
+    str b;
+    b += L"Hello";
+    b += L" ";
+    b += L"world!";
+  }
+
+
+} // namespace test_str
+
+
+using namespace test_str;
 
 int main()
 {
@@ -64,6 +137,33 @@ int main()
   s2 = s.substr(1,3) + s2.substr(6,999);
   assert( s2.size() == 8 );
   assert( wcscmp(s2.c_str(), L"ELLWORLD") == 0 );
+
+  str cs( "HELLO" );
+  assert( cs.size() == 5 );
+  assert( wcscmp(cs.c_str(), L"HELLO") == 0 );
+
+  cs = "HELLO";
+  assert( cs.size() == 5 );
+  assert( wcscmp(cs.c_str(), L"HELLO") == 0 );
+
+  assert( cs.find( L'H') == 0 );
+  assert( cs.find( L'E') == 1 );
+  assert( cs.find( L"LL") == 2 );
+
+  cs = std::string("HELLO");
+  assert( cs.size() == 5 );
+  assert( wcscmp(cs.c_str(), L"HELLO") == 0 );
+
+  // performance
+  csl_common_print_results( "str_baseline       ", csl_common_test_timer_v0(str_baseline),"" );
+  csl_common_print_results( "string_baseline    ", csl_common_test_timer_v0(string_baseline),"" );
+  csl_common_print_results( "str_hello          ", csl_common_test_timer_v0(str_hello),"" );
+  csl_common_print_results( "string_hello       ", csl_common_test_timer_v0(string_hello),"" );
+  csl_common_print_results( "str_concat         ", csl_common_test_timer_v0(str_concat),"" );
+  csl_common_print_results( "string_concat      ", csl_common_test_timer_v0(string_concat),"" );
+  csl_common_print_results( "str_append         ", csl_common_test_timer_v0(str_append),"" );
+  csl_common_print_results( "string_append      ", csl_common_test_timer_v0(string_append),"" );
+
 
   return 0;
 }
