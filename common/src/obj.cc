@@ -26,7 +26,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "str.hh"
 
 /**
-  @file csl_common/src/str.cc
+  @file csl_common/src/obj.cc
   @brief implementation of simple string class
  */
 

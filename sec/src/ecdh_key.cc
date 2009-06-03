@@ -169,7 +169,15 @@ namespace csl
         this->reset();
 
         /* get algorithm id */
-        if( (alg_nid = name_to_nid_(algname.c_str())) != NID_undef )
+        char algnm[128];
+        size_t asz = wcstombs(algnm,algname.c_str(),126);
+
+        if( asz == 0 )
+        {
+          throw oEXC("oEC_KEY cannot convert string!");
+        }
+
+        if( (alg_nid = name_to_nid_(algnm)) != NID_undef ) // TODO
         {
           if( (key_=EC_KEY_new_by_curve_name(alg_nid)) == NULL )
           {
@@ -200,7 +208,15 @@ namespace csl
         this->reset();
 
         /* get algorithm id */
-        if( (alg_nid = name_to_nid_(algname.c_str())) != NID_undef )
+        char algnm[128];
+        size_t asz = wcstombs(algnm,algname.c_str(),126);
+
+        if( asz == 0 )
+        {
+          throw oEXC("oEC_KEY cannot convert string!");
+        }
+
+        if( (alg_nid = name_to_nid_(algnm)) != NID_undef )
         {
           if( (key_=EC_KEY_new_by_curve_name(alg_nid)) == NULL )
           {
@@ -351,7 +367,16 @@ namespace csl
 
       if( !algname.size() ) return 0;
 
-      if( (nid = name_to_nid_( algname.c_str())) == NID_undef )
+      /* get algorithm id */
+      char algnm[128];
+      size_t asz = wcstombs(algnm,algname.c_str(),126);
+
+      if( asz == 0 )
+      {
+        return 0;
+      }
+
+      if( (nid = name_to_nid_(algnm)) == NID_undef )
         return 0;  /* unknown algorithm */
 
       if( (group = EC_GROUP_new_by_curve_name(nid)) == NULL )
@@ -470,12 +495,14 @@ namespace csl
       bool ret = true;
       try
       {
-        char tmp[32];
+        wchar_t tmp[64];
+        tmp[63] = 0;
+
         unsigned int sz = 0;
-        bool ret = buf.get_data( (unsigned char *)tmp,sz,32 );
+        bool ret = buf.get_data( (unsigned char *)tmp,sz,64 );
         if( ret )
         {
-          algname_.assign( (char*)tmp,((char*)tmp)+sz );
+          algname_ = tmp;
           if( !(x_.from_xdr(buf)) ) return false;
           if( !(y_.from_xdr(buf)) ) return false;
           return true;
@@ -505,9 +532,9 @@ namespace csl
 
     void ecdh_key::print() const
     {
-      printf("ECDH_KEY[%s]:\n",(algname_.size() > 0 ? algname_.c_str() : "EMPTY ALG"));
-      printf("  X key: "); x_.print();
-      printf("  Y key: "); y_.print();
+      PRINTF(L"ECDH_KEY[%sl]:\n",(algname_.size() > 0 ? algname_.c_str() : L"EMPTY ALG"));
+      PRINTF(L"  X key: "); x_.print();
+      PRINTF(L"  Y key: "); y_.print();
     }
 
     void ecdh_key::set(const common::str & algname, const bignum & x, const bignum & y)

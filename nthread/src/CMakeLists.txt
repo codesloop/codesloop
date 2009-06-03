@@ -23,17 +23,13 @@
 
 IF(WIN32)
 
-  INCLUDE_DIRECTORIES(
-      ../../common/src
-      ../../sec/src )
+  INCLUDE_DIRECTORIES( ../../common/src )
 
 ELSE(WIN32)
 
   ADD_DEFINITIONS( -Wall -g3 -pthread )
 
-  INCLUDE_DIRECTORIES(
-      ../src
-      ../../common/src )
+  INCLUDE_DIRECTORIES( ../../common/src )
 
 ENDIF(WIN32)
 

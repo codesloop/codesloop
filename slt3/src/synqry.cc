@@ -39,11 +39,11 @@ namespace csl
   {
     void synqry::colhead::debug()
     {
-      printf("Colhead: Name='%s' Table='%s' DB='%s' Origin='%s' Type=%d\n",
-             (name_ ? name_ : "null"),
-             (table_ ? table_ : "null"),
-             (db_ ? db_ : "null"),
-             (origin_ ? origin_ : "null"),
+      PRINTF(L"Colhead: Name='%sl' Table='%sl' DB='%sl' Origin='%sl' Type=%d\n",
+             (name_ ? name_ : L"null"),
+             (table_ ? table_ : L"null"),
+             (db_ ? db_ : L"null"),
+             (origin_ ? origin_ : L"null"),
              type_ );
     }
 
@@ -52,15 +52,15 @@ namespace csl
     void synqry::debug() { impl_->debug(); }
     param & synqry::get_param(unsigned int pos) { return impl_->get_param(pos); }
     void synqry::clear_params() { impl_->clear_params(); }
-    bool synqry::prepare(const char * sql) { return impl_->prepare(sql); }
+    bool synqry::prepare(const wchar_t * sql) { return impl_->prepare(sql); }
     bool synqry::reset()  { return impl_->reset(); }
     void synqry::reset_data()  { impl_->reset_data(); }
     void synqry::autoreset_data(bool yesno) { impl_->autoreset_data(yesno); }
     bool synqry::autoreset_data() { return impl_->autoreset_data(); }
     bool synqry::next(columns_t & cols, fields_t & fields) { return impl_->next(cols,fields); }
     bool synqry::next() { return impl_->next(); }
-    bool synqry::execute(const char * sql) { return impl_->execute(sql); }
-    bool synqry::execute(const char * sql, common::str & result)  { return impl_->execute(sql, result); }
+    bool synqry::execute(const wchar_t * sql) { return impl_->execute(sql); }
+    bool synqry::execute(const wchar_t * sql, common::str & result)  { return impl_->execute(sql, result); }
 
     void synqry::use_exc(bool yesno) { impl_->use_exc(yesno); }
     bool synqry::use_exc() { return impl_->use_exc(); }

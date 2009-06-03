@@ -81,7 +81,7 @@ namespace csl
       {
         return v_.get_at(which);
       }
-
+#if 0
       /**
       @brief duplicates the given string (allocates memory from pool)
       @param str is the string to be duplicated
@@ -94,6 +94,20 @@ namespace csl
         ret = (char *)allocate(len+1);
         if( len ) ::memcpy(ret,str,len);
         ret[len] = 0;
+        return ret;
+      }
+#endif
+      /**
+        @brief duplicates the given string (allocates memory from pool)
+        @param str is the string to be duplicated
+      */
+      inline wchar_t * wcsdup(const wchar_t * str)
+      {
+        if( !str ) return 0;
+        size_t len = ::wcslen(str);
+        wchar_t * ret = 0;
+        ret = (wchar_t *)allocate(len+1);
+        if( len ) wcsncpy(ret,str,len);
         return ret;
       }
 

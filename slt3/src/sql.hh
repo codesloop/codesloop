@@ -54,11 +54,11 @@ namespace csl
           public:
             struct data
             {
-              const char * name_;
-              const char * type_;
-              const char * flags_;
+              const wchar_t * name_;
+              const wchar_t * type_;
+              const wchar_t * flags_;
 
-              data(const char * name, const char * typ,const char * flags)
+              data(const wchar_t * name, const wchar_t * typ,const wchar_t * flags)
                 : name_(name), type_(typ), flags_(flags) {}
             };
 
@@ -66,26 +66,26 @@ namespace csl
             typedef common::pvlist< 32,data,common::delete_destructor<data> > fieldlist_t;
             typedef common::mpool<> strpool_t;
 
-            inline const char * table_name() { return table_name_; }
+            inline const wchar_t * table_name() { return table_name_; }
 
-            helper(const char * tablename);
-            bool add_field(const char * name,const char * typ, const char * flags="");
+            helper(const wchar_t * tablename);
+            bool add_field(const wchar_t * name,const wchar_t * typ, const wchar_t * flags=L"");
 
-            const char * init_sql();
-            const char * create_sql();
-            const char * save_sql();
-            const char * remove_sql();
-            const char * find_by_id_sql();
-            const char * find_by(int field1,
-                                 int field2=-1,
-                                 int field3=-1,
-                                 int field4=-1,
-                                 int field5=-1);
+            const wchar_t * init_sql();
+            const wchar_t * create_sql();
+            const wchar_t * save_sql();
+            const wchar_t * remove_sql();
+            const wchar_t * find_by_id_sql();
+            const wchar_t * find_by(int field1,
+                                    int field2=-1,
+                                    int field3=-1,
+                                    int field4=-1,
+                                    int field5=-1);
 
           private:
             helper() {}
 
-            const char * table_name_;
+            const wchar_t * table_name_;
             bool         done_;
             fieldlist_t  fields_;
             //strpool_t    pool_;

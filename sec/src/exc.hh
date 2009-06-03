@@ -64,10 +64,10 @@ namespace csl
         };
 
         /** @brief converts reason code to string */
-        static const char * reason_string(int rc);
+        static const wchar_t * reason_string(int rc);
 
         /** @brief converts component code to string */
-        static const char * component_string(int cm);
+        static const wchar_t * component_string(int cm);
 
         /** @brief converts exception to string */
         void to_string(common::str & res);
@@ -100,15 +100,15 @@ namespace csl
         *   @param file tells which source file caused the error
         *   @param lin tells which line cause the error
         */
-        exc(int reason, int component, const char * txt, const wchar_t * file, unsigned int line)
+        exc(int reason, int component, const wchar_t * txt, const wchar_t * file, unsigned int line)
         : reason_(reason), component_(component), text_(txt), file_(file), line_(line) {}
 
         ~exc();
 
         int reason_;        ///<reason code: one of rs_*
         int component_;     ///<component code: one of cm_*
-	common::str text_;  ///<error explanation
-	common::str file_;  ///<error source file
+        common::str text_;  ///<error explanation
+        common::str file_;  ///<error source file
         unsigned int line_; ///<error posintion in source file
 
       private:

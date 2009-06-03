@@ -36,27 +36,9 @@ namespace csl
 {
   namespace common
   {
-    size_t str::find(const str & s) const
+    void str::ensure_trailing_zero()
     {
-      return '\0';
-    }
-
-    size_t str::find(wchar_t w) const
-    {
-      const wchar_t * d = data();
-      return '\0';
-    }
-
-    size_t str::find(const wchar_t * str) const
-    {
-      if( empty() ) return npos;
-      if( !str )    return npos;
-
-      const wchar_t * res = 0;
-
-      if( (res = wcsstr(data(),str)) == NULL ) return npos;
-
-      return (res-data());
+      // TODO
     }
 
     str& str::operator+=(const str& s)
@@ -102,7 +84,7 @@ namespace csl
       return s;
     }
 
-    str::str(const char * mbstring)
+    str::str(const char * mbstring) : obj()
     {
       size_t len =  strlen(mbstring)+1;
       wchar_t wcstring[len];
@@ -111,7 +93,7 @@ namespace csl
       {
         // wcstring includes trailing zero char
         buf_.set( (unsigned char *)wcstring, len*sizeof(wchar_t) );
-      }      
+      }
     }
 
     str& str::operator=(const char * mbstring )
@@ -128,9 +110,9 @@ namespace csl
       return *this;
     }
 
-    const size_t str::find(wchar_t c) const
+    size_t str::find(wchar_t c) const
     {
-      size_t ret = size_t(-1);
+      size_t ret = npos;
       size_t len = size();
 
       for ( size_t pos = 0; pos < len ; pos++ ) 
@@ -144,10 +126,26 @@ namespace csl
       return ret;
     }
 
-    const size_t str::find(const str & s) const
+    size_t str::rfind(wchar_t c) const
+    {
+      size_t ret = npos;
+      size_t len = size();
+
+      for ( size_t pos = len-1; pos >= 0 ; --pos )
+      {
+        if ( (*this)[pos] == c ) {
+          ret = pos;
+          break;
+        }
+      }
+
+      return ret;
+    }
+
+    size_t str::find(const str & s) const
     {
       wchar_t * p = wcsstr( data(), s.data() );
-      size_t ret = size_t(-1);
+      size_t ret = npos;
 
       if ( p != NULL ) {
         ret = p - data();
@@ -156,7 +154,17 @@ namespace csl
       return ret;
     }
 
-    /* public interface */
+    size_t str::find(const wchar_t * str) const
+    {
+      if( empty() ) return npos;
+      if( !str )    return npos;
+
+      const wchar_t * res = 0;
+
+      if( (res = wcsstr(data(),str)) == NULL ) return npos;
+
+      return (res-data());
+    }
 
     wchar_t str::at(const size_t n) const
     {

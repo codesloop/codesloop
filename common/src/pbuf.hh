@@ -97,7 +97,21 @@ namespace csl
           return append((unsigned char *)str,l);
         }
 
+        /**
+        @brief appends the string pointed by str to the internal buffers
+        @param str is the string
+        @return true if successful
+         */
+        bool append(const wchar_t * str)
+        {
+          unsigned int l=0;
+          if( !str || (l=::wcslen(str))== 0 ) return false;
+          return append((unsigned char *)str,l);
+        }
+
         pbuf & operator<<(const char * str) { append(str); return *this; }
+
+        pbuf & operator<<(const wchar_t * str) { append(str); return *this; }
 
         template <typename T> bool t_copy_to(T & t,unsigned int max_size=0)
         {

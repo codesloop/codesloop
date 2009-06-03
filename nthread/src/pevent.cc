@@ -23,6 +23,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "exc.hh"
 #include "pevent.hh"
 #include "str.hh"
 #include "common.h"
@@ -97,7 +98,8 @@ namespace csl
 
     // no-copy
     pevent::pevent(const pevent & other) 
-      : impl_((impl *)0) {throw common::str("should never be called"); }
+      : impl_((impl *)0) { throw nthread::exc(exc::rs_not_implemented,exc::cm_pevent); }
+
     pevent & pevent::operator=(const pevent & other) { return *this; }
   }
 }

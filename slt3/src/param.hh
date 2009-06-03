@@ -80,7 +80,7 @@ namespace csl
         double get_double() const;
 
         /** @brief return the parameter value as a C string */
-        const char * get_string() const;
+        const wchar_t * get_string() const;
 
         /** @brief returns true if not set */
         bool is_empty();
@@ -107,7 +107,7 @@ namespace csl
         void set(const common::str & val);
 
         /** @brief sets the value as a string */
-        void set(const char * val);
+        void set(const wchar_t * val);
 
         /** @brief sets the value as a vector of unsigned characters */
         void set(const blob_t & val);

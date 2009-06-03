@@ -37,7 +37,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "str.hh"
 #include <assert.h>
 
+using namespace csl;
 using namespace csl::slt3;
+using csl::common::str;
 
 /** @brief contains tests related to slt3::param */
 namespace test_param {
@@ -82,7 +84,7 @@ namespace test_param {
     param::blob_t b((unsigned char *)(&intval),((unsigned char *)(&intval))+sizeof(intval));
 
     test_conv( intval, (double)123456789.0, p );
-    test_conv( intval, common::str("123456789"), p );
+    test_conv( intval, str(L"123456789"), p );
     test_conv( intval, b, p );
 
     // double to anything
@@ -90,26 +92,26 @@ namespace test_param {
     b.assign((unsigned char *)(&dblval),((unsigned char *)(&dblval))+sizeof(dblval));
 
     test_conv( dblval, (long long)357987ll, p );
-    test_conv( dblval, common::str("357987.1234500000"), p );
+    test_conv( dblval, str(L"357987.1234500000"), p );
     test_conv( dblval, b, p );
 
     // string to anything
-    common::str strval("Hello world");
-    b.assign(strval.begin(),strval.end());
+    str strval(L"Hello world");
+    //b.assign( ()strval.data(),strval.size() ); // TODO ???
 
     test_conv( strval, (long long)0ll, p );
     test_conv( strval, (double)0.0, p );
     test_conv( strval, b, p );
 
-    strval = "12345678";
-    b.assign(strval.begin(),strval.end());
+    strval = L"12345678";
+    // b.assign(strval.begin(),strval.end());  TODO
 
     test_conv( strval, (long long)12345678ll, p );
     test_conv( strval, (double)12345678.0, p );
     test_conv( strval, b, p );
 
-    strval = "12345678.12345678";
-    b.assign(strval.begin(),strval.end());
+    strval = L"12345678.12345678";
+    // b.assign(strval.begin(),strval.end()); TODO
 
     test_conv( strval, (long long)12345678ll, p );
     test_conv( strval, (double)12345678.12345678, p );

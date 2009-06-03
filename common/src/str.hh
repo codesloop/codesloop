@@ -39,31 +39,25 @@ Credits: some techniques and code pieces are stolen from Christian
 #include "obj.hh"
 #include "tbuf.hh"
 #ifdef __cplusplus
+#include <string>
 
 namespace csl
 {
   namespace common
   {
     /** @todo document me */
-<<<<<<< HEAD:common/src/str.hh
-    class str 
+    class str : public csl::common::obj
     {
-=======
-    class str : public obj
-    {      
->>>>>>> 2b5366b84cf8c5afeac93cc1910e52b792b8cc3f:common/src/str.hh
       public:
         enum { buf_size = 128 * sizeof(wchar_t), npos = 0xFFFFFFFF };
 
-        /** @brief constructor */
-<<<<<<< HEAD:common/src/str.hh
-        inline str()  { }
+        /** @brief reset internal data */
+        inline void reset() { buf_.reset(); }
 
-=======
-        inline str() { }
-        
->>>>>>> 2b5366b84cf8c5afeac93cc1910e52b792b8cc3f:common/src/str.hh
-        /** @brief destructor 
+        /** @brief constructor */
+        inline str() : csl::common::obj() { }
+
+        /** @brief destructor
         since there are not virtual functions, and we do not expect inherited
         classes from str the destructor is not virtual. this casues a bit
         faster initalization, because no vptr table is required, i guess 
@@ -71,13 +65,16 @@ namespace csl
         ~str() {}
 
         /** @brief copy constructor */
-        inline str(const str& s) 
+        inline str & operator=(const pbuf & other) { buf_ = other; return *this; }
+
+        /** @brief copy constructor */
+        inline str(const str& s) : csl::common::obj()
         {
           buf_ = s.buf_;
         }
 
         /** @brief copy constructor */
-        inline str(const wchar_t * wcs)
+        inline str(const wchar_t * wcs) : csl::common::obj()
         {
           buf_.set((unsigned char *)wcs,sizeof(wchar_t) * (wcslen(wcs)+1));
         }
@@ -96,7 +93,7 @@ namespace csl
         str& operator=(const char *);
 
         /** @brief let equal operator */
-        str& operator=(std::string s) 
+        str& operator=(const std::string & s)
         {
           return operator=(s.c_str());
         }
@@ -186,13 +183,14 @@ namespace csl
           return buf_;
         }
 
+        void ensure_trailing_zero();
+
         /** @brief substr
             @param start start from this position
             @param length take length bytes from origin str
         */
         str substr(const size_t start, const size_t length) const;
 
-<<<<<<< HEAD:common/src/str.hh
         /** @brief find a wide character in the string
             @param w is the character to be found
             @returns npos if not found or the position
@@ -211,12 +209,12 @@ namespace csl
         **/
         size_t find(const str & s) const;
 
+        /** @brief reverse find a wide character in the string
+            @param w is the character to be found
+            @returns npos if not found or the position
+         **/
+        size_t rfind(wchar_t w) const;
 
-=======
-        const size_t find(wchar_t) const;
-        const size_t find(const str &) const;
-        
->>>>>>> 2b5366b84cf8c5afeac93cc1910e52b792b8cc3f:common/src/str.hh
       private:
         tbuf<buf_size> buf_;
     };

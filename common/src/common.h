@@ -73,9 +73,18 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ifndef FPRINTF
 #  define FPRINTF fwprintf
 # endif /*FPRINTF*/
+# ifndef PRINTF
+#  define PRINTF wprintf
+# endif /*PRINTF*/
 # ifndef ATOLL
 #  define ATOLL _atoi64
 # endif /*ATOLL*/
+# ifndef WCSTOLL
+#  define WCSTOLL wcstoll
+# endif /*WCSTOLL*/
+# ifndef WCSTOLD
+#  define WCSTOLD wcstold
+# endif /*WCSTOLD*/
 # ifndef UNLINK
 #  define UNLINK _unlink
 # endif /*UNLINK*/
@@ -89,9 +98,18 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ifndef FPRINTF
 #  define FPRINTF fwprintf
 # endif /*FPRINTF*/
+# ifndef PRINTF
+#  define PRINTF wprintf
+# endif /*PRINTF*/
 # ifndef ATOLL
 #  define ATOLL atoll
 # endif /*ATOLL*/
+# ifndef WCSTOLL
+#  define WCSTOLL wcstoll
+# endif /*WCSTOLL*/
+# ifndef WCSTOLD
+#  define WCSTOLD wcstold
+# endif /*WCSTOLD*/
 # ifndef UNLINK
 #  define UNLINK unlink
 # endif /*UNLINK*/

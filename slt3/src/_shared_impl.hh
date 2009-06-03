@@ -64,6 +64,8 @@ namespace csl
       /* internal */
       unsigned long long new_tran_id();
       static exc create_exc(int rc,int component, const common::str & str);
+      bool exec_noret(const wchar_t * sql);
+      bool exec(const wchar_t * sql,common::str & res);
       bool exec_noret(const char * sql);
       bool exec(const char * sql,common::str & res);
       bool valid_db_ptr();
@@ -126,7 +128,7 @@ namespace csl
       common::mpool<>  param_pool_;
       common::mpool<>  data_pool_;
       sqlite3_stmt *   stmt_;
-      const char *     tail_;
+      const void *     tail_;
       bool             use_exc_;
       bool             autoreset_data_;
       long long        last_insert_id_;
@@ -151,15 +153,15 @@ namespace csl
       long long change_count();
 
       // stepwise query
-      bool prepare(const char * sql);
+      bool prepare(const wchar_t * sql);
       bool reset();
       void reset_data();
       bool next(columns_t & cols, fields_t & fields);
       bool next();
 
       // oneshot query
-      bool execute(const char * sql);
-      bool execute(const char * sql, common::str & result);
+      bool execute(const wchar_t * sql);
+      bool execute(const wchar_t * sql, common::str & result);
 
       void debug();
 
@@ -192,7 +194,7 @@ namespace csl
       void * get_ptr() const;
       long long get_long() const;
       double get_double() const;
-      const char * get_string() const;
+      const wchar_t * get_string() const;
 
       bool get(long long & val) const;
       bool get(double & val) const;
@@ -202,7 +204,7 @@ namespace csl
       void set(long long val);
       void set(double val);
       void set(const common::str & val);
-      void set(const char * val);
+      void set(const wchar_t * val);
       void set(const blob_t & val);
       void set(const unsigned char * ptr,unsigned int size);
 

@@ -37,7 +37,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <assert.h>
 #include <sys/stat.h>
 
-#define LOG_TEST_MSG "logger test"
+#define LOG_TEST_MSG L"logger test"
 
 using csl::common::exc;
 using csl::common::str;

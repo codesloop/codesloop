@@ -37,10 +37,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "exc.hh"
 #include "common.h"
 #include "mpool.hh"
+#include "str.hh"
 #include <assert.h>
-#include <stdlib.h>
 
 using namespace csl::slt3;
+using csl::common::str;
 
 /** @brief contains tests related to slt3::var */
 namespace test_var {
@@ -54,7 +55,7 @@ namespace test_var {
       static reg::helper  reg_;
   };
 
-  reg::helper TestBase::reg_("test_var","test_var.db");
+  reg::helper TestBase::reg_(L"test_var",L"test_var.db");
 
   /** SingleInt tests a single integer to be stored in an SQLite DB by the ORM mapper (sql_helper) */
   class SingleInt : public TestBase
@@ -63,14 +64,14 @@ namespace test_var {
       virtual sql::helper & sql_helper() const { return sql_helper_; }
       static sql::helper  sql_helper_;
 
-      SingleInt() : id_("id",*this,"PRIMARY KEY ASC AUTOINCREMENT"), 
-                    value_("intval",*this) {}
+      SingleInt() : id_(L"id",*this,L"PRIMARY KEY ASC AUTOINCREMENT"), 
+                    value_(L"intval",*this) {}
 
       intvar id_;
       intvar value_;
   };
 
-  sql::helper SingleInt::sql_helper_("single_int");
+  sql::helper SingleInt::sql_helper_(L"single_int");
 
   /** SingleString tests a single string to be stored in an SQLite DB by the ORM mapper (sql_helper) */
   class SingleString : public TestBase
@@ -79,14 +80,14 @@ namespace test_var {
       virtual sql::helper & sql_helper() const { return sql_helper_; }
       static sql::helper  sql_helper_;
 
-      SingleString() : id_("id",*this,"PRIMARY KEY ASC AUTOINCREMENT"),
-                       value_("strval",*this) {}
+      SingleString() : id_(L"id",*this,L"PRIMARY KEY ASC AUTOINCREMENT"),
+                       value_(L"strval",*this) {}
 
       intvar id_;
       strvar value_;
   };
 
-  sql::helper SingleString::sql_helper_("single_string");
+  sql::helper SingleString::sql_helper_(L"single_string");
 
   /** SingleDouble tests a double precision value to be stored in an SQLite DB by the ORM mapper (sql_helper) */
   class SingleDouble : public TestBase
@@ -95,14 +96,14 @@ namespace test_var {
       virtual sql::helper & sql_helper() const { return sql_helper_; }
       static sql::helper    sql_helper_;
 
-      SingleDouble() : id_("id",*this,"PRIMARY KEY ASC AUTOINCREMENT"),
-                       value_("dblval",*this) {}
+      SingleDouble() : id_(L"id",*this,L"PRIMARY KEY ASC AUTOINCREMENT"),
+                       value_(L"dblval",*this) {}
 
       intvar     id_;
       doublevar  value_;
   };
 
-  sql::helper SingleDouble::sql_helper_("single_dbl");
+  sql::helper SingleDouble::sql_helper_(L"single_dbl");
 
   /** SingleBlob tests a single blob to be stored in an SQLite DB by the ORM mapper (sql_helper) */
   class SingleBlob : public TestBase
@@ -111,14 +112,14 @@ namespace test_var {
       virtual sql::helper & sql_helper() const { return sql_helper_; }
       static sql::helper    sql_helper_;
 
-      SingleBlob() : id_("id",*this,"PRIMARY KEY ASC AUTOINCREMENT"),
-                     value_("blobval",*this) {}
+      SingleBlob() : id_(L"id",*this,L"PRIMARY KEY ASC AUTOINCREMENT"),
+                     value_(L"blobval",*this) {}
 
       intvar     id_;
       blobvar  value_;
   };
 
-  sql::helper SingleBlob::sql_helper_("single_blob");
+  sql::helper SingleBlob::sql_helper_(L"single_blob");
 
   /** @test baseline for performance comparison */
   void baseline()

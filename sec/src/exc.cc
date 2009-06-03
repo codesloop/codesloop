@@ -36,49 +36,49 @@ namespace csl
 {
   namespace sec
   {
-    const char * exc::reason_string(int rc)
+    const wchar_t * exc::reason_string(int rc)
     {
       switch( rc )
       {
-        case rs_salt_size:        return "Invalid salt size.";
-        case rs_null_key:         return "Null key received.";
-        case rs_too_big:          return "Data too big.";
-        case rs_rand_failed:      return "Cannot generate random.";
-        case rs_header_size:      return "Invalid header size.";
-        case rs_footer_size:      return "Invalid footer size.";
-        case rs_null_data:        return "Data too short for encryption.";
-        case rs_cksum:            return "Checksum mismatch.";
+        case rs_salt_size:        return L"Invalid salt size.";
+        case rs_null_key:         return L"Null key received.";
+        case rs_too_big:          return L"Data too big.";
+        case rs_rand_failed:      return L"Cannot generate random.";
+        case rs_header_size:      return L"Invalid header size.";
+        case rs_footer_size:      return L"Invalid footer size.";
+        case rs_null_data:        return L"Data too short for encryption.";
+        case rs_cksum:            return L"Checksum mismatch.";
         case rs_unknown:
-          default:               return "Unknown reason";
+          default:               return L"Unknown reason";
       };
     }
 
-    const char * exc::component_string(int cm)
+    const wchar_t * exc::component_string(int cm)
     {
       switch( cm )
       {
-        case cm_crypt_pkt: return "sec::crypt_pkt";
+        case cm_crypt_pkt: return L"sec::crypt_pkt";
         case cm_unknown:
-          default:         return "unknown component";
+          default:         return L"unknown component";
       };
     }
 
     void exc::to_string(common::str & res)
     {
-      common::str t("Exception");
+      common::str t(L"Exception");
       if( file_.size() > 0 && line_ > 0 )
       {
-        char tx[200];
-        SNPRINTF(tx,199,"(%s:%d): ",file_.c_str(),line_);
+        wchar_t tx[200];
+        SNPRINTF(tx,199,L"(%sl:%d): ",file_.c_str(),line_);
         t += tx;
       }
-      t += " [";
+      t += L" [";
       t += component_string(component_);
-      t += "] [";
+      t += L"] [";
       t += reason_string(reason_);
-      t += "] ";
+      t += L"] ";
       if( text_.size() > 0 ) t+= text_;
-      res.swap(t);
+      res = t;
     }
 
     exc::exc() : reason_(rs_unknown), component_(cm_unknown) {}

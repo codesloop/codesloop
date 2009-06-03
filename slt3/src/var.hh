@@ -65,24 +65,24 @@ namespace csl
         class helper
         {
           public:
-            bool add_field(const char * name, var & v);
+            bool add_field(const wchar_t * name, var & v);
 
             struct data
             {
-              const char * name_;
+              const wchar_t * name_;
               var  * var_;
-              data(const char * nm,var & v) : name_(nm), var_(&v) {}
+              data(const wchar_t * nm,var & v) : name_(nm), var_(&v) {}
             };
 
             typedef common::pvlist< 32,data,common::delete_destructor<data> > datalist_t;
 
-            bool init(tran & t, const char * sql_query);
-            bool create(tran & t, const char * sql_query);
-            bool save(tran & t, const char * sql_query);
-            bool remove(tran & t, const char * sql_query);
-            bool find_by_id(tran & t, const char * sql_query);
+            bool init(tran & t, const wchar_t * sql_query);
+            bool create(tran & t, const wchar_t * sql_query);
+            bool save(tran & t, const wchar_t * sql_query);
+            bool remove(tran & t, const wchar_t * sql_query);
+            bool find_by_id(tran & t, const wchar_t * sql_query);
             bool find_by(tran & t,
-                         const char * sql_query,
+                         const wchar_t * sql_query,
                          int field1,
                          int field2=-1,
                          int field3=-1,
@@ -118,7 +118,7 @@ namespace csl
 
         virtual void set_param(param & p);
         virtual bool set_value(synqry::colhead * ch,synqry::field * fd);
-        intvar(const char * name, obj & parent,const char * flags="");
+        intvar(const wchar_t * name, obj & parent,const wchar_t * flags=L"");
 
         virtual intvar & operator=(const intvar & other);
         virtual intvar & operator=(long long v);
@@ -134,22 +134,21 @@ namespace csl
     {
       public:
         enum { typ = synqry::colhead::t_string };
-        typedef common::tbuf<128> value_t;
+        typedef common::str value_t;
 
         virtual inline int type() { return typ; }
 
         virtual void set_param(param & p);
         virtual bool set_value(synqry::colhead * ch,synqry::field * fd);
-        strvar(const char * name, obj & parent,const char * flags="");
+        strvar(const wchar_t * name, obj & parent,const wchar_t * flags=L"");
 
         virtual strvar & operator=(const strvar & other);
-        virtual strvar & operator=(const char * other);
+        virtual strvar & operator=(const wchar_t * other);
         virtual strvar & operator=(const common::str & other);
-        virtual strvar & operator=(const value_t & other);
         virtual strvar & operator=(const common::pbuf & other);
         virtual const value_t & operator*() const;
         virtual const value_t & get() const;
-        virtual const char * c_str();
+        virtual const wchar_t * c_str();
 
       private:
         value_t value_;
@@ -166,7 +165,7 @@ namespace csl
 
         virtual void set_param(param & p);
         virtual bool set_value(synqry::colhead * ch,synqry::field * fd);
-        doublevar(const char * name, obj & parent,const char * flags="");
+        doublevar(const wchar_t * name, obj & parent,const wchar_t * flags=L"");
 
         virtual doublevar & operator=(const doublevar & other);
         virtual doublevar & operator=(value_t other);
@@ -188,12 +187,13 @@ namespace csl
 
         virtual void set_param(param & p);
         virtual bool set_value(synqry::colhead * ch,synqry::field * fd);
-        blobvar(const char * name, obj & parent,const char * flags="");
+        blobvar(const wchar_t * name, obj & parent,const wchar_t * flags=L"");
 
         virtual blobvar & operator=(const blobvar & other);
         virtual blobvar & operator=(const value_t & other);
         virtual blobvar & operator=(const std::vector<unsigned char> & other);
         virtual blobvar & operator=(const common::pbuf & other);
+        virtual blobvar & operator=(const common::str & other);
         virtual const value_t & operator*() const;
         virtual const value_t & get() const;
         virtual unsigned int size();

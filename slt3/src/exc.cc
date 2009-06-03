@@ -36,78 +36,78 @@ namespace csl
 {
   namespace slt3
   {
-    const char * exc::reason_string(int rc)
+    const wchar_t * exc::reason_string(int rc)
     {
       switch( rc )
       {
-        case rs_notopened:       return "Not opened";
-        case rs_nullparam:       return "Param is null";
-        case rs_nulltran:        return "Tran is null";
-        case rs_nullconn:        return "Conn is null";
-        case rs_nulldb:          return "DB is null";
-        case rs_nullstmnt:       return "Statement is null";
-        case rs_transaction_already_started: return "Transaction already started";
-        case rs_internal:        return "Internal error";
-        case rs_permission:      return "Permission denied";
-        case rs_abort:           return "Abort";
-        case rs_busy:            return "Busy";
-        case rs_locked:          return "Locked";
-        case rs_nomem:           return "No mem";
-        case rs_readonly:        return "Readonly";
-        case rs_ioerr:           return "I/O error";
-        case rs_corrupt:         return "Corrupt database";
-        case rs_notfound:        return "Not found";
-        case rs_cantopen:        return "Cannot open";
-        case rs_full:            return "Full";
-        case rs_protocol:        return "Protocol error";
-        case rs_empty:           return "Empty";
-        case rs_schema:          return "Schema";
-        case rs_toobig:          return "Too big";
-        case rs_constraint:      return "Constraint violation";
-        case rs_mismatch:        return "Mismatch";
-        case rs_misuse:          return "Misuse";
-        case rs_auth:            return "Auth";
-        case rs_format:          return "Format";
-        case rs_range:           return "Range";
-        case rs_notadb:          return "Not a DB";
-        case rs_cannot_reg:      return "Cannot register database";
+        case rs_notopened:       return L"Not opened";
+        case rs_nullparam:       return L"Param is null";
+        case rs_nulltran:        return L"Tran is null";
+        case rs_nullconn:        return L"Conn is null";
+        case rs_nulldb:          return L"DB is null";
+        case rs_nullstmnt:       return L"Statement is null";
+        case rs_transaction_already_started: return L"Transaction already started";
+        case rs_internal:        return L"Internal error";
+        case rs_permission:      return L"Permission denied";
+        case rs_abort:           return L"Abort";
+        case rs_busy:            return L"Busy";
+        case rs_locked:          return L"Locked";
+        case rs_nomem:           return L"No mem";
+        case rs_readonly:        return L"Readonly";
+        case rs_ioerr:           return L"I/O error";
+        case rs_corrupt:         return L"Corrupt database";
+        case rs_notfound:        return L"Not found";
+        case rs_cantopen:        return L"Cannot open";
+        case rs_full:            return L"Full";
+        case rs_protocol:        return L"Protocol error";
+        case rs_empty:           return L"Empty";
+        case rs_schema:          return L"Schema";
+        case rs_toobig:          return L"Too big";
+        case rs_constraint:      return L"Constraint violation";
+        case rs_mismatch:        return L"Mismatch";
+        case rs_misuse:          return L"Misuse";
+        case rs_auth:            return L"Auth";
+        case rs_format:          return L"Format";
+        case rs_range:           return L"Range";
+        case rs_notadb:          return L"Not a DB";
+        case rs_cannot_reg:      return L"Cannot register database";
         case rs_unknown:
-          default:               return "Unknown reason";
+          default:               return L"Unknown reason";
       };
-      return "unkonwn reason";
+      return L"unkonwn reason";
     }
 
-    const char * exc::component_string(int cm)
+    const wchar_t * exc::component_string(int cm)
     {
       switch( cm )
       {
-        case cm_conn:      return "slt3::conn";
-        case cm_tran:      return "slt3::tran";
-        case cm_synqry:    return "slt3::synqry";
-        case cm_param:     return "slt3::param";
-        case cm_reg:       return "slt3::reg";
+        case cm_conn:      return L"slt3::conn";
+        case cm_tran:      return L"slt3::tran";
+        case cm_synqry:    return L"slt3::synqry";
+        case cm_param:     return L"slt3::param";
+        case cm_reg:       return L"slt3::reg";
         case cm_unknown:
-        default:           return "unknown";
+        default:           return L"unknown";
       };
-      return "unknown component";
+      return L"unknown component";
     }
 
     void exc::to_string(common::str & res)
     {
-      common::str t("Exception");
+      common::str t(L"Exception");
       if( file_.size() > 0 && line_ > 0 )
       {
-        char tx[200];
-        SNPRINTF(tx,199,"(%s:%d): ",file_.c_str(),line_);
+        wchar_t tx[200];
+        SNPRINTF(tx,199,L"(%ls:%d): ",file_.c_str(),line_);
         t += tx;
       }
-      t += " [";
+      t += L" [";
       t += component_string(component_);
-      t += "] [";
+      t += L"] [";
       t += reason_string(reason_);
-      t += "] ";
+      t += L"] ";
       if( text_.size() > 0 ) t+= text_;
-      res.swap(t);
+      res = t;
     }
 
     exc::exc() : reason_(rs_unknown), component_(cm_unknown) {}

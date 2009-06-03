@@ -39,6 +39,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <assert.h>
 
 using namespace csl::slt3;
+using csl::common::str;
 
 /** @brief contains tests related to slt3::synqry */
 namespace test_synqry {
@@ -64,7 +65,7 @@ namespace test_synqry {
     tran t(c);
     synqry q(t);
     fprintf(stderr,"Error message should follow here:\n");
-    assert( q.execute("CREATE TABLE nothrow (i INT);") == false );
+    assert( q.execute(L"CREATE TABLE nothrow (i INT);") == false );
   }
 
   /** @test querying a database that was not opened w/ throwing exception */
@@ -77,7 +78,7 @@ namespace test_synqry {
     {
       tran t(c);
       synqry q(t);
-      assert( q.execute("CREATE TABLE nothrow (i INT);") == false );
+      assert( q.execute(L"CREATE TABLE nothrow (i INT);") == false );
     }
     catch( exc e )
     {
@@ -122,24 +123,24 @@ namespace test_synqry {
 
     assert( pa1.get_long() == pb1.get_long() );
     assert( pa1.get_double() == pb1.get_double() );
-    assert( common::str(pa1.get_string()) == pb1.get_string() );
+    assert( str(pa1.get_string()) == pb1.get_string() );
     assert( pb1.get_long() == 1ll );
     assert( pb1.get_double() == 1.0 );
-    assert( common::str(pb1.get_string()) == "1.0000000000" );
+    assert( str(pb1.get_string()) == "1.0000000000" );
 
     assert( pa2.get_long() == pb2.get_long() );
     assert( pa2.get_double() == pb2.get_double() );
-    assert( common::str(pa2.get_string()) == pb2.get_string() );
+    assert( str(pa2.get_string()) == pb2.get_string() );
     assert( pb2.get_long() == 10000ll );
     assert( pb2.get_double() == 10000.001 );
-    assert( common::str(pb2.get_string()) == "10000.001" );
+    assert( str(pb2.get_string()) == "10000.001" );
 
     assert( pa3.get_long() == pb3.get_long() );
     assert( pa3.get_double() == pb3.get_double() );
-    assert( common::str(pa3.get_string()) == pb3.get_string() );
+    assert( str(pa3.get_string()) == pb3.get_string() );
     assert( pb3.get_long() == 100ll );
     assert( pb3.get_double() == 100.0 );
-    assert( common::str(pb3.get_string()) == "100" );
+    assert( str(pb3.get_string()) == "100" );
 
     q.clear_params();
     param & pc1(q.get_param(1));
@@ -150,33 +151,33 @@ namespace test_synqry {
   void stepw_noret_noaut()
   {
     conn c;
-    assert( c.open("test.db") == true );
+    assert( c.open(L"test.db") == true );
     try
     {
       tran t(c);
       synqry q(t);
       q.autoreset_data(false);
-      assert( q.execute("CREATE TABLE stepw_noret_noaut (o string);") == true );
+      assert( q.execute(L"CREATE TABLE stepw_noret_noaut (o string);") == true );
       param & p(q.get_param(1));
-      assert( q.prepare("INSERT INTO stepw_noret_noaut (o) VALUES (?);") == true );
+      assert( q.prepare(L"INSERT INTO stepw_noret_noaut (o) VALUES (?);") == true );
       for( unsigned int i=0;i<100;++i )
       {
-        p.set("Hello world");
+        p.set(L"Hello world");
         assert( q.next() == false );
         assert( q.reset() == true );
         assert( q.last_insert_id() > i );
         assert( q.change_count() == 1 );
         assert( q.change_count() == c.change_count() );
       }
-      assert( q.execute("DELETE FROM stepw_noret_noaut;") == true );
+      assert( q.execute(L"DELETE FROM stepw_noret_noaut;") == true );
       assert( q.change_count() == 100 );
       assert( c.change_count() == 100 );
-      assert( q.execute("DROP TABLE stepw_noret_noaut;") == true );
+      assert( q.execute(L"DROP TABLE stepw_noret_noaut;") == true );
     }
     catch(exc e)
     {
-      common::str s; e.to_string(s);
-      fprintf(stderr,"ERROR: %s\n",s.c_str());
+      str s; e.to_string(s);
+      FPRINTF(stderr,L"ERROR: %sl\n",s.c_str());
     }
   }
 
@@ -184,28 +185,28 @@ namespace test_synqry {
   void stepw_noret_aut()
   {
     conn c;
-    assert( c.open("test.db") == true );
+    assert( c.open(L"test.db") == true );
     try
     {
       tran t(c);
       synqry q(t);
       q.autoreset_data(true);
-      assert( q.execute("CREATE TABLE stepw_noret_aut (o string);") == true );
+      assert( q.execute(L"CREATE TABLE stepw_noret_aut (o string);") == true );
       param & p(q.get_param(1));
-      assert( q.prepare("INSERT INTO stepw_noret_aut (o) VALUES (?);") == true );
+      assert( q.prepare(L"INSERT INTO stepw_noret_aut (o) VALUES (?);") == true );
       for( unsigned int i=0;i<100;++i )
       {
-        p.set("Hello world");
+        p.set(L"Hello world");
         assert( q.next() == false );
         assert( q.reset() == true );
         assert( q.last_insert_id() > i );
       }
-      assert( q.execute("DROP TABLE stepw_noret_aut;") == true );
+      assert( q.execute(L"DROP TABLE stepw_noret_aut;") == true );
     }
     catch(exc e)
     {
-      common::str s; e.to_string(s);
-      fprintf(stderr,"ERROR: %s\n",s.c_str());
+      str s; e.to_string(s);
+      FPRINTF(stderr,L"ERROR: %sl\n",s.c_str());
     }
   }
 
@@ -213,36 +214,36 @@ namespace test_synqry {
   void stepw_ret_noaut()
   {
     conn c;
-    assert( c.open("test.db") == true );
+    assert( c.open(L"test.db") == true );
     try
     {
       tran t(c);
       synqry q(t);
       q.autoreset_data(false);
-      assert( q.execute("CREATE TABLE stepw_ret_noaut (o string);") == true );
-      assert( q.execute("INSERT INTO stepw_ret_noaut (o) VALUES ('Hello');") == true );
+      assert( q.execute(L"CREATE TABLE stepw_ret_noaut (o string);") == true );
+      assert( q.execute(L"INSERT INTO stepw_ret_noaut (o) VALUES ('Hello');") == true );
 
       param & p(q.get_param(1));
-      assert( q.prepare("SELECT o FROM stepw_ret_noaut WHERE o=?;") == true );
+      assert( q.prepare(L"SELECT o FROM stepw_ret_noaut WHERE o=?;") == true );
 
       synqry::columns_t ch;
       synqry::fields_t  fd;
 
       for( unsigned int i=0;i<100;++i )
       {
-        p.set("Hello");
+        p.set(L"Hello");
         assert( q.next(ch,fd) == true );
         assert( q.reset() == true );
-        assert( common::str("Hello") == fd.get_at(0)->stringval_ );
+        assert( str("Hello") == fd.get_at(0)->stringval_ );
         assert( fd.get_at(0)->size_ == 5 );
       }
 
-      assert( q.execute("DROP TABLE stepw_ret_noaut;") == true );
+      assert( q.execute(L"DROP TABLE stepw_ret_noaut;") == true );
     }
     catch(exc e)
     {
-      common::str s; e.to_string(s);
-      fprintf(stderr,"ERROR: %s\n",s.c_str());
+      str s; e.to_string(s);
+      FPRINTF(stderr,L"ERROR: %sl\n",s.c_str());
     }
   }
 
@@ -250,18 +251,18 @@ namespace test_synqry {
   void stepw_ret_aut()
   {
     conn c;
-    assert( c.open("test.db") == true );
+    assert( c.open(L"test.db") == true );
     try
     {
       tran t(c);
       synqry q(t);
       q.autoreset_data(true);
-      assert( q.execute("CREATE TABLE stepw_ret_aut (o string);") == true );
-      assert( q.execute("INSERT INTO stepw_ret_aut (o) VALUES ('Hello');") == true );
+      assert( q.execute(L"CREATE TABLE stepw_ret_aut (o string);") == true );
+      assert( q.execute(L"INSERT INTO stepw_ret_aut (o) VALUES ('Hello');") == true );
       assert( q.last_insert_id() > 0 );
 
       param & p(q.get_param(1));
-      assert( q.prepare("SELECT o FROM stepw_ret_aut WHERE o=?;") == true );
+      assert( q.prepare(L"SELECT o FROM stepw_ret_aut WHERE o=?;") == true );
 
       synqry::columns_t ch;
       synqry::fields_t  fd;
@@ -271,16 +272,16 @@ namespace test_synqry {
         p.set("Hello");
         assert( q.next(ch,fd) == true );
         assert( q.reset() == true );
-        assert( common::str("Hello") == fd.get_at(0)->stringval_ );
+        assert( str("Hello") == fd.get_at(0)->stringval_ );
         assert( fd.get_at(0)->size_ == 5 );
       }
 
-      assert( q.execute("DROP TABLE stepw_ret_aut;") == true );
+      assert( q.execute(L"DROP TABLE stepw_ret_aut;") == true );
     }
     catch(exc e)
     {
-      common::str s; e.to_string(s);
-      fprintf(stderr,"ERROR: %s\n",s.c_str());
+      str s; e.to_string(s);
+      FPRINTF(stderr,L"ERROR: %sl\n",s.c_str());
     }
   }
 
@@ -288,21 +289,21 @@ namespace test_synqry {
   void onesht_noret_noaut()
   {
     conn c;
-    assert( c.open("test.db") == true );
+    assert( c.open(L"test.db") == true );
     try
     {
       tran t(c);
       synqry q(t);
       q.autoreset_data(false);
-      assert( q.execute("CREATE TABLE onesht_noret_noaut (o string);") == true );
-      assert( q.execute("INSERT INTO onesht_noret_noaut (o) VALUES ('Hello');") == true );
-      assert( q.execute("SELECT o FROM onesht_noret_noaut WHERE o='Hello';") == true );
-      assert( q.execute("DROP TABLE onesht_noret_noaut;") == true );
+      assert( q.execute(L"CREATE TABLE onesht_noret_noaut (o string);") == true );
+      assert( q.execute(L"INSERT INTO onesht_noret_noaut (o) VALUES ('Hello');") == true );
+      assert( q.execute(L"SELECT o FROM onesht_noret_noaut WHERE o='Hello';") == true );
+      assert( q.execute(L"DROP TABLE onesht_noret_noaut;") == true );
     }
     catch(exc e)
     {
-      common::str s; e.to_string(s);
-      fprintf(stderr,"ERROR: %s\n",s.c_str());
+      str s; e.to_string(s);
+      FPRINTF(stderr,L"ERROR: %sl\n",s.c_str());
     }
   }
 
@@ -310,21 +311,21 @@ namespace test_synqry {
   void onesht_noret_aut()
   {
     conn c;
-    assert( c.open("test.db") == true );
+    assert( c.open(L"test.db") == true );
     try
     {
       tran t(c);
       synqry q(t);
       q.autoreset_data(true);
-      assert( q.execute("CREATE TABLE onesht_noret_aut (o string);") == true );
-      assert( q.execute("INSERT INTO onesht_noret_aut (o) VALUES ('Hello');") == true );
-      assert( q.execute("SELECT o FROM onesht_noret_aut WHERE o='Hello';") == true );
-      assert( q.execute("DROP TABLE onesht_noret_aut;") == true );
+      assert( q.execute(L"CREATE TABLE onesht_noret_aut (o string);") == true );
+      assert( q.execute(L"INSERT INTO onesht_noret_aut (o) VALUES ('Hello');") == true );
+      assert( q.execute(L"SELECT o FROM onesht_noret_aut WHERE o='Hello';") == true );
+      assert( q.execute(L"DROP TABLE onesht_noret_aut;") == true );
     }
     catch(exc e)
     {
-      common::str s; e.to_string(s);
-      fprintf(stderr,"ERROR: %s\n",s.c_str());
+      str s; e.to_string(s);
+      FPRINTF(stderr,L"ERROR: %sl\n",s.c_str());
     }
   }
 
@@ -332,23 +333,23 @@ namespace test_synqry {
   void onesht_ret_noaut()
   {
     conn c;
-    assert( c.open("test.db") == true );
+    assert( c.open(L"test.db") == true );
     try
     {
       tran t(c);
       synqry q(t);
       q.autoreset_data(false);
-      assert( q.execute("CREATE TABLE onesht_ret_noaut (o string);") == true );
-      assert( q.execute("INSERT INTO onesht_ret_noaut (o) VALUES ('Hello');") == true );
-      common::str s;
-      assert( q.execute("SELECT o FROM onesht_ret_noaut WHERE o='Hello';",s) == true );
+      assert( q.execute(L"CREATE TABLE onesht_ret_noaut (o string);") == true );
+      assert( q.execute(L"INSERT INTO onesht_ret_noaut (o) VALUES ('Hello');") == true );
+      str s;
+      assert( q.execute(L"SELECT o FROM onesht_ret_noaut WHERE o='Hello';",s) == true );
       assert( s == "Hello" );
-      assert( q.execute("DROP TABLE onesht_ret_noaut;") == true );
+      assert( q.execute(L"DROP TABLE onesht_ret_noaut;") == true );
     }
     catch(exc e)
     {
-      common::str s; e.to_string(s);
-      fprintf(stderr,"ERROR: %s\n",s.c_str());
+      str s; e.to_string(s);
+      FPRINTF(stderr,L"ERROR: %sl\n",s.c_str());
     }
   }
 
@@ -356,23 +357,23 @@ namespace test_synqry {
   void onesht_ret_aut()
   {
     conn c;
-    assert( c.open("test.db") == true );
+    assert( c.open(L"test.db") == true );
     try
     {
       tran t(c);
       synqry q(t);
       q.autoreset_data(true);
-      assert( q.execute("CREATE TABLE onesht_ret_aut (o string);") == true );
-      assert( q.execute("INSERT INTO onesht_ret_aut (o) VALUES ('Hello');") == true );
-      common::str s;
-      assert( q.execute("SELECT o FROM onesht_ret_aut WHERE o='Hello';",s) == true );
+      assert( q.execute(L"CREATE TABLE onesht_ret_aut (o string);") == true );
+      assert( q.execute(L"INSERT INTO onesht_ret_aut (o) VALUES ('Hello');") == true );
+      str s;
+      assert( q.execute(L"SELECT o FROM onesht_ret_aut WHERE o='Hello';",s) == true );
       assert( s == "Hello" );
-      assert( q.execute("DROP TABLE onesht_ret_aut;") == true );
+      assert( q.execute(L"DROP TABLE onesht_ret_aut;") == true );
     }
     catch(exc e)
     {
-      common::str s; e.to_string(s);
-      fprintf(stderr,"ERROR: %s\n",s.c_str());
+      str s; e.to_string(s);
+      FPRINTF(stderr,L"ERROR: %sl\n",s.c_str());
     }
   }
 
@@ -384,9 +385,9 @@ namespace test_synqry {
   {
     tran t(*perf_conn_);
     synqry q(t);
-    assert( q.execute("INSERT INTO perftest (i) VALUES(1);") == true );
+    assert( q.execute(L"INSERT INTO perftest (i) VALUES(1);") == true );
     assert( q.last_insert_id() > 0 );
-    assert( q.execute("DELETE FROM perftest WHERE i=1;") == true );
+    assert( q.execute(L"DELETE FROM perftest WHERE i=1;") == true );
   }
 
   /** @test insert and delete double */
@@ -394,9 +395,9 @@ namespace test_synqry {
   {
     tran t(*perf_conn_);
     synqry q(t);
-    assert( q.execute("INSERT INTO perftest (d) VALUES('3.14123');") == true );
+    assert( q.execute(L"INSERT INTO perftest (d) VALUES('3.14123');") == true );
     assert( q.last_insert_id() > 0 );
-    assert( q.execute("DELETE FROM perftest WHERE d='3.14123';") == true );
+    assert( q.execute(L"DELETE FROM perftest WHERE d='3.14123';") == true );
   }
 
   /** @test insert and delete string */
@@ -404,9 +405,9 @@ namespace test_synqry {
   {
     tran t(*perf_conn_);
     synqry q(t);
-    assert( q.execute("INSERT INTO perftest (s) VALUES('3.14123');") == true );
+    assert( q.execute(L"INSERT INTO perftest (s) VALUES('3.14123');") == true );
     assert( q.last_insert_id() > 0 );
-    assert( q.execute("DELETE FROM perftest WHERE s='3.14123';") == true );
+    assert( q.execute(L"DELETE FROM perftest WHERE s='3.14123';") == true );
   }
 
   /** @test insert and delete blob */
@@ -414,18 +415,18 @@ namespace test_synqry {
   {
     tran t(*perf_conn_);
     synqry q(t);
-    assert( q.execute("INSERT INTO perftest (b) VALUES('3.14123');") == true );
+    assert( q.execute(L"INSERT INTO perftest (b) VALUES('3.14123');") == true );
     assert( q.last_insert_id() > 0 );
-    assert( q.execute("DELETE FROM perftest WHERE b='3.14123';") == true );
+    assert( q.execute(L"DELETE FROM perftest WHERE b='3.14123';") == true );
   }
 
   /** @test insert and delete integer */
   void insdel_int_notran()
   {
     synqry q(*perf_tran_);
-    assert( q.execute("INSERT INTO perftest (i) VALUES(1);") == true );
+    assert( q.execute(L"INSERT INTO perftest (i) VALUES(1);") == true );
     assert( q.last_insert_id() > 0 );
-    assert( q.execute("DELETE FROM perftest WHERE i=1;") == true );
+    assert( q.execute(L"DELETE FROM perftest WHERE i=1;") == true );
   }
 
 } // end of test_synqry
@@ -456,10 +457,10 @@ int main()
   {
     conn c;
     perf_conn_ = &c;
-    assert( c.open("test2.db") == true );
+    assert( c.open(L"test2.db") == true );
     {
       tran t(c); synqry q(t);
-      assert( q.execute("CREATE TABLE perftest (i int, d real, s string, b blob);") == true );
+      assert( q.execute(L"CREATE TABLE perftest (i int, d real, s string, b blob);") == true );
     }
     csl_common_print_results( "ins_del_int        ", csl_common_test_timer_v0(ins_del_int),"" );
     csl_common_print_results( "ins_del_double     ", csl_common_test_timer_v0(ins_del_double),"" );

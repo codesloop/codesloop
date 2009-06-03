@@ -43,6 +43,7 @@ namespace csl
         case rs_invalid_param:   return L"Invalid parameter received.";
         case rs_start_error:     return L"Cannot start thread.";
         case rs_stop_error:      return L"Cannot stop thread.";
+        case rs_not_implemented: return L"Function is not implemented.";
         case rs_unknown:
           default:               return L"Unknown reason";
       };
@@ -53,6 +54,10 @@ namespace csl
       switch( cm )
       {
         case cm_thrpool:   return L"nthread::thrpool";
+        case cm_event:     return L"nthread::event";
+        case cm_thread:    return L"nthread::thread";
+        case cm_pevent:    return L"nthread::pevent";
+        case cm_mutex:     return L"nthread::mutex";
         case cm_unknown:
           default:         return L"unknown component";
       };

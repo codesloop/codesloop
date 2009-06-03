@@ -28,10 +28,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   @brief basic slt3 demonstration using exceptions
  */
 
+#include "str.hh"
 #include "csl_slt3.hh"
-#include <stdio.h>
+#include "common.h"
 
 using namespace csl::slt3;
+using namespace csl::common;
 
 int main()
 {
@@ -39,7 +41,7 @@ int main()
 
   try
   {
-    c.open("testme.db");
+    c.open(L"testme.db");
 
     /* start a transaction */
     tran t(c);
@@ -47,14 +49,14 @@ int main()
     /* create a query object */
     synqry q(t);
 
-    q.execute("create table test(i int);");
+    q.execute(L"create table test(i int);");
   }
   catch( exc e )
   {
-    common::str s;
+    str s;
     e.to_string(s);
 
-    fprintf(stderr,"Exception caught: %s\n",s.c_str());
+    FPRINTF(stderr,L"Exception caught: %sl\n",s.c_str());
   }
 
   return 0;

@@ -53,7 +53,7 @@ namespace csl
     }
 
     // initalize to default logfile
-    tbuf<256> logger::logfile_ = CSL_LOGFILE;
+    std::string logger::logfile_ = CSL_LOGFILE;
 #if DEBUG
     str logger::class_to_trace_= ( getenv(CSL_TRACE_SCOPE) == NULL ?
                                         L"all" : wgetenv(CSL_TRACE_SCOPE) );
@@ -95,7 +95,7 @@ namespace csl
         strftime( szDateBuf, sizeof(szDateBuf), "%b %d %H:%M:%S", localtime( &ostime ) );
 
         // append line-by-line
-        std::fstream fs_log ( (const char *)logfile_.data(), std::ios_base::out | std::ios_base::app );
+        std::fstream fs_log ( logfile_.c_str(), std::ios_base::out | std::ios_base::app );
 
         // print header + string like: [2006-12-24 23:59] DEBUG: hello world!
         fs_log << szDateBuf 

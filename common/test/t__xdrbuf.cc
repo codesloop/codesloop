@@ -96,8 +96,8 @@ namespace test_xdrbuf {
     pbuf pb;
     xdrbuf xb(pb);
 
-    xb << "Hello World";
-    common::str hw;
+    xb << L"Hello World";
+    str hw;
 
     xb.rewind();
 
@@ -138,15 +138,15 @@ namespace test_xdrbuf {
       /* add invalid pointer */
       xx << (char *)0;
 
-      common::str zz;
+      str zz;
 
       xx >> zz;
     }
     catch( csl::common::exc e )
     {
-      common::str es;
+      str es;
       e.to_string(es);
-      fprintf(stderr,"Exception caught: %s\n",es.c_str());
+      FPRINTF(stderr,L"Exception caught: %sl\n",es.c_str());
       caught = true;
     }
     /* this should not throw an exception, will add as zero length string */
@@ -288,7 +288,7 @@ namespace test_xdrbuf {
 
       while( true )
       {
-        common::str i;
+        str i;
         xb >> i;
       };
     }
@@ -318,7 +318,7 @@ namespace test_xdrbuf {
 
       while( true )
       {
-        common::str i;
+        str i;
         xb >> i;
       };
     }

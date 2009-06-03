@@ -46,16 +46,16 @@ namespace csl
     {
       public:
         static reg & instance();
-        static reg & instance(const char * path);
+        static reg & instance(const wchar_t * path);
         static reg & instance(const common::str & path);
 
         class helper
         {
           public:
-            helper(const char * default_db_name, const char * default_db_path);
+            helper(const wchar_t * default_db_name, const wchar_t * default_db_path);
 
-            const char * name() { return name_.c_str(); }
-            const char * path();
+            const wchar_t * name() { return name_.c_str(); }
+            const wchar_t * path();
             conn & db();
 
             virtual ~helper() {}
@@ -73,18 +73,18 @@ namespace csl
 
         struct item
         {
-          long long    id_;
-          char *       name_;
-          char *       path_;
+          long long       id_;
+          wchar_t *       name_;
+          wchar_t *       path_;
         };
 
-        typedef common::pvlist< 64,char,common::nop_destructor<char> > strlist_t;
+        typedef common::pvlist< 64,wchar_t,common::nop_destructor<wchar_t> > strlist_t;
         typedef common::pvlist< 64,item,common::nop_destructor<item> > itemlist_t;
         typedef common::mpool<> pool_t;
 
-        bool get( const char * name, conn & c );
+        bool get( const wchar_t * name, conn & c );
         bool get( const common::str & name, conn & c );
-        bool get( const char * name, item & i, pool_t & pool );
+        bool get( const wchar_t * name, item & i, pool_t & pool );
         bool get( const common::str & name, item & i, pool_t & pool );
 
         bool set( const item & it );

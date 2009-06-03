@@ -118,7 +118,6 @@ namespace csl
         */
         bool gen_sha1hex_shared_key(const bignum & peer_private_key, common::str & shared_key) const;
 
-
         /**
         @brief generates the shared key based on the internal public key and the given private_key
         @param peer_private_key is the private key
@@ -156,9 +155,9 @@ namespace csl
         /** @brief compares for equality */
         inline bool operator==(const ecdh_key & other) const
         {
-          if( algname_ != other.algname_ ) return false;
-          if( !(x_ == other.x_) )          return false;
-          if( !(y_ == other.y_) )          return false;
+          if( !(algname_ == other.algname_) ) return false;
+          if( !(x_ == other.x_) )             return false;
+          if( !(y_ == other.y_) )             return false;
           return true;
         }
 

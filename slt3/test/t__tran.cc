@@ -38,6 +38,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <assert.h>
 
 using namespace csl::slt3;
+using csl::common::str;
 
 /** @brief contains tests related to slt3::tran */
 namespace test_tran {
@@ -57,23 +58,23 @@ namespace test_tran {
   {
     conn c;
     c.use_exc(false);
-    assert(c.open("test.db") == true );
+    assert(c.open(L"test.db") == true );
     {
       tran t(c);
       synqry q(t);
-      assert( q.execute("CREATE TABLE t(i INT);") == true );
-      assert( q.execute("INSERT INTO t VALUES(1);") == true );
+      assert( q.execute(L"CREATE TABLE t(i INT);") == true );
+      assert( q.execute(L"INSERT INTO t VALUES(1);") == true );
       t.commit();
     }
     assert( c.close() == true );
-    assert(c.open("test.db") == true );
+    assert(c.open(L"test.db") == true );
     {
       tran t(c);
       synqry q(t);
-      common::str s;
-      assert( q.execute("SELECT SUM(i) FROM T;",s) == true );
+      str s;
+      assert( q.execute(L"SELECT SUM(i) FROM T;",s) == true );
       assert( s == "1" );
-      assert( q.execute("DROP TABLE T;",s) == true );
+      assert( q.execute(L"DROP TABLE T;",s) == true );
       t.commit();
     }
   }
@@ -83,30 +84,30 @@ namespace test_tran {
   {
     conn c;
     c.use_exc(false);
-    assert(c.open("test.db") == true );
+    assert(c.open(L"test.db") == true );
     {
       tran t(c);
       t.commit_on_destruct(true);
       synqry q(t);
-      assert( q.execute("CREATE TABLE t(i INT);") == true );
-      assert( q.execute("INSERT INTO t VALUES(1);") == true );
+      assert( q.execute(L"CREATE TABLE t(i INT);") == true );
+      assert( q.execute(L"INSERT INTO t VALUES(1);") == true );
     }
     {
       tran t(c);
       t.commit_on_destruct(false);
       synqry q(t);
-      assert( q.execute("INSERT INTO t VALUES(3);") == true );
+      assert( q.execute(L"INSERT INTO t VALUES(3);") == true );
     }
     assert( c.close() == true );
-    assert(c.open("test.db") == true );
+    assert(c.open(L"test.db") == true );
     {
       tran t(c);
       t.commit_on_destruct(true);
       synqry q(t);
-      common::str s;
-      assert( q.execute("SELECT SUM(i) FROM T;",s) == true );
+      str s;
+      assert( q.execute(L"SELECT SUM(i) FROM T;",s) == true );
       assert( s == "1" );
-      assert( q.execute("DROP TABLE T;",s) == true );
+      assert( q.execute(L"DROP TABLE T;",s) == true );
     }
   }
 
@@ -116,22 +117,22 @@ namespace test_tran {
     conn c;
     c.use_exc(true);
     bool caught = false;
-    assert(c.open("test.db") == true );
+    assert(c.open(L"test.db") == true );
     {
       tran t(c);
       synqry q(t);
-      assert( q.execute("CREATE TABLE t(i INT);") == true );
-      assert( q.execute("INSERT INTO t VALUES(1);") == true );
+      assert( q.execute(L"CREATE TABLE t(i INT);") == true );
+      assert( q.execute(L"INSERT INTO t VALUES(1);") == true );
       t.rollback();
     }
     assert( c.close() == true );
-    assert( c.open("test.db") == true );
+    assert( c.open(L"test.db") == true );
     try
     {
       tran t(c);
       synqry q(t);
-      common::str s;
-      assert( q.execute("SELECT SUM(i) FROM T;",s) == true );
+      str s;
+      assert( q.execute(L"SELECT SUM(i) FROM T;",s) == true );
       assert( s == "1" );
     }
     catch( exc e )
@@ -147,23 +148,23 @@ namespace test_tran {
     conn c;
     c.use_exc(true);
     bool caught = false;
-    assert(c.open("test.db") == true );
+    assert(c.open(L"test.db") == true );
     {
       tran t(c);
       t.rollback_on_destruct(true);
       synqry q(t);
-      assert( q.execute("CREATE TABLE t(i INT);") == true );
-      assert( q.execute("INSERT INTO t VALUES(1);") == true );
+      assert( q.execute(L"CREATE TABLE t(i INT);") == true );
+      assert( q.execute(L"INSERT INTO t VALUES(1);") == true );
     }
     assert( c.close() == true );
-    assert( c.open("test.db") == true );
+    assert( c.open(L"test.db") == true );
     try
     {
       tran t(c);
       t.rollback_on_destruct(false);
       synqry q(t);
-      common::str s;
-      assert( q.execute("SELECT SUM(i) FROM T;",s) == true );
+      str s;
+      assert( q.execute(L"SELECT SUM(i) FROM T;",s) == true );
       assert( s == "1" );
     }
     catch( exc e )

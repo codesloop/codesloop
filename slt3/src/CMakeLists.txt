@@ -53,6 +53,8 @@ ENDIF(NOT WIN32)
 ADD_LIBRARY( csl_slt3 STATIC
              sqlite3.c
              _shared_impl.cc _shared_impl.hh
+             sql.cc     sql.hh
+             var.cc     var.hh
              exc.cc     exc.hh
              reg.cc     reg.hh
              conn.cc    conn.hh
@@ -60,7 +62,6 @@ ADD_LIBRARY( csl_slt3 STATIC
              synqry.cc  synqry.hh
              param.cc   param.hh
              obj.cc     obj.hh
-             var.cc     var.hh
-             sql.cc     sql.hh )
+           )
 
 # -- EOF --

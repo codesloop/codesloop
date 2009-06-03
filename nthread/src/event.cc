@@ -23,6 +23,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "exc.hh"
 #include "event.hh"
 #include "common.h"
 #include "str.hh"
@@ -82,7 +83,7 @@ namespace csl
 
     // no-copy
     event::event(const event & other) 
-      : impl_((impl *)0) {throw common::str("should never be called"); }
+      : impl_((impl *)0) { throw nthread::exc(exc::rs_not_implemented,exc::cm_event); }
 
     event & event::operator=(const event & other) { return *this; }
   }

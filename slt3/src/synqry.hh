@@ -90,11 +90,11 @@ namespace csl
             t_blob       ///<blob column
           };
           //
-          int    type_;    ///<the column type: t_null,t_integer,t_double,t_string or t_blob
-          char * name_;    ///<the column name as given in the SQL query
-          char * table_;   ///<the table name
-          char * db_;      ///<the db name
-          char * origin_;  ///<the original column name
+          int       type_;    ///<the column type: t_null,t_integer,t_double,t_string or t_blob
+          wchar_t * name_;    ///<the column name as given in the SQL query
+          wchar_t * table_;   ///<the table name
+          wchar_t * db_;      ///<the db name
+          wchar_t * origin_;  ///<the original column name
           //
           colhead() : type_(t_null), name_(0), table_(0), db_(0), origin_(0) {}
 
@@ -114,7 +114,7 @@ namespace csl
           union {
             long long         intval_;    ///<the 64 bit integer value
             double            doubleval_; ///<the 8 byte double precision value
-            char *            stringval_; ///<the string value
+            wchar_t *         stringval_; ///<the string value
             unsigned char *   blobval_;   ///<pointer to the blob data
           };
           unsigned int size_; ///<the size of the returned value
@@ -147,7 +147,7 @@ namespace csl
             @param sql is the query to be prepared
             @return true if successful
             @throw slt3::exc on error */
-        bool prepare(const char * sql);
+        bool prepare(const wchar_t * sql);
 
         /** @brief resets an iterative query
             @return true if successful
@@ -221,7 +221,7 @@ namespace csl
             @throw slt3::exc
             @note that no parameters are used even if given before or the query itself is a
             parametrized query. for those queries use prepare() and next() */
-        bool execute(const char * sql);
+        bool execute(const wchar_t * sql);
 
         /** @brief executes a onestep query with returning a single string
             @param sql is the query to be executed
@@ -233,7 +233,7 @@ namespace csl
             if there are return values of the execute query, only the first column of the
             first row is returned in the result reference. for returning more than one row
             or column use the prepare(), next() interface instead. */
-        bool execute(const char * sql, common::str & result);
+        bool execute(const wchar_t * sql, common::str & result);
 
         void debug();
 

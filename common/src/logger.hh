@@ -33,8 +33,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "str.hh"
-#include "tbuf.hh"
 #ifdef __cplusplus
+#include <string>
 
 // default logfile
 #define CSL_LOGFILE        "csl.log"
@@ -53,7 +53,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if __GCC__ || __GNUC__
 #define STORE_FUNC_NAME()  \
-  csl::common::str __function_name = csl::common::tbuf<256>(__PRETTY_FUNCTION__);             \
+  csl::common::str __function_name = csl::common::str(__PRETTY_FUNCTION__);             \
   csl::common::str __class_name;                                                   \
   __function_name = __function_name.substr( 0, __function_name.find(L'('));    \
   __function_name = __function_name.substr( (__function_name.rfind(L' ') ==    \
@@ -194,7 +194,7 @@ namespace csl {
         }
 
         private:
-        static tbuf<256>     logfile_;
+        static std::string   logfile_;
 #ifdef DEBUG
         public:
         static bool          enable_trace_;

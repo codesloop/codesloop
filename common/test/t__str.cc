@@ -34,12 +34,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "exc.hh"
 #include "common.h"
 #include "str.hh"
-<<<<<<< HEAD:common/test/t__str.cc
-=======
 #include "test_timer.h"
-#include <stdlib.h>
-#include <string.h>
->>>>>>> 2b5366b84cf8c5afeac93cc1910e52b792b8cc3f:common/test/t__str.cc
 #include <assert.h>
 #include <sys/stat.h>
 

@@ -41,21 +41,21 @@ namespace csl
       int find_by_fields_initializer_[5] = { -1, -1, -1, -1, -1 };
     }
 
-    sql::helper::helper(const char * tablename) : table_name_(tablename), done_(false)
+    sql::helper::helper(const wchar_t * tablename) : table_name_(tablename), done_(false)
     {
       ::memcpy( find_by_fields_ ,find_by_fields_initializer_,sizeof(find_by_fields_initializer_));
     }
 
-    bool sql::helper::add_field(const char * name,const char * typ, const char * flags)
+    bool sql::helper::add_field(const wchar_t * name,const wchar_t * typ, const wchar_t * flags)
     {
-      if( done_ || !name || ::strlen(name) == 0 || typ == 0 || ::strlen(typ) == 0 ) return false;
+      if( done_ || !name || ::wcslen(name) == 0 || typ == 0 || ::wcslen(typ) == 0 ) return false;
 
       fieldlist_t::iterator it(fields_.begin());
       fieldlist_t::iterator end(fields_.end());
 
       for( ;it!=end;++it )
       {
-        if( ::strcmp(name,(*it)->name_) == 0 )
+        if( ::wcscmp(name,(*it)->name_) == 0 )
         {
           done_ = true;
           return false;
@@ -66,11 +66,11 @@ namespace csl
       return true;
     }
 
-    const char * sql::helper::init_sql()
+    const wchar_t * sql::helper::init_sql()
     {
-      if( init_sql_.size() > 0 ) { return (const char *)init_sql_.data(); }
+      if( init_sql_.size() > 0 ) { return (const wchar_t *)init_sql_.data(); }
       common::pbuf pb;
-      pb << "CREATE TABLE IF NOT EXISTS " << table_name_ << " ( ";
+      pb << L"CREATE TABLE IF NOT EXISTS " << table_name_ << L" ( ";
 
       fieldlist_t::iterator it(fields_.begin());
       fieldlist_t::iterator end(fields_.end());
@@ -79,21 +79,21 @@ namespace csl
 
       for( ;it!=end;++it )
       {
-        if( i ) pb << " , ";
-        pb << (*it)->name_ << " " << (*it)->type_ << " ";
-        if( ::strlen((*it)->flags_) > 0 ) pb << (*it)->flags_;
+        if( i ) pb << L" , ";
+        pb << (*it)->name_ << L" " << (*it)->type_ << L" ";
+        if( ::wcslen((*it)->flags_) > 0 ) pb << (*it)->flags_;
         ++i;
       }
-      pb.append((const unsigned char *)" );\0",4);
+      pb.append((const unsigned char *)L" );\0",wcslen(L" );")+1);
       pb.copy_to( (unsigned char *)init_sql_.allocate(pb.size()) );
-      return (const char *)init_sql_.data();
+      return (const wchar_t *)init_sql_.data();
     }
 
-    const char * sql::helper::create_sql()
+    const wchar_t * sql::helper::create_sql()
     {
-      if( create_sql_.size() > 0 ) { return (const char *)create_sql_.data(); }
+      if( create_sql_.size() > 0 ) { return (const wchar_t *)create_sql_.data(); }
       common::pbuf pb;
-      pb << "INSERT INTO " << table_name_ << " ( ";
+      pb << L"INSERT INTO " << table_name_ << L" ( ";
 
       fieldlist_t::iterator it(fields_.begin());
       fieldlist_t::iterator end(fields_.end());
@@ -105,30 +105,30 @@ namespace csl
         if( i == 0 ) {}
         else
         {
-          if( i > 1 )  pb << ",";
+          if( i > 1 )  pb << L",";
           pb << (*it)->name_;
         }
         ++i;
       }
-      pb << " ) VALUES ( ";
+      pb << L" ) VALUES ( ";
 
       for( unsigned int j=1;j<i;++j )
       {
-        if( j>1 ) pb << ",";
-        pb << "?";
+        if( j>1 ) pb << L",";
+        pb << L"?";
       }
 
       pb.append((const unsigned char *)" );\0",4);
       pb.copy_to( (unsigned char *)create_sql_.allocate(pb.size()) );
-      return (const char *)create_sql_.data();
+      return (const wchar_t *)create_sql_.data();
     }
 
-    const char * sql::helper::save_sql()
+    const wchar_t * sql::helper::save_sql()
     {
-      if( save_sql_.size() > 0 ) { return (const char *)save_sql_.data(); }
+      if( save_sql_.size() > 0 ) { return (const wchar_t *)save_sql_.data(); }
       common::pbuf pb;
 
-      pb << "UPDATE " << table_name_ << " SET ";
+      pb << L"UPDATE " << table_name_ << L" SET ";
 
       fieldlist_t::iterator it(fields_.begin());
       fieldlist_t::iterator end(fields_.end());
@@ -140,8 +140,8 @@ namespace csl
         if( i == 0 ) {}
         else
         {
-          if( i > 1 )  pb << ", ";
-          pb << (*it)->name_ << "=? ";
+          if( i > 1 )  pb << L", ";
+          pb << (*it)->name_ << L"=? ";
         }
         ++i;
       }
@@ -149,32 +149,32 @@ namespace csl
       if( i > 0 )
       {
         it = fields_.begin();
-        pb << " WHERE " << (*it)->name_ << "=? ;";
+        pb << L" WHERE " << (*it)->name_ << L"=? ;";
       }
 
       pb.copy_to( (unsigned char *)save_sql_.allocate(pb.size()) );
-      return (const char *)save_sql_.data();
+      return (const wchar_t *)save_sql_.data();
     }
 
-    const char * sql::helper::remove_sql()
+    const wchar_t * sql::helper::remove_sql()
     {
-      if( remove_sql_.size() > 0 ) { return (const char *)remove_sql_.data(); }
+      if( remove_sql_.size() > 0 ) { return (const wchar_t *)remove_sql_.data(); }
       common::pbuf pb;
 
       fieldlist_t::iterator it(fields_.begin());
 
-      pb << "DELETE FROM " << table_name_ << " WHERE " << (*it)->name_ << "=?;";
+      pb << L"DELETE FROM " << table_name_ << L" WHERE " << (*it)->name_ << L"=?;";
 
       pb.copy_to( (unsigned char *)remove_sql_.allocate(pb.size()) );
-      return (const char *)remove_sql_.data();
+      return (const wchar_t *)remove_sql_.data();
     }
 
-    const char * sql::helper::find_by_id_sql()
+    const wchar_t * sql::helper::find_by_id_sql()
     {
-      if( find_by_id_sql_.size() > 0 ) { return (const char *)find_by_id_sql_.data(); }
+      if( find_by_id_sql_.size() > 0 ) { return (const wchar_t *)find_by_id_sql_.data(); }
       common::pbuf pb;
 
-      pb << "SELECT ";
+      pb << L"SELECT ";
 
       fieldlist_t::iterator it(fields_.begin());
       fieldlist_t::iterator end(fields_.end());
@@ -183,33 +183,33 @@ namespace csl
 
       for( ;it!=end;++it )
       {
-        if( i > 0 )  pb << ",";
+        if( i > 0 )  pb << L",";
         pb << (*it)->name_;
         ++i;
       }
 
-      pb << " FROM " << table_name_ << " WHERE ";
+      pb << L" FROM " << table_name_ << L" WHERE ";
 
       if( i > 0 )
       {
         it = fields_.begin();
-        pb << (*it)->name_ << "=? LIMIT 1;";
+        pb << (*it)->name_ << L"=? LIMIT 1;";
       }
 
       pb.copy_to( (unsigned char *)find_by_id_sql_.allocate(pb.size()) );
-      return (const char *)find_by_id_sql_.data();
+      return (const wchar_t *)find_by_id_sql_.data();
     }
 
-    const char * sql::helper::find_by(int field1, int field2, int field3, int field4, int field5)
+    const wchar_t * sql::helper::find_by(int field1, int field2, int field3, int field4, int field5)
     {
       int tmpi[5] = { field1, field2, field3, field4, field5 };
       if( memcmp( tmpi,find_by_fields_,sizeof(tmpi) ) == 0 )
       {
-        if( find_by_sql_.size() > 0 ) { return (const char *)find_by_sql_.data(); }
+        if( find_by_sql_.size() > 0 ) { return (const wchar_t *)find_by_sql_.data(); }
       }
 
       common::pbuf pb;
-      pb << "SELECT ";
+      pb << L"SELECT ";
 
       fieldlist_t::iterator it(fields_.begin());
       fieldlist_t::iterator end(fields_.end());
@@ -218,12 +218,12 @@ namespace csl
 
       for( ;it!=end;++it )
       {
-        if( i > 0 )  pb << ",";
+        if( i > 0 )  pb << L",";
         pb << (*it)->name_;
         ++i;
       }
 
-      pb << " FROM " << table_name_ << " WHERE ";
+      pb << L" FROM " << table_name_ << L" WHERE ";
 
       i = 0;
 
@@ -234,16 +234,16 @@ namespace csl
           data * d = fields_.get_at(tmpi[k]);
           if( d )
           {
-            if( i > 0 ) pb << " AND ";
-            pb << d->name_ << "=? ";
+            if( i > 0 ) pb << L" AND ";
+            pb << d->name_ << L"=? ";
             ++i;
           }
         }
       }
 
-      pb << "LIMIT 1; ";
+      pb << L"LIMIT 1; ";
       pb.copy_to( (unsigned char *)find_by_sql_.allocate(pb.size()) );
-      return (const char *)find_by_sql_.data();
+      return (const wchar_t *)find_by_sql_.data();
     }
   };
 };

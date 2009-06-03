@@ -47,15 +47,20 @@ namespace csl
     {
       public:
         enum {
-          rs_unknown,        ///<Unknown error.
-          rs_invalid_param,  ///<Invalid parameter received
-          rs_start_error,    ///<Cannot start thread
-          rs_stop_error,     ///<Cannot stop thread
+          rs_unknown,          ///<Unknown error.
+          rs_invalid_param,    ///<Invalid parameter received
+          rs_start_error,      ///<Cannot start thread
+          rs_stop_error,       ///<Cannot stop thread
+          rs_not_implemented,  ///<Function is not implemented
         };
 
         enum {
           cm_unknown,  ///<Unknown component
           cm_thrpool,  ///<thrpool component
+          cm_event,    ///<Event component
+          cm_thread,   ///<Thread component
+          cm_pevent,   ///<Pevent component
+          cm_mutex,    ///<Mutex component
         };
 
         /** @brief converts reason code to string */
@@ -95,7 +100,7 @@ namespace csl
         *   @param file tells which source file caused the error
         *   @param lin tells which line cause the error
         */
-        exc(int reason, int component, const char * wchar_t, const char * wchar_t, unsigned int line)
+        exc(int reason, int component, const wchar_t * txt, const wchar_t * file, unsigned int line)
         : reason_(reason), component_(component), text_(txt), file_(file), line_(line) {}
 
         ~exc();

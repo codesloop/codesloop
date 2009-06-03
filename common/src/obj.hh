@@ -40,7 +40,7 @@ namespace csl
   namespace common
   {
     /** @brief superclass of all codesloop objects */
-    class obj 
+    class obj
     {
       public:
         obj(); ///< default destructor

@@ -80,7 +80,7 @@ namespace csl
         virtual void on_load() {}
         virtual void on_change() { changed_ = true; }
 
-        virtual const char * table_name() const { return sql_helper().table_name(); }
+        virtual const wchar_t * table_name() const { return sql_helper().table_name(); }
         virtual var::helper & var_helper() { return var_helper_; }
 
         bool changed() { return changed_; }
