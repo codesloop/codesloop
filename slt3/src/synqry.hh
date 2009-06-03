@@ -27,9 +27,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _csl_slt3_synqry_hh_included_
 
 #include "pvlist.hh"
+#include "str.hh"
 #ifdef __cplusplus
 #include <memory>
-#include <string>
 
 /**
    @file synqry.hh
@@ -233,7 +233,7 @@ namespace csl
             if there are return values of the execute query, only the first column of the
             first row is returned in the result reference. for returning more than one row
             or column use the prepare(), next() interface instead. */
-        bool execute(const char * sql, std::string & result);
+        bool execute(const char * sql, common::str & result);
 
         void debug();
 

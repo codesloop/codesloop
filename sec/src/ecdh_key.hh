@@ -33,8 +33,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "bignum.hh"
 #include "xdrbuf.hh"
+#include "str.hh"
 #ifdef __cplusplus
-#include <string>
 
 namespace csl
 {
@@ -87,10 +87,10 @@ namespace csl
         @note that this class only stores the public key as coordinates. the private
         key is expected to be in an external bignum instance
         */
-        void set(const std::string & algname, const bignum & x, const bignum & y);
+        void set(const common::str & algname, const bignum & x, const bignum & y);
 
         /** @brief returns the algorithm strength in bits */
-        static unsigned int algorithm_strength(const std::string & algname);
+        static unsigned int algorithm_strength(const common::str & algname);
 
         /** @brief returns the algorithm strength in bits */
         unsigned int strength() const;
@@ -116,7 +116,7 @@ namespace csl
         be stored in this instance. based on its own private key and the peers public key, it generates
         a shared key that may be used for encryption.
         */
-        bool gen_sha1hex_shared_key(const bignum & peer_private_key, std::string & shared_key) const;
+        bool gen_sha1hex_shared_key(const bignum & peer_private_key, common::str & shared_key) const;
 
 
         /**
@@ -138,15 +138,15 @@ namespace csl
         /* inline functions */
         inline void x(const bignum & v)             { x_ = v; }        ///<sets x
         inline void y(const bignum & v)             { y_ = v; }        ///<sets y
-        inline void algname(const std::string & v)  { algname_ = v; }  ///<sets algname
+        inline void algname(const common::str & v)  { algname_ = v; }  ///<sets algname
 
         inline bignum & x()             { return x_; }         ///<gets x
         inline bignum & y()             { return y_; }         ///<gets y
-        inline std::string & algname()  { return algname_; }   ///<gets algname
+        inline common::str & algname()  { return algname_; }   ///<gets algname
 
         inline const bignum & x() const             { return x_; }       ///<gets x
         inline const bignum & y() const             { return y_; }       ///<gets y
-        inline const std::string & algname() const  { return algname_; } ///<gets algname
+        inline const common::str & algname() const  { return algname_; } ///<gets algname
 
         /** @brief chacks if properly filled with data */
         inline bool has_data() const { return (x_.is_empty()==false && y_.is_empty()==false && algname_.size()>0); }
@@ -163,7 +163,7 @@ namespace csl
         }
 
       private:
-        std::string   algname_;   ///<the algorithm name used to generate the key
+        common::str   algname_;   ///<the algorithm name used to generate the key
         bignum        x_;         ///<x coordinate part of the public key
         bignum        y_;         ///<y coordinate part of the public key
     };

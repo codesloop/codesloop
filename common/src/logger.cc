@@ -36,79 +36,88 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   @brief implementation of csl::common::logger
  */
 
-using std::string;
+using std::string; /* TODO move to common::str */
 
 namespace csl
 {
   namespace common
   {
+    namespace
+    {
+      static wchar_t * wgetenv(const char * e)
+      {
+        static wchar_t res[1024]; // TODO this is not thread safe
+        mbstowcs( res,getenv(e),1024 );
+        return res;
+      }
+    }
 
     // initalize to default logfile
-    string logger::logfile_ = CSL_LOGFILE;
+    tbuf<256> logger::logfile_ = CSL_LOGFILE;
 #if DEBUG
-    string logger::class_to_trace_= ( getenv(CSL_TRACE_SCOPE) == NULL ? 
-                                        "all" : getenv(CSL_TRACE_SCOPE) );
-    bool   logger::enable_trace_  = ( getenv(CSL_TRACE_ENABLE) == NULL ? 
+    str logger::class_to_trace_= ( getenv(CSL_TRACE_SCOPE) == NULL ?
+                                        L"all" : wgetenv(CSL_TRACE_SCOPE) );
+    bool   logger::enable_trace_  = ( getenv(CSL_TRACE_ENABLE) == NULL ?
                                         false : true );
-    bool   logger::enable_stderr_ = ( getenv(CSL_TRACE_STDERR) == NULL ? 
+    bool   logger::enable_stderr_ = ( getenv(CSL_TRACE_STDERR) == NULL ?
                                         false : true ) ;
 #endif
 
     // type name to string helper 
-    static const char * LOGTYPE_NAMES [] = { 
-      "UNKNOWN", "DEBUG", "INFO", "AUTH", "WARNING", "ERROR", "CRITICAL"
+    static const wchar_t * LOGTYPE_NAMES [] = { 
+      L"UNKNOWN", L"DEBUG", L"INFO", L"AUTH", L"WARNING", L"ERROR", L"CRITICAL"
     };
 
     // sets output filename
-    void logger::set_log_file( const string logfile )
+    void logger::set_log_file( const char * logfile )
     {
       logfile_ = logfile;
     }
 
 
     // logs one message to the file
-    void logger::log( logger_types type, const string & str )
+    void logger::log( logger_types type, const str & st )
     {
       char   szDateBuf[128];
       time_t ostime;
 
 #ifndef DEBUG
-      if ( type == LOG_DEBUG ) 
+      if ( type == LOG_DEBUG )
         return;
 #endif
 
-      if ( (int)type >= (int)LOG_LAST || (int)type <= LOG_UNKNOWN ) 
-        throw exc(exc::rs_invalid_param,exc::cm_logger,"Unknown log type");
+      if ( (int)type >= (int)LOG_LAST || (int)type <= LOG_UNKNOWN )
+        throw exc(exc::rs_invalid_param,exc::cm_logger,L"Unknown log type");
 
-      try { 
+      try {
         // set date and time
         time( &ostime );
         strftime( szDateBuf, sizeof(szDateBuf), "%b %d %H:%M:%S", localtime( &ostime ) );
 
         // append line-by-line
-        std::fstream fs_log ( logfile_.c_str(), std::ios_base::out | std::ios_base::app );
+        std::fstream fs_log ( (const char *)logfile_.data(), std::ios_base::out | std::ios_base::app );
 
         // print header + string like: [2006-12-24 23:59] DEBUG: hello world!
         fs_log << szDateBuf 
-               << " (" 
-               <<  getpid()  
-               << ") [" 
+               << L" ("
+               <<  getpid()
+               << L") ["
                << LOGTYPE_NAMES[ (int) type ] 
-               << "] " 
-               << str 
+               << L"] "
+               << st.c_str()
                << std::endl;
 
         fs_log.close();
 #ifdef DEBUG
         if ( enable_stderr_ )
-          std::cerr  << szDateBuf 
-                     << " (" 
-                     << getpid()  
-                     << ") ["
-                     << LOGTYPE_NAMES[ (int) type ] 
-                     << "] " 
-                     << str 
-                     << std::endl;        
+          std::cerr  << szDateBuf
+                     << L" ("
+                     << getpid()
+                     << L") ["
+                     << LOGTYPE_NAMES[ (int) type ]
+                     << L"] "
+                     << st.c_str()
+                     << std::endl;
 #endif
 
       } catch ( std::exception ex ) {

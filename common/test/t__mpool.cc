@@ -30,11 +30,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "mpool.hh"
 #include "test_timer.h"
+#include "common.h"
 #include <vector>
 #include <assert.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 
 using namespace csl::common;
 

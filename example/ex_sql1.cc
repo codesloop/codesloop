@@ -51,7 +51,7 @@ int main()
   }
   catch( exc e )
   {
-    std::string s;
+    common::str s;
     e.to_string(s);
 
     fprintf(stderr,"Exception caught: %s\n",s.c_str());
@@ -59,3 +59,6 @@ int main()
 
   return 0;
 }
+
+/* EOF */
+

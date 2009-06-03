@@ -34,9 +34,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "zfile.hh"
 #include "xdrbuf.hh"
 #include "pbuf.hh"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "common.h"
+#include "str.hh"
 #include <assert.h>
 
 using namespace csl::sec;
@@ -80,7 +79,7 @@ namespace test_ecdh_key {
     assert( k1.gen_keypair(private_key1) == true );
     assert( k2.gen_keypair(private_key2) == true );
 
-    std::string shared1,shared2;
+    common::str shared1,shared2;
 
     assert( k1.gen_sha1hex_shared_key(private_key2,shared1) == true );
     assert( k2.gen_sha1hex_shared_key(private_key1,shared2) == true );
@@ -117,7 +116,7 @@ namespace test_ecdh_key {
     assert( k1.gen_keypair(private_key1) == true );
     assert( k2.gen_keypair(private_key2) == true );
 
-    std::string shared1,shared2;
+    common::str shared1,shared2;
 
     assert( k1.gen_sha1hex_shared_key(private_key2,shared1) == true );
     assert( k2.gen_sha1hex_shared_key(private_key1,shared2) == true );

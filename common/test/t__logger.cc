@@ -33,30 +33,29 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "logger.hh"
 #include "exc.hh"
 #include "common.h"
-#include <stdlib.h>
-#include <string.h>
+#include "str.hh"
 #include <assert.h>
-#include <string>
 #include <sys/stat.h>
 
 #define LOG_TEST_MSG "logger test"
 
 using csl::common::exc;
+using csl::common::str;
 
 /**@brief test namespace for logger */
-namespace test_logger 
+namespace test_logger
 {
-  /**@brief test class for logging */  
-  class logtest 
+  /**@brief test class for logging */
+  class logtest
   {
     public:
 
       /**@test return value from RETURN_FUNCTION */
-      int int_function(const char * sz)
+      int int_function(const wchar_t * sz)
       {
         ENTER_FUNCTION();
 
-        CSL_DEBUG( std::string("parameter: ") + sz  );
+        CSL_DEBUG( str(L"parameter: ") + sz  );
 
         RETURN_FUNCTION( 0x12345678 );
       }
@@ -90,7 +89,7 @@ int main()
 
   // check return code from RETURN_FUNCTION 
   test_logger::logtest l;
-  assert( l.int_function("param1") == 0x12345678 );
+  assert( l.int_function(L"param1") == 0x12345678 );
 
   // check created logfile
   assert( stat(CSL_LOGFILE,&st) == 0 );

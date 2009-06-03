@@ -40,6 +40,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "bignum.hh"
 #include "ecdh_key.hh"
 #include "tbuf.hh"
+#include "str.hh"
 
 /**
   @file ecdh_pkt.cc
@@ -76,8 +77,8 @@ namespace csl
       unsigned char *           sesskey_;
       unsigned char *           peer_cert_buf_;
       size_t                    peer_cert_sz_;
-      std::string               login_;
-      std::string               pass_;
+      common::str               login_;
+      common::str               pass_;
       priv_key *                use_private_key_;
       pkeys_t                   private_keys_;
       pbuf                      peer_cert_;
@@ -120,7 +121,7 @@ namespace csl
         return ret;
       }
 
-      unsigned int get_algorithm_strength( const std::string & alg )
+      unsigned int get_algorithm_strength( const common::str & alg )
       {
         return ecdh_key::algorithm_strength( alg );
       }
@@ -223,7 +224,7 @@ namespace csl
                   if( k.gen_keypair( (*it)->private_key_) )
                   {
                     response_.key(k);
-                    std::string sesskey;
+                    common::str sesskey;
 
                     if( ekch.gen_sha1hex_shared_key( (*it)->private_key_, sesskey ) )
                     {
@@ -396,7 +397,7 @@ namespace csl
           response_.cert().get_data( peer_cert_buf_ );
         }
 
-        std::string sesskey;
+        common::str sesskey;
 
         pkeys_t::iterator it(private_keys_.begin());
         pkeys_t::iterator end(private_keys_.end());
@@ -686,12 +687,12 @@ namespace csl
 
     /* private functions, copying not allowed */
     ecdh_pkt::ecdh_pkt(const ecdh_pkt & other)
-      : impl_((impl *)0) {throw std::string("should never be called"); }
+      : impl_((impl *)0) {throw common::str("should never be called"); }
 
     ecdh_pkt &
     ecdh_pkt::operator=(const ecdh_pkt & other)
     {
-      throw std::string("should never be called");
+      throw common::str("should never be called");
       return *this;
     }
   };

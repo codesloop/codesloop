@@ -31,6 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tran.hh"
 #include "synqry.hh"
 #include "param.hh"
+#include "str.hh"
 
 /**
   @file var.cc
@@ -480,7 +481,7 @@ namespace csl
       return *this;
     }
 
-    strvar & strvar::operator=(const std::string & other)
+    strvar & strvar::operator=(const common::str & other)
     {
       if( other.size() )
       {

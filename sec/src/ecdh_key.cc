@@ -26,12 +26,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ecdh_key.hh"
 #include "bignum.hh"
 #include "csl_sec.h"
-#include <string>
 #include <openssl/ec.h>
 #include <openssl/ecdh.h>
 #include <openssl/bn.h>
 #include <openssl/objects.h>
-#include <stdio.h>
+#include "str.hh"
+#include "common.h"
 
 /**
   @file ecdh_key.cc
@@ -155,7 +155,7 @@ namespace csl
 
       void reset() { if( key_ ) { EC_KEY_free(key_); key_ = 0; } }
 
-      bool gen_key(const std::string & algname)
+      bool gen_key(const common::str & algname)
       {
         int alg_nid = NID_undef;
 
@@ -186,7 +186,7 @@ namespace csl
         return false;
       }
 
-      bool init_key(const std::string & algname)
+      bool init_key(const common::str & algname)
       {
         int alg_nid = NID_undef;
 
@@ -224,7 +224,7 @@ namespace csl
         return true;
       }
 
-      bool privkey_from_bignum( const sec::bignum & bn, const std::string & algname )
+      bool privkey_from_bignum( const sec::bignum & bn, const common::str & algname )
       {
         if( !init_key(algname) ) return false;
 
@@ -343,7 +343,7 @@ namespace csl
 
   namespace sec
   {
-    unsigned int ecdh_key::algorithm_strength(const std::string & algname)
+    unsigned int ecdh_key::algorithm_strength(const common::str & algname)
     {
       int nid = NID_undef;
       EC_GROUP * group = 0;
@@ -390,7 +390,7 @@ namespace csl
       return false;
     }
 
-    bool ecdh_key::gen_sha1hex_shared_key(const bignum & peer_private_key, std::string & shared_key) const
+    bool ecdh_key::gen_sha1hex_shared_key(const bignum & peer_private_key, common::str & shared_key) const
     {
       try
       {
@@ -510,7 +510,7 @@ namespace csl
       printf("  Y key: "); y_.print();
     }
 
-    void ecdh_key::set(const std::string & algname, const bignum & x, const bignum & y)
+    void ecdh_key::set(const common::str & algname, const bignum & x, const bignum & y)
     {
       algname_ = algname;
       x_       = x;

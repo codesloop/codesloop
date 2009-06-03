@@ -26,7 +26,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "exc.hh"
 #include "thrpool.hh"
 #include "common.h"
-#include <string>
+#include "str.hh"
 
 /**
   @file thrpool.cc

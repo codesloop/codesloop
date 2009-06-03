@@ -25,9 +25,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "_shared_impl.hh"
 #include "common.h"
+#include "str.hh"
 #include <map>
-#include <string>
-#include <stdlib.h>
 
 /**
   @file _shared_impl.cc
@@ -108,13 +107,13 @@ namespace csl
       return ret;
     }
 
-    bool conn::impl::open(const char * db)
+    bool conn::impl::open(const wchar_t * db)
     {
       scoped_mutex m(mtx_);
       sqlite3 * td = 0;
       int rc = 0;
       if( !db ) { return false; }
-      else if( (rc=sqlite3_open( db, &td )) == SQLITE_OK )
+      else if( (rc=sqlite3_open16( db, &td )) == SQLITE_OK )
       {
         name_ = db;
         db_ = td;
@@ -123,7 +122,7 @@ namespace csl
       }
       else
       {
-        THRE(create_exc,rc,exc::cm_conn,"Failed to open DB",false);
+        THRE(create_exc,rc,exc::cm_conn,L"Failed to open DB",false);
       }
     }
 
@@ -158,7 +157,7 @@ namespace csl
       }
     }
 
-    exc conn::impl::create_exc(int rc,int component, const std::string & str)
+    exc conn::impl::create_exc(int rc,int component, const common::str & str)
     {
       exc e(exc::cm_conn);
       if( str.size() > 0 ) e.text_ = str;
@@ -207,14 +206,14 @@ namespace csl
       }
       else
       {
-        std::string s;
+        common::str s;
         if( zErr ) { s = zErr; sqlite3_free( zErr ); }
         THRE(create_exc,rc,exc::cm_conn,s.c_str(),false);
       }
       return true;
     }
 
-    bool conn::impl::exec(const char * sql,std::string & res)
+    bool conn::impl::exec(const char * sql,common::str & res)
     {
       scoped_mutex m(mtx_);
       char * zErr = 0;
@@ -244,7 +243,7 @@ namespace csl
       {
         if( rset ) sqlite3_free_table( rset );
         rset = 0;
-        std::string s;
+        common::str s;
         if( zErr ) { s = zErr; sqlite3_free( zErr ); }
         THRE(create_exc,rc,exc::cm_conn,s.c_str(),false);
       }
@@ -471,7 +470,7 @@ namespace csl
       if(rc != SQLITE_OK)
       {
         scoped_mutex m2(tran_->cn_->mtx_);
-        std::string s(sqlite3_errmsg(tran_->cn_->db_));
+        common::str s(sqlite3_errmsg(tran_->cn_->db_));
         THRE(conn::impl::create_exc,rc,exc::cm_synqry,s.c_str(),false);
       }
       //
@@ -496,7 +495,7 @@ namespace csl
       if( rc != SQLITE_OK )
       {
         scoped_mutex m2(tran_->cn_->mtx_);
-        std::string s(sqlite3_errmsg(tran_->cn_->db_));
+        common::str s(sqlite3_errmsg(tran_->cn_->db_));
         THRE(conn::impl::create_exc,rc,exc::cm_synqry,s.c_str(),false);
       }
 
@@ -634,7 +633,7 @@ namespace csl
       else
       {
         scoped_mutex m2(tran_->cn_->mtx_);
-        std::string s(sqlite3_errmsg(tran_->cn_->db_));
+        common::str s(sqlite3_errmsg(tran_->cn_->db_));
         THRE(conn::impl::create_exc,rc,exc::cm_synqry,s.c_str(),false);
       }
 
@@ -724,7 +723,7 @@ namespace csl
       else
       {
         scoped_mutex m2(tran_->cn_->mtx_);
-        std::string s(sqlite3_errmsg(tran_->cn_->db_));
+        common::str s(sqlite3_errmsg(tran_->cn_->db_));
         THRE(conn::impl::create_exc,rc,exc::cm_synqry,s.c_str(),false);
       }
 
@@ -780,7 +779,7 @@ namespace csl
       return ret;
     }
 
-    bool synqry::impl::execute(const char * sql, std::string & result)
+    bool synqry::impl::execute(const char * sql, common::str & result)
     {
       scoped_mutex m(mtx_);
 
@@ -883,7 +882,7 @@ namespace csl
 
     void param::impl::debug()
     {
-      std::map<int,std::string> m;
+      std::map<int,common::str> m;
       m[synqry::colhead::t_integer] = "integer";
       m[synqry::colhead::t_string]  = "string";
       m[synqry::colhead::t_double]  = "double";
@@ -986,7 +985,7 @@ namespace csl
       return true;
     }
 
-    bool param::impl::get(std::string & val) const
+    bool param::impl::get(common::str & val) const
     {
       if( !ptr_ ) THR(exc::rs_nullparam,exc::cm_param,false);
       val = get_string();
@@ -1016,7 +1015,7 @@ namespace csl
       changed_  = true;
     }
 
-    void param::impl::set(const std::string & val)
+    void param::impl::set(const common::str & val)
     {
       if( val.size() > 0 )
       {

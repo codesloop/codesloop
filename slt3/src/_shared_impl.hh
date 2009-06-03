@@ -35,6 +35,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "exc.hh"
 #include "sqlite3.h"
 #include "mpool.hh"
+#include "str.hh"
 
 /**
   @file _shared_impl.hh
@@ -54,7 +55,7 @@ namespace csl
       mutex                mtx_;
       unsigned long long   tran_id_;
       bool                 use_exc_;
-      std::string          name_;
+      common::str          name_;
 
       /* initialization */
       impl();
@@ -62,21 +63,21 @@ namespace csl
 
       /* internal */
       unsigned long long new_tran_id();
-      static exc create_exc(int rc,int component, const std::string & str);
+      static exc create_exc(int rc,int component, const common::str & str);
       bool exec_noret(const char * sql);
-      bool exec(const char * sql,std::string & res);
+      bool exec(const char * sql,common::str & res);
       bool valid_db_ptr();
       long long last_insert_id();
       long long change_count();
 
       /* interface */
-      bool open(const char * db);
+      bool open(const wchar_t * db);
       bool close();
 
       /* inline functions */
       inline void use_exc(bool yesno)         { use_exc_ = yesno; }
       inline bool use_exc() const             { return use_exc_;  }
-      inline const std::string & name() const { return name_; }
+      inline const common::str & name() const { return name_; }
     };
 
     struct tran::impl
@@ -158,7 +159,7 @@ namespace csl
 
       // oneshot query
       bool execute(const char * sql);
-      bool execute(const char * sql, std::string & result);
+      bool execute(const char * sql, common::str & result);
 
       void debug();
 
@@ -195,12 +196,12 @@ namespace csl
 
       bool get(long long & val) const;
       bool get(double & val) const;
-      bool get(std::string & val) const;
+      bool get(common::str & val) const;
       bool get(blob_t & val) const;
 
       void set(long long val);
       void set(double val);
-      void set(const std::string & val);
+      void set(const common::str & val);
       void set(const char * val);
       void set(const blob_t & val);
       void set(const unsigned char * ptr,unsigned int size);

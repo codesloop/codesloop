@@ -26,7 +26,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "xdr_challenge.hh"
 #include "mpool.hh"
 #include "zfile.hh"
-#include <string>
 
 /**
   @file xdr_challenge.cc

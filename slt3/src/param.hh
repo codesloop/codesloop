@@ -32,9 +32,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "synqry.hh"
+#include "str.hh"
 #ifdef __cplusplus
 #include <memory>
-#include <string>
 #include <vector>
 
 namespace csl
@@ -92,7 +92,7 @@ namespace csl
         bool get(double & val) const;
 
         /** @brief return the parameter value as a string object */
-        bool get(std::string & val) const;
+        bool get(common::str & val) const;
 
         /** @brief return the parameter value as a vector of unsigned characters */
         bool get(blob_t & val) const;
@@ -104,7 +104,7 @@ namespace csl
         void set(double val);
 
         /** @brief sets the value as a string */
-        void set(const std::string & val);
+        void set(const common::str & val);
 
         /** @brief sets the value as a string */
         void set(const char * val);

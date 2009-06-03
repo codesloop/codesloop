@@ -34,8 +34,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pbuf.hh"
 #include "common.h"
 #include "exc.hh"
+#include "str.hh"
 #ifdef __cplusplus
-#include <string>
 #include <utility>
 
 namespace csl
@@ -121,7 +121,7 @@ namespace csl
         @li puts size bytes of val string to pbuf
         @li puts optional padding 1-3 bytes
         */
-        xdrbuf & operator<<(const std::string & val);
+        xdrbuf & operator<<(const common::str & val);
 
         /**
         @brief serialize val to pbuf
@@ -177,7 +177,7 @@ namespace csl
         @li reads size bytes from pbuf to val
         @li align internal pointer with 1-3 optional padding bytes
          */
-        xdrbuf & operator>>(std::string & val);
+        xdrbuf & operator>>(common::str & val);
 
         /**
         @brief deserialize val from pbuf

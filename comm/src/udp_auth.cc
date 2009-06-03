@@ -31,7 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pbuf.hh"
 #include "xdrbuf.hh"
 #include "common.h"
-#include <string>
+#include "str.hh"
 
 namespace csl
 {
@@ -62,9 +62,9 @@ namespace csl
 
       /* auth packet */
       bool udp::auth_handler::init_auth( ecdh_key & peer_public_key,
-                                         string & login,
-                                         string & pass,
-                                         string & sesskey,
+                                         str & login,
+                                         str & pass,
+                                         str & sesskey,
                                          saltbuf_t & slt,
                                          const msg & m )
       {
@@ -91,7 +91,7 @@ namespace csl
           /* encrypted part */
 
           /* generate session key */
-          std::string session_key;
+          common::str session_key;
 
           if( !peer_public_key.gen_sha1hex_shared_key(private_key(),session_key) )
           {
@@ -159,7 +159,7 @@ namespace csl
         }
         catch( common::exc e )
         {
-          std::string s;
+          common::str s;
           e.to_string(s);
           fprintf(stderr,"Exception caught: %s\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_auth_handler,false);
@@ -169,7 +169,7 @@ namespace csl
       /* htua packet */
       bool udp::auth_handler::prepare_htua( const saltbuf_t & pkt_salt,
                                             const saltbuf_t & comm_salt,
-                                            const string & sesskey,
+                                            const str & sesskey,
                                             msg & m )
       {
         try
@@ -243,7 +243,7 @@ namespace csl
         }
         catch( common::exc e )
         {
-          std::string s;
+          common::str s;
           e.to_string(s);
           fprintf(stderr,"Exception caught: %s\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_auth_handler,false);
@@ -282,9 +282,9 @@ namespace csl
           ecdh_key   my_public_key(public_key_);
           bignum     my_private_key(private_key_);
 
-          string     login;
-          string     pass;
-          string     sesskey;
+          str        login;
+          str        pass;
+          str        sesskey;
           saltbuf_t  peer_salt;
 
           if( init_auth(peer_public_key, login, pass, sesskey, peer_salt, ms) == false ) { return; }
@@ -336,13 +336,13 @@ namespace csl
         }
         catch( common::exc e )
         {
-          std::string s;
+          common::str s;
           e.to_string(s);
           fprintf(stderr,"Error [%s:%d]: %s\n",__FILE__,__LINE__,s.c_str());
         }
         catch( comm::exc e )
         {
-          std::string s;
+          common::str s;
           e.to_string(s);
           fprintf(stderr,"Error [%s:%d]: %s\n",__FILE__,__LINE__,s.c_str());
         }
@@ -467,7 +467,7 @@ namespace csl
           }
 
           /* generate session key */
-          std::string session_key;
+          common::str session_key;
 
           if( server_public_key_.is_empty() == false )
           {
@@ -527,7 +527,7 @@ namespace csl
         }
         catch( common::exc e )
         {
-          std::string s;
+          common::str s;
           e.to_string(s);
           fprintf(stderr,"Exception caught: %s\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_auth_cli,false);
@@ -613,7 +613,7 @@ namespace csl
         }
         catch( common::exc e )
         {
-          std::string s;
+          common::str s;
           e.to_string(s);
           fprintf(stderr,"Exception caught: %s\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_auth_cli,false);
@@ -655,7 +655,7 @@ namespace csl
 
       namespace
       {
-        static void gen_sess_key(std::string & k)
+        static void gen_sess_key(common::str & k)
         {
           char s[64];
           csl_sec_gen_rand(s,sizeof(s));

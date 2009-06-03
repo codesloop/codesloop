@@ -24,8 +24,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "pevent.hh"
+#include "str.hh"
 #include "common.h"
-#include <string>
 
 #ifdef WIN32
 # include "pevent_impl_windows.cc"
@@ -97,7 +97,7 @@ namespace csl
 
     // no-copy
     pevent::pevent(const pevent & other) 
-      : impl_((impl *)0) {throw std::string("should never be called"); }
+      : impl_((impl *)0) {throw common::str("should never be called"); }
     pevent & pevent::operator=(const pevent & other) { return *this; }
   }
 }

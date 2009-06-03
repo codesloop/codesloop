@@ -27,6 +27,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mpool.hh"
 #include "pvlist.hh"
 #include "zfile.hh"
+#include "str.hh"
 #include <zlib.h>
 
 /**
@@ -311,12 +312,12 @@ namespace csl
         return true;
       }
 
-      bool dump_data_common( std::string & str, const pbuf & bf, char prefix ) const
+      bool dump_data_common( common::str & str, const pbuf & bf, char prefix ) const
       {
-        char tmp[32];
+        wchar_t tmp[32];
         str.clear();
 
-        SNPRINTF(tmp,sizeof(tmp),"[sz=%ld]\n",(unsigned long)get_size_common(bf));
+        SNPRINTF(tmp,sizeof(tmp),L"[sz=%ld]\n",(unsigned long)get_size_common(bf));
         str += tmp;
 
         size_t b = 0;
@@ -331,7 +332,7 @@ namespace csl
           size_t k=0;
           while( k<(bx)->size_ )
           {
-            SNPRINTF( tmp,sizeof(tmp),"%c[%.2d:%.2d:%.4d:%.4d]: ",
+            SNPRINTF( tmp,sizeof(tmp),L"%c[%.2d:%.2d:%.4d:%.4d]: ",
                 prefix,
                 (unsigned short)b,
                 (unsigned short)l,
@@ -340,12 +341,12 @@ namespace csl
             str += tmp;
             for( i=0;(k<(bx->size_)&& i<16);++i )
             {
-              SNPRINTF( tmp,sizeof(tmp),"%.2x", bx->data_[k] );
+              SNPRINTF( tmp,sizeof(tmp),L"%.2x", bx->data_[k] );
               str += tmp;
               ++k;
             }
             ++l;
-            str += "\n";
+            str += L"\n";
           }
           ++b;
         }
@@ -383,13 +384,13 @@ namespace csl
         return write_file_common( filename, p_zdata_ );
       }
 
-      bool dump_data(std::string & str)
+      bool dump_data(common::str & str)
       {
         if( !ensure_file() ) return false;
         return dump_data_common( str, p_data_, '-' );
       }
 
-      bool dump_zdata(std::string & str)
+      bool dump_zdata(common::str & str)
       {
         if( !ensure_zfile() ) return false;
         return dump_data_common( str, p_zdata_, 'z' );
@@ -562,8 +563,8 @@ namespace csl
     unsigned char * zfile::get_buff()  { return impl_->get_buff();  }
     unsigned char * zfile::get_zbuff() { return impl_->get_zbuff(); }
 
-    bool zfile::dump_data(std::string & str)  { return impl_->dump_data(str);  }
-    bool zfile::dump_zdata(std::string & str) { return impl_->dump_zdata(str); }
+    bool zfile::dump_data(common::str & str)  { return impl_->dump_data(str);  }
+    bool zfile::dump_zdata(common::str & str) { return impl_->dump_zdata(str); }
 
     bool zfile::drop_data()  { return impl_->drop_data();  }
     bool zfile::drop_zdata() { return impl_->drop_zdata(); }

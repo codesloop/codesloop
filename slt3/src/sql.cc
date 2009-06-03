@@ -25,7 +25,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pbuf.hh"
 #include "sql.hh"
-#include <string.h>
+#include "common.h"
 
 /**
   @file sqhelpr.cc

@@ -34,8 +34,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "conn.hh"
 #include "synqry.hh"
 #include "exc.hh"
+#include "str.hh"
 #include <assert.h>
-#include <stdlib.h>
 
 using namespace csl::slt3;
 
@@ -70,7 +70,7 @@ namespace test_tran {
     {
       tran t(c);
       synqry q(t);
-      std::string s;
+      common::str s;
       assert( q.execute("SELECT SUM(i) FROM T;",s) == true );
       assert( s == "1" );
       assert( q.execute("DROP TABLE T;",s) == true );
@@ -103,7 +103,7 @@ namespace test_tran {
       tran t(c);
       t.commit_on_destruct(true);
       synqry q(t);
-      std::string s;
+      common::str s;
       assert( q.execute("SELECT SUM(i) FROM T;",s) == true );
       assert( s == "1" );
       assert( q.execute("DROP TABLE T;",s) == true );
@@ -130,7 +130,7 @@ namespace test_tran {
     {
       tran t(c);
       synqry q(t);
-      std::string s;
+      common::str s;
       assert( q.execute("SELECT SUM(i) FROM T;",s) == true );
       assert( s == "1" );
     }
@@ -162,7 +162,7 @@ namespace test_tran {
       tran t(c);
       t.rollback_on_destruct(false);
       synqry q(t);
-      std::string s;
+      common::str s;
       assert( q.execute("SELECT SUM(i) FROM T;",s) == true );
       assert( s == "1" );
     }

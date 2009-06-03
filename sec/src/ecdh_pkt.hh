@@ -40,7 +40,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 #include <memory>
 #include <vector>
-#include <string>
 
 namespace csl
 {

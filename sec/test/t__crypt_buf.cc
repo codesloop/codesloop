@@ -30,9 +30,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "crypt_buf.hh"
 #include "test_timer.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "common.h"
 #include <assert.h>
 
 using csl::sec::crypt_buf;

@@ -26,6 +26,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "csl_slt3.hh"
 #include "reg.hh"
 #include "common.h"
+#include "str.hh"
 
 /**
   @file slt3/src/reg.cc
@@ -149,7 +150,7 @@ namespace csl
       return *instance_;
     }
 
-    reg & reg::instance(const std::string & path)
+    reg & reg::instance(const common::str & path)
     {
       if( path.size() ) return instance(path.c_str());
       else              return instance(0);
@@ -157,7 +158,7 @@ namespace csl
 
     namespace
     {
-      bool init_db(conn & c,const std::string & path)
+      bool init_db(conn & c,const common::str & path)
       {
         c.use_exc(true);
         if( c.open(path.c_str()) )
@@ -174,7 +175,7 @@ namespace csl
       }
     }
 
-    bool reg::get( const std::string & name, item & i, pool_t & pool )
+    bool reg::get( const common::str & name, item & i, pool_t & pool )
     {
       return get( name.c_str(),i,pool );
     }
@@ -346,7 +347,7 @@ namespace csl
       }
     }
 
-    bool reg::get( const std::string & name, conn & cn )
+    bool reg::get( const common::str & name, conn & cn )
     {
       return get( name.c_str(),cn );
     }

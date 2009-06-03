@@ -28,8 +28,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <openssl/blowfish.h>
 #include <openssl/rand.h>
 #include <openssl/sha.h>
-#include <string.h>
-#include <string>
+#include "str.hh"
+#include "common.h"
 
 /**
   @file crypt_buf.cc
@@ -176,7 +176,7 @@ namespace csl
 
     /* private functions, copying not allowed */
     crypt_buf::crypt_buf(const crypt_buf & other)
-      : impl_((impl *)0) {throw std::string("should never be called"); }
+      : impl_((impl *)0) {throw common::str("should never be called"); }
 
     crypt_buf &
     crypt_buf::operator=(const crypt_buf & other)

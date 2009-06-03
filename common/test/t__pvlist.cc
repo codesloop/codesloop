@@ -30,11 +30,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pvlist.hh"
 #include "test_timer.h"
+#include "common.h"
 #include <vector>
 #include <assert.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #ifdef TEST_BOOST_POOL
 #  include <boost/pool/object_pool.hpp>
 #endif

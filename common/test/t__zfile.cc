@@ -30,9 +30,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "zfile.hh"
 #include "test_timer.h"
+#include "common.h"
 #include <assert.h>
-#include <stdlib.h>
-#include <string.h>
 #include <zlib.h>
 
 using namespace csl::common;

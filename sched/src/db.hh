@@ -35,7 +35,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "conn.hh"
 #include "mpool.hh"
 #ifdef __cplusplus
-#include <string>
 
 namespace csl
 {

@@ -24,6 +24,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "conn.hh"
+#include "str.hh"
 #include "_shared_impl.hh"
 
 /**
@@ -38,12 +39,12 @@ namespace csl
     long long conn::last_insert_id() { return impl_->last_insert_id(); }
     long long conn::change_count() { return impl_->change_count(); }
 
-    bool conn::open(const char * db) { return impl_->open(db); }
+    bool conn::open(const wchar_t * db) { return impl_->open(db); }
     bool conn::close() { return impl_->close(); }
 
     void conn::use_exc(bool yesno) { impl_->use_exc(yesno); }
     bool conn::use_exc() { return impl_->use_exc(); }
-    const std::string & conn::name() const { return impl_->name(); }
+    const common::str & conn::name() const { return impl_->name(); }
 
     /* public interface */
     conn::conn() : impl_(new impl) { }

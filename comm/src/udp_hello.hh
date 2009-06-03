@@ -42,7 +42,7 @@ namespace csl
   using sec::ecdh_key;
   using sec::bignum;
 
-  using std::string;
+  using common::str; 
 
   namespace comm
   {

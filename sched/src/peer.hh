@@ -37,8 +37,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "reg.hh"
 #include "obj.hh"
 #include "var.hh"
+#include "str.hh"
 #ifdef __cplusplus
-#include <string>
 
 #ifndef SCHED_PEER_DB_NAME
 #define SCHED_PEER_DB_NAME "sched_peer"

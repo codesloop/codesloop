@@ -31,7 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pbuf.hh"
 #include "xdrbuf.hh"
 #include "common.h"
-#include <string>
+#include "str.hh"
 
 namespace csl
 {
@@ -84,7 +84,7 @@ namespace csl
         }
         catch( common::exc e )
         {
-          std::string s;
+          common::str s;
           e.to_string(s);
           fprintf(stderr,"Exception caught: %s\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_hello_handler,false);
@@ -133,7 +133,7 @@ namespace csl
           }
 
           /* generate session key */
-          std::string session_key;
+          common::str session_key;
 
         /* ***
           hello callback may change the private key to be used
@@ -188,7 +188,7 @@ namespace csl
         }
         catch( common::exc e )
         {
-          std::string s;
+          common::str s;
           e.to_string(s);
           fprintf(stderr,"Exception caught: %s\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_hello_handler,false);
@@ -264,13 +264,13 @@ namespace csl
         }
         catch( common::exc e )
         {
-          std::string s;
+          common::str s;
           e.to_string(s);
           fprintf(stderr,"Error [%s:%d]: %s\n",__FILE__,__LINE__,s.c_str());
         }
         catch( comm::exc e )
         {
-          std::string s;
+          common::str s;
           e.to_string(s);
           fprintf(stderr,"Error [%s:%d]: %s\n",__FILE__,__LINE__,s.c_str());
         }
@@ -378,7 +378,7 @@ namespace csl
         }
         catch( common::exc e )
         {
-          std::string s;
+          common::str s;
           e.to_string(s);
           fprintf(stderr,"Exception caught: %s\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_hello_cli,false);
@@ -412,7 +412,7 @@ namespace csl
           /* encrypted part */
 
           /* generate session key */
-          std::string session_key;
+          common::str session_key;
 
           if( !server_public_key_.gen_sha1hex_shared_key(private_key_,session_key) )
           {
@@ -464,7 +464,7 @@ namespace csl
         }
         catch( common::exc e )
         {
-          std::string s;
+          common::str s;
           e.to_string(s);
           fprintf(stderr,"Exception caught: %s\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_hello_cli,false);

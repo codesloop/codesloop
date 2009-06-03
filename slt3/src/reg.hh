@@ -34,8 +34,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pvlist.hh"
 #include "conn.hh"
 #include "mpool.hh"
+#include "str.hh"
 #ifdef __cplusplus
-#include <string>
 
 namespace csl
 {
@@ -47,7 +47,7 @@ namespace csl
       public:
         static reg & instance();
         static reg & instance(const char * path);
-        static reg & instance(const std::string & path);
+        static reg & instance(const common::str & path);
 
         class helper
         {
@@ -65,9 +65,9 @@ namespace csl
             helper(const helper & other) {}
             helper & operator=(const helper & other) { return *this; }
 
-            std::string name_;
-            std::string default_path_;
-            std::string path_;
+            common::str name_;
+            common::str default_path_;
+            common::str path_;
             conn conn_;
         };
 
@@ -83,9 +83,9 @@ namespace csl
         typedef common::mpool<> pool_t;
 
         bool get( const char * name, conn & c );
-        bool get( const std::string & name, conn & c );
+        bool get( const common::str & name, conn & c );
         bool get( const char * name, item & i, pool_t & pool );
-        bool get( const std::string & name, item & i, pool_t & pool );
+        bool get( const common::str & name, item & i, pool_t & pool );
 
         bool set( const item & it );
 
@@ -93,8 +93,8 @@ namespace csl
         bool dbs( itemlist_t & itms, pool_t & pool );
 
         /* inline functions */
-        const std::string & path() const { return path_; }
-        void path(const std::string & p) { path_ = p; }
+        const common::str & path() const { return path_; }
+        void path(const common::str & p) { path_ = p; }
 
       private:
         /* no default construction or copy */
@@ -105,7 +105,7 @@ namespace csl
         inline reg(const reg & x) { }
 
         /* variables */
-        std::string  path_;
+        common::str  path_;
     };
   }
 }

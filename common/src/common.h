@@ -68,8 +68,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef WIN32
 # ifndef SNPRINTF
-#  define SNPRINTF _snprintf
+#  define SNPRINTF swprintf
 # endif /*SNPRINTF*/
+# ifndef FPRINTF
+#  define FPRINTF fwprintf
+# endif /*FPRINTF*/
 # ifndef ATOLL
 #  define ATOLL _atoi64
 # endif /*ATOLL*/
@@ -81,8 +84,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # endif /*STRDUP*/
 #else /* WIN32 */
 # ifndef SNPRINTF
-#  define SNPRINTF snprintf
+#  define SNPRINTF swprintf
 # endif /*SNPRINTF*/
+# ifndef FPRINTF
+#  define FPRINTF fwprintf
+# endif /*FPRINTF*/
 # ifndef ATOLL
 #  define ATOLL atoll
 # endif /*ATOLL*/
@@ -99,11 +105,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define THR(REASON,COMPONENT,RET) \
     do { \
       if( this->use_exc() ) { \
-        throw exc(REASON,COMPONENT,"",__FILE__,__LINE__); \
+        throw exc(REASON,COMPONENT,L"",L""__FILE__,__LINE__); \
         return RET; } \
       else { \
-        fprintf(stderr,"Exception(%s:%d): [%s] [%s]\n", \
-            __FILE__,__LINE__, \
+        FPRINTF(stderr,L"Exception(%sl:%d): [%sl] [%sl]\n", \
+            L""__FILE__,__LINE__, \
             exc::component_string(COMPONENT), \
             exc::reason_string(REASON)); \
         return RET; } } while(false);
@@ -113,13 +119,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define THRC(REASON,COMPONENT,RET) \
     do { \
       if( this->use_exc() ) { \
-        char errstr[256]; \
-        strncpy(errstr,strerror(errno),255); errstr[255]=0; \
-        throw exc(REASON,COMPONENT,errstr,__FILE__,__LINE__); \
+        wchar_t errstr[256]; \
+        mbstowcs( errstr,strerror(errno),255 ); \
+        throw exc(REASON,COMPONENT,errstr,L""__FILE__,__LINE__); \
         return RET; } \
       else { \
-        fprintf(stderr,"Exception(%s:%d): [%s] [%s]\n", \
-            __FILE__,__LINE__, \
+        FPRINTF(stderr,L"Exception(%sl:%d): [%sl] [%sl]\n", \
+            L""__FILE__,__LINE__, \
             exc::component_string(COMPONENT), \
             exc::reason_string(REASON)); \
         return RET; } } while(false);
@@ -132,7 +138,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         throw E; \
         return RET; } \
       else { \
-        fprintf(stderr,"Exception(%s:%d): [%s] [%s]\n", \
+        FPRINTF(stderr,L"Exception(%sl:%d): [%sl] [%sl]\n", \
             E.file_.c_str(),E.line_, \
             exc::component_string(E.component_), \
             exc::reason_string(E.reason_)); \
@@ -143,10 +149,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define THRNORET(REASON,COMPONENT) \
     do { \
       if( this->use_exc() ) { \
-        throw exc(REASON,COMPONENT,"",__FILE__,__LINE__); } \
+        throw exc(REASON,COMPONENT,L"",L""__FILE__,__LINE__); } \
       else { \
-        fprintf(stderr,"Exception(%s:%d): [%s] [%s]\n", \
-            __FILE__,__LINE__, \
+        FPRINTF(stderr,L"Exception(%sl:%d): [%sl] [%sl]\n", \
+            L""__FILE__,__LINE__, \
             exc::component_string(COMPONENT), \
             exc::reason_string(REASON)); } } while(false);
 #endif /*THRNORET*/
@@ -223,6 +229,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # define CSL_ERRNO_H_INCLUDED
 # include <errno.h>
 #endif /*CSL_ERRNO_H_INCLUDED*/
+
+#ifndef CSL_WCHAR_H_INCLUDED
+#define CSL_WCHAR_H_INCLUDED
+#include <wchar.h>
+#endif /*CSL_WCHAR_H_INCLUDED*/
 
 #ifdef WIN32
 # define getpid()  0

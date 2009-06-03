@@ -34,9 +34,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "conn.hh"
 #include "exc.hh"
 #include "param.hh"
+#include "str.hh"
 #include "common.h"
 #include <assert.h>
-#include <stdlib.h>
 
 using namespace csl::slt3;
 
@@ -122,24 +122,24 @@ namespace test_synqry {
 
     assert( pa1.get_long() == pb1.get_long() );
     assert( pa1.get_double() == pb1.get_double() );
-    assert( std::string(pa1.get_string()) == pb1.get_string() );
+    assert( common::str(pa1.get_string()) == pb1.get_string() );
     assert( pb1.get_long() == 1ll );
     assert( pb1.get_double() == 1.0 );
-    assert( std::string(pb1.get_string()) == "1.0000000000" );
+    assert( common::str(pb1.get_string()) == "1.0000000000" );
 
     assert( pa2.get_long() == pb2.get_long() );
     assert( pa2.get_double() == pb2.get_double() );
-    assert( std::string(pa2.get_string()) == pb2.get_string() );
+    assert( common::str(pa2.get_string()) == pb2.get_string() );
     assert( pb2.get_long() == 10000ll );
     assert( pb2.get_double() == 10000.001 );
-    assert( std::string(pb2.get_string()) == "10000.001" );
+    assert( common::str(pb2.get_string()) == "10000.001" );
 
     assert( pa3.get_long() == pb3.get_long() );
     assert( pa3.get_double() == pb3.get_double() );
-    assert( std::string(pa3.get_string()) == pb3.get_string() );
+    assert( common::str(pa3.get_string()) == pb3.get_string() );
     assert( pb3.get_long() == 100ll );
     assert( pb3.get_double() == 100.0 );
-    assert( std::string(pb3.get_string()) == "100" );
+    assert( common::str(pb3.get_string()) == "100" );
 
     q.clear_params();
     param & pc1(q.get_param(1));
@@ -175,7 +175,7 @@ namespace test_synqry {
     }
     catch(exc e)
     {
-      std::string s; e.to_string(s);
+      common::str s; e.to_string(s);
       fprintf(stderr,"ERROR: %s\n",s.c_str());
     }
   }
@@ -204,7 +204,7 @@ namespace test_synqry {
     }
     catch(exc e)
     {
-      std::string s; e.to_string(s);
+      common::str s; e.to_string(s);
       fprintf(stderr,"ERROR: %s\n",s.c_str());
     }
   }
@@ -233,7 +233,7 @@ namespace test_synqry {
         p.set("Hello");
         assert( q.next(ch,fd) == true );
         assert( q.reset() == true );
-        assert( std::string("Hello") == fd.get_at(0)->stringval_ );
+        assert( common::str("Hello") == fd.get_at(0)->stringval_ );
         assert( fd.get_at(0)->size_ == 5 );
       }
 
@@ -241,7 +241,7 @@ namespace test_synqry {
     }
     catch(exc e)
     {
-      std::string s; e.to_string(s);
+      common::str s; e.to_string(s);
       fprintf(stderr,"ERROR: %s\n",s.c_str());
     }
   }
@@ -271,7 +271,7 @@ namespace test_synqry {
         p.set("Hello");
         assert( q.next(ch,fd) == true );
         assert( q.reset() == true );
-        assert( std::string("Hello") == fd.get_at(0)->stringval_ );
+        assert( common::str("Hello") == fd.get_at(0)->stringval_ );
         assert( fd.get_at(0)->size_ == 5 );
       }
 
@@ -279,7 +279,7 @@ namespace test_synqry {
     }
     catch(exc e)
     {
-      std::string s; e.to_string(s);
+      common::str s; e.to_string(s);
       fprintf(stderr,"ERROR: %s\n",s.c_str());
     }
   }
@@ -301,7 +301,7 @@ namespace test_synqry {
     }
     catch(exc e)
     {
-      std::string s; e.to_string(s);
+      common::str s; e.to_string(s);
       fprintf(stderr,"ERROR: %s\n",s.c_str());
     }
   }
@@ -323,7 +323,7 @@ namespace test_synqry {
     }
     catch(exc e)
     {
-      std::string s; e.to_string(s);
+      common::str s; e.to_string(s);
       fprintf(stderr,"ERROR: %s\n",s.c_str());
     }
   }
@@ -340,14 +340,14 @@ namespace test_synqry {
       q.autoreset_data(false);
       assert( q.execute("CREATE TABLE onesht_ret_noaut (o string);") == true );
       assert( q.execute("INSERT INTO onesht_ret_noaut (o) VALUES ('Hello');") == true );
-      std::string s;
+      common::str s;
       assert( q.execute("SELECT o FROM onesht_ret_noaut WHERE o='Hello';",s) == true );
       assert( s == "Hello" );
       assert( q.execute("DROP TABLE onesht_ret_noaut;") == true );
     }
     catch(exc e)
     {
-      std::string s; e.to_string(s);
+      common::str s; e.to_string(s);
       fprintf(stderr,"ERROR: %s\n",s.c_str());
     }
   }
@@ -364,14 +364,14 @@ namespace test_synqry {
       q.autoreset_data(true);
       assert( q.execute("CREATE TABLE onesht_ret_aut (o string);") == true );
       assert( q.execute("INSERT INTO onesht_ret_aut (o) VALUES ('Hello');") == true );
-      std::string s;
+      common::str s;
       assert( q.execute("SELECT o FROM onesht_ret_aut WHERE o='Hello';",s) == true );
       assert( s == "Hello" );
       assert( q.execute("DROP TABLE onesht_ret_aut;") == true );
     }
     catch(exc e)
     {
-      std::string s; e.to_string(s);
+      common::str s; e.to_string(s);
       fprintf(stderr,"ERROR: %s\n",s.c_str());
     }
   }

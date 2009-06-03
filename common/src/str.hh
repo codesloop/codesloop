@@ -35,10 +35,8 @@ Credits: some techniques and code pieces are stolen from Christian
    @todo document me
  */
 
-#include <stdlib.h>
-#include <string.h>
+#include "common.h"
 #include "obj.hh"
-#include "exc.hh"
 #include "tbuf.hh"
 #ifdef __cplusplus
 
@@ -48,15 +46,15 @@ namespace csl
   {
     /** @todo document me */
     class str 
-    {      
+    {
       public:
-        enum { buf_size = 128 * sizeof(wchar_t) }; 
+        enum { buf_size = 128 * sizeof(wchar_t), npos = 0xFFFFFFFF };
 
         /** @brief constructor */
         inline str()  { }
-        
+
         /** @brief destructor 
-        since there are not virtual functions, and we do not excpect inherited
+        since there are not virtual functions, and we do not expect inherited
         classes from str the destructor is not virtual. this casues a bit
         faster initalization, because no vptr table is required, i guess 
         */
@@ -73,12 +71,12 @@ namespace csl
         {
           buf_.set((unsigned char *)wcs,sizeof(wchar_t) * (wcslen(wcs)+1));
         }
-        
+
         /** @brief let equal operator */
         inline str& operator=(const wchar_t * wcs)
         {
           buf_.set((unsigned char *)wcs,sizeof(wchar_t) * (wcslen(wcs)+1));
-          return *this; 
+          return *this;
         }
 
         /** @brief let equal operator */
@@ -90,7 +88,10 @@ namespace csl
 
         /** @brief append operator */
         str& operator+=(const str&);
-        
+
+        /** @brief append operator */
+        str& operator+=(const wchar_t * str);
+
         /** @brief append operator with two parameters */
         inline friend str operator+(const str& lhs, const str& rhs)
         {
@@ -101,7 +102,8 @@ namespace csl
         inline bool operator==(const wchar_t * s) const
         {
           return !wcscmp( data(), s);
-        }        
+        }
+
         /** @brief is equal operator */
         inline bool operator==(const str& s) const
         {
@@ -124,28 +126,32 @@ namespace csl
         inline const bool empty() const
         {
           return !buf_.has_data();
-        } 
-        
+        }
+
         /** @brief returns the background c str */
         inline const wchar_t * c_str() const
         {
           return( data() ); // TODO: have a char * version
-        } 
-        
-        /**@brief unchecked access to buffer */
+        }
+
+        /** @brief assign string
+            @param start is the start of the string
+            @param lend is the end of the string
+        */
+        inline str & assign(const wchar_t * start, const wchar_t * end)
+        {
+          buf_.set( (unsigned char *)start, end-start);
+          return *this;
+        }
+
+        /** @brief unchecked access to buffer */
         inline wchar_t operator[](const size_t n) const
         {
           return data()[n];
         }
 
         /** @brief check access to buffer */
-        inline wchar_t at(const size_t n) const
-        {
-          if ( n > wcslen( data() ) )
-            throw exc(exc::rs_invalid_param,exc::cm_str);
-
-          return data()[n];
-        }
+        wchar_t at(const size_t n) const;
 
         /** @brief get data as wchar_t */
         inline const wchar_t * data() const
@@ -158,12 +164,31 @@ namespace csl
           return buf_;
         }
 
-        /**@brief substr 
-           @param start start from this position
-           @param length take length bytes from origin str
+        /** @brief substr
+            @param start start from this position
+            @param length take length bytes from origin str
         */
         str substr(const size_t start, const size_t length) const;
-        
+
+        /** @brief find a wide character in the string
+            @param w is the character to be found
+            @returns npos if not found or the position
+        **/
+        size_t find(wchar_t w) const;
+
+        /** @brief find a wide character in the string
+            @param s is the string to be found
+            @returns npos if not found or the position
+        **/
+        size_t find(const wchar_t * s) const;
+
+        /** @brief find a string
+            @param s is the string to be found
+            @returns npos if not found or the position
+        **/
+        size_t find(const str & s) const;
+
+
       private:
         tbuf<buf_size> buf_;
     };

@@ -28,17 +28,16 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _csl_common_logger_hh_included_
 
 /**
-   @file csl_common/src/exc.hh
-   @brief common exception class for common
+   @file csl_common/src/logger.hh
+   @brief common logger class
  */
 
+#include "str.hh"
+#include "tbuf.hh"
 #ifdef __cplusplus
 
-#include <string>
-
-
 // default logfile
-#define CSL_LOGFILE     "csl.log"
+#define CSL_LOGFILE        "csl.log"
 
 
 // env variables
@@ -49,25 +48,24 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef DEBUG
 #define CSL_DEBUG(str)     csl::common::logger::debug( str, __class_name )
 #else
-#define CSL_DEBUG(str)     
+#define CSL_DEBUG(str)
 #endif
-
 
 #if __GCC__ || __GNUC__
 #define STORE_FUNC_NAME()  \
-  std::string __function_name = std::string(__PRETTY_FUNCTION__);             \
-  std::string __class_name;                                                   \
-  __function_name = __function_name.substr( 0, __function_name.find('('));    \
-  __function_name = __function_name.substr( (__function_name.rfind(' ') ==    \
-          std::string::npos ) ?  0 : __function_name.rfind(' ') + 1, -1 );    \
-  if ( __function_name.find( "rx_iface::" ) != std::string::npos)             \
+  csl::common::str __function_name = csl::common::tbuf<256>(__PRETTY_FUNCTION__);             \
+  csl::common::str __class_name;                                                   \
+  __function_name = __function_name.substr( 0, __function_name.find(L'('));    \
+  __function_name = __function_name.substr( (__function_name.rfind(L' ') ==    \
+          str::npos ) ?  0 : __function_name.rfind(L' ') + 1, -1 );    \
+  if ( __function_name.find( L"csl::" ) != str::npos)             \
     __function_name = __function_name.substr(10,-1);                          \
-  if ( __function_name.find( ':' ) !=  std::string::npos)                     \
-    __class_name = __function_name.substr( 0, __function_name.find( "::" ) )  
+  if ( __function_name.find( ':' ) !=  str::npos)                     \
+    __class_name = __function_name.substr( 0, __function_name.find( L"::" ) )
 #else 
 #define STORE_FUNC_NAME()                   \
-  std::string __function_name = __func__; \
-  const char   __class_name[] = "class" 
+  str __function_name = L""__func__; \
+  const wchar_t   __class_name[] = L"class"
 #endif
 
 /* in debug mode these are optimized out by preprocessor */
@@ -75,32 +73,32 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  #define ENTER_FUNCTION()  \
    STORE_FUNC_NAME();    \
    if ( csl::common::logger::enable_trace_ )                     \
-     csl::common::logger::debug(">>> Entering function: " + __function_name,__class_name)
+     csl::common::logger::debug(L">>> Entering function: " + __function_name,__class_name)
  #define LEAVE_FUNCTION()                                        \
    {                                                             \
    if ( csl::common::logger::enable_trace_ )                     \
-     csl::common::logger::debug("<<< Leaving function: " + __function_name,__class_name); \
+     csl::common::logger::debug(L"<<< Leaving function: " + __function_name,__class_name); \
    return;                                                       \
    }
  #define RETURN_FUNCTION(ret)                                    \
    {                                                             \
    if ( csl::common::logger::enable_trace_ )                     \
-     csl::common::logger::debug("<<< Leaving function: " + __function_name,__class_name); \
+     csl::common::logger::debug(L"<<< Leaving function: " + __function_name,__class_name); \
    return(ret);                                                  \
    }
 
  #define THROW_EXCEPTION(e)                                      \
    {                                                             \
    if ( csl::common::logger::enable_trace_ )                     \
-     csl::common::logger::debug("<<< Leaving function: " + __function_name +  \
-                   "; Exception: " + e.to_string());             \
+     csl::common::logger::debug(L"<<< Leaving function: " + __function_name +  \
+                   L"; Exception: " + e.to_string());             \
    throw(e);                                                     \
    }
 
 #else /* !DEBUG */
- #define ENTER_FUNCTION()  
+ #define ENTER_FUNCTION()
  #define LEAVE_FUNCTION()       return
- #define RETURN_FUNCTION(ret)   return(ret)  
+ #define RETURN_FUNCTION(ret)   return(ret)
  #define THROW_EXCEPTION(e)     throw(e)
 #endif /* DEBUG */
 
@@ -139,36 +137,36 @@ namespace csl {
         /** @brief main logger function 
         @param type log level (debug, error, etc.)
         @param str  message to log */
-        static void             log( logger_types type, const std::string & str );
+        static void             log( logger_types type, const str & str );
 
         /** @brief override default log file name and location 
         @param logfile full path of demanded file name */
-        static void             set_log_file( const std::string logfile );
+        static void             set_log_file( const char * logfile );
 
         /** @brief shortcut function for critical errors  
         @param str  message to log */
-        static inline void      critical( const std::string & str ) 
+        static inline void      critical( const str & str ) 
         {
           log( LOG_CRITICAL, str );
         }
         /** @brief shortcut function for info messages 
         @param str  message to log */
-        static inline void      info ( const std::string & str ) {
+        static inline void      info ( const str & str ) {
           log( LOG_INFO, str );
         }
         /** @brief shortcut function for warning messages
         @param str  message to log */
-        static inline void      warning( const std::string & str ) {
+        static inline void      warning( const str & str ) {
           log( LOG_WARNING, str );
         }
         /** @brief shortcut function for authentication logs
         @param str  message to log */
-        static inline void      auth( const std::string & str ) {
+        static inline void      auth( const str & str ) {
           log( LOG_AUTH, str );
         }
         /** @brief shortcut function for normal errors  
         @param str  message to log */
-        static inline void      error( const std::string & str ) {
+        static inline void      error( const str & str ) {
           log( LOG_ERROR, str );
         }
 
@@ -177,31 +175,32 @@ namespace csl {
         Debug messages are only available in DEBUG builds, otherwise
         compiler optimizes out the debug related log macros
         @param str  message to log */
-#if defined __GNUC__ && !defined DEBUG    
-        static inline void      debug( const std::string & str, 
-            const std::string & invoker = "" )
-        {         
+#if defined __GNUC__ && !defined DEBUG
+        static inline void      debug( const str & str,
+                                       const str & invoker = L"" )
+        {
 #else
-        static inline void      debug( const std::string & str, const std::string & invoker = "" )
-        {         
+        static inline void      debug( const str & st,
+                                       const str & invoker = L"" )
+        {
 #endif
 #ifdef DEBUG
-          if ( class_to_trace_ == "all" || 
-              class_to_trace_.find( invoker ) != std::string::npos )
+          if ( class_to_trace_ == L"all" ||
+              class_to_trace_.find( invoker ) != str::npos )
           {
-            log( LOG_DEBUG, str );
+            log( LOG_DEBUG, st );
           }
 #endif
         }
 
-        private:        
-        static std::string           logfile_;
-#ifdef DEBUG        
+        private:
+        static tbuf<256>     logfile_;
+#ifdef DEBUG
         public:
-        static bool                  enable_trace_;
-        static std::string           class_to_trace_;
-        static bool                  enable_stderr_;
-#endif        
+        static bool          enable_trace_;
+        static str           class_to_trace_;
+        static bool          enable_stderr_;
+#endif
     }; /* class */
   }; /* namespace common */
 }; /* namespace csl */

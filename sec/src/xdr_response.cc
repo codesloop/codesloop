@@ -25,7 +25,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "xdr_response.hh"
 #include "mpool.hh"
-#include <string>
 
 using namespace csl::common;
 

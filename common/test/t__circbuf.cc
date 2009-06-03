@@ -30,10 +30,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "circbuf.hh"
 #include "test_timer.h"
+#include "common.h"
 #include <assert.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <list>
 
 using namespace csl::common;

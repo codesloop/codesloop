@@ -34,8 +34,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "exc.hh"
 #include "common.h"
 #include "mpool.hh"
+#include "str.hh"
 #include <assert.h>
-#include <stdlib.h>
 
 using namespace csl::slt3;
 using namespace csl::sched;
@@ -173,7 +173,7 @@ namespace test_peer {
     assert( p3.public_key().is_empty() == false );
     assert( p3.private_key().has_data() == true );
     assert( p3.public_key().algname() == "prime192v3" );
-    assert( std::string(p3.common_name_.c_str()) == "Hello" );
+    assert( common::str(p3.common_name_.c_str()) == "Hello" );
     assert( p3.id_.get() == p2.id_.get() );
   }
 

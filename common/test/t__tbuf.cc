@@ -34,8 +34,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "test_timer.h"
 #include "zfile.hh"
 #include "common.h"
-#include <stdlib.h>
-#include <string.h>
 #include <assert.h>
 #include <string>
 

@@ -26,6 +26,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "xdrbuf.hh"
 #include "common.h"
 #include "exc.hh"
+#include "str.hh"
 #include <memory>
 
 /**
@@ -49,7 +50,7 @@ namespace csl
     {
       if( !b || !p || !sz )
       {
-        throw common::exc(exc::rs_cannot_append,exc::cm_xdrbuf,"",__FILE__,__LINE__);
+        throw common::exc(exc::rs_cannot_append,exc::cm_xdrbuf,L"",L""__FILE__,__LINE__);
         return;
       }
 
@@ -61,13 +62,13 @@ namespace csl
 
       if( !b->append((unsigned char *)&elen,sizeof(elen)) )
       {
-        throw common::exc(exc::rs_cannot_append,exc::cm_xdrbuf,"",__FILE__,__LINE__);
+        throw common::exc(exc::rs_cannot_append,exc::cm_xdrbuf,L"",L""__FILE__,__LINE__);
         return;
       }
 
       if( !b->append((unsigned char *)p,sz) )
       {
-        throw common::exc(exc::rs_cannot_append,exc::cm_xdrbuf,"",__FILE__,__LINE__);
+        throw common::exc(exc::rs_cannot_append,exc::cm_xdrbuf,L"",L""__FILE__,__LINE__);
         return;
       }
 
@@ -75,7 +76,7 @@ namespace csl
       {
         if( !b->append(pad,pad_size) )
         {
-          throw common::exc(exc::rs_cannot_append,exc::cm_xdrbuf,"",__FILE__,__LINE__);
+          throw common::exc(exc::rs_cannot_append,exc::cm_xdrbuf,L"",L""__FILE__,__LINE__);
           return;
         }
       }
@@ -138,14 +139,14 @@ namespace csl
       return *this;
     }
 
-    xdrbuf & xdrbuf::operator<<(const std::string & val)
+    xdrbuf & xdrbuf::operator<<(const common::str & val)
     {
       uint32_t sz = val.size();
       if( sz )
       {
         try
         {
-          size_and_buf_to_pbuf( b_, &(val[0]), val.size() );
+          size_and_buf_to_pbuf( b_, val.data(), val.size() );
         }
         catch(common::exc e)
         {
@@ -254,7 +255,7 @@ namespace csl
       return *this;
     }
 
-    xdrbuf & xdrbuf::operator>>(std::string & val)
+    xdrbuf & xdrbuf::operator>>(common::str & val)
     {
       uint32_t sz = 0;
       (*this) >> sz;
@@ -262,7 +263,7 @@ namespace csl
 
       if( !sz ) { val.clear(); return *this; }
 
-      std::auto_ptr<char> tmp(new char[sz+1]);
+      std::auto_ptr<wchar_t> tmp(new wchar_t[sizeof(wchar_t)*sz+1]);
 
       if( tmp.get() )
       {

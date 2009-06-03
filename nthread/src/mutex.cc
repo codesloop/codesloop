@@ -25,8 +25,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "mutex.hh"
 #include "common.h"
-#include <string.h>
-#include <string>
+#include "str.hh"
 
 #ifdef WIN32
 # include "mutex_impl_windows.cc"
@@ -85,7 +84,7 @@ namespace csl
 
     // no-copy
     mutex::mutex(const mutex & other) 
-      : impl_((impl *)0) {throw std::string("should never be called"); }
+      : impl_((impl *)0) {throw common::str("should never be called"); }
 
     mutex & mutex::operator=(const mutex & other) { return *this; }
   }

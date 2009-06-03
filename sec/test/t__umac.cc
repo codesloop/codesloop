@@ -31,9 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "umac_ae.h"
 #include "tbuf.hh"
 #include "test_timer.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "common.h"
 #include <assert.h>
 
 using namespace csl::common;

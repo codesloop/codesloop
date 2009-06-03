@@ -26,6 +26,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "param.hh"
 #include "synqry.hh"
 #include "_shared_impl.hh"
+#include "str.hh"
 
 /**
   @file synqry.cc
@@ -59,7 +60,7 @@ namespace csl
     bool synqry::next(columns_t & cols, fields_t & fields) { return impl_->next(cols,fields); }
     bool synqry::next() { return impl_->next(); }
     bool synqry::execute(const char * sql) { return impl_->execute(sql); }
-    bool synqry::execute(const char * sql, std::string & result)  { return impl_->execute(sql, result); }
+    bool synqry::execute(const char * sql, common::str & result)  { return impl_->execute(sql, result); }
 
     void synqry::use_exc(bool yesno) { impl_->use_exc(yesno); }
     bool synqry::use_exc() { return impl_->use_exc(); }

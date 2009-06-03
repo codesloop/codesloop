@@ -37,8 +37,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tbuf.hh"
 #include "pbuf.hh"
 #include "synqry.hh"
+#include "str.hh"
 #ifdef __cplusplus
-#include <string>
 #include <vector>
 
 namespace csl
@@ -144,7 +144,7 @@ namespace csl
 
         virtual strvar & operator=(const strvar & other);
         virtual strvar & operator=(const char * other);
-        virtual strvar & operator=(const std::string & other);
+        virtual strvar & operator=(const common::str & other);
         virtual strvar & operator=(const value_t & other);
         virtual strvar & operator=(const common::pbuf & other);
         virtual const value_t & operator*() const;

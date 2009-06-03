@@ -24,6 +24,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "param.hh"
+#include "str.hh"
 #include "_shared_impl.hh"
 
 /**
@@ -46,12 +47,12 @@ namespace csl
 
     bool param::get(long long & val) const { return impl_->get(val); }
     bool param::get(double & val) const { return impl_->get(val); }
-    bool param::get(std::string & val) const { return impl_->get(val); }
+    bool param::get(common::str & val) const { return impl_->get(val); }
     bool param::get(blob_t & val) const { return impl_->get(val); }
 
     void param::set(long long val) { impl_->set(val); }
     void param::set(double val) { impl_->set(val); }
-    void param::set(const std::string & val) { impl_->set(val); }
+    void param::set(const common::str & val) { impl_->set(val); }
     void param::set(const char * val) { impl_->set(val); }
     void param::set(const blob_t & val) { impl_->set(val); }
     void param::set(const unsigned char * ptr,unsigned int size) { impl_->set(ptr,size); }

@@ -32,10 +32,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pbuf.hh"
 #include "zfile.hh"
 #include "mpool.hh"
+#include "common.h"
 #include "test_timer.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <assert.h>
 
 using namespace csl::common;
@@ -99,7 +97,7 @@ namespace test_xdrbuf {
     xdrbuf xb(pb);
 
     xb << "Hello World";
-    std::string hw;
+    common::str hw;
 
     xb.rewind();
 
@@ -140,13 +138,13 @@ namespace test_xdrbuf {
       /* add invalid pointer */
       xx << (char *)0;
 
-      std::string zz;
+      common::str zz;
 
       xx >> zz;
     }
     catch( csl::common::exc e )
     {
-      std::string es;
+      common::str es;
       e.to_string(es);
       fprintf(stderr,"Exception caught: %s\n",es.c_str());
       caught = true;
@@ -290,7 +288,7 @@ namespace test_xdrbuf {
 
       while( true )
       {
-        std::string i;
+        common::str i;
         xb >> i;
       };
     }
@@ -320,7 +318,7 @@ namespace test_xdrbuf {
 
       while( true )
       {
-        std::string i;
+        common::str i;
         xb >> i;
       };
     }

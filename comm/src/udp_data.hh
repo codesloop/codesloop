@@ -42,8 +42,7 @@ namespace csl
   using sec::bignum;
 
   using common::tbuf;
-
-  using std::string;
+  using common::str;
 
   namespace comm
   {
@@ -61,7 +60,7 @@ namespace csl
           /* this is what we need to decode the incoming packet */
           virtual bool operator()( const saltbuf_t & old_salt,       // in
                                    const SAI & addr,                 // in
-                                   std::string & sesskey ) = 0;      // out
+                                   str & sesskey ) = 0;              // out
       };
 
       class handle_data_callback
@@ -72,14 +71,14 @@ namespace csl
           virtual bool send_reply( const saltbuf_t & old_salt,
                                    const saltbuf_t & new_salt,
                                    const SAI & addr,
-                                   const std::string & sesskey,
+                                   const str & sesskey,
                                    int sock,
                                    const b1024_t & data );
 
           virtual bool operator()( const saltbuf_t & old_salt,  // in: from request
                                    const saltbuf_t & new_salt,  // in: generated
                                    const SAI & addr,            // in: from request
-                                   const std::string & sesskey, // in: looked up in cb
+                                   const str & sesskey,         // in: looked up in cb
                                    int sock,                    // in: from handler
                                    const b1024_t & data ) = 0;  // in: decrypted from request
       };
@@ -91,7 +90,7 @@ namespace csl
           virtual bool operator()( const saltbuf_t & old_salt,          // in
                                    const saltbuf_t & new_salt,          // in
                                    const SAI & addr,                    // in
-                                   const std::string & sesskey ) = 0;   // in
+                                   const str & sesskey ) = 0;           // in
       };
 
       class data_handler : public recvr::msg_handler
@@ -113,14 +112,14 @@ namespace csl
                          const msg & m );
 
           bool init_data( saltbuf_t & new_salt,    // received in encrypted part
-                          const string & sesskey,  // needed for decrypt packet
+                          const str & sesskey,     // needed for decrypt packet
                           const msg & m,           // the messages as received
                           b1024_t & recvdta );     // the decrypted data
 
           /* data packet */
           bool prepare_data( const saltbuf_t & old_salt,
                              const saltbuf_t & new_salt,
-                             const string & sesskey,
+                             const str & sesskey,
                              const b1024_t & senddta,
                              msg & m );
       };
@@ -208,7 +207,7 @@ namespace csl
 
           saltbuf_t    server_salt_;
           saltbuf_t    my_salt_;
-          string       session_key_;
+          str          session_key_;
 
           bool init();
 
@@ -222,8 +221,8 @@ namespace csl
           inline void my_salt(const saltbuf_t & s) { my_salt_ = s;    }
 
           /* session_key */
-          inline const string & session_key() const { return session_key_; }
-          inline void session_key(const string & s) { session_key_ = s;    }
+          inline const str & session_key() const { return session_key_; }
+          inline void session_key(const str & s) { session_key_ = s;    }
 
           /* auth_addr */
           inline const SAI & addr() const { return addr_; }

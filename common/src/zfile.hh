@@ -34,10 +34,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "pbuf.hh"
+#include "str.hh"
 #ifdef __cplusplus
 #include <memory>
 #include <vector>
-#include <string>
 
 namespace csl
 {
@@ -196,7 +196,7 @@ namespace csl
          @param str Reference of the output string
          @return true if successful, false otherwise
       */
-      bool dump_data(std::string & str);
+      bool dump_data(common::str & str);
 
       /**
          @brief Allocates a continous buffer and puts the uncompressed data into that
@@ -300,7 +300,7 @@ namespace csl
          @param str Reference of the output string
          @return true if successful, false otherwise
       */
-      bool dump_zdata(std::string & str);
+      bool dump_zdata(common::str & str);
 
       /**
          @brief Allocates a continous buffer and puts the compressed data into that

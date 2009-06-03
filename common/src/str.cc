@@ -24,6 +24,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "str.hh"
+#include "exc.hh"
 #include "common.h"
 
 /**
@@ -35,13 +36,47 @@ namespace csl
 {
   namespace common
   {
+    size_t str::find(const str & s) const
+    {
+      return '\0';
+    }
+
+    size_t str::find(wchar_t w) const
+    {
+      const wchar_t * d = data();
+      return '\0';
+    }
+
+    size_t str::find(const wchar_t * str) const
+    {
+      if( empty() ) return npos;
+      if( !str )    return npos;
+
+      const wchar_t * res = 0;
+
+      if( (res = wcsstr(data(),str)) == NULL ) return npos;
+
+      return (res-data());
+    }
+
     str& str::operator+=(const str& s)
     {
       // remove trailing NULL character
-      buf_.allocate( size() * sizeof(wchar_t) ); 
+      buf_.allocate( size() * sizeof(wchar_t) );
+
+      // append new string
+      buf_.append( s.buffer() );
+
+      return *this;
+    }
+
+    str& str::operator+=(const wchar_t * s)
+    {
+      // remove trailing NULL character
+      buf_.allocate( size() * sizeof(wchar_t) );
 
       // append new string 
-      buf_.append( s.buffer() );
+      buf_.append( (unsigned char *)s, sizeof(wchar_t) * (wcslen(s)+1) );
 
       return *this;
     }
@@ -53,7 +88,7 @@ namespace csl
       wchar_t t = 0;
 
       if ( start > size() )
-        throw exc(exc::rs_invalid_param,exc::cm_str,"out of range");
+        throw exc(exc::rs_invalid_param,exc::cm_str,L"out of range");
 
       // shrink length to fit in
       if ( size() < length + start )
@@ -68,6 +103,15 @@ namespace csl
     }
 
     /* public interface */
+
+    wchar_t str::at(const size_t n) const
+    {
+      if ( n > wcslen( data() ) )
+        throw exc(exc::rs_invalid_param,exc::cm_str);
+
+      return data()[n];
+    }
+
   };
 };
 

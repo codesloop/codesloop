@@ -29,7 +29,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unistd.h>
 #include <sys/time.h>
 #include <errno.h>
-#include <string.h>
 
 /**
   @file mutex_impl_pthread.cc

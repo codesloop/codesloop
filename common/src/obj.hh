@@ -32,8 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @todo document me
  */
 
-#include <stdlib.h>
-#include <string.h>
+#include "common.h"
 #ifdef __cplusplus
 
 namespace csl

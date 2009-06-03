@@ -33,9 +33,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    The implementation is based on SQLite3
  */
 
+#include "str.hh"
 #ifdef __cplusplus
 #include <memory>
-#include <string>
 
 namespace csl
 {
@@ -73,13 +73,13 @@ namespace csl
             depending on the use_exc() value it may throw an slt3::exc exception
 
             if use_exc is true it throws otherwise it displays an error message on stderr */
-        bool open(const char * db);
+        bool open(const wchar_t * db);
 
         /** @brief Returns the name used for opening the database
             @return the pathname of the database opened 
 
            if the open() was not successful than name().empty() == true */
-        const std::string & name() const;
+        const common::str & name() const;
 
         /** @brief Closes an SQLite3 connection
             @return true if successful

@@ -37,8 +37,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "param.hh"
 #include <math.h>
 #include <assert.h>
-#include <stdlib.h>
-#include <string>
 
 using namespace csl::slt3;
 
@@ -99,7 +97,7 @@ namespace test_sqlite {
       {
         tran st(t);
         synqry q(st);
-        std::string v;
+	common::str v;
         assert( q.execute("CREATE TABLE t(i INT);") == true );
         assert( q.execute("INSERT INTO t (i) VALUES(1);") == true );
         assert( q.execute("SELECT COUNT(*) FROM t;",v) == true );
@@ -120,7 +118,7 @@ namespace test_sqlite {
       {
         tran st(t);
         synqry q(st);
-        std::string v;
+	common::str v;
         assert( q.execute("CREATE TABLE tint(i INT NOT NULL);") == true );
         assert( q.prepare("INSERT INTO tint (i) VALUES(?);") == true );
         param & p(q.get_param(1));
@@ -184,20 +182,20 @@ namespace test_sqlite {
         assert( cols.get_at(2)->type_ == synqry::colhead::t_integer );
         assert( cols.get_at(3)->type_ == synqry::colhead::t_integer );
 
-        assert( std::string("i1") == cols.get_at(0)->name_ );
-        assert( std::string("i2") == cols.get_at(1)->name_ );
-        assert( std::string("i3") == cols.get_at(2)->name_ );
-        assert( std::string("i4") == cols.get_at(3)->name_ );
+        assert( common::str("i1") == cols.get_at(0)->name_ );
+        assert( common::str("i2") == cols.get_at(1)->name_ );
+        assert( common::str("i3") == cols.get_at(2)->name_ );
+        assert( common::str("i4") == cols.get_at(3)->name_ );
 
-        assert( std::string("intp") == cols.get_at(0)->table_ );
-        assert( std::string("intp") == cols.get_at(1)->table_ );
-        assert( std::string("intp") == cols.get_at(2)->table_ );
-        assert( std::string("intp") == cols.get_at(3)->table_ );
+        assert( common::str("intp") == cols.get_at(0)->table_ );
+        assert( common::str("intp") == cols.get_at(1)->table_ );
+        assert( common::str("intp") == cols.get_at(2)->table_ );
+        assert( common::str("intp") == cols.get_at(3)->table_ );
 
-        assert( std::string("main") == cols.get_at(0)->db_ );
-        assert( std::string("main") == cols.get_at(1)->db_ );
-        assert( std::string("main") == cols.get_at(2)->db_ );
-        assert( std::string("main") == cols.get_at(3)->db_ );
+        assert( common::str("main") == cols.get_at(0)->db_ );
+        assert( common::str("main") == cols.get_at(1)->db_ );
+        assert( common::str("main") == cols.get_at(2)->db_ );
+        assert( common::str("main") == cols.get_at(3)->db_ );
       }
 
       {
@@ -264,20 +262,20 @@ namespace test_sqlite {
         assert( cols.get_at(2)->type_ == synqry::colhead::t_double );
         assert( cols.get_at(3)->type_ == synqry::colhead::t_double );
 
-        assert( std::string("d1") == cols.get_at(0)->name_ );
-        assert( std::string("d2") == cols.get_at(1)->name_ );
-        assert( std::string("d3") == cols.get_at(2)->name_ );
-        assert( std::string("d4") == cols.get_at(3)->name_ );
+        assert( common::str("d1") == cols.get_at(0)->name_ );
+        assert( common::str("d2") == cols.get_at(1)->name_ );
+        assert( common::str("d3") == cols.get_at(2)->name_ );
+        assert( common::str("d4") == cols.get_at(3)->name_ );
 
-        assert( std::string("doublep") == cols.get_at(0)->table_ );
-        assert( std::string("doublep") == cols.get_at(1)->table_ );
-        assert( std::string("doublep") == cols.get_at(2)->table_ );
-        assert( std::string("doublep") == cols.get_at(3)->table_ );
+        assert( common::str("doublep") == cols.get_at(0)->table_ );
+        assert( common::str("doublep") == cols.get_at(1)->table_ );
+        assert( common::str("doublep") == cols.get_at(2)->table_ );
+        assert( common::str("doublep") == cols.get_at(3)->table_ );
 
-        assert( std::string("main") == cols.get_at(0)->db_ );
-        assert( std::string("main") == cols.get_at(1)->db_ );
-        assert( std::string("main") == cols.get_at(2)->db_ );
-        assert( std::string("main") == cols.get_at(3)->db_ );
+        assert( common::str("main") == cols.get_at(0)->db_ );
+        assert( common::str("main") == cols.get_at(1)->db_ );
+        assert( common::str("main") == cols.get_at(2)->db_ );
+        assert( common::str("main") == cols.get_at(3)->db_ );
       }
 
       {
@@ -330,22 +328,22 @@ namespace test_sqlite {
       assert( cols.get_at(0)->type_ == synqry::colhead::t_string );
       assert( cols.get_at(1)->type_ == synqry::colhead::t_string );
 
-      assert( std::string("t1") == cols.get_at(0)->name_ );
-      assert( std::string("t2") == cols.get_at(1)->name_ );
+      assert( common::str("t1") == cols.get_at(0)->name_ );
+      assert( common::str("t2") == cols.get_at(1)->name_ );
 
-      assert( std::string("textp") == cols.get_at(0)->table_ );
-      assert( std::string("textp") == cols.get_at(1)->table_ );
+      assert( common::str("textp") == cols.get_at(0)->table_ );
+      assert( common::str("textp") == cols.get_at(1)->table_ );
 
-      assert( std::string("main") == cols.get_at(0)->db_ );
-      assert( std::string("main") == cols.get_at(1)->db_ );
+      assert( common::str("main") == cols.get_at(0)->db_ );
+      assert( common::str("main") == cols.get_at(1)->db_ );
     }
 
     {
       assert( flds.get_at(0)->size_ == 4 );
       assert( flds.get_at(1)->size_ == 7 );
 
-      assert( std::string(flds.get_at(0)->stringval_) == "'_.\"" );
-      assert( std::string(flds.get_at(1)->stringval_) == "0123.'\"" );
+      assert( common::str(flds.get_at(0)->stringval_) == "'_.\"" );
+      assert( common::str(flds.get_at(1)->stringval_) == "0123.'\"" );
     }
 
     assert( q.next(cols,flds) == false );
@@ -393,14 +391,14 @@ namespace test_sqlite {
       assert( cols.get_at(0)->type_ == synqry::colhead::t_blob );
       assert( cols.get_at(1)->type_ == synqry::colhead::t_blob );
 
-      assert( std::string("b1") == cols.get_at(0)->name_ );
-      assert( std::string("b2") == cols.get_at(1)->name_ );
+      assert( common::str("b1") == cols.get_at(0)->name_ );
+      assert( common::str("b2") == cols.get_at(1)->name_ );
 
-      assert( std::string("blobp") == cols.get_at(0)->table_ );
-      assert( std::string("blobp") == cols.get_at(1)->table_ );
+      assert( common::str("blobp") == cols.get_at(0)->table_ );
+      assert( common::str("blobp") == cols.get_at(1)->table_ );
 
-      assert( std::string("main") == cols.get_at(0)->db_ );
-      assert( std::string("main") == cols.get_at(1)->db_ );
+      assert( common::str("main") == cols.get_at(0)->db_ );
+      assert( common::str("main") == cols.get_at(1)->db_ );
     }
 
     {

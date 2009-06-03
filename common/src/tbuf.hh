@@ -33,8 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "pbuf.hh"
-#include <stdlib.h>
-#include <string.h>
+#include "common.h"
 #ifdef __cplusplus
 
 namespace csl
@@ -56,6 +55,11 @@ namespace csl
           *this = other;
         }
 
+        inline tbuf(const char * other) : data_(preallocated_), size_(0) // TODO test copy constructor!!!
+        {
+          *this = other;
+        }
+
         inline bool operator==(const tbuf & other) const
         {
           if( other.size_ != size_ ) return false;
@@ -63,6 +67,12 @@ namespace csl
           if( data_ == 0 )           return false;
           if( other.data_ == 0 )     return false;
           return (::memcmp(other.data_,data_,size_) == 0);
+        }
+
+        inline tbuf & operator=(const char * other)
+        {
+          if( other ) set((const unsigned char *)other,::strlen(other)+1);
+          return *this;
         }
 
         inline tbuf & operator=(const pbuf & other)

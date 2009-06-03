@@ -25,6 +25,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "exc.hh"
 #include "common.h"
+#include "str.hh"
 
 /**
   @file csl_sec/src/exc.cc
@@ -62,9 +63,9 @@ namespace csl
       };
     }
 
-    void exc::to_string(std::string & res)
+    void exc::to_string(common::str & res)
     {
-      std::string t("Exception");
+      common::str t("Exception");
       if( file_.size() > 0 && line_ > 0 )
       {
         char tx[200];

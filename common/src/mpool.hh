@@ -35,8 +35,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "pvlist.hh"
-#include <stdlib.h>
-#include <string.h>
+#include "common.h"
 #ifdef __cplusplus
 
 namespace csl

@@ -34,8 +34,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tran.hh"
 #include "synqry.hh"
 #include "common.h"
+#include "str.hh"
 #include <assert.h>
-#include <stdlib.h>
 
 using namespace csl::slt3;
 
@@ -82,7 +82,7 @@ namespace test_param {
     param::blob_t b((unsigned char *)(&intval),((unsigned char *)(&intval))+sizeof(intval));
 
     test_conv( intval, (double)123456789.0, p );
-    test_conv( intval, std::string("123456789"), p );
+    test_conv( intval, common::str("123456789"), p );
     test_conv( intval, b, p );
 
     // double to anything
@@ -90,11 +90,11 @@ namespace test_param {
     b.assign((unsigned char *)(&dblval),((unsigned char *)(&dblval))+sizeof(dblval));
 
     test_conv( dblval, (long long)357987ll, p );
-    test_conv( dblval, std::string("357987.1234500000"), p );
+    test_conv( dblval, common::str("357987.1234500000"), p );
     test_conv( dblval, b, p );
 
     // string to anything
-    std::string strval("Hello world");
+    common::str strval("Hello world");
     b.assign(strval.begin(),strval.end());
 
     test_conv( strval, (long long)0ll, p );

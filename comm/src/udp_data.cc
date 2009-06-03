@@ -31,15 +31,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pbuf.hh"
 #include "xdrbuf.hh"
 #include "common.h"
-#include <string>
+#include "str.hh"
 
 namespace csl
 {
   using namespace nthread;
   using namespace sec;
   using namespace common;
-
-  using std::string;
 
   namespace
   {
@@ -65,7 +63,7 @@ namespace csl
       bool handle_data_callback::send_reply( const saltbuf_t & old_salt,
                                              const saltbuf_t & new_salt,
                                              const SAI & addr,
-                                             const std::string & sesskey,
+                                             const str & sesskey,
                                              int sock,
                                              const b1024_t & data )
       {
@@ -117,7 +115,7 @@ namespace csl
       }
 
       bool udp::data_handler::init_data( saltbuf_t & new_salt,
-                                         const string & sesskey,
+                                         const str & sesskey,
                                          const msg & m,
                                          b1024_t & recvdta )
       {
@@ -200,7 +198,7 @@ namespace csl
         }
         catch( common::exc e )
         {
-          std::string s;
+          str s;
           e.to_string(s);
           fprintf(stderr,"Exception caught: %s\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_data_handler,false);
@@ -211,7 +209,7 @@ namespace csl
       /* data packet */
       bool udp::data_handler::prepare_data( const saltbuf_t & old_salt,
                                             const saltbuf_t & new_salt,
-                                            const string & sesskey,
+                                            const str & sesskey,
                                             const b1024_t & senddta,
                                             msg & m )
       {
@@ -287,7 +285,7 @@ namespace csl
         }
         catch( common::exc e )
         {
-          std::string s;
+          str s;
           e.to_string(s);
           fprintf(stderr,"Exception caught: %s\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_data_handler,false);
@@ -324,7 +322,7 @@ namespace csl
         {
           saltbuf_t old_salt;
           saltbuf_t new_salt;
-          string    sesskey;
+          str       sesskey;
           b1024_t   recvdta;
 
           if( get_salt(old_salt,ms) == false ) { return; }
@@ -354,13 +352,13 @@ namespace csl
         }
         catch( common::exc e )
         {
-          std::string s;
+          str s;
           e.to_string(s);
           fprintf(stderr,"Error [%s:%d]: %s\n",__FILE__,__LINE__,s.c_str());
         }
         catch( comm::exc e )
         {
-          std::string s;
+          str s;
           e.to_string(s);
           fprintf(stderr,"Error [%s:%d]: %s\n",__FILE__,__LINE__,s.c_str());
         }

@@ -25,9 +25,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "mutex.hh"
 #include "common.h"
-#include <errno.h>
-#include <string.h>
-#include <windows.h>
 
 /**
   @file mutex_impl_windows.cc

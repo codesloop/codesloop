@@ -25,7 +25,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "event.hh"
 #include "common.h"
-#include <string>
+#include "str.hh"
 
 #ifdef WIN32
 # include "event_impl_windows.cc"
@@ -82,7 +82,7 @@ namespace csl
 
     // no-copy
     event::event(const event & other) 
-      : impl_((impl *)0) {throw std::string("should never be called"); }
+      : impl_((impl *)0) {throw common::str("should never be called"); }
 
     event & event::operator=(const event & other) { return *this; }
   }

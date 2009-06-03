@@ -24,6 +24,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "exc.hh"
+#include "str.hh"
 #include "common.h"
 
 /**
@@ -35,44 +36,44 @@ namespace csl
 {
   namespace nthread
   {
-    const char * exc::reason_string(int rc)
+    const wchar_t * exc::reason_string(int rc)
     {
       switch( rc )
       {
-        case rs_invalid_param:   return "Invalid parameter received.";
-        case rs_start_error:     return "Cannot start thread.";
-        case rs_stop_error:      return "Cannot stop thread.";
+        case rs_invalid_param:   return L"Invalid parameter received.";
+        case rs_start_error:     return L"Cannot start thread.";
+        case rs_stop_error:      return L"Cannot stop thread.";
         case rs_unknown:
-          default:               return "Unknown reason";
+          default:               return L"Unknown reason";
       };
     }
 
-    const char * exc::component_string(int cm)
+    const wchar_t * exc::component_string(int cm)
     {
       switch( cm )
       {
-        case cm_thrpool:   return "nthread::thrpool";
+        case cm_thrpool:   return L"nthread::thrpool";
         case cm_unknown:
-          default:         return "unknown component";
+          default:         return L"unknown component";
       };
     }
 
-    void exc::to_string(std::string & res)
+    void exc::to_string(common::str & res)
     {
-      std::string t("Exception");
+      common::str t(L"Exception");
       if( file_.size() > 0 && line_ > 0 )
       {
-        char tx[200];
-        SNPRINTF(tx,199,"(%s:%d): ",file_.c_str(),line_);
+        wchar_t tx[200];
+        SNPRINTF(tx,199,L"(%s:%d): ",file_.c_str(),line_);
         t += tx;
       }
-      t += " [";
+      t += L" [";
       t += component_string(component_);
-      t += "] [";
+      t += L"] [";
       t += reason_string(reason_);
-      t += "] ";
+      t += L"] ";
       if( text_.size() > 0 ) t+= text_;
-      res.swap(t);
+      res = t;
     }
 
     exc::exc() : reason_(rs_unknown), component_(cm_unknown) {}

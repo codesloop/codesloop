@@ -33,8 +33,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "exc.hh"
 #include "common.h"
 #include "mpool.hh"
+#include "str.hh"
 #include <assert.h>
-#include <stdlib.h>
 
 using namespace csl::slt3;
 
@@ -65,8 +65,8 @@ namespace test_reg {
     reg::pool_t p;
     reg::item i;
     assert( r.get( "Hello",i,p ) == true );
-    assert( std::string("Hello") == i.name_ );
-    assert( std::string("hello.db") == i.path_ );
+    assert( common::str("Hello") == i.name_ );
+    assert( common::str("hello.db") == i.path_ );
   }
 
   /** @test how double inserting the same values behave */

@@ -33,9 +33,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "zfile.hh"
 #include "mpool.hh"
 #include "csl_sec.h"
+#include "common.h"
+#include "str.hh"
 #include <assert.h>
-#include <stdio.h>
-#include <string.h>
 
 using namespace csl::sec;
 using csl::common::zfile;
@@ -73,7 +73,7 @@ void test_zfile( )
 */
 void test_alg( )
 {
-  std::string dbg;
+  common::str dbg;
   ecdh_pkt ph;
   assert( ph.add_algorithms(algs_subset) == true );
 }
@@ -83,7 +83,7 @@ void test_alg( )
 */
 void test_addkeys( )
 {
-  std::string dbg;
+  common::str dbg;
   ecdh_pkt ph;
   assert( ph.add_algorithms(algs_subset) == true );
   assert( ph.add_keys_to_challenge(CSL_EC_STRENGTH_MIN, CSL_EC_STRENGTH_MAX) == true );
@@ -107,7 +107,7 @@ void test_addkey( int which )
 */
 void test_addkey_dbg( int from, int to )
 {
-  std::string dbg;
+  common::str dbg;
   ecdh_pkt ph;
   unsigned char * xdta;
   size_t sz;
@@ -122,7 +122,7 @@ void test_addkey_dbg( int from, int to )
 */
 void test_add_cert( int dbgme )
 {
-  std::string dbg;
+  common::str dbg;
   ecdh_pkt ph;
   unsigned char * xdta;
   size_t sz1=0,sz2=0;

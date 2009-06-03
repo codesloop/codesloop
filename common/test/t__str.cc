@@ -34,10 +34,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "exc.hh"
 #include "common.h"
 #include "str.hh"
-#include <stdlib.h>
-#include <string.h>
 #include <assert.h>
-#include <string>
 #include <sys/stat.h>
 
 using csl::common::str;
