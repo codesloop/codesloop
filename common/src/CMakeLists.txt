@@ -44,8 +44,10 @@ ADD_LIBRARY( csl_common STATIC
              xdrbuf.cc     xdrbuf.hh
              test_timer.c  test_timer.h
              common.h      pvlist.hh
-             mpool.hh      tbuf.hh
              circbuf.hh
-             logger.cc     logger.hh)
+             mpool.hh      tbuf.hh 
+             logger.cc     logger.hh
+             str.hh        str.cc
+             obj.hh )
 
 # -- EOF --

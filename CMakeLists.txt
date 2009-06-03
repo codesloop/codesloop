@@ -32,6 +32,7 @@ SUBDIRS( common
          nthread
          slt3
          sched
+         rpc
          example )
 
 # -- EOF --

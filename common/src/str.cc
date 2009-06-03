@@ -23,24 +23,52 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_common_csl_common_hh_included_
-#define _csl_common_csl_common_hh_included_
+#include "str.hh"
+#include "common.h"
 
 /**
-   @file csl_common.hh
-   @brief Common features
+  @file csl_common/src/str.cc
+  @brief implementation of simple string class
  */
 
-#include "common.h"
-#include "exc.hh"
-#include "pvlist.hh"
-#include "mpool.hh"
-#include "pbuf.hh"
-#include "tbuf.hh"
-#include "xdrbuf.hh"
-#include "zfile.hh"
-#include "test_timer.h"
-#include "str.hh"
-#include "logger.hh"
+namespace csl
+{
+  namespace common
+  {
+    str& str::operator+=(const str& s)
+    {
+      // remove trailing NULL character
+      buf_.allocate( size() * sizeof(wchar_t) ); 
 
-#endif /* _csl_common_csl_common_hh_included_ */
+      // append new string 
+      buf_.append( s.buffer() );
+
+      return *this;
+    }
+
+    str str::substr(const size_t start, const size_t length) const
+    {
+      str s;
+      size_t len = length; 
+      wchar_t t = 0;
+
+      if ( start > size() )
+        throw exc(exc::rs_invalid_param,exc::cm_str,"out of range");
+
+      // shrink length to fit in
+      if ( size() < length + start )
+        len = size() - start;
+
+      // copy string
+      s.buf_.set( (unsigned char *)(data() + start), (len) * sizeof(wchar_t) );
+      // terminate string
+      s.buf_.append( (unsigned char *)&t, sizeof(wchar_t) );
+
+      return s;
+    }
+
+    /* public interface */
+  };
+};
+
+/* EOF */

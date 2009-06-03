@@ -31,10 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief item @todo item
  */
 
-#include "conn.hh"
-#include "reg.hh"
-#include "obj.hh"
-#include "var.hh"
+#include "csl_slt3.hh"
 #include "head.hh"
 #include "data.hh"
 #ifdef __cplusplus

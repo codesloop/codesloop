@@ -1,4 +1,4 @@
-# Copyright (c) 2008, David Beck
+# Copyright (c) 2008,2009, David Beck, Tamas Foldi
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -21,47 +21,15 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IF(WIN32)
-  LINK_DIRECTORIES(
-                    ../src
-                    "C:/Program Files/GnuWin32/lib/"
-                    $ENV{ZLIB_DEV_ENV}/lib
-                    ../../../3rdparty/zlib/GnuWin32/lib
-                  )
+# SET(CMAKE_VERBOSE_MAKEFILE ON)
 
-  INCLUDE_DIRECTORIES(
-                       ../src
-                       "C:/Program Files/GnuWin32/include/"
-                       $ENV{ZLIB_DEV_ENV}/include
-                       ../../../3rdparty/zlib/GnuWin32/include
-                     )
-  LINK_LIBRARIES(
-                  csl_common
-                  zlib
-                  wsock32
-                )
 
-ELSE(WIN32)
+# -- EOF --DD_DEFINITIONS(-Wall -g3)
 
-  ADD_DEFINITIONS( -Wall -O3 )
-  LINK_DIRECTORIES( ../src )
-  INCLUDE_DIRECTORIES( ../src )
+ADD_CUSTOM_COMMAND( OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/csl_rpc.cpp
+                  PRE_BUILD
+                  COMMAND ragel -G2 ARGS -o csl_rpc.cpp csl_rpc.rl
+                  MAIN_DEPENDENCY csl_rpc.rl
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} )
 
-  LINK_LIBRARIES(
-                  csl_common
-                  z
-                )
-
-ENDIF(WIN32)
-
-ADD_EXECUTABLE( t__zfile    t__zfile.cc )
-ADD_EXECUTABLE( t__circbuf  t__circbuf.cc )
-ADD_EXECUTABLE( t__pvlist   t__pvlist.cc )
-ADD_EXECUTABLE( t__mpool    t__mpool.cc )
-ADD_EXECUTABLE( t__pbuf     t__pbuf.cc )
-ADD_EXECUTABLE( t__tbuf     t__tbuf.cc )
-ADD_EXECUTABLE( t__xdrbuf   t__xdrbuf.cc )
-ADD_EXECUTABLE(t__logger   t__logger.cc)
-ADD_EXECUTABLE(t__str      t__str.cc)
-
-# -- EOF --
+ADD_EXECUTABLE( csl_rpc csl_rpc.cpp )

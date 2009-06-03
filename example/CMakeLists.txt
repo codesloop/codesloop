@@ -51,6 +51,15 @@ IF(WIN32)
                   )
 ELSE(WIN32)
 
+  find_library(DLOPEN_FOUND NAMES dl PATH /usr/lib /lib /usr/local/lib)
+  set(LIBDL)
+
+  if (DLOPEN_FOUND)
+   set(LIBDL dl)
+   set(HAVE_LIBDL TRUE)
+  endif (DLOPEN_FOUND)
+
+
   LINK_DIRECTORIES( 
                   ../common/src
                   ../sec/src
@@ -70,7 +79,7 @@ ELSE(WIN32)
                   csl_nthread
                   csl_common
                   pthread
-                  dl
+                  ${LIBDL}
                   z )
 ENDIF(WIN32)
 

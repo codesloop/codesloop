@@ -33,13 +33,21 @@ IF(WIN32)
                   csl_nthread
                   csl_common )
 ELSE(WIN32)
+  find_library(DLOPEN_FOUND NAMES dl PATH /usr/lib /lib /usr/local/lib)
+  set(LIBDL)
+
+  if (DLOPEN_FOUND)
+   set(LIBDL dl)
+   set(HAVE_LIBDL TRUE)
+  endif (DLOPEN_FOUND)
+
   ADD_DEFINITIONS( -Wall -g3 -pthread )
   LINK_LIBRARIES(
 	  csl_slt3 
 	  csl_nthread 
 	  csl_common
 	  pthread 
-	  dl
+	  ${LIBDL}
 	  )
 ENDIF(WIN32)
 

@@ -30,6 +30,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pbuf.hh"
 #include "tbuf.hh"
+#include "str.hh"
 #include "test_timer.h"
 #include "zfile.hh"
 #include "common.h"
@@ -40,6 +41,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using csl::common::pbuf;
 using csl::common::tbuf;
+using csl::common::str;
 
 /** @brief contains tests related to tbuf */
 namespace test_tbuf {
@@ -60,6 +62,12 @@ namespace test_tbuf {
   void string_baseline()
   {
     std::string b;
+  }
+
+  /** @test baseline for performance comparison */
+  void str_baseline()
+  {
+    str b;
   }
 
   /** @test adds 6 bytes to tbuf (for performance comparison) */
@@ -83,6 +91,13 @@ namespace test_tbuf {
     b = "Hello";
   }
 
+  /** @test @todo */
+  void str_hello()
+  {
+    str b;
+    b = L"Hello";
+  }
+
 } // end of test_tbuf
 
 using namespace test_tbuf;
@@ -91,10 +106,12 @@ int main()
 {
   csl_common_print_results( "tbuf_baseline      ", csl_common_test_timer_v0(tbuf_baseline),"" );
   csl_common_print_results( "pbuf_baseline      ", csl_common_test_timer_v0(pbuf_baseline),"" );
+  csl_common_print_results( "str_baseline       ", csl_common_test_timer_v0(str_baseline),"" );
   csl_common_print_results( "string_baseline    ", csl_common_test_timer_v0(string_baseline),"" );
 
   csl_common_print_results( "tbuf_hello         ", csl_common_test_timer_v0(tbuf_hello),"" );
   csl_common_print_results( "pbuf_hello         ", csl_common_test_timer_v0(pbuf_hello),"" );
+  csl_common_print_results( "str_hello          ", csl_common_test_timer_v0(str_hello),"" );
   csl_common_print_results( "string_hello       ", csl_common_test_timer_v0(string_hello),"" );
 
   return 0;

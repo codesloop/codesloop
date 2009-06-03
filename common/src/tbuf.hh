@@ -81,6 +81,12 @@ namespace csl
 
         inline tbuf & operator=(const tbuf & other) // TODO test copy operator!!!
         {
+          /* return immediately if they are the same */
+          if( &other == this || other.data_ == data_ )
+          {
+            return *this;
+          }
+
           /* quick return if empty */
           if( other.is_empty() ) { reset(); return *this; }
 
@@ -201,11 +207,39 @@ namespace csl
           }
         }
 
+        /** @todo return value */
         inline void append(unsigned char c)
         {
           set_at(size_,c);
         }
 
+        /** @todo test  */
+        inline bool append(const unsigned char * dta,unsigned int sz)
+        {
+          /* if no data on the other side we are done */
+          if( !sz )  { return true; }
+
+          /* if sz is not zero than dta must not be null */
+          if( !dta ) { return false; }
+
+          if( allocate(size_+sz) )
+          {
+            /* copy in the data */
+            ::memcpy(data_+size_-sz,dta,sz);
+            return true;
+          }
+          else
+          {
+            return false;
+          }
+        }
+
+        inline bool append(const tbuf & other)
+        {
+          return append( other.data(), other.size() );
+        }
+
+        /** @todo return value */
         inline void set_at(unsigned int pos,unsigned char c)
         {
           unsigned char * t = allocate(pos+1);

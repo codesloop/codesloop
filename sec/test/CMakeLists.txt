@@ -53,28 +53,34 @@ IF(WIN32)
 
 ELSE(WIN32)
 
-  ADD_DEFINITIONS( -Wall
-                   -g3
-                 )
+  find_library(DLOPEN_FOUND NAMES dl PATH /usr/lib /lib /usr/local/lib)
+  set(LIBDL)
 
-  INCLUDE_DIRECTORIES( ../src
-                       ../../common/src
-                       /usr/local/ssl/include
-                     )
+  if (DLOPEN_FOUND)
+    set(LIBDL dl)
+    set(HAVE_LIBDL TRUE)
+  endif (DLOPEN_FOUND)
 
-  LINK_LIBRARIES( csl_sec
-                  csl_common
-                  ssl
-                  crypto
-                  z
-                  stdc++
-                  dl
-                )
+  ADD_DEFINITIONS( -Wall -g3 )
 
-  LINK_DIRECTORIES( ../src
-                    ../../common/src
-                    /usr/local/ssl/lib
-                  )
+  INCLUDE_DIRECTORIES(
+      ../src
+      ../../common/src
+      /usr/local/ssl/include )
+
+  LINK_LIBRARIES(
+      csl_sec
+      csl_common
+      ssl
+      crypto
+      z
+      stdc++
+      ${LIBDL} )
+
+  LINK_DIRECTORIES(
+      ../src
+      ../../common/src
+       /usr/local/ssl/lib )
 
 ENDIF(WIN32)
 

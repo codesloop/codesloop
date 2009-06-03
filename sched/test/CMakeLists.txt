@@ -64,7 +64,16 @@ IF(WIN32)
 
 ELSE(WIN32)
 
+ find_library(DLOPEN_FOUND NAMES dl PATH /usr/lib /lib /usr/local/lib)
+  set(LIBDL)
+
+  if (DLOPEN_FOUND)
+   set(LIBDL dl)
+   set(HAVE_LIBDL TRUE)
+  endif (DLOPEN_FOUND)
+
   ADD_DEFINITIONS( -Wall -g3 -pthread )
+
   INCLUDE_DIRECTORIES(
       ../src
       ../../common/src
@@ -84,7 +93,7 @@ ELSE(WIN32)
       z
       stdc++
       pthread
-      dl )
+      ${LIBDL} )
 
   LINK_DIRECTORIES(
       ../src

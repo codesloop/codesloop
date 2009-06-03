@@ -23,24 +23,23 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_common_csl_common_hh_included_
-#define _csl_common_csl_common_hh_included_
+#include "str.hh"
 
 /**
-   @file csl_common.hh
-   @brief Common features
+  @file csl_common/src/str.cc
+  @brief implementation of simple string class
  */
 
-#include "common.h"
-#include "exc.hh"
-#include "pvlist.hh"
-#include "mpool.hh"
-#include "pbuf.hh"
-#include "tbuf.hh"
-#include "xdrbuf.hh"
-#include "zfile.hh"
-#include "test_timer.h"
-#include "str.hh"
-#include "logger.hh"
+namespace csl
+{
+  namespace common
+  {
+    /** @todo implement */
+    obj::obj() : logger_flags_(0)
+    {}
 
-#endif /* _csl_common_csl_common_hh_included_ */
+    /* public interface */
+  };
+};
+
+/* EOF */

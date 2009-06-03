@@ -63,6 +63,7 @@ namespace csl
           cm_xdrbuf,  ///<xdrbuf component
           cm_circbuf, ///<circbuf component
           cm_logger,  ///<logger component
+          cm_str      ///<str component
         };
 
         /** @brief converts reason code to string */

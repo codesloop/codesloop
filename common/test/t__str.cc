@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+   Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -23,24 +23,52 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_common_csl_common_hh_included_
-#define _csl_common_csl_common_hh_included_
-
 /**
-   @file csl_common.hh
-   @brief Common features
+   @file t__logger.cc
+   @brief Tests to verify logger
  */
 
-#include "common.h"
-#include "exc.hh"
-#include "pvlist.hh"
-#include "mpool.hh"
-#include "pbuf.hh"
-#include "tbuf.hh"
-#include "xdrbuf.hh"
-#include "zfile.hh"
-#include "test_timer.h"
-#include "str.hh"
-#include "logger.hh"
+#define DEBUG 
 
-#endif /* _csl_common_csl_common_hh_included_ */
+#include "logger.hh"
+#include "exc.hh"
+#include "common.h"
+#include "str.hh"
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+#include <string>
+#include <sys/stat.h>
+
+using csl::common::str;
+
+int main()
+{
+
+  str s( L"HELLO" );
+  assert( s.size() == 5 );
+  assert( wcscmp(s.c_str(), L"HELLO") == 0 );
+
+  assert( s[0] == L'H' );
+  assert( s[1] == L'E' );
+
+  str s2 = s;
+  assert( s2.size() == 5 );
+  assert( wcscmp(s2.c_str(), L"HELLO") == 0 );
+
+  str s3(s);
+  assert( s3.size() == 5 );
+  assert( wcscmp(s3.c_str(), L"HELLO") == 0 );
+
+  s2 += L" WORLD";
+  assert( s2.size() == 11 );
+  assert( wcscmp(s2.c_str(), L"HELLO WORLD") == 0 );
+
+  s2 = s.substr(1,3) + s2.substr(6,999);
+  assert( s2.size() == 8 );
+  assert( wcscmp(s2.c_str(), L"ELLWORLD") == 0 );
+
+  return 0;
+}
+
+/* EOF */
