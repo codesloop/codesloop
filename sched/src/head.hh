@@ -33,6 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "conn.hh"
 #include "reg.hh"
+#include "sql.hh"
 #include "obj.hh"
 #include "var.hh"
 #ifdef __cplusplus
