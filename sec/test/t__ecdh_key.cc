@@ -54,14 +54,14 @@ namespace test_ecdh_key {
   void bl_prime192v3_1()
   {
     ecdh_key k;
-    k.algname("prime192v3");
+    k.algname(L"prime192v3");
   }
 
   /** @test generate prime192v3 keypair */
   void bl_prime192v3_2()
   {
     ecdh_key k;
-    k.algname("prime192v3");
+    k.algname(L"prime192v3");
     bignum private_key;
     assert( k.gen_keypair(private_key) == true );
   }
@@ -70,8 +70,8 @@ namespace test_ecdh_key {
   void print_prime192v3()
   {
     ecdh_key k1,k2;
-    k1.algname("prime192v3");
-    k2.algname("prime192v3");
+    k1.algname(L"prime192v3");
+    k2.algname(L"prime192v3");
 
     bignum private_key1;
     bignum private_key2;
@@ -79,7 +79,7 @@ namespace test_ecdh_key {
     assert( k1.gen_keypair(private_key1) == true );
     assert( k2.gen_keypair(private_key2) == true );
 
-    common::str shared1,shared2;
+    str shared1,shared2;
 
     assert( k1.gen_sha1hex_shared_key(private_key2,shared1) == true );
     assert( k2.gen_sha1hex_shared_key(private_key1,shared2) == true );
@@ -93,22 +93,22 @@ namespace test_ecdh_key {
     k2.print();
     private_key2.print();
 
-    printf("SHARED KEY: %s\n",shared1.c_str());
+    PRINTF(L"SHARED KEY: %sl\n",shared1.c_str());
 
     pbuf pb1,pb2;
 
     assert( k1.gen_shared_key(private_key2,pb1) == true );
     assert( k2.gen_shared_key(private_key1,pb2) == true );
 
-    printf("Key sizes: [%d] [%d]\n",pb1.size(),pb2.size());
+    PRINTF(L"Key sizes: [%d] [%d]\n",pb1.size(),pb2.size());
   }
 
   /** @test generate prime192v3 keypairs and shared key */
   void prime192v3_keypair()
   {
     ecdh_key k1,k2;
-    k1.algname("prime192v3");
-    k2.algname("prime192v3");
+    k1.algname(L"prime192v3");
+    k2.algname(L"prime192v3");
 
     bignum private_key1;
     bignum private_key2;
@@ -116,7 +116,7 @@ namespace test_ecdh_key {
     assert( k1.gen_keypair(private_key1) == true );
     assert( k2.gen_keypair(private_key2) == true );
 
-    common::str shared1,shared2;
+    str shared1,shared2;
 
     assert( k1.gen_sha1hex_shared_key(private_key2,shared1) == true );
     assert( k2.gen_sha1hex_shared_key(private_key1,shared2) == true );
@@ -130,7 +130,7 @@ namespace test_ecdh_key {
     k2.print();
     private_key2.print();
 
-    printf("SHARED KEY: %s\n",shared1.c_str());
+    PRINTF(L"SHARED KEY: %ls\n",shared1.c_str());
   }
 
   struct rndata

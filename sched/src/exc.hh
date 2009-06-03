@@ -69,10 +69,10 @@ namespace csl
         };
 
         /** @brief converts reason code to string */
-        static const char * reason_string(int rc);
+        static const wchar_t * reason_string(int rc);
 
         /** @brief converts component code to string */
-        static const char * component_string(int cm);
+        static const wchar_t * component_string(int cm);
 
         /** @brief converts exception to string */
         void to_string(common::str & res);

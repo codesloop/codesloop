@@ -37,8 +37,5 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "crypt_buf.hh"
 #include "crypt_pkt.hh"
 #include "ecdh_key.hh"
-#include "ecdh_pkt.hh"
-#include "xdr_challenge.hh"
-#include "xdr_response.hh"
 
 #endif /* _csl_sec_csl_sec_hh_included_ */

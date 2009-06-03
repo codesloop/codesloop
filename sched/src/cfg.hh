@@ -38,15 +38,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 
 #ifndef SCHED_CFG_DB_NAME
-#define SCHED_CFG_DB_NAME "sched_cfg"
+#define SCHED_CFG_DB_NAME L"sched_cfg"
 #endif /*SCHED_CFG_DB_NAME*/
 
 #ifndef SCHED_CFG_TABLE_NAME
-#define SCHED_CFG_TABLE_NAME "cfgs"
+#define SCHED_CFG_TABLE_NAME L"cfgs"
 #endif /*SCHED_CFG_TABLE_NAME*/
 
 #ifndef SCHED_CFG_DB_DEFAULT_PATH
-#define SCHED_CFG_DB_DEFAULT_PATH "cfg.db"
+#define SCHED_CFG_DB_DEFAULT_PATH L"cfg.db"
 #endif /*SCHED_CFG_DB_DEFAULT_PATH*/
 
 namespace csl
@@ -63,10 +63,10 @@ namespace csl
       public:
         inline cfg():
           /* database fields */
-          id_(             "id",           *this,"PRIMARY KEY ASC AUTOINCREMENT"),
-          schedule_id_(    "schedule_id",  *this,"NOT NULL"),
-          name_(           "name",         *this,"NOT NULL"),
-          value_(          "value",        *this,"NOT NULL")
+          id_(             L"id",           *this, L"PRIMARY KEY ASC AUTOINCREMENT"),
+          schedule_id_(    L"schedule_id",  *this, L"NOT NULL"),
+          name_(           L"name",         *this, L"NOT NULL"),
+          value_(          L"value",        *this, L"NOT NULL")
           {}
 
         inline ~cfg() { }

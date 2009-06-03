@@ -48,8 +48,8 @@ namespace test_udp_data_server {
 
   struct SessionStore
   {
-    typedef vector<unsigned char>   ucharvec_t;
-    typedef map<ucharvec_t,str>     map_t;
+    typedef std::vector<unsigned char>   ucharvec_t;
+    typedef std::map<ucharvec_t,str>     map_t;
 
     mutex mtx_;
     map_t m_;
@@ -62,9 +62,9 @@ namespace test_udp_data_server {
       RegisterCB(SessionStore & s) : sessions_(&s) {}
 
       bool operator()( const udp::SAI & addr,
-                       const common::str & login,
-                       const common::str & pass,
-                       const common::str & session_key,
+                       const str & login,
+                       const str & pass,
+                       const str & session_key,
                        const udp::saltbuf_t & peer_salt,
                        udp::saltbuf_t & my_salt )
       {
@@ -88,7 +88,7 @@ namespace test_udp_data_server {
 
       bool operator()( const udp::saltbuf_t & old_salt,
                        const udp::SAI & addr,
-                       common::str & sesskey )
+                       str & sesskey )
       {
         const unsigned char * dp = old_salt.data();
         SessionStore::ucharvec_t v(dp,dp+old_salt.size());
@@ -116,7 +116,7 @@ namespace test_udp_data_server {
       bool operator()( const udp::saltbuf_t & old_salt,  // in: from request
                        const udp::saltbuf_t & new_salt,  // in: generated
                        const udp::SAI & addr,            // in: from request
-                       const common::str & sesskey,      // in: looked up in cb
+                       const str & sesskey,      // in: looked up in cb
                        int sock,                         // in: from handler
                        const udp::b1024_t & data )       // in: decrypted from request
       {
@@ -136,7 +136,7 @@ namespace test_udp_data_server {
       bool operator()( const udp::saltbuf_t & old_salt,          // in
                        const udp::saltbuf_t & new_salt,          // in
                        const udp::SAI & addr,                    // in
-                       const common::str & sesskey )             // in
+                       const str & sesskey )             // in
       {
         const unsigned char * dp = old_salt.data();
         SessionStore::ucharvec_t v(dp,dp+old_salt.size());

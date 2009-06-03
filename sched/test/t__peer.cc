@@ -40,6 +40,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace csl::slt3;
 using namespace csl::sched;
 using namespace csl::sec;
+using namespace csl::common;
 
 /** @brief contains tests related to sched::peer */
 namespace test_peer {
@@ -82,7 +83,7 @@ namespace test_peer {
     p.id_ = 199999999;
     assert( p.find_by_id(t) == false );
 
-    p.common_name_ = "Whatever I put here";
+    p.common_name_ = L"Whatever I put here";
     assert( p.find_by(t,1) == false );
   }
 
@@ -93,16 +94,16 @@ namespace test_peer {
     conn & db(p.db());
     tran t(db);
     ecdh_key pubk;
-    pubk.algname("prime192v3");
+    pubk.algname(L"prime192v3");
     bignum   privk;
     assert( pubk.gen_keypair(privk) == true );
     p.public_key(pubk);
     p.private_key(privk);
-    p.common_name_ = "Hello";
+    p.common_name_ = L"Hello";
     p.create(t);
 
     peer p2;
-    p2.common_name_ = "Hello";
+    p2.common_name_ = L"Hello";
     assert( p2.find_by(t,1) == true );
     assert( p2.public_key().has_data() == true );
     assert( p2.private_key().is_empty() == false );
@@ -123,16 +124,16 @@ namespace test_peer {
     conn & db(p.db());
     tran t(db);
     ecdh_key pubk;
-    pubk.algname("prime192v3");
+    pubk.algname(L"prime192v3");
     bignum   privk;
     assert( pubk.gen_keypair(privk) == true );
     p.public_key(pubk);
     p.private_key(privk);
-    p.common_name_ = "Hello";
+    p.common_name_ = L"Hello";
     p.create(t);
 
     peer p2;
-    p2.common_name_ = "Hello";
+    p2.common_name_ = L"Hello";
     assert( p2.find_by(t,1) == true );
     assert( p2.public_key().has_data() == true );
     assert( p2.private_key().is_empty() == false );
@@ -150,7 +151,7 @@ namespace test_peer {
     peer p2;
     conn & db(p2.db());
     tran t(db);
-    p2.common_name_ = "Hello";
+    p2.common_name_ = L"Hello";
     assert( p2.find_by(t,1) == true );
     assert( p2.public_key().has_data() == true );
     assert( p2.private_key().is_empty() == false );
@@ -163,7 +164,7 @@ namespace test_peer {
     conn & db(p2.db());
     tran t(db);
 
-    p2.common_name_ = "Hello";
+    p2.common_name_ = L"Hello";
     assert( p2.find_by(t,1) == true );
 
     peer p3;
@@ -172,8 +173,8 @@ namespace test_peer {
     assert( p3.find_by(t,2) == true );
     assert( p3.public_key().is_empty() == false );
     assert( p3.private_key().has_data() == true );
-    assert( p3.public_key().algname() == "prime192v3" );
-    assert( common::str(p3.common_name_.c_str()) == "Hello" );
+    assert( p3.public_key().algname() == L"prime192v3" );
+    assert( str(p3.common_name_.c_str()) == L"Hello" );
     assert( p3.id_.get() == p2.id_.get() );
   }
 
@@ -203,7 +204,7 @@ int main()
     conn & db(p.db());
     tran t(db);
     synqry q(t);
-    q.execute("DELETE FROM peers;");
+    q.execute(L"DELETE FROM peers;");
   }
 
   return 0;

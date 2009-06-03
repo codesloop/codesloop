@@ -41,13 +41,14 @@ namespace csl
 
   namespace
   {
-    static void print_hex(const char * prefix,const void * vp,size_t len)
+    static void print_hex(const wchar_t * prefix,const void * vp,size_t len)
     {
       unsigned char * hx = (unsigned char *)vp;
-      printf("%s [%04d] : ",prefix,len);
-      for(size_t i=0;i<len;++i) printf("%.2X",hx[i]);
-      printf("\n");
+      PRINTF(L"%sl [%04d] : ",prefix,len);
+      for(size_t i=0;i<len;++i) PRINTF(L"%.2X",hx[i]);
+      PRINTF(L"\n");
     }
+
   }
 
   namespace comm
@@ -73,13 +74,13 @@ namespace csl
 
         if( helper.prepare_data(old_salt,new_salt,sesskey,data,m) == false )
         {
-          fprintf(stderr,"[%s:%d] prepare_data failed\n",__FILE__,__LINE__);
+          FPRINTF(stderr,L"[%sl:%d] prepare_data failed\n",L""__FILE__,__LINE__);
           return false;
         }
 
         if( (::sendto( sock, (const char *)m.data_, m.size_ , 0, (const struct sockaddr *)&addr, sizeof(addr) )) != (int)(m.size_) )
         {
-          fprintf(stderr,"[%s:%d] sendto failed\n",__FILE__,__LINE__);
+          FPRINTF(stderr,L"[%s:%d] sendto failed\n",L""__FILE__,__LINE__);
           return false;
         }
 
@@ -140,8 +141,8 @@ namespace csl
           /* encrypted part */
           if( debug() )
           {
-            printf(" -- [%ld] : packet_type : %d\n",xbo.position(),packet_type );
-            printf("  -- Session Key: '%s'\n",sesskey.c_str());
+            PRINTF(L" -- [%ld] : packet_type : %d\n",xbo.position(),packet_type );
+            PRINTF(L"  -- Session Key: '%s'\n",sesskey.c_str());
           }
 
           /* de-compile packet */
@@ -189,9 +190,9 @@ namespace csl
 
           if( debug() )
           {
-            print_hex("  -- oldsalt ",head.data(),head.size());
-            print_hex("  -- newsalt ",new_salt.data(),new_salt.size());
-            print_hex("  -- data    ",recvdta.data(),recvdta.size());
+            print_hex(L"  -- oldsalt ",head.data(),head.size());
+            print_hex(L"  -- newsalt ",new_salt.data(),new_salt.size());
+            print_hex(L"  -- data    ",recvdta.data(),recvdta.size());
           }
 
           return true;
@@ -200,7 +201,7 @@ namespace csl
         {
           str s;
           e.to_string(s);
-          fprintf(stderr,"Exception caught: %s\n",s.c_str());
+          FPRINTF(stderr,L"Exception caught: %sl\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_data_handler,false);
         }
         return false;
@@ -239,8 +240,8 @@ namespace csl
 
           if( debug() )
           {
-            printf(" ++ [%ld] : packet_type : %d\n",xbo.position(),msg::data_p );
-            printf("  ++ Session Key: '%s'\n",sesskey.c_str());
+            PRINTF(L" ++ [%ld] : packet_type : %d\n",xbo.position(),msg::data_p );
+            PRINTF(L"  ++ Session Key: '%s'\n",sesskey.c_str());
           }
 
           /* compile packet */
@@ -273,10 +274,10 @@ namespace csl
 
           if( debug() )
           {
-            print_hex("  ++ DATA PROL ",m.data_,outer.size());
-            print_hex("  ++ DATA HEAD ",head.data(),head.size() );
-            print_hex("  ++ DATA DATA ",data.data(),data.size() );
-            print_hex("  ++ DATA FOOT ",foot.data(),foot.size() );
+            print_hex(L"  ++ DATA PROL ",m.data_,outer.size());
+            print_hex(L"  ++ DATA HEAD ",head.data(),head.size() );
+            print_hex(L"  ++ DATA DATA ",data.data(),data.size() );
+            print_hex(L"  ++ DATA FOOT ",foot.data(),foot.size() );
           }
 
           /* return the data */
@@ -287,7 +288,7 @@ namespace csl
         {
           str s;
           e.to_string(s);
-          fprintf(stderr,"Exception caught: %s\n",s.c_str());
+          FPRINTF(stderr,L"Exception caught: %sl\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_data_handler,false);
         }
         return false;
@@ -354,13 +355,13 @@ namespace csl
         {
           str s;
           e.to_string(s);
-          fprintf(stderr,"Error [%s:%d]: %s\n",__FILE__,__LINE__,s.c_str());
+          FPRINTF(stderr,L"Error [%sl:%d]: %s\n",L""__FILE__,__LINE__,s.c_str());
         }
         catch( comm::exc e )
         {
           str s;
           e.to_string(s);
-          fprintf(stderr,"Error [%s:%d]: %s\n",__FILE__,__LINE__,s.c_str());
+          FPRINTF(stderr,L"Error [%sl:%d]: %s\n",L""__FILE__,__LINE__,s.c_str());
         }
       }
 

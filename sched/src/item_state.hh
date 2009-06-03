@@ -38,15 +38,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 
 #ifndef SCHED_ITEM_STATE_DB_NAME
-#define SCHED_ITEM_STATE_DB_NAME "sched_item_state"
+#define SCHED_ITEM_STATE_DB_NAME L"sched_item_state"
 #endif /*SCHED_ITEM_STATE_DB_NAME*/
 
 #ifndef SCHED_ITEM_STATE_TABLE_NAME
-#define SCHED_ITEM_STATE_TABLE_NAME "item_states"
+#define SCHED_ITEM_STATE_TABLE_NAME L"item_states"
 #endif /*SCHED_ITEM_STATE_TABLE_NAME*/
 
 #ifndef SCHED_ITEM_STATE_DB_DEFAULT_PATH
-#define SCHED_ITEM_STATE_DB_DEFAULT_PATH "item_state.db"
+#define SCHED_ITEM_STATE_DB_DEFAULT_PATH L"item_state.db"
 #endif /*SCHED_ITEM_STATE_DB_DEFAULT_PATH*/
 
 namespace csl
@@ -63,10 +63,10 @@ namespace csl
       public:
         inline item_state():
           /* database fields */
-          id_(           "id",           *this,"PRIMARY KEY ASC AUTOINCREMENT"),
-          item_id_(      "item_id",      *this,"NOT NULL"),
-          peer_id_(      "peer_id",      *this,"NOT NULL"),
-          peer_state_(   "peer_state",   *this,"NOT NULL")
+          id_(           L"id",           *this, L"PRIMARY KEY ASC AUTOINCREMENT"),
+          item_id_(      L"item_id",      *this, L"NOT NULL"),
+          peer_id_(      L"peer_id",      *this, L"NOT NULL"),
+          peer_state_(   L"peer_state",   *this, L"NOT NULL")
         {}
 
         inline ~item_state() { }

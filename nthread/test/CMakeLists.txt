@@ -23,8 +23,8 @@
 
 IF(WIN32)
 
-  LINK_LIBRARIES( csl_common
-                  csl_nthread
+  LINK_LIBRARIES( csl_nthread
+                  csl_common
                   zlib )
 
   INCLUDE_DIRECTORIES( ../src
@@ -44,8 +44,8 @@ ELSE(WIN32)
   INCLUDE_DIRECTORIES( ../src
                        ../../common/src )
 
-  LINK_LIBRARIES( csl_common
-                  csl_nthread
+  LINK_LIBRARIES( csl_nthread
+                  csl_common
                   pthread
                   z )
 

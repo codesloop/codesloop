@@ -39,15 +39,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 
 #ifndef SCHED_SCHEDULE_DB_NAME
-#define SCHED_SCHEDULE_DB_NAME "sched_schedule"
+#define SCHED_SCHEDULE_DB_NAME L"sched_schedule"
 #endif /*SCHED_SCHEDULE_DB_NAME*/
 
 #ifndef SCHED_SCHEDULE_TABLE_NAME
-#define SCHED_SCHEDULE_TABLE_NAME "schedules"
+#define SCHED_SCHEDULE_TABLE_NAME L"schedules"
 #endif /*SCHED_SCHEDULE_TABLE_NAME*/
 
 #ifndef SCHED_SCHEDULE_DB_DEFAULT_PATH
-#define SCHED_SCHEDULE_DB_DEFAULT_PATH "sched.db"
+#define SCHED_SCHEDULE_DB_DEFAULT_PATH L"sched.db"
 #endif /*SCHED_SCHEDULE_DB_DEFAULT_PATH*/
 
 namespace csl
@@ -64,9 +64,9 @@ namespace csl
       public:
         inline schedule() :
               /* database fields */
-              id_(             "id",           *this,"PRIMARY KEY ASC AUTOINCREMENT"),
-              common_name_(    "common_name",  *this,"UNIQUE NOT NULL"),
-              owner_peer_id_(  "owner_peer_id",*this,"NOT NULL")
+              id_(             L"id",            *this, L"PRIMARY KEY ASC AUTOINCREMENT"),
+              common_name_(    L"common_name",   *this, L"UNIQUE NOT NULL"),
+              owner_peer_id_(  L"owner_peer_id", *this, L"NOT NULL")
         {}
 
         inline ~schedule() { }

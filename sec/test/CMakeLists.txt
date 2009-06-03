@@ -88,12 +88,9 @@ ADD_EXECUTABLE(t__umac               t__umac.cc)
 ADD_EXECUTABLE(t__crypt_buf          t__crypt_buf.cc)
 ADD_EXECUTABLE(t__crypt_pkt          t__crypt_pkt.cc)
 ADD_EXECUTABLE(t__derive_ec_params   t__derive_ec_params.c)
-ADD_EXECUTABLE(t__ecdh_pkt           t__ecdh_pkt.cc)
 ADD_EXECUTABLE(t__read_x509_cert     t__read_x509_cert.c)
 ADD_EXECUTABLE(t__sha1               t__sha1.c)
 ADD_EXECUTABLE(t__bignum             t__bignum.cc)
 ADD_EXECUTABLE(t__ecdh_key           t__ecdh_key.cc)
-ADD_EXECUTABLE(t__xdr_challenge      t__xdr_challenge.cc)
-ADD_EXECUTABLE(t__xdr_response       t__xdr_response.cc)
 
 # -- EOF --

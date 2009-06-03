@@ -41,13 +41,14 @@ namespace csl
 
   namespace
   {
-    static void print_hex(const char * prefix,const void * vp,size_t len)
+    static void print_hex(const wchar_t * prefix,const void * vp,size_t len)
     {
       unsigned char * hx = (unsigned char *)vp;
-      printf("%s [%04d] : ",prefix,len);
-      for(size_t i=0;i<len;++i) printf("%.2X",hx[i]);
-      printf("\n");
+      PRINTF(L"%sl [%04d] : ",prefix,len);
+      for(size_t i=0;i<len;++i) PRINTF(L"%.2X",hx[i]);
+      PRINTF(L"\n");
     }
+
   }
 
   namespace comm
@@ -100,9 +101,9 @@ namespace csl
 
           if( debug() )
           {
-            printf(" -- [%ld] : packet_type : %d\n",xbo.position(),packet_type );
-            printf(" -- [%ld] : ",xbo.position()); peer_public_key.print();
-            printf("  -- Session Key: '%s'\n",session_key.c_str());
+            PRINTF(L" -- [%ld] : packet_type : %d\n",xbo.position(),packet_type );
+            PRINTF(L" -- [%ld] : ",xbo.position()); peer_public_key.print();
+            PRINTF(L"  -- Session Key: '%s'\n",session_key.c_str());
           }
 
           /* de-compile packet */
@@ -149,10 +150,10 @@ namespace csl
 
           if( debug() )
           {
-            print_hex("  -- RAND ",slt.data(),slt.size());
-            printf(   "  -- [%ld] login: '%s'\n",xbi.position(),login.c_str());
-            printf(   "  -- [%ld] pass: '%s'\n",xbi.position(),pass.c_str());
-            printf(   "  -- [%ld] sesskey: '%s'\n",xbi.position(),sesskey.c_str());
+            print_hex(L"  -- RAND ",slt.data(),slt.size());
+            PRINTF(   L"  -- [%ld] login:   '%sl'\n",xbi.position(),login.c_str());
+            PRINTF(   L"  -- [%ld] pass:    '%sl'\n",xbi.position(),pass.c_str());
+            PRINTF(   L"  -- [%ld] sesskey: '%sl'\n",xbi.position(),sesskey.c_str());
           }
 
           return true;
@@ -161,7 +162,7 @@ namespace csl
         {
           common::str s;
           e.to_string(s);
-          fprintf(stderr,"Exception caught: %s\n",s.c_str());
+          FPRINTF(stderr,L"Exception caught: %sl\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_auth_handler,false);
         }
       }
@@ -196,8 +197,8 @@ namespace csl
 
           if( debug() )
           {
-            printf(" ++ [%ld] : packet_type : %d\n",xbo.position(),msg::unicast_htua_p );
-            printf("  ++ Session Key: '%s'\n",sesskey.c_str());
+            PRINTF(L" ++ [%ld] : packet_type : %d\n",xbo.position(),msg::unicast_htua_p );
+            PRINTF(L"  ++ Session Key: '%s'\n",sesskey.c_str());
           }
 
           /* compile packet */
@@ -230,11 +231,11 @@ namespace csl
 
           if( debug() )
           {
-            print_hex("  ++ UCHTUA PROL ",m.data_,outer.size());
-            print_hex("  ++ UCHTUA HEAD ",head.data(),head.size() );
-            print_hex("  ++ UCHTUA DATA ",data.data(),data.size() );
-            print_hex("  ++ UCHTUA FOOT ",foot.data(),foot.size() );
-            printf(   "  ++ UCHTUA size: %d\n",retlen );
+            print_hex(L"  ++ UCHTUA PROL ",m.data_,outer.size());
+            print_hex(L"  ++ UCHTUA HEAD ",head.data(),head.size() );
+            print_hex(L"  ++ UCHTUA DATA ",data.data(),data.size() );
+            print_hex(L"  ++ UCHTUA FOOT ",foot.data(),foot.size() );
+            PRINTF(  L"  ++ UCHTUA size: %d\n",retlen );
           }
 
           /* return the data */
@@ -245,7 +246,7 @@ namespace csl
         {
           common::str s;
           e.to_string(s);
-          fprintf(stderr,"Exception caught: %s\n",s.c_str());
+          FPRINTF(stderr,L"Exception caught: %sl\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_auth_handler,false);
         }
         return false;
@@ -319,7 +320,7 @@ namespace csl
           /* prepare response htua packet */
           if( prepare_htua( pkt_salt, my_salt, sesskey, ms) == false )
           {
-            fprintf(stderr,"[%s:%d] Error in prepare_htua()\n",__FILE__,__LINE__);
+            FPRINTF(stderr,L"[%s:%d] Error in prepare_htua()\n",L""__FILE__,__LINE__);
             return;
           }
 
@@ -329,7 +330,7 @@ namespace csl
           if( sendto( socket_, (const char *)ms.data_, ms.size_, 0,
               (struct sockaddr *)&(ms.sender_), len ) != (int)(ms.size_) )
           {
-            fprintf(stderr,"[%s:%d] Error in sendto(%d)\n",__FILE__,__LINE__,socket_);
+            FPRINTF(stderr,L"[%sl:%d] Error in sendto(%d)\n",L""__FILE__,__LINE__,socket_);
             perror("sendto");
             return;
           }
@@ -338,13 +339,13 @@ namespace csl
         {
           common::str s;
           e.to_string(s);
-          fprintf(stderr,"Error [%s:%d]: %s\n",__FILE__,__LINE__,s.c_str());
+          FPRINTF(stderr,L"Error [%sl:%d]: %s\n",L""__FILE__,__LINE__,s.c_str());
         }
         catch( comm::exc e )
         {
           common::str s;
           e.to_string(s);
-          fprintf(stderr,"Error [%s:%d]: %s\n",__FILE__,__LINE__,s.c_str());
+          FPRINTF(stderr,L"Error [%sl:%d]: %s\n",L""__FILE__,__LINE__,s.c_str());
         }
       }
 
@@ -440,11 +441,13 @@ namespace csl
 
           xbo << (int32_t)msg::unicast_auth_p;
 
-          if( debug() ) { printf(" ++ [%ld] : packet_type : %d\n",xbo.position(),msg::unicast_auth_p ); }
-
           if( public_key_.to_xdr(xbo) == false ) { THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_auth_cli,false); }
 
-          if( debug() ) { printf(" ++ [%ld] : ",xbo.position()); public_key_.print(); }
+          if( debug() )
+          {
+            PRINTF(L" ++ [%ld] : packet_type : %d\n",xbo.position(),msg::unicast_auth_p );
+            PRINTF(L" ++ [%ld] : ",xbo.position()); public_key_.print();
+          }
 
           if( outer.size() > m.max_len() ) { THR(comm::exc::rs_too_big,comm::exc::cm_udp_auth_cli,false); }
 
@@ -462,7 +465,7 @@ namespace csl
 
           if( debug() )
           {
-            printf("  ++ login: '%s' pass: '%s' sesskey: '%s'\n",
+            PRINTF(L"  ++ login: '%s' pass: '%s' sesskey: '%s'\n",
                    login_.c_str(),pass_.c_str(),session_key_.c_str());
           }
 
@@ -481,7 +484,7 @@ namespace csl
             THR(comm::exc::rs_pubkey_empty,comm::exc::cm_udp_auth_cli,false);
           }
 
-          if( debug() ) { printf("  ++ Session Key: '%s'\n",session_key.c_str()); }
+          if( debug() ) { PRINTF(L"  ++ Session Key: '%s'\n",session_key.c_str()); }
 
           /* compile packet */
           crypt_pkt::saltbuf_t  salt;
@@ -514,11 +517,11 @@ namespace csl
 
           if( debug() )
           {
-            print_hex("  ++ UCAUTH PROL ",m.data_,outer.size());
-            print_hex("  ++ UCAUTH HEAD ",head.data(),head.size() );
-            print_hex("  ++ UCAUTH DATA ",data.data(),data.size() );
-            print_hex("  ++ UCAUTH FOOT ",foot.data(),foot.size() );
-            printf(   "  ++ UCAUTH size: %d\n",retlen );
+            print_hex(L"  ++ UCAUTH PROL ",m.data_,outer.size());
+            print_hex(L"  ++ UCAUTH HEAD ",head.data(),head.size() );
+            print_hex(L"  ++ UCAUTH DATA ",data.data(),data.size() );
+            print_hex(L"  ++ UCAUTH FOOT ",foot.data(),foot.size() );
+            PRINTF(  L"  ++ UCAUTH size: %d\n",retlen );
           }
 
           /* return the data */
@@ -529,7 +532,7 @@ namespace csl
         {
           common::str s;
           e.to_string(s);
-          fprintf(stderr,"Exception caught: %s\n",s.c_str());
+          FPRINTF(stderr,L"Exception caught: %sl\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_auth_cli,false);
         }
         return false;
@@ -547,7 +550,7 @@ namespace csl
           int32_t packet_type = 0;
           xbo >> packet_type;
 
-          if( debug() ) { printf(" -- [%ld] : packet_type : %d  size : %d\n",xbo.position(),packet_type,m.size_ ); }
+          if( debug() ) { PRINTF(L" -- [%ld] : packet_type : %d  size : %d\n",xbo.position(),packet_type,m.size_ ); }
 
           if( packet_type != msg::unicast_htua_p )
           {
@@ -558,7 +561,7 @@ namespace csl
           unsigned int          lenp = m.size_ - xbo.position();
 
           /* encrypted part */
-          if( debug() ) { printf("  -- Session Key: '%s'\n",session_key_.c_str()); }
+          if( debug() ) { PRINTF(L"  -- Session Key: '%s'\n",session_key_.c_str()); }
 
           /* de-compile packet */
           crypt_pkt::keybuf_t   key;
@@ -575,11 +578,11 @@ namespace csl
 
           if( debug() )
           {
-            print_hex("  ++ UCHTUA PROL ",m.data_,outer.size());
-            print_hex("  ++ UCHTUA HEAD ",head.data(),head.size() );
-            print_hex("  ++ UCHTUA DATA ",data.data(),data.size() );
-            print_hex("  ++ UCHTUA FOOT ",foot.data(),foot.size() );
-            print_hex("  ++ UCHTUA KEY  ",key.data(),key.size() );
+            print_hex(L"  ++ UCHTUA PROL ",m.data_,outer.size());
+            print_hex(L"  ++ UCHTUA HEAD ",head.data(),head.size() );
+            print_hex(L"  ++ UCHTUA DATA ",data.data(),data.size() );
+            print_hex(L"  ++ UCHTUA FOOT ",foot.data(),foot.size() );
+            print_hex(L"  ++ UCHTUA KEY  ",key.data(),key.size() );
           }
 
           crypt_pkt pk;
@@ -607,7 +610,7 @@ namespace csl
             THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_auth_cli,false);
           }
 
-          if( debug() ) { print_hex("  -- RAND ",server_salt_.data(),server_salt_.size()); }
+          if( debug() ) { print_hex(L"  -- RAND ",server_salt_.data(),server_salt_.size()); }
 
           return true;
         }
@@ -615,7 +618,7 @@ namespace csl
         {
           common::str s;
           e.to_string(s);
-          fprintf(stderr,"Exception caught: %s\n",s.c_str());
+          FPRINTF(stderr,L"Exception caught: %sl\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_auth_cli,false);
         }
         return false;

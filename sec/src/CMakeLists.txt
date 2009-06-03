@@ -69,11 +69,8 @@ ADD_LIBRARY( csl_sec STATIC
              exc.cc              exc.hh
              bignum.cc           bignum.hh
              ecdh_key.cc         ecdh_key.hh
-             xdr_challenge.cc    xdr_challenge.hh
-             xdr_response.cc     xdr_response.hh
              sha1_conv.cc        csl_sec.h
              gen_rand.cc
-             ecdh_pkt.cc         ecdh_pkt.hh
              crypt_buf.cc        crypt_buf.hh
              crypt_pkt.cc        crypt_pkt.hh
              # -- 3rd party UMAC and AES

@@ -38,15 +38,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 
 #ifndef SCHED_DATA_DB_NAME
-#define SCHED_DATA_DB_NAME "sched_data"
+#define SCHED_DATA_DB_NAME L"sched_data"
 #endif /*SCHED_DATA_DB_NAME*/
 
 #ifndef SCHED_DATA_TABLE_NAME
-#define SCHED_DATA_TABLE_NAME "data"
+#define SCHED_DATA_TABLE_NAME L"data"
 #endif /*SCHED_DATA_TABLE_NAME*/
 
 #ifndef SCHED_DATA_DB_DEFAULT_PATH
-#define SCHED_DATA_DB_DEFAULT_PATH "data.db"
+#define SCHED_DATA_DB_DEFAULT_PATH L"data.db"
 #endif /*SCHED_DATA_DB_DEFAULT_PATH*/
 
 namespace csl
@@ -63,10 +63,10 @@ namespace csl
       public:
         inline data():
           /* database fields */
-          id_(         "id",        *this,"PRIMARY KEY ASC AUTOINCREMENT"),
-          item_id_(    "item_id",   *this,"NOT NULL"),
-          is_inline_(  "is_inline", *this,"NOT NULL DEFAULT(0)"),
-          value_(      "value",     *this)
+          id_(         L"id",        *this, L"PRIMARY KEY ASC AUTOINCREMENT"),
+          item_id_(    L"item_id",   *this, L"NOT NULL"),
+          is_inline_(  L"is_inline", *this, L"NOT NULL DEFAULT(0)"),
+          value_(      L"value",     *this)
         {}
 
         inline ~data() { }
