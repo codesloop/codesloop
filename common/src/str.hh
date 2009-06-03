@@ -47,13 +47,13 @@ namespace csl
   namespace common
   {
     /** @todo document me */
-    class str 
+    class str : public obj
     {      
       public:
         enum { buf_size = 128 * sizeof(wchar_t) }; 
 
         /** @brief constructor */
-        inline str()  { }
+        inline str() { }
         
         /** @brief destructor 
         since there are not virtual functions, and we do not excpect inherited

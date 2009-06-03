@@ -47,6 +47,7 @@ ADD_LIBRARY( csl_common STATIC
              mpool.hh      tbuf.hh 
              logger.cc     logger.hh
              str.hh        str.cc
-             obj.hh)
+             obj.cc        obj.hh)
+
 
 # -- EOF --

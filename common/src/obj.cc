@@ -36,7 +36,8 @@ namespace csl
   {
     /** @todo implement */
     obj::obj() : logger_flags_(0)
-    {}
+    {
+    }
 
     /* public interface */
   };
