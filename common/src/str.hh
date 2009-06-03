@@ -88,6 +88,12 @@ namespace csl
         str& operator=(const char *);
 
         /** @brief let equal operator */
+        str& operator=(std::string s) 
+        {
+          return operator=(s.c_str());
+        }
+
+        /** @brief let equal operator */
         inline str& operator=(const str& s)
         {
           buf_ = s.buffer();

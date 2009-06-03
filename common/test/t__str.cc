@@ -148,6 +148,10 @@ int main()
   assert( cs.find( L'E') == 1 );
   assert( cs.find( L"LL") == 2 );
 
+  cs = std::string("HELLO");
+  assert( cs.size() == 5 );
+  assert( wcscmp(cs.c_str(), L"HELLO") == 0 );
+
   // performance
   csl_common_print_results( "str_baseline       ", csl_common_test_timer_v0(str_baseline),"" );
   csl_common_print_results( "string_baseline    ", csl_common_test_timer_v0(string_baseline),"" );
