@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -65,6 +65,60 @@ namespace csl
       s.buf_.append( (unsigned char *)&t, sizeof(wchar_t) );
 
       return s;
+    }
+
+    str::str(const char * mbstring)
+    {
+      size_t len =  strlen(mbstring)+1;
+      wchar_t wcstring[len];
+
+      if ( mbstowcs( wcstring, mbstring, len ) != size_t(-1) )
+      {
+        // wcstring includes trailing zero char
+        buf_.set( (unsigned char *)wcstring, len*sizeof(wchar_t) );
+      }      
+    }
+
+    str& str::operator=(const char * mbstring )
+    {
+      size_t len =  strlen(mbstring)+1;
+      wchar_t wcstring[len];
+
+      if ( mbstowcs( wcstring, mbstring, len ) != size_t(-1) )
+      {
+        // wcstring includes trailing zero char
+        buf_.set( (unsigned char *)wcstring, len*sizeof(wchar_t) ); 
+      }
+
+      return *this;
+    }
+
+    const size_t str::find(wchar_t c) const
+    {
+      size_t ret = size_t(-1);
+      size_t len = size();
+
+      for ( size_t pos = 0; pos < len ; pos++ ) 
+      {
+        if ( (*this)[pos] == c ) {
+          ret = pos;
+          break;
+        }
+      }
+
+      return ret;
+    }
+
+    const size_t str::find(const str & s) const
+    {
+      wchar_t * p = wcsstr( data(), s.data() );
+      size_t ret = size_t(-1);
+
+      if ( p != NULL ) {
+        ret = p - data();
+      }
+
+      return ret;
     }
 
     /* public interface */

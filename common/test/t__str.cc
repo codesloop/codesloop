@@ -68,6 +68,19 @@ int main()
   assert( s2.size() == 8 );
   assert( wcscmp(s2.c_str(), L"ELLWORLD") == 0 );
 
+  str cs( "HELLO" );
+  assert( cs.size() == 5 );
+  assert( wcscmp(cs.c_str(), L"HELLO") == 0 );
+
+  cs = "HELLO";
+  assert( cs.size() == 5 );
+  assert( wcscmp(cs.c_str(), L"HELLO") == 0 );
+
+  assert( cs.find( L'H') == 0 );
+  assert( cs.find( L'E') == 1 );
+  assert( cs.find( L"LL") == 2 );
+
+
   return 0;
 }
 

@@ -81,6 +81,12 @@ namespace csl
           return *this; 
         }
 
+        /** @brief copy constructor */
+        str(const char *);
+
+        /** @brief let equal operator */
+        str& operator=(const char *);
+
         /** @brief let equal operator */
         inline str& operator=(const str& s)
         {
@@ -163,6 +169,9 @@ namespace csl
            @param length take length bytes from origin str
         */
         str substr(const size_t start, const size_t length) const;
+
+        const size_t find(wchar_t) const;
+        const size_t find(const str &) const;
         
       private:
         tbuf<buf_size> buf_;
