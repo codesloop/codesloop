@@ -35,6 +35,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common.h"
 #include "exc.hh"
 #include "str.hh"
+#include "ustr.hh"
 #ifdef __cplusplus
 #include <utility>
 
@@ -129,6 +130,18 @@ namespace csl
         @return reference to xdrbuf
         @throw common::exc
 
+        @li puts a 32 bit integer to stream as size
+        @li puts size bytes of val string to pbuf
+        @li puts optional padding 1-3 bytes
+         */
+        xdrbuf & operator<<(const common::ustr & val);
+
+        /**
+        @brief serialize val to pbuf
+        @param val is the value to be serialized
+        @return reference to xdrbuf
+        @throw common::exc
+
         @li puts a 32 bit integer to stream as size (val.second)
         @li puts (val.second) bytes from val to pbuf (val.first)
         @li puts optional padding 1-3 bytes
@@ -178,6 +191,18 @@ namespace csl
         @li align internal pointer with 1-3 optional padding bytes
          */
         xdrbuf & operator>>(common::str & val);
+
+        /**
+        @brief deserialize val from pbuf
+        @param val is the value to be deserialized
+        @return reference to xdrbuf
+        @throw common::exc
+
+        @li reads a 32 bit integer from stream as size
+        @li reads size bytes from pbuf to val
+        @li align internal pointer with 1-3 optional padding bytes
+         */
+        xdrbuf & operator>>(common::ustr & val);
 
         /**
         @brief deserialize val from pbuf

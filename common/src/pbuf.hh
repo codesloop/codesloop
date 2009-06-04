@@ -94,7 +94,7 @@ namespace csl
         {
           unsigned int l=0;
           if( !str || (l=::strlen(str))== 0 ) return false;
-          return append((unsigned char *)str,l);
+          return append((unsigned char *)str,(l+1));
         }
 
         /**

@@ -30,7 +30,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <openssl/ecdh.h>
 #include <openssl/bn.h>
 #include <openssl/objects.h>
-#include "str.hh"
+#include "ustr.hh"
 #include "common.h"
 
 /**
@@ -158,7 +158,7 @@ namespace csl
 
       void reset() { if( key_ ) { EC_KEY_free(key_); key_ = 0; } }
 
-      bool gen_key(const common::str & algname)
+      bool gen_key(const common::ustr & algname)
       {
         int alg_nid = NID_undef;
 
@@ -172,16 +172,7 @@ namespace csl
         this->reset();
 
         /* get algorithm id */
-        char algnm[128];
-        size_t asz = wcstombs(algnm,algname.c_str(),126);
-        algnm[algname.size()] = 0;
-
-        if( asz == 0 )
-        {
-          THROWEXC("oEC_KEY cannot convert string!");
-        }
-
-        if( (alg_nid = name_to_nid_(algnm)) != NID_undef ) // TODO
+        if( (alg_nid = name_to_nid_(algname.c_str())) != NID_undef ) // TODO
         {
           if( (key_=EC_KEY_new_by_curve_name(alg_nid)) == NULL )
           {
@@ -198,7 +189,7 @@ namespace csl
         return false;
       }
 
-      bool init_key(const common::str & algname)
+      bool init_key(const common::ustr & algname)
       {
         int alg_nid = NID_undef;
 
@@ -212,16 +203,7 @@ namespace csl
         this->reset();
 
         /* get algorithm id */
-        char algnm[128];
-        size_t asz = wcstombs(algnm,algname.c_str(),126);
-        algnm[algname.size()] = 0;
-
-        if( asz == 0 )
-        {
-          THROWEXC("oEC_KEY cannot convert string!");
-        }
-
-        if( (alg_nid = name_to_nid_(algnm)) != NID_undef )
+        if( (alg_nid = name_to_nid_(algname.c_str())) != NID_undef )
         {
           if( (key_=EC_KEY_new_by_curve_name(alg_nid)) == NULL )
           {
@@ -245,7 +227,7 @@ namespace csl
         return true;
       }
 
-      bool privkey_from_bignum( const sec::bignum & bn, const common::str & algname )
+      bool privkey_from_bignum( const sec::bignum & bn, const common::ustr & algname )
       {
         if( !init_key(algname) ) return false;
 
@@ -371,7 +353,7 @@ namespace csl
 
   namespace sec
   {
-    unsigned int ecdh_key::algorithm_strength(const common::str & algname)
+    unsigned int ecdh_key::algorithm_strength(const common::ustr & algname)
     {
       int nid = NID_undef;
       EC_GROUP * group = 0;
@@ -380,16 +362,7 @@ namespace csl
       if( !algname.size() ) return 0;
 
       /* get algorithm id */
-      char algnm[128];
-      size_t asz = wcstombs(algnm,algname.c_str(),126);
-      algnm[algname.size()] = 0;
-
-      if( asz == 0 )
-      {
-        return 0;
-      }
-
-      if( (nid = name_to_nid_(algnm)) == NID_undef )
+      if( (nid = name_to_nid_(algname.c_str())) == NID_undef )
         return 0;  /* unknown algorithm */
 
       if( (group = EC_GROUP_new_by_curve_name(nid)) == NULL )
@@ -428,7 +401,7 @@ namespace csl
       return false;
     }
 
-    bool ecdh_key::gen_sha1hex_shared_key(const bignum & peer_private_key, common::str & shared_key) const
+    bool ecdh_key::gen_sha1hex_shared_key(const bignum & peer_private_key, common::ustr & shared_key) const
     {
       try
       {
@@ -508,15 +481,15 @@ namespace csl
       bool ret = true;
       try
       {
-        wchar_t tmp[64];
-        tmp[63] = L'\0';
+        char tmp[64];
+        tmp[63] = 0;
 
         unsigned int sz = 0;
         bool ret = buf.get_data( (unsigned char *)tmp,sz,64 );
 
         if( ret )
         {
-          tmp[sz] = L'\0';
+          tmp[sz] = 0;
           algname_ = tmp;
 
           if( !(x_.from_xdr(buf)) ) return false;
@@ -549,12 +522,12 @@ namespace csl
 
     void ecdh_key::print() const
     {
-      PRINTF(L"ECDH_KEY[%ls]:\n",(algname_.size() > 0 ? algname_.c_str() : L"EMPTY ALG"));
+      PRINTF(L"ECDH_KEY[%s]:\n",(algname_.size() > 0 ? algname_.c_str() : "EMPTY ALG"));
       PRINTF(L"  X key: "); x_.print();
       PRINTF(L"  Y key: "); y_.print();
     }
 
-    void ecdh_key::set(const common::str & algname, const bignum & x, const bignum & y)
+    void ecdh_key::set(const common::ustr & algname, const bignum & x, const bignum & y)
     {
       algname_ = algname;
       x_       = x;

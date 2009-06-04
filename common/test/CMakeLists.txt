@@ -1,4 +1,4 @@
-# Copyright (c) 2008, David Beck
+# Copyright (c) 2008,2009, David Beck, Tamas Foldi
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -61,7 +61,8 @@ ADD_EXECUTABLE( t__mpool    t__mpool.cc )
 ADD_EXECUTABLE( t__pbuf     t__pbuf.cc )
 ADD_EXECUTABLE( t__tbuf     t__tbuf.cc )
 ADD_EXECUTABLE( t__xdrbuf   t__xdrbuf.cc )
-ADD_EXECUTABLE(t__logger   t__logger.cc)
-ADD_EXECUTABLE(t__str      t__str.cc)
+ADD_EXECUTABLE( t__logger   t__logger.cc )
+ADD_EXECUTABLE( t__str      t__str.cc )
+ADD_EXECUTABLE( t__ustr     t__ustr.cc )
 
 # -- EOF --

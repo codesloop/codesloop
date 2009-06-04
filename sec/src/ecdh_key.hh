@@ -33,7 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "bignum.hh"
 #include "xdrbuf.hh"
-#include "str.hh"
+#include "ustr.hh"
 #ifdef __cplusplus
 
 namespace csl
@@ -87,10 +87,10 @@ namespace csl
         @note that this class only stores the public key as coordinates. the private
         key is expected to be in an external bignum instance
         */
-        void set(const common::str & algname, const bignum & x, const bignum & y);
+        void set(const common::ustr & algname, const bignum & x, const bignum & y);
 
         /** @brief returns the algorithm strength in bits */
-        static unsigned int algorithm_strength(const common::str & algname);
+        static unsigned int algorithm_strength(const common::ustr & algname);
 
         /** @brief returns the algorithm strength in bits */
         unsigned int strength() const;
@@ -116,7 +116,7 @@ namespace csl
         be stored in this instance. based on its own private key and the peers public key, it generates
         a shared key that may be used for encryption.
         */
-        bool gen_sha1hex_shared_key(const bignum & peer_private_key, common::str & shared_key) const;
+        bool gen_sha1hex_shared_key(const bignum & peer_private_key, common::ustr & shared_key) const;
 
         /**
         @brief generates the shared key based on the internal public key and the given private_key
@@ -135,17 +135,17 @@ namespace csl
         void print() const;
 
         /* inline functions */
-        inline void x(const bignum & v)             { x_ = v; }        ///<sets x
-        inline void y(const bignum & v)             { y_ = v; }        ///<sets y
-        inline void algname(const common::str & v)  { algname_ = v; }  ///<sets algname
+        inline void x(const bignum & v)              { x_ = v; }        ///<sets x
+        inline void y(const bignum & v)              { y_ = v; }        ///<sets y
+        inline void algname(const common::ustr & v)  { algname_ = v; }  ///<sets algname
 
-        inline bignum & x()             { return x_; }         ///<gets x
-        inline bignum & y()             { return y_; }         ///<gets y
-        inline common::str & algname()  { return algname_; }   ///<gets algname
+        inline bignum & x()              { return x_; }         ///<gets x
+        inline bignum & y()              { return y_; }         ///<gets y
+        inline common::ustr & algname()  { return algname_; }   ///<gets algname
 
-        inline const bignum & x() const             { return x_; }       ///<gets x
-        inline const bignum & y() const             { return y_; }       ///<gets y
-        inline const common::str & algname() const  { return algname_; } ///<gets algname
+        inline const bignum & x() const              { return x_; }       ///<gets x
+        inline const bignum & y() const              { return y_; }       ///<gets y
+        inline const common::ustr & algname() const  { return algname_; } ///<gets algname
 
         /** @brief chacks if properly filled with data */
         inline bool has_data() const { return (x_.is_empty()==false && y_.is_empty()==false && algname_.size()>0); }
@@ -162,9 +162,9 @@ namespace csl
         }
 
       private:
-        common::str   algname_;   ///<the algorithm name used to generate the key
-        bignum        x_;         ///<x coordinate part of the public key
-        bignum        y_;         ///<y coordinate part of the public key
+        common::ustr   algname_;   ///<the algorithm name used to generate the key
+        bignum         x_;         ///<x coordinate part of the public key
+        bignum         y_;         ///<y coordinate part of the public key
     };
   }
 }

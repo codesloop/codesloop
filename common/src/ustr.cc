@@ -23,40 +23,33 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "str.hh"
+#include "ustr.hh"
 #include "exc.hh"
 #include "common.h"
 
 /**
-  @file csl_common/src/str.cc
-  @brief implementation of simple string class
+  @file csl_common/src/ustr.cc
+  @brief implementation of simple UTF-8 string class
  */
 
 namespace csl
 {
   namespace common
   {
-    void str::ensure_trailing_zero()
+    void ustr::ensure_trailing_zero()
     {
+      unsigned char c = 0;
+      size_t       sz = buf_.size();
 
-      wchar_t  c = 0;
-      size_t  sz = (nbytes()/sizeof(wchar_t))-1;
-
-      if( buf_.size() == 0 )
-      {
-        buf_.append( (unsigned char *)(&c),sizeof(wchar_t) );
-      }
-      else if( data()[sz] != 0 )
-      {
-        buf_.append( (unsigned char *)(&c),sizeof(wchar_t) );
-      }
+      if( buf_.size() == 0 )       { buf_.append( &c,1 ); }
+      if( buf_.data()[sz-1] != 0 ) { buf_.append( &c,1 ); }
     }
 
-    str& str::operator+=(const str& s)
+    ustr& ustr::operator+=(const ustr& s)
     {
-      size_t  sz = size();
+      size_t sz = buf_.size();
 
-      if( nbytes() > 0 && data()[sz] == 0 ) buf_.allocate( sz * sizeof(wchar_t) );
+      if( sz > 0 && data()[sz-1] == 0 ) buf_.allocate( sz-1 );
 
       buf_.append( s.buffer() );
 
@@ -65,22 +58,22 @@ namespace csl
       return *this;
     }
 
-    str& str::operator+=(const wchar_t * s)
+    ustr& ustr::operator+=(const char * s)
     {
-      size_t  sz = size();
+      size_t sz = buf_.size();
 
-      if( nbytes() > 0 && data()[sz] == 0 ) buf_.allocate( sz * sizeof(wchar_t) );
+      if( sz > 0 && data()[sz-1] == 0 ) buf_.allocate( sz-1 );
 
-      buf_.append( (unsigned char *)s, sizeof(wchar_t) * (wcslen(s)+1) );
+      buf_.append( (unsigned char *)s, (strlen(s)+1) );
 
       ensure_trailing_zero();
 
       return *this;
     }
 
-    str str::substr(const size_t start, const size_t length) const
+    ustr ustr::substr(const size_t start, const size_t length) const
     {
-      str s;
+      ustr s;
       size_t len = length;
       size_t sz = size();
 
@@ -91,45 +84,13 @@ namespace csl
       if ( sz < length + start ) len = sz - start;
 
       // copy string
-      s.buf_.set( (unsigned char *)(data() + start), (len*sizeof(wchar_t)) );
+      s.buf_.set( (unsigned char *)(data() + start), len );
       s.ensure_trailing_zero();
 
       return s;
     }
 
-    str::str(const char * st) : obj()
-    {
-      if( !st ) return;
-
-      size_t len = strlen(st)+1;
-
-      wchar_t * nptr = (wchar_t *)buf_.allocate( len * sizeof(wchar_t) );
-
-      if ( mbstowcs( nptr, st, len ) != size_t(-1) )
-      {
-        // wcstring includes trailing zero char
-        nptr[len-1] = L'\0';
-      }
-    }
-
-    str& str::operator=(const char * st)
-    {
-      if( st ) return *this;
-
-      size_t len =  strlen(st)+1;
-
-      wchar_t * nptr = (wchar_t *)buf_.allocate( len * sizeof(wchar_t) );
-
-      if ( mbstowcs( nptr, st, len ) != size_t(-1) )
-      {
-        // wcstring includes trailing zero char
-        nptr[len-1] = L'\0';
-      }
-
-      return *this;
-    }
-
-    size_t str::find(wchar_t c) const
+    size_t ustr::find(char c) const
     {
       size_t ret = npos;
       size_t len = size();
@@ -145,7 +106,7 @@ namespace csl
       return ret;
     }
 
-    size_t str::rfind(wchar_t c) const
+    size_t ustr::rfind(char c) const
     {
       size_t ret = npos;
       size_t len = size();
@@ -161,9 +122,9 @@ namespace csl
       return ret;
     }
 
-    size_t str::find(const str & s) const
+    size_t ustr::find(const ustr & s) const
     {
-      wchar_t * p = wcsstr( data(), s.data() );
+      char * p = strstr( data(), s.data() );
       size_t ret = npos;
 
       if ( p != NULL ) {
@@ -173,21 +134,21 @@ namespace csl
       return ret;
     }
 
-    size_t str::find(const wchar_t * str) const
+    size_t ustr::find(const char * str) const
     {
       if( empty() ) return npos;
       if( !str )    return npos;
 
-      const wchar_t * res = 0;
+      const char * res = 0;
 
-      if( (res = wcsstr(data(),str)) == NULL ) return npos;
+      if( (res = strstr(data(),str)) == NULL ) return npos;
 
       return (res-data());
     }
 
-    wchar_t str::at(const size_t n) const
+    char ustr::at(const size_t n) const
     {
-      if ( n > wcslen( data() ) )
+      if ( n > nbytes() )
         throw exc(exc::rs_invalid_param,exc::cm_str);
 
       return data()[n];

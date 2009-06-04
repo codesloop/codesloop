@@ -24,8 +24,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
-   @file t__str.cc
-   @brief Tests to verify wide character string
+   @file t__ustr.cc
+   @brief Tests to verify unicode character string
  */
 
 #define DEBUG
@@ -34,16 +34,17 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "exc.hh"
 #include "common.h"
 #include "str.hh"
-#include "pbuf.hh"
+#include "ustr.hh"
 #include "test_timer.h"
 #include <assert.h>
 #include <sys/stat.h>
 
 using csl::common::str;
+using csl::common::ustr;
 using csl::common::pbuf;
 
-/** @brief contains tests related to str */
-namespace test_str {
+/** @brief contains tests related to tbuf */
+namespace test_ustr {
 
   /** @test baseline for performance comparison */
   void string_baseline()
@@ -54,7 +55,7 @@ namespace test_str {
   /** @test baseline for performance comparison */
   inline void str_baseline()
   {
-    str b;
+    ustr b;
   }
 
   /** @test @todo */
@@ -67,8 +68,8 @@ namespace test_str {
   /** @test @todo */
   void str_hello()
   {
-    str b;
-    b = L"Hello";
+    ustr b;
+    b = "Hello";
   }
 
   /** @test @todo */
@@ -81,11 +82,11 @@ namespace test_str {
   /** @test @todo */
   void str_concat()
   {
-    str b;
-    b = L"Hello" + str(L"world");
+    ustr b;
+    b = "Hello" + ustr("world");
     assert( b.size() == 10 );
     assert( b.nchars() == 10 );
-    assert( b.nbytes() == 11*sizeof(wchar_t) );
+    assert( b.nbytes() == 11 );
   }
 
   /** @test @todo */
@@ -100,166 +101,164 @@ namespace test_str {
   /** @test @todo */
   void str_append()
   {
-    str b;
-    b += L"Hello";
-    b += L" ";
-    b += L"world!";
+    ustr b;
+    b += "Hello";
+    b += " ";
+    b += "world!";
     assert( b.size() == 12 );
     assert( b.nchars() == 12 );
-    assert( b.nbytes() == 13*sizeof(wchar_t) );
+    assert( b.nbytes() == 13 );
   }
 
   /** @test @todo */
   void str_opeq()
   {
-    str b("Hello world");
+    ustr b("Hello world");
     assert( b.size() == 11 );
     assert( b.empty() == false );
     assert( b.c_str() != 0 );
     assert( b.nchars() == 11 );
-    assert( b.nbytes() == 12*sizeof(wchar_t) );
+    assert( b.nbytes() == 12 );
   }
 
   void test_empty_constr()
   {
-    str s;
-    assert( s.nbytes() == sizeof(wchar_t) );
+    ustr s;
+    assert( s.nbytes() == 1 );
     assert( s.size() == 0 );
     assert( s.nchars() == 0 );
   }
 
   void test_opeq_pbuf()
   {
-    str s;
+    ustr s;
     pbuf pb;
-    pb.append(L"Hello");
+    pb.append("Hello");
     s = pb;
-    assert( pb.size() == 6*sizeof(wchar_t) );
+    assert( pb.size() == 6 );
     assert( s.size() == 5 );
-    assert( s.nbytes() == 6*sizeof(wchar_t) );
+    assert( s.nbytes() == 6 );
     assert( s.nchars() == 5 );
-    assert( s == L"Hello" );
-    assert( memcmp( s.data(),L"Hello",6*sizeof(wchar_t) ) == 0 );
+    assert( s == "Hello" );
+    assert( memcmp( s.data(),"Hello",6 ) == 0 );
   }
 
   void test_cpyconstr()
   {
-    str s1(L"Hello");
+    ustr s1("Hello");
 
     assert( s1.size() == 5 );
-    assert( s1.nbytes() == 6*sizeof(wchar_t) );
+    assert( s1.nbytes() == 6 );
     assert( s1.nchars() == 5 );
 
-    str s2(s1);
+    ustr s2(s1);
 
     assert( s2.size() == 5 );
-    assert( s2.nbytes() == 6*sizeof(wchar_t) );
+    assert( s2.nbytes() == 6 );
     assert( s2.nchars() == 5 );
 
-    assert( s2 == L"Hello" );
-    assert( memcmp( s2.data(),L"Hello",6*sizeof(wchar_t) ) == 0 );
+    assert( s2 == "Hello" );
+    assert( memcmp( s2.data(),"Hello",6 ) == 0 );
   }
 
   void test_cpy0()
   {
-    str s1(L"Hello");
+    ustr s1("Hello");
   }
 
   void test_cpyop()
   {
-    str s;
-    s = L"Hello";
+    ustr s;
+    s = "Hello";
     assert( s.size() == 5 );
-    assert( s.nbytes() == 6*sizeof(wchar_t) );
+    assert( s.nbytes() == 6 );
     assert( s.nchars() == 5 );
 
-    str s2;
+    ustr s2;
     s2 = s;
 
     assert( s2.size() == 5 );
-    assert( s2.nbytes() == 6*sizeof(wchar_t) );
+    assert( s2.nbytes() == 6 );
     assert( s2.nchars() == 5 );
   }
 
   void test_pluseq()
   {
-    str s;
-    s += L"Hello";
+    ustr s;
+    s += "Hello";
 
     assert( s.size() == 5 );
-    assert( s.nbytes() == 6*sizeof(wchar_t) );
+    assert( s.nbytes() == 6 );
     assert( s.nchars() == 5 );
 
-    s += L" world";
+    s += " world";
 
     assert( s.size() == 11 );
-    assert( s.nbytes() == 12*sizeof(wchar_t) );
+    assert( s.nbytes() == 12 );
     assert( s.nchars() == 11 );
 
-    assert( s == L"Hello world" );
-    assert( memcmp( s.data(),L"Hello world",12*sizeof(wchar_t) ) == 0 );
+    assert( s == "Hello world" );
+    assert( memcmp( s.data(),"Hello world",12 ) == 0 );
   }
 
   void test_find0()
   {
-    str s(L"Hello World");
-    assert( s.find(L"l") == 2 );
+    ustr s("Hello World");
+    assert( s.find("l") == 2 );
     assert( s.find('l') == 2 );
     assert( s.rfind('l') == 9 );
   }
 
   void test_substr0()
   {
-    str s(L"Hello World");
-    str s2 = s.substr(2,4);
-    assert( s2 == L"llo " );
+    ustr s("Hello World");
+    ustr s2 = s.substr(2,4);
+    assert( s2 == "llo " );
   }
-} // namespace test_str
+}
 
-
-using namespace test_str;
+using namespace test_ustr;
 
 int main()
 {
-
-  str s( L"HELLO" );
+  ustr s( "HELLO" );
   assert( s.size() == 5 );
-  assert( wcscmp(s.c_str(), L"HELLO") == 0 );
+  assert( strcmp(s.c_str(), "HELLO") == 0 );
 
   assert( s[0] == L'H' );
   assert( s[1] == L'E' );
 
-  str s2 = s;
+  ustr s2 = s;
   assert( s2.size() == 5 );
-  assert( wcscmp(s2.c_str(), L"HELLO") == 0 );
+  assert( strcmp(s2.c_str(), "HELLO") == 0 );
 
-  str s3(s);
+  ustr s3(s);
   assert( s3.size() == 5 );
-  assert( wcscmp(s3.c_str(), L"HELLO") == 0 );
+  assert( strcmp(s3.c_str(), "HELLO") == 0 );
 
-  s2 += L" WORLD";
+  s2 += " WORLD";
   assert( s2.size() == 11 );
-  assert( wcscmp(s2.c_str(), L"HELLO WORLD") == 0 );
+  assert( strcmp(s2.c_str(), "HELLO WORLD") == 0 );
 
   s2 = s.substr(1,3) + s2.substr(6,999);
   assert( s2.size() == 8 );
-  assert( wcscmp(s2.c_str(), L"ELLWORLD") == 0 );
+  assert( strcmp(s2.c_str(), "ELLWORLD") == 0 );
 
-  str cs( "HELLO" );
+  ustr cs( "HELLO" );
   assert( cs.size() == 5 );
-  assert( wcscmp(cs.c_str(), L"HELLO") == 0 );
+  assert( strcmp(cs.c_str(), "HELLO") == 0 );
 
   cs = "HELLO";
   assert( cs.size() == 5 );
-  assert( wcscmp(cs.c_str(), L"HELLO") == 0 );
+  assert( strcmp(cs.c_str(), "HELLO") == 0 );
 
   assert( cs.find( L'H') == 0 );
   assert( cs.find( L'E') == 1 );
-  assert( cs.find( L"LL") == 2 );
+  assert( cs.find( "LL") == 2 );
 
   cs = std::string("HELLO");
   assert( cs.size() == 5 );
-  assert( wcscmp(cs.c_str(), L"HELLO") == 0 );
+  assert( strcmp(cs.c_str(), "HELLO") == 0 );
 
   // functional tests
   csl_common_print_results( "empty_constr       ", csl_common_test_timer_v0(test_empty_constr),"" );

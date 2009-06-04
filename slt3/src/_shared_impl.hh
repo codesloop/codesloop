@@ -36,6 +36,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "sqlite3.h"
 #include "mpool.hh"
 #include "str.hh"
+#include "ustr.hh"
 
 /**
   @file _shared_impl.hh
@@ -55,7 +56,7 @@ namespace csl
       mutex                mtx_;
       unsigned long long   tran_id_;
       bool                 use_exc_;
-      common::str          name_;
+      common::ustr         name_;
 
       /* initialization */
       impl();
@@ -63,23 +64,23 @@ namespace csl
 
       /* internal */
       unsigned long long new_tran_id();
-      static exc create_exc(int rc,int component, const common::str & str);
-      bool exec_noret(const wchar_t * sql);
-      bool exec(const wchar_t * sql,common::str & res);
+      static exc create_exc(int rc,int component, const common::ustr & str);
       bool exec_noret(const char * sql);
-      bool exec(const char * sql,common::str & res);
+      bool exec(const char * sql,common::ustr & res);
+      bool exec_noret(const char * sql);
+      bool exec(const char * sql,common::ustr & res);
       bool valid_db_ptr();
       long long last_insert_id();
       long long change_count();
 
       /* interface */
-      bool open(const wchar_t * db);
+      bool open(const char * db);
       bool close();
 
       /* inline functions */
-      inline void use_exc(bool yesno)         { use_exc_ = yesno; }
-      inline bool use_exc() const             { return use_exc_;  }
-      inline const common::str & name() const { return name_; }
+      inline void use_exc(bool yesno)          { use_exc_ = yesno; }
+      inline bool use_exc() const              { return use_exc_;  }
+      inline const common::ustr & name() const { return name_; }
     };
 
     struct tran::impl
@@ -153,15 +154,15 @@ namespace csl
       long long change_count();
 
       // stepwise query
-      bool prepare(const wchar_t * sql);
+      bool prepare(const char * sql);
       bool reset();
       void reset_data();
       bool next(columns_t & cols, fields_t & fields);
       bool next();
 
       // oneshot query
-      bool execute(const wchar_t * sql);
-      bool execute(const wchar_t * sql, common::str & result);
+      bool execute(const char * sql);
+      bool execute(const char * sql, common::ustr & result);
 
       void debug();
 
@@ -194,16 +195,19 @@ namespace csl
       void * get_ptr() const;
       long long get_long() const;
       double get_double() const;
-      const wchar_t * get_string() const;
+      const char * get_string() const;
 
       bool get(long long & val) const;
       bool get(double & val) const;
       bool get(common::str & val) const;
+      bool get(common::ustr & val) const;
       bool get(blob_t & val) const;
 
       void set(long long val);
       void set(double val);
       void set(const common::str & val);
+      void set(const common::ustr & val);
+      void set(const char * val);
       void set(const wchar_t * val);
       void set(const blob_t & val);
       void set(const unsigned char * ptr,unsigned int size);

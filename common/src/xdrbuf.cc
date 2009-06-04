@@ -162,6 +162,27 @@ namespace csl
       return *this;
     }
 
+    xdrbuf & xdrbuf::operator<<(const common::ustr & val)
+    {
+      uint32_t sz = val.nbytes();
+      if( sz )
+      {
+        try
+        {
+          size_and_buf_to_pbuf( b_, val.data(), sz );
+        }
+        catch(common::exc e)
+        {
+          if( use_exc() ) throw e;
+        }
+      }
+      else
+      {
+        (*this) << sz;
+      }
+      return *this;
+    }
+
     xdrbuf & xdrbuf::operator<<(const xdrbuf::bindata_t & val)
     {
       uint32_t sz = val.second;
@@ -265,17 +286,45 @@ namespace csl
 
       if( !sz ) { val.clear(); return *this; }
 
-      size_t nsz = (sz/sizeof(wchar_t));
+      wchar_t * wcp = (wchar_t *)val.buffer().allocate(sz);
 
-      std::auto_ptr<wchar_t> tmp(new wchar_t[nsz+1]);
-
-      if( nsz > 0 )
+      if( sz > 0 )
       {
-        tmp.get()[nsz] = 0;
-
-        if( (szrd=get_data((unsigned char *)tmp.get(),sz)) == sz )
+        if( (szrd=get_data((unsigned char *)wcp,sz)) == sz )
         {
-          val = tmp.get();
+          val.ensure_trailing_zero();
+        }
+        else if( szrd == 0 && it_==b_->end() )
+        {
+          THR(exc::rs_xdr_eof,exc::cm_xdrbuf,*this);
+        }
+        else if( szrd != sz )
+        {
+          THR(exc::rs_xdr_invalid,exc::cm_xdrbuf,*this);
+        }
+        else
+        {
+          THR(exc::rs_cannot_get,exc::cm_xdrbuf,*this);
+        }
+      }
+      return *this;
+    }
+
+    xdrbuf & xdrbuf::operator>>(common::ustr & val)
+    {
+      uint32_t sz = 0;
+      (*this) >> sz;
+      unsigned int szrd=0;
+
+      if( !sz ) { val.clear(); return *this; }
+
+      unsigned char * cp = val.buffer().allocate(sz);
+
+      if( sz > 0 )
+      {
+        if( (szrd=get_data(cp,sz)) == sz )
+        {
+          val.ensure_trailing_zero();
         }
         else if( szrd == 0 && it_==b_->end() )
         {

@@ -34,6 +34,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tbuf.hh"
 #include "synqry.hh"
 #include "str.hh"
+#include "ustr.hh"
 #ifdef __cplusplus
 #include <memory>
 #include <vector>
@@ -81,7 +82,7 @@ namespace csl
         double get_double() const;
 
         /** @brief return the parameter value as a C string */
-        const wchar_t * get_string() const;
+        const char * get_string() const;
 
         /** @brief returns true if not set */
         bool is_empty();
@@ -91,6 +92,9 @@ namespace csl
 
         /** @brief return the parameter value as a double precision value */
         bool get(double & val) const;
+
+        /** @brief return the parameter value as a string object */
+        bool get(common::ustr & val) const;
 
         /** @brief return the parameter value as a string object */
         bool get(common::str & val) const;
@@ -105,10 +109,16 @@ namespace csl
         void set(double val);
 
         /** @brief sets the value as a string */
+        void set(const common::ustr & val);
+
+        /** @brief sets the value as a string */
         void set(const common::str & val);
 
         /** @brief sets the value as a string */
         void set(const wchar_t * val);
+
+        /** @brief sets the value as a string */
+        void set(const char * val);
 
         /** @brief sets the value as a vector of unsigned characters */
         void set(const blob_t & val);

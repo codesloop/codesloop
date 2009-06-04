@@ -35,6 +35,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "conn.hh"
 #include "mpool.hh"
 #include "str.hh"
+#include "ustr.hh"
 #ifdef __cplusplus
 
 namespace csl
@@ -46,16 +47,16 @@ namespace csl
     {
       public:
         static reg & instance();
-        static reg & instance(const wchar_t * path);
-        static reg & instance(const common::str & path);
+        static reg & instance(const char * path);
+        static reg & instance(const common::ustr & path);
 
         class helper
         {
           public:
-            helper(const wchar_t * default_db_name, const wchar_t * default_db_path);
+            helper(const char * default_db_name, const char * default_db_path);
 
-            const wchar_t * name() { return name_.c_str(); }
-            const wchar_t * path();
+            const char * name() { return name_.c_str(); }
+            const char * path();
             conn & db();
 
             virtual ~helper() {}
@@ -65,27 +66,27 @@ namespace csl
             helper(const helper & other) {}
             helper & operator=(const helper & other) { return *this; }
 
-            common::str name_;
-            common::str default_path_;
-            common::str path_;
+            common::ustr name_;
+            common::ustr default_path_;
+            common::ustr path_;
             conn conn_;
         };
 
         struct item
         {
           long long       id_;
-          wchar_t *       name_;
-          wchar_t *       path_;
+          char *       name_;
+          char *       path_;
         };
 
-        typedef common::pvlist< 64,wchar_t,common::nop_destructor<wchar_t> > strlist_t;
+        typedef common::pvlist< 64,char,common::nop_destructor<char> > strlist_t;
         typedef common::pvlist< 64,item,common::nop_destructor<item> > itemlist_t;
         typedef common::mpool<> pool_t;
 
-        bool get( const wchar_t * name, conn & c );
-        bool get( const common::str & name, conn & c );
-        bool get( const wchar_t * name, item & i, pool_t & pool );
-        bool get( const common::str & name, item & i, pool_t & pool );
+        bool get( const char * name, conn & c );
+        bool get( const common::ustr & name, conn & c );
+        bool get( const char * name, item & i, pool_t & pool );
+        bool get( const common::ustr & name, item & i, pool_t & pool );
 
         bool set( const item & it );
 
@@ -93,8 +94,8 @@ namespace csl
         bool dbs( itemlist_t & itms, pool_t & pool );
 
         /* inline functions */
-        const common::str & path() const { return path_; }
-        void path(const common::str & p) { path_ = p; }
+        const common::ustr & path() const { return path_; }
+        void path(const common::ustr & p) { path_ = p; }
 
       private:
         /* no default construction or copy */
@@ -105,7 +106,7 @@ namespace csl
         inline reg(const reg & x) { }
 
         /* variables */
-        common::str  path_;
+        common::ustr  path_;
     };
   }
 }

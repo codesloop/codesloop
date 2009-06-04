@@ -36,6 +36,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pbuf.hh"
 #include "common.h"
 #include "str.hh"
+#include "ustr.hh"
 #include <assert.h>
 
 using namespace csl::sec;
@@ -54,14 +55,14 @@ namespace test_ecdh_key {
   void bl_prime192v3_1()
   {
     ecdh_key k;
-    k.algname(L"prime192v3");
+    k.algname("prime192v3");
   }
 
   /** @test generate prime192v3 keypair */
   void bl_prime192v3_2()
   {
     ecdh_key k;
-    k.algname(L"prime192v3");
+    k.algname("prime192v3");
     bignum private_key;
     assert( k.gen_keypair(private_key) == true );
   }
@@ -70,8 +71,8 @@ namespace test_ecdh_key {
   void print_prime192v3()
   {
     ecdh_key k1,k2;
-    k1.algname(L"prime192v3");
-    k2.algname(L"prime192v3");
+    k1.algname("prime192v3");
+    k2.algname("prime192v3");
 
     bignum private_key1;
     bignum private_key2;
@@ -79,7 +80,7 @@ namespace test_ecdh_key {
     assert( k1.gen_keypair(private_key1) == true );
     assert( k2.gen_keypair(private_key2) == true );
 
-    str shared1,shared2;
+    ustr shared1,shared2;
 
     assert( k1.gen_sha1hex_shared_key(private_key2,shared1) == true );
     assert( k2.gen_sha1hex_shared_key(private_key1,shared2) == true );
@@ -93,8 +94,8 @@ namespace test_ecdh_key {
     k2.print();
     private_key2.print();
 
-    PRINTF(L"SHARED KEY1: %ls\n",shared1.c_str());
-    PRINTF(L"SHARED KEY2: %ls\n",shared2.c_str());
+    PRINTF(L"SHARED KEY1: %s\n",shared1.c_str());
+    PRINTF(L"SHARED KEY2: %s\n",shared2.c_str());
 
     pbuf pb1,pb2;
 
@@ -108,8 +109,8 @@ namespace test_ecdh_key {
   void prime192v3_keypair()
   {
     ecdh_key k1,k2;
-    k1.algname(L"prime192v3");
-    k2.algname(L"prime192v3");
+    k1.algname("prime192v3");
+    k2.algname("prime192v3");
 
     bignum private_key1;
     bignum private_key2;
@@ -117,7 +118,7 @@ namespace test_ecdh_key {
     assert( k1.gen_keypair(private_key1) == true );
     assert( k2.gen_keypair(private_key2) == true );
 
-    str shared1,shared2;
+    ustr shared1,shared2;
 
     assert( k1.gen_sha1hex_shared_key(private_key2,shared1) == true );
     assert( k2.gen_sha1hex_shared_key(private_key1,shared2) == true );
@@ -131,7 +132,7 @@ namespace test_ecdh_key {
     k2.print();
     private_key2.print();
 
-    PRINTF(L"SHARED KEY: %ls\n",shared1.c_str());
+    PRINTF(L"SHARED KEY: %s\n",shared1.c_str());
   }
 
   struct rndata
@@ -180,6 +181,12 @@ using namespace test_ecdh_key;
 
 int main()
 {
+  if (!setlocale(LC_CTYPE, "")) {
+    fprintf(stderr, "Can't set the specified locale! "
+                    "Check LANG, LC_CTYPE, LC_ALL.\n");
+    exit(-1);
+  }
+
   print_prime192v3();
   prime192v3_keypair();
 

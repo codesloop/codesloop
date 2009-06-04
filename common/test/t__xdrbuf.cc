@@ -101,7 +101,67 @@ namespace test_xdrbuf {
 
     xb.rewind();
 
-    assert( pb.size() == 48 );
+    assert( pb.size() == sizeof(wchar_t)*11+sizeof(int32_t) );
+
+    xb >> hw;
+
+    assert( hw.size() == 11 );
+    assert( hw == "Hello World" );
+
+    assert( xb.position() > 10 );
+
+    /* save position */
+    xdrbuf xx(xb);
+
+    bool caught = false;
+    try
+    {
+      unsigned int c;
+
+      /* read more than available */
+      xb >> c;
+    }
+    catch( csl::common::exc e )
+    {
+      caught = true;
+      assert( e.reason_    == csl::common::exc::rs_xdr_eof );
+      assert( e.component_ == csl::common::exc::cm_xdrbuf );
+    }
+    assert( caught == true );
+
+    caught = false;
+    try
+    {
+      /* add invalid pointer */
+      xx << (char *)0;
+
+      str zz;
+
+      xx >> zz;
+    }
+    catch( csl::common::exc e )
+    {
+      str es;
+      e.to_string(es);
+      FPRINTF(stderr,L"Exception caught: %ls\n",es.c_str());
+      caught = true;
+    }
+    /* this should not throw an exception, will add as zero length string */
+    assert( caught == false );
+  }
+
+  /** @test string de/serialization */
+  void test_ustring()
+  {
+    pbuf pb;
+    xdrbuf xb(pb);
+
+    xb << "Hello World";
+    ustr hw;
+
+    xb.rewind();
+
+    assert( pb.size() == 16 );
 
     xb >> hw;
 
@@ -398,6 +458,7 @@ int main()
   csl_common_print_results( "test_copy            ", csl_common_test_timer_v0(test_copy),"" );
   csl_common_print_results( "test_int             ", csl_common_test_timer_v0(test_int),"" );
   csl_common_print_results( "test_string          ", csl_common_test_timer_v0(test_string),"" );
+  csl_common_print_results( "test_ustring         ", csl_common_test_timer_v0(test_ustring),"" );
   csl_common_print_results( "test_bin             ", csl_common_test_timer_v0(test_bin),"" );
   csl_common_print_results( "test_pbuf            ", csl_common_test_timer_v0(test_pbuf),"" );
   csl_common_print_results( "garbage_int_small    ", csl_common_test_timer_v0(garbage_int_small),"" );

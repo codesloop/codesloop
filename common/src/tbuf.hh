@@ -48,6 +48,17 @@ namespace csl
         enum { preallocated_size = SZ };
 
         inline tbuf() : data_(preallocated_), size_(0) { }
+
+        inline tbuf(unsigned char c) : data_(preallocated_), size_(1)
+        {
+          preallocated_[0] = c;
+        }
+
+        inline tbuf(wchar_t c) : data_(preallocated_), size_(sizeof(wchar_t))
+        {
+          ((wchar_t *)preallocated_)[0] = c;
+        }
+
         inline ~tbuf() { reset(); }
 
         inline tbuf(const tbuf & other) : data_(preallocated_), size_(0) // TODO test copy constructor!!!
