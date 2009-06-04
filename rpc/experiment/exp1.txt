@@ -1,0 +1,22 @@
+// include
+
+#include "hello"
+#include <world>
+
+#version      1.2.3.4
+#name         interface
+#namespace    csl::rpc
+
+function_name {
+ input:
+     int64 value,
+     myclass myclass,
+     string mystring,
+ output:
+     int64 ret,
+     retclass e,
+ exception:
+     exc exception1,
+     std::exc exception1
+}
+
