@@ -113,6 +113,12 @@ using namespace test_str;
 int main()
 {
 
+  if (!setlocale(LC_CTYPE, "")) {
+    fprintf(stderr, "Can't set the specified locale! "
+              "Check LANG, LC_CTYPE, LC_ALL.\n");
+    exit(-1);
+  }
+
   str s( L"HELLO" );
   assert( s.size() == 5 );
   assert( wcscmp(s.c_str(), L"HELLO") == 0 );
@@ -151,6 +157,11 @@ int main()
   cs = std::string("HELLO");
   assert( cs.size() == 5 );
   assert( wcscmp(cs.c_str(), L"HELLO") == 0 );
+
+  cs = L"Árvíztűrő tükörfúrógép";
+  assert( cs.size() == 22 );
+  assert( cs.buffer().size() == sizeof(wchar_t) * (cs.size() + 1) );
+  assert( wcscmp(cs.c_str(), L"Árvíztűrő tükörfúrógép" ) == 0 );
 
   // performance
   csl_common_print_results( "str_baseline       ", csl_common_test_timer_v0(str_baseline),"" );
