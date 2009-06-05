@@ -23,4 +23,23 @@
 
 # SET(CMAKE_VERBOSE_MAKEFILE ON)
 
-# -- EOF --
+
+IF(WIN32)
+  ADD_DEFINITIONS(-Wall)
+ELSE(WIN32)
+  ADD_DEFINITIONS(-Wall -g3 )
+ENDIF(WIN32)
+
+
+INCLUDE_DIRECTORIES( ../../common/src) 
+LINK_DIRECTORIES( ../../common/src )
+LINK_LIBRARIES( csl_common )
+
+ADD_CUSTOM_COMMAND( OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/csrgen.cpp
+                  PRE_BUILD
+                  COMMAND ragel -G2 ARGS -o csrgen.cpp csrgen.rl
+                  MAIN_DEPENDENCY csrgen.rl
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} )
+
+ADD_EXECUTABLE( csrgen csrgen.cpp )
+# -- EOF 
