@@ -12,14 +12,17 @@
 
 disposable function_name {
  input:
-     int64 value,
-     myclass myclass,
-     string mystring,
+     int64 value_,
+     myclass myvalue_,
+     string mystring_,
  output:
      int64 ret,
      retclass e,
  exception:
-     exc exception1,
-     std::exc exception1
+     exc csl_exc,
+     std::exc std_exc
 }
 
+func2 { 
+  double d_
+}

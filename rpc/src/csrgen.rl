@@ -49,15 +49,24 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   }
 
   action modifier {
-    printf("\tmodifier\n");
+    printf("\tmod:");
+    fwrite(ts,1,p-ts,stdout);    
+    printf("\n");
   }
   action type_name {
-    printf("\t\t ");
+    printf("\t\t tn:");
     fwrite(ts,1,p-ts,stdout);
     printf(" -> ");
   }
 
   action obj_name {
+    printf("on:");
+    fwrite(ts,1,p-ts,stdout);
+    printf("\n");
+  }
+
+  action func_name {
+    printf("function:");
     fwrite(ts,1,p-ts,stdout);
     printf("\n");
   }
@@ -70,10 +79,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   ws_no_nl  = ('\t'|' '|'\r');
 
   # language constants
-  disp      = 'disposable' %{printf("disp\n");};
-  input     = 'input';
-  output    = 'output';
-  exc       = 'exception';
+  input     = 'input'       >s;
+  output    = 'output'      >s;
+  exc       = 'exception'   >s;
+  disp      = 'disposable';
   incl      = 'include';
   name      = 'name';
   version   = 'version';
@@ -81,29 +90,31 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   
 
   # literals, identifiers
-  dquote      = ( 'L'? '"' ( [^"\\\n] | /\\./ )* '"' );
-  gtquote     = ( '<' ( [^>\\\n] | /\\./ )* '>' );
-  identifier  = ( [a-zA-Z_] [a-zA-Z0-9_]* ) >s;
+  dquote      = ( 'L'? '"' ( [^"\\\n] | /\\./ )* '"' )  >s;
+  gtquote     = ( '<' ( [^>\\\n] | /\\./ )* '>' )       >s;
+  identifier  = ( [a-zA-Z_] [a-zA-Z0-9_]* )             >s;
 
   type_ident  = ( [a-zA-Z_:] [a-zA-Z0-9_:<>]*) >s;
-  version_num = ( [0-9] ( '.'? [0-9] )* );
+  version_num = ( [0-9] ( '.'? [0-9] )* )      >s;
 
 
   # parameters and function header definition 
   parameter_spec  = type_ident %type_name ws+ identifier %obj_name;
   parameter_type  = (input|output|exc) ':' %modifier;
 
-  function    = (disp ws+)? <: identifier %{printf("start function\n");} ws* '{' ws*
-                  ((parameter_type ws+)? <: parameter_spec ws*  ',' ws*)*  # parameters ended by ,
-                  (parameter_type ws+)?  <: parameter_spec ws*  '}'   # last parameter without ,
-                %{ printf("end function\n"); }
+  func_param_line      = (ws* (parameter_type ws+)? <: parameter_spec ws*  ','); 
+  func_param_lastline  = (ws* (parameter_type ws+)? <: parameter_spec ws*  '}');
+
+  function    = (disp ws+)? <: identifier %func_name ws* '{'                 
+                func_param_line*         # regular lines with comma ending
+                func_param_lastline      # last line with bracket ends
                 ;
   
   # Describe both c style comments and c++ style comments. The
   # priority bump on tne terminator of the comments brings us
   # out of the extend* which matches everything.
   c_comment   =  '/*' any_count_line* :>>  '*/' %{printf("c comment\n");} ;
-  cpp_comment = '//' [^\n]* newline %{printf("cpp comment\n");} ;  
+  cpp_comment = '//' [^\n]* newline             %{printf("cpp comment\n");} ;  
   comment     = cpp_comment | c_comment;
 
   includes    = '#' ws_no_nl* incl ws_no_nl+ 
