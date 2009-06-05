@@ -53,9 +53,6 @@ namespace csl
       public:
         enum { buf_size = 128, npos = 0xFFFFFFFF };
 
-        /** @brief reset internal data */
-        inline void reset() { buf_.reset(); }
-
         /** @brief constructor */
         inline ustr() : csl::common::obj(), buf_((unsigned char)0) { }
 
@@ -239,7 +236,14 @@ namespace csl
         /** @brief resets ustr buffer */
         inline void clear()
         {
+          reset();
+        }
+
+        /** @brief reset internal data */
+        inline void reset()
+        {
           buf_.reset();
+          buf_.set( (const unsigned char *)("\0"), 1 );
         }
 
         /** @brief gets ustr size  */

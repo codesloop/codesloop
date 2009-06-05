@@ -53,9 +53,6 @@ namespace csl
       public:
         enum { buf_size = 128 * sizeof(wchar_t), npos = 0xFFFFFFFF };
 
-        /** @brief reset internal data */
-        inline void reset() { buf_.reset(); }
-
         /** @brief constructor */
         inline str() : csl::common::obj(), buf_((wchar_t)L'\0') { }
 
@@ -243,8 +240,16 @@ namespace csl
         /* ------------------------------------------------------------------------ */
 
         /** @brief resets str buffer */
-        inline void clear() {
+        inline void clear()
+        {
+          reset();
+        }
+
+        /** @brief reset internal data */
+        inline void reset()
+        {
           buf_.reset();
+          buf_.set( (unsigned char *)(L"\0"), sizeof(wchar_t) );
         }
 
         /** @brief gets str size  */
