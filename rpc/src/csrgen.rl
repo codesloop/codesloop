@@ -1,4 +1,4 @@
-    /*
+/*
 Copyright (c) 2008,2009, Beck David, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   }
 
   action print_err  {
-    printf("error at line %d:%d (0x%x)\n", curline, (p-ls), *p );
+    printf("\nerror at line %d:%d (%.10s...)\n",  
+              curline, 
+              (p-ls), 
+              ls < p-10 ? ls+1 : p-10 
+          );
   }
 
   action newline {
@@ -94,12 +98,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   gtquote     = ( '<' ( [^>\\\n] | /\\./ )* '>' )       >s;
   identifier  = ( [a-zA-Z_] [a-zA-Z0-9_]* )             >s;
 
-  type_ident  = ( [a-zA-Z_:] [a-zA-Z0-9_:<>]*) >s;
+  type_ident  = ( [a-zA-Z_:] ([a-zA-Z 0-9_:<>]*[a-zA-Z0-9_>])?) >s;
   version_num = ( [0-9] ( '.'? [0-9] )* )      >s;
 
 
   # parameters and function header definition 
-  parameter_spec  = type_ident %type_name ws+ identifier %obj_name;
+  parameter_spec  = type_ident %type_name ws+ :>> identifier %obj_name;
   parameter_type  = (input|output|exc) ':' %modifier;
 
   func_param_line      = (ws* (parameter_type ws+)? <: parameter_spec ws*  ','); 
@@ -119,28 +123,28 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
   includes    = '#' ws_no_nl* incl ws_no_nl+ 
                 (dquote  | gtquote )
-                newline
+                ws_no_nl* newline
                 @{printf("include\n");};
 
   if_name     = '#' ws_no_nl* name ws_no_nl+ 
                 (dquote | identifier) 
-                newline
+                ws_no_nl* newline
                 @{printf("if name\n");};
 
   if_version  = '#' ws_no_nl* version ws_no_nl+ 
                 version_num 
-                newline
+                ws_no_nl* newline
                 @{printf("if version\n");};
 
   if_namespc  = '#' ws_no_nl* namespc ws_no_nl+ 
                 type_ident
-                newline
+                ws_no_nl* newline
                 @{printf("if namespc\n");};
 
   main  :=  ( ws            # whitespace
             | comment       # comments
             | includes      # include statements
-            | function      # interface declaration for on function
+            | function      # interface definition for one function
             | if_version    # version information
             | if_name       # interface name
             | if_namespc    # namespace
@@ -153,21 +157,25 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int  main(  int  argc,  char  **argv  )
 {
-  int cs, act, have = 0, curline = 1;
-  char *ts, *te = 0;
+  int cs, curline = 1;
+  char *ts = 0;
   char * eof = NULL;
   char * ls = NULL;
   std::string buffer;
-  int done = 0;
 
   if ( argc == 1 ) 
   {
     fprintf(stderr, "usage: %s <filename>\n", argv[0] );
-    exit(-1);
+    exit(1);
   } else {
-    printf("Readiny file %s\n", argv[1] );
     std::ifstream in( argv[1] );
-    buffer = std::string(std::istreambuf_iterator<char>(in),std::istreambuf_iterator<char>());
+    if ( in.good() )
+    {
+      buffer = std::string(std::istreambuf_iterator<char>(in),std::istreambuf_iterator<char>());
+    } else {
+      fprintf(stderr, "%s: can not open file \"%s\"\n", argv[0], argv[1] );
+      exit(1);
+    }
   }
             
 
@@ -177,10 +185,8 @@ int  main(  int  argc,  char  **argv  )
   %%  write  init;
   %%  write  exec;
 
-  if ( cs == csrgen_error ) {
-    fprintf(stderr, "PARSE ERROR\n" );
-  }
+  if ( cs == csrgen_error ) 
+    exit(1);
 
-  printf("lines  =  %i\n",  curline );
   return  0;
 }
