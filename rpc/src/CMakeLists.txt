@@ -26,6 +26,10 @@
 
 # -- EOF --DD_DEFINITIONS(-Wall -g3)
 
+INCLUDE_DIRECTORIES( ../../common/src) 
+LINK_DIRECTORIES( ../../common/src )
+LINK_LIBRARIES( csl_common )
+
 ADD_CUSTOM_COMMAND( OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/csrgen.cpp
                   PRE_BUILD
                   COMMAND ragel -G2 ARGS -o csrgen.cpp csrgen.rl

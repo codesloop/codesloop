@@ -1,4 +1,4 @@
-/*
+    /*
 Copyright (c) 2008,2009, Beck David, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
@@ -24,22 +24,20 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 #include <string>
 #include <iostream>
-#include <sstream>
-#include <string>
 #include <fstream>
-#include <iostream>
-#include <iomanip>
-
-using namespace std;
 
 %%{
 
+  machine  csrgen;
 
-  machine  csl_rpcgen;
+
+  action s { 
+    ts = p;
+  }
 
   action print_err  {
     printf("error at line %d:%d (0x%x)\n", curline, (p-ls), *p );
@@ -50,6 +48,20 @@ using namespace std;
     ls = p;
   }
 
+  action modifier {
+    printf("\tmodifier\n");
+  }
+  action type_name {
+    printf("\t\t ");
+    fwrite(ts,1,p-ts,stdout);
+    printf(" -> ");
+  }
+
+  action obj_name {
+    fwrite(ts,1,p-ts,stdout);
+    printf("\n");
+  }
+
   # new line handler with line counting
   newline         = '\n' @newline;
   any_count_line  = any | newline;
@@ -58,7 +70,7 @@ using namespace std;
   ws_no_nl  = ('\t'|' '|'\r');
 
   # language constants
-  disp      = 'disposable';
+  disp      = 'disposable' %{printf("disp\n");};
   input     = 'input';
   output    = 'output';
   exc       = 'exception';
@@ -71,44 +83,48 @@ using namespace std;
   # literals, identifiers
   dquote      = ( 'L'? '"' ( [^"\\\n] | /\\./ )* '"' );
   gtquote     = ( '<' ( [^>\\\n] | /\\./ )* '>' );
-  identifier  = ( [a-zA-Z_] [a-zA-Z0-9_]* )     @{printf("identifier\n");} ;
-  type_ident  = ( [a-zA-Z_:] [a-zA-Z0-9_:<>]*)  @{printf("type identifier\n");} ;
-  version_num = ( [0-9] ( '.'? [0-9] )* )       @{printf("version num\n");} ; 
+  identifier  = ( [a-zA-Z_] [a-zA-Z0-9_]* ) >s;
+
+  type_ident  = ( [a-zA-Z_:] [a-zA-Z0-9_:<>]*) >s;
+  version_num = ( [0-9] ( '.'? [0-9] )* );
 
 
   # parameters and function header definition 
-  parameter_spec  = type_ident ws* identifier @{printf("spec\n");};
-  parameter_type  = (input|output|exc) ':'    @{printf("type\n");};
+  parameter_spec  = type_ident %type_name ws+ identifier %obj_name;
+  parameter_type  = (input|output|exc) ':' %modifier;
 
-  function    = (disp ws+)? identifier ws* '{' ws*
-                  ((parameter_spec ws* ',' | parameter_type) ws*)*    # parameters ended by ,
-                  ( parameter_spec         | parameter_type) ws*      # last parameter without ,
-                '}'
-                @{printf("function\n");}
+  function    = (disp ws+)? <: identifier %{printf("start function\n");} ws* '{' ws*
+                  ((parameter_type ws+)? <: parameter_spec ws*  ',' ws*)*  # parameters ended by ,
+                  (parameter_type ws+)?  <: parameter_spec ws*  '}'   # last parameter without ,
+                %{ printf("end function\n"); }
                 ;
   
   # Describe both c style comments and c++ style comments. The
   # priority bump on tne terminator of the comments brings us
   # out of the extend* which matches everything.
-  c_comment   =  '/*' any_count_line* :>>  '*/' @{printf("c comment\n");} ;
-  cpp_comment = '//' [^\n]* newline @{printf("cpp comment\n");} ;  
+  c_comment   =  '/*' any_count_line* :>>  '*/' %{printf("c comment\n");} ;
+  cpp_comment = '//' [^\n]* newline %{printf("cpp comment\n");} ;  
   comment     = cpp_comment | c_comment;
 
   includes    = '#' ws_no_nl* incl ws_no_nl+ 
                 (dquote  | gtquote )
+                newline
                 @{printf("include\n");};
 
   if_name     = '#' ws_no_nl* name ws_no_nl+ 
                 (dquote | identifier) 
+                newline
                 @{printf("if name\n");};
 
   if_version  = '#' ws_no_nl* version ws_no_nl+ 
                 version_num 
+                newline
                 @{printf("if version\n");};
 
   if_namespc  = '#' ws_no_nl* namespc ws_no_nl+ 
                 type_ident
-                @{printf("if name\n");};
+                newline
+                @{printf("if namespc\n");};
 
   main  :=  ( ws            # whitespace
             | comment       # comments
@@ -117,8 +133,8 @@ using namespace std;
             | if_version    # version information
             | if_name       # interface name
             | if_namespc    # namespace
-            )*    
-            $!print_err;
+            )* 
+            $!print_err; 
 
 }%%
 
@@ -126,36 +142,33 @@ using namespace std;
 
 int  main(  int  argc,  char  **argv  )
 {
-  int cs, curline = 1;
-  stringstream buffer;
-  string line;
+  int cs, act, have = 0, curline = 1;
+  char *ts, *te = 0;
   char * eof = NULL;
   char * ls = NULL;
+  std::string buffer;
+  int done = 0;
 
   if ( argc == 1 ) 
   {
-    while ( cin >> line)
-      buffer << line << endl;      
-
-    printf("<< buffer >>\n%s<< buffer >>\n", buffer.str().c_str() );
-
+    fprintf(stderr, "usage: %s <filename>\n", argv[0] );
+    exit(-1);
   } else {
-    cout << "Readiny file " << argv[1] << endl;
+    printf("Readiny file %s\n", argv[1] );
     std::ifstream in( argv[1] );
-    buffer << std::string(std::istreambuf_iterator<char>(in),std::istreambuf_iterator<char>());      
+    buffer = std::string(std::istreambuf_iterator<char>(in),std::istreambuf_iterator<char>());
   }
             
 
-  char  *p = ls  = (char*) buffer.str().c_str() ;
+  char  *p = ls  = (char*) buffer.c_str() ;
   char  *pe  =  p  +  strlen(p);
 
   %%  write  init;
   %%  write  exec;
 
-  if ( cs == csl_rpcgen_error ) {
+  if ( cs == csrgen_error ) {
     fprintf(stderr, "PARSE ERROR\n" );
   }
-
 
   printf("lines  =  %i\n",  curline );
   return  0;
