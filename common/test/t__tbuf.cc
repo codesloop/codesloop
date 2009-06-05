@@ -102,6 +102,9 @@ using namespace test_tbuf;
 
 int main()
 {
+  tbuf<10> t;
+  t = t;
+
   csl_common_print_results( "tbuf_baseline      ", csl_common_test_timer_v0(tbuf_baseline),"" );
   csl_common_print_results( "pbuf_baseline      ", csl_common_test_timer_v0(pbuf_baseline),"" );
   csl_common_print_results( "str_baseline       ", csl_common_test_timer_v0(str_baseline),"" );

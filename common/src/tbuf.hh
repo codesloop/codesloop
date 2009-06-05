@@ -263,7 +263,8 @@ namespace csl
         /** @todo return value */
         inline void set_at(unsigned int pos,unsigned char c)
         {
-          unsigned char * t = allocate(pos+1);
+          unsigned char * t = data_;
+          if( pos >= size_ ) t = allocate( pos+1 );
           t[pos] = c;
         }
 

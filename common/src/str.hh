@@ -249,7 +249,7 @@ namespace csl
         inline void reset()
         {
           buf_.reset();
-          buf_.set( (unsigned char *)(L"\0"), sizeof(wchar_t) );
+          buf_.set( (const unsigned char *)(L"\0"), sizeof(wchar_t) );
         }
 
         /** @brief gets str size  */
