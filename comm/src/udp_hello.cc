@@ -84,7 +84,7 @@ namespace csl
         }
         catch( common::exc e )
         {
-          common::str s;
+          str s;
           e.to_string(s);
           FPRINTF(stderr,L"Exception caught: %ls\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_hello_handler,false);
@@ -133,7 +133,7 @@ namespace csl
           }
 
           /* generate session key */
-          common::str session_key;
+          ustr session_key;
 
         /* ***
           hello callback may change the private key to be used
@@ -188,7 +188,7 @@ namespace csl
         }
         catch( common::exc e )
         {
-          common::str s;
+          str s;
           e.to_string(s);
           FPRINTF(stderr,L"Exception caught: %ls\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_hello_handler,false);
@@ -264,13 +264,13 @@ namespace csl
         }
         catch( common::exc e )
         {
-          common::str s;
+          str s;
           e.to_string(s);
           FPRINTF(stderr,L"Error [%ls:%d]: %s\n",L""__FILE__,__LINE__,s.c_str());
         }
         catch( comm::exc e )
         {
-          common::str s;
+          str s;
           e.to_string(s);
           FPRINTF(stderr,L"Error [%ls:%d]: %s\n",L""__FILE__,__LINE__,s.c_str());
         }
@@ -378,7 +378,7 @@ namespace csl
         }
         catch( common::exc e )
         {
-          common::str s;
+          str s;
           e.to_string(s);
           FPRINTF(stderr,L"Exception caught: %ls\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_hello_cli,false);
@@ -412,7 +412,7 @@ namespace csl
           /* encrypted part */
 
           /* generate session key */
-          common::str session_key;
+          ustr session_key;
 
           if( !server_public_key_.gen_sha1hex_shared_key(private_key_,session_key) )
           {
@@ -464,7 +464,7 @@ namespace csl
         }
         catch( common::exc e )
         {
-          common::str s;
+          str s;
           e.to_string(s);
           FPRINTF(stderr,L"Exception caught: %ls\n",s.c_str());
           THR(comm::exc::rs_common_error,comm::exc::cm_udp_hello_cli,false);

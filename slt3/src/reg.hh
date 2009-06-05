@@ -61,15 +61,19 @@ namespace csl
 
             virtual ~helper() {}
 
+            inline void use_exc(bool yesno) { use_exc_ = yesno; }
+            inline bool use_exc() const     { return use_exc_; }
+
           private:
             helper() {}
             helper(const helper & other) {}
             helper & operator=(const helper & other) { return *this; }
 
-            common::ustr name_;
-            common::ustr default_path_;
-            common::ustr path_;
-            conn conn_;
+            common::ustr  name_;
+            common::ustr  default_path_;
+            common::ustr  path_;
+            conn          conn_;
+            bool          use_exc_;
         };
 
         struct item
@@ -97,6 +101,9 @@ namespace csl
         const common::ustr & path() const { return path_; }
         void path(const common::ustr & p) { path_ = p; }
 
+        inline void use_exc(bool yesno) { use_exc_ = yesno; }
+        inline bool use_exc() const     { return use_exc_; }
+
       private:
         /* no default construction or copy */
         reg() { }
@@ -107,6 +114,7 @@ namespace csl
 
         /* variables */
         common::ustr  path_;
+        bool          use_exc_;
     };
   }
 }

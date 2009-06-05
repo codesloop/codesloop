@@ -32,6 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "xdrbuf.hh"
 #include "common.h"
 #include "str.hh"
+#include "ustr.hh"
 
 namespace csl
 {
@@ -64,7 +65,7 @@ namespace csl
       bool handle_data_callback::send_reply( const saltbuf_t & old_salt,
                                              const saltbuf_t & new_salt,
                                              const SAI & addr,
-                                             const str & sesskey,
+                                             const ustr & sesskey,
                                              int sock,
                                              const b1024_t & data )
       {
@@ -116,7 +117,7 @@ namespace csl
       }
 
       bool udp::data_handler::init_data( saltbuf_t & new_salt,
-                                         const str & sesskey,
+                                         const ustr & sesskey,
                                          const msg & m,
                                          b1024_t & recvdta )
       {
@@ -210,7 +211,7 @@ namespace csl
       /* data packet */
       bool udp::data_handler::prepare_data( const saltbuf_t & old_salt,
                                             const saltbuf_t & new_salt,
-                                            const str & sesskey,
+                                            const ustr & sesskey,
                                             const b1024_t & senddta,
                                             msg & m )
       {
@@ -323,7 +324,7 @@ namespace csl
         {
           saltbuf_t old_salt;
           saltbuf_t new_salt;
-          str       sesskey;
+          ustr      sesskey;
           b1024_t   recvdta;
 
           if( get_salt(old_salt,ms) == false ) { return; }

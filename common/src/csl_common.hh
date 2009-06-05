@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -41,6 +41,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "zfile.hh"
 #include "test_timer.h"
 #include "str.hh"
+#include "ustr.hh"
 #include "logger.hh"
 
 #endif /* _csl_common_csl_common_hh_included_ */

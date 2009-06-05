@@ -68,8 +68,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef WIN32
 # ifndef SNPRINTF
-#  define SNPRINTF swprintf
+#  define SNPRINTF _snprintf
 # endif /*SNPRINTF*/
+# ifndef SWPRINTF
+#  define SWPRINTF swprintf
+# endif /*SWPRINTF*/
 # ifndef FPRINTF
 #  define FPRINTF fwprintf
 # endif /*FPRINTF*/
@@ -93,8 +96,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # endif /*STRDUP*/
 #else /* WIN32 */
 # ifndef SNPRINTF
-#  define SNPRINTF swprintf
+#  define SNPRINTF snprintf
 # endif /*SNPRINTF*/
+# ifndef SWPRINTF
+#  define SWPRINTF swprintf
+# endif /*SWPRINTF*/
 # ifndef FPRINTF
 #  define FPRINTF fwprintf
 # endif /*FPRINTF*/
@@ -126,12 +132,27 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         throw exc(REASON,COMPONENT,L"",L""__FILE__,__LINE__); \
         return RET; } \
       else { \
-        FPRINTF(stderr,L"Exception(%sl:%d): [%sl] [%sl]\n", \
+        FPRINTF(stderr,L"Exception(%ls:%d): [%ls] [%ls]\n", \
             L""__FILE__,__LINE__, \
             exc::component_string(COMPONENT), \
             exc::reason_string(REASON)); \
         return RET; } } while(false);
 #endif /*THR*/
+
+#ifndef THRR
+#define THRR(REASON,COMPONENT,MSG,RET) \
+    do { \
+      if( this->use_exc() ) { \
+        throw exc(REASON,COMPONENT,MSG,L""__FILE__,__LINE__); \
+        return RET; } \
+      else { \
+        FPRINTF(stderr,L"Exception(%ls:%d): [%ls] [%ls] [%ls]\n", \
+            L""__FILE__,__LINE__, \
+            exc::component_string(COMPONENT), \
+            exc::reason_string(REASON), \
+            MSG ); \
+        return RET; } } while(false);
+#endif /*THRR*/
 
 #ifndef THRC
 #define THRC(REASON,COMPONENT,RET) \
@@ -142,7 +163,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         throw exc(REASON,COMPONENT,errstr,L""__FILE__,__LINE__); \
         return RET; } \
       else { \
-        FPRINTF(stderr,L"Exception(%sl:%d): [%sl] [%sl]\n", \
+        FPRINTF(stderr,L"Exception(%ls:%d): [%ls] [%ls]\n", \
             L""__FILE__,__LINE__, \
             exc::component_string(COMPONENT), \
             exc::reason_string(REASON)); \
@@ -156,7 +177,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         throw E; \
         return RET; } \
       else { \
-        FPRINTF(stderr,L"Exception(%sl:%d): [%sl] [%sl]\n", \
+        FPRINTF(stderr,L"Exception(%ls:%d): [%ls] [%ls]\n", \
             E.file_.c_str(),E.line_, \
             exc::component_string(E.component_), \
             exc::reason_string(E.reason_)); \
@@ -169,7 +190,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       if( this->use_exc() ) { \
         throw exc(REASON,COMPONENT,L"",L""__FILE__,__LINE__); } \
       else { \
-        FPRINTF(stderr,L"Exception(%sl:%d): [%sl] [%sl]\n", \
+        FPRINTF(stderr,L"Exception(%ls:%d): [%ls] [%ls]\n", \
             L""__FILE__,__LINE__, \
             exc::component_string(COMPONENT), \
             exc::reason_string(REASON)); } } while(false);

@@ -35,11 +35,19 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "synqry.hh"
 #include "common.h"
 #include "str.hh"
+#include "ustr.hh"
 #include <assert.h>
 
 using namespace csl;
 using namespace csl::slt3;
 using csl::common::str;
+using csl::common::ustr;
+
+/*
+   TODO 1: wide char handling must be carefuly tested
+   TODO 2: comparison between strings and blobs are badly written
+   TODO 3: rethink parameter handling
+*/
 
 /** @brief contains tests related to slt3::param */
 namespace test_param {
@@ -85,7 +93,7 @@ namespace test_param {
     b.set((unsigned char *)(&intval),sizeof(intval));
 
     test_conv( intval, (double)123456789.0, p );
-    test_conv( intval, str(L"123456789"), p );
+    test_conv( intval, ustr("123456789"), p );
     test_conv( intval, b, p );
 
     // double to anything
@@ -93,26 +101,26 @@ namespace test_param {
     b.set((unsigned char *)(&dblval),sizeof(dblval));
 
     test_conv( dblval, (long long)357987ll, p );
-    test_conv( dblval, str(L"357987.1234500000"), p );
+    test_conv( dblval, ustr("357987.1234500000"), p );
     test_conv( dblval, b, p );
 
     // string to anything
-    str strval(L"Hello world");
-    b.set( (unsigned char *)strval.data(), strval.nbytes() );
+    ustr strval("Hello world");
+    b.set( (unsigned char *)strval.data(), strval.size() );
 
     test_conv( strval, (long long)0ll, p );
     test_conv( strval, (double)0.0, p );
     test_conv( strval, b, p );
 
-    strval = L"12345678";
-    b.set( (unsigned char *)strval.data(), strval.nbytes() );
+    strval = "12345678";
+    b.set( (unsigned char *)strval.data(), strval.size() );
 
     test_conv( strval, (long long)12345678ll, p );
     test_conv( strval, (double)12345678.0, p );
     test_conv( strval, b, p );
 
-    strval = L"12345678.12345678";
-    b.set( (unsigned char *)strval.data(), strval.nbytes() );
+    strval = "12345678.12345678";
+    b.set( (unsigned char *)strval.data(), strval.size() );
 
     test_conv( strval, (long long)12345678ll, p );
     test_conv( strval, (double)12345678.12345678, p );

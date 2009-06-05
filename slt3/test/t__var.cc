@@ -38,16 +38,18 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common.h"
 #include "mpool.hh"
 #include "str.hh"
+#include "ustr.hh"
 #include <assert.h>
 
 using namespace csl::slt3;
 using csl::common::str;
+using csl::common::ustr;
 
 /** @brief contains tests related to slt3::var */
 namespace test_var {
 
   /** Helper base class */
-  class TestBase : public obj
+  class TestBase : public csl::slt3::obj
   {
     public:
       /* helper to lookup the database */
@@ -55,7 +57,7 @@ namespace test_var {
       static reg::helper  reg_;
   };
 
-  reg::helper TestBase::reg_(L"test_var",L"test_var.db");
+  reg::helper TestBase::reg_("test_var","test_var.db");
 
   /** SingleInt tests a single integer to be stored in an SQLite DB by the ORM mapper (sql_helper) */
   class SingleInt : public TestBase
@@ -64,14 +66,14 @@ namespace test_var {
       virtual sql::helper & sql_helper() const { return sql_helper_; }
       static sql::helper  sql_helper_;
 
-      SingleInt() : id_(L"id",*this,L"PRIMARY KEY ASC AUTOINCREMENT"), 
-                    value_(L"intval",*this) {}
+      SingleInt() : id_("id",*this,"PRIMARY KEY ASC AUTOINCREMENT"),
+                    value_("intval",*this) {}
 
       intvar id_;
       intvar value_;
   };
 
-  sql::helper SingleInt::sql_helper_(L"single_int");
+  sql::helper SingleInt::sql_helper_("single_int");
 
   /** SingleString tests a single string to be stored in an SQLite DB by the ORM mapper (sql_helper) */
   class SingleString : public TestBase
@@ -80,14 +82,14 @@ namespace test_var {
       virtual sql::helper & sql_helper() const { return sql_helper_; }
       static sql::helper  sql_helper_;
 
-      SingleString() : id_(L"id",*this,L"PRIMARY KEY ASC AUTOINCREMENT"),
-                       value_(L"strval",*this) {}
+      SingleString() : id_("id",*this,"PRIMARY KEY ASC AUTOINCREMENT"),
+                       value_("strval",*this) {}
 
       intvar id_;
       strvar value_;
   };
 
-  sql::helper SingleString::sql_helper_(L"single_string");
+  sql::helper SingleString::sql_helper_("single_string");
 
   /** SingleDouble tests a double precision value to be stored in an SQLite DB by the ORM mapper (sql_helper) */
   class SingleDouble : public TestBase
@@ -96,14 +98,14 @@ namespace test_var {
       virtual sql::helper & sql_helper() const { return sql_helper_; }
       static sql::helper    sql_helper_;
 
-      SingleDouble() : id_(L"id",*this,L"PRIMARY KEY ASC AUTOINCREMENT"),
-                       value_(L"dblval",*this) {}
+      SingleDouble() : id_("id",*this,"PRIMARY KEY ASC AUTOINCREMENT"),
+                       value_("dblval",*this) {}
 
       intvar     id_;
       doublevar  value_;
   };
 
-  sql::helper SingleDouble::sql_helper_(L"single_dbl");
+  sql::helper SingleDouble::sql_helper_("single_dbl");
 
   /** SingleBlob tests a single blob to be stored in an SQLite DB by the ORM mapper (sql_helper) */
   class SingleBlob : public TestBase
@@ -112,14 +114,14 @@ namespace test_var {
       virtual sql::helper & sql_helper() const { return sql_helper_; }
       static sql::helper    sql_helper_;
 
-      SingleBlob() : id_(L"id",*this,L"PRIMARY KEY ASC AUTOINCREMENT"),
-                     value_(L"blobval",*this) {}
+      SingleBlob() : id_("id",*this,"PRIMARY KEY ASC AUTOINCREMENT"),
+                     value_("blobval",*this) {}
 
       intvar     id_;
       blobvar  value_;
   };
 
-  sql::helper SingleBlob::sql_helper_(L"single_blob");
+  sql::helper SingleBlob::sql_helper_("single_blob");
 
   /** @test baseline for performance comparison */
   void baseline()
@@ -310,6 +312,9 @@ using namespace test_var;
 
 int main()
 {
+  try
+  {
+
   csl_common_print_results( "baseline           ", csl_common_test_timer_v0(baseline),"" );
   csl_common_print_results( "single_int0        ", csl_common_test_timer_v0(single_int0),"" );
   csl_common_print_results( "single_int1        ", csl_common_test_timer_v0(single_int1),"" );
@@ -330,6 +335,14 @@ int main()
   csl_common_print_results( "single_blb1        ", csl_common_test_timer_v0(single_blb1),"" );
   csl_common_print_results( "single_blb2        ", csl_common_test_timer_v0(single_blb2),"" );
   csl_common_print_results( "single_blb3        ", csl_common_test_timer_v0(single_blb3),"" );
+
+  }
+  catch( csl::slt3::exc & e )
+  {
+    str s;
+    e.to_string(s);
+    FPRINTF(stderr,L"Exception: %ls\n",s.c_str());
+  }
 
   return 0;
 }

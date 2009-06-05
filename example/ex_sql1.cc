@@ -41,7 +41,7 @@ int main()
 
   try
   {
-    c.open(L"testme.db");
+    c.open("testme.db");
 
     /* start a transaction */
     tran t(c);
@@ -49,7 +49,7 @@ int main()
     /* create a query object */
     synqry q(t);
 
-    q.execute(L"create table test(i int);");
+    q.execute("create table test(i int);");
   }
   catch( exc e )
   {

@@ -38,7 +38,7 @@ int main()
   conn c;
   c.use_exc(false);
 
-  if( c.open(L"testme.db") )
+  if( c.open("testme.db") )
   {
     /* start a transaction */
     tran t(c);
@@ -46,7 +46,7 @@ int main()
     /* create a query object */
     synqry q(t);
 
-    if( q.execute(L"create table test(i int);") == false )
+    if( q.execute("create table test(i int);") == false )
     {
       /* error message will be automatically sent to stderr */
     }

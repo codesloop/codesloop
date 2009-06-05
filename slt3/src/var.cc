@@ -32,11 +32,16 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "synqry.hh"
 #include "param.hh"
 #include "str.hh"
+#include "ustr.hh"
 
 /**
   @file var.cc
   @brief implementation of slt3::var
  */
+
+using csl::common::str;
+using csl::common::ustr;
+using csl::common::pbuf;
 
 namespace csl
 {
@@ -65,7 +70,7 @@ namespace csl
                                             name TEXT NOT NULL ,
                                             height REAL DEFAULT (0.1) ,
                                             pk BLOB  ); */
-    bool var::helper::init(tran & t, const wchar_t * sql_query)
+    bool var::helper::init(tran & t, const char * sql_query)
     {
       synqry q(t);
       if( q.prepare(sql_query) == false ) return false;
@@ -74,7 +79,7 @@ namespace csl
     }
 
     /* 'INSERT INTO Xtable ( name,height,pk ) VALUES ( ?,?,? );' */
-    bool var::helper::create(tran & t, const wchar_t * sql_query)
+    bool var::helper::create(tran & t, const char * sql_query)
     {
       synqry q(t);
 
@@ -113,7 +118,7 @@ namespace csl
     }
 
     /* 'UPDATE Xtable SET name=? , height=? , pk=?  WHERE id=? ;' */
-    bool var::helper::save(tran & t, const wchar_t * sql_query)
+    bool var::helper::save(tran & t, const char * sql_query)
     {
       synqry q(t);
 
@@ -151,7 +156,7 @@ namespace csl
     }
 
     /* 'DELETE FROM Xtable WHERE id=?;' */
-    bool var::helper::remove(tran & t, const wchar_t * sql_query)
+    bool var::helper::remove(tran & t, const char * sql_query)
     {
       synqry q(t);
 
@@ -170,7 +175,7 @@ namespace csl
     }
 
     /* 'SELECT id,name,height,pk FROM Xtable WHERE id=? LIMIT 1;' */
-    bool var::helper::find_by_id(tran & t, const wchar_t * sql_query)
+    bool var::helper::find_by_id(tran & t, const char * sql_query)
     {
       synqry q(t);
 
@@ -213,7 +218,7 @@ namespace csl
     }
 
     bool var::helper::find_by(tran & t,
-                              const wchar_t * sql_query,
+                              const char * sql_query,
                               int field1,
                               int field2,
                               int field3,
@@ -267,7 +272,7 @@ namespace csl
     }
 
 
-    bool var::helper::add_field(const wchar_t * name, var & v)
+    bool var::helper::add_field(const char * name, var & v)
     {
       data * d = new data(name,v);
       dtalst_.push_back(d);
@@ -275,15 +280,13 @@ namespace csl
     }
 
     void intvar::set_param(param & p)    { p.set(value_); }
-    void strvar::set_param(param & p)    { p.set((const wchar_t *)value_.data()); }
+    void strvar::set_param(param & p)    { p.set((const char *)value_.data()); }
     void doublevar::set_param(param & p) { p.set(value_); }
     void blobvar::set_param(param & p)   { p.set(value_.data(),value_.size()); }
 
     bool intvar::set_value(synqry::colhead * ch,synqry::field * fd)
     {
       if( !ch || !fd ) return false;
-
-      wchar_t * endp = 0;
 
       switch( ch->type_ )
       {
@@ -294,7 +297,7 @@ namespace csl
 
         case synqry::colhead::t_string:
           if( !fd->stringval_ || !fd->size_ ) return false;
-          value_ = WCSTOLL(fd->stringval_,&endp,10);
+          value_ = ATOLL(fd->stringval_);
           break;
 
         case synqry::colhead::t_double:
@@ -322,8 +325,6 @@ namespace csl
     {
       if( !ch || !fd ) return false;
 
-      wchar_t * endp = 0;
-
       switch( ch->type_ )
       {
         case synqry::colhead::t_integer:
@@ -333,7 +334,7 @@ namespace csl
 
         case synqry::colhead::t_string:
           if( !fd->stringval_ || !fd->size_ ) return false;
-          value_ = WCSTOLD(fd->stringval_,&endp);
+          value_ = atof(fd->stringval_);
           break;
 
         case synqry::colhead::t_double:
@@ -361,30 +362,29 @@ namespace csl
     {
       if( !ch || !fd ) return false;
 
-      wchar_t tmp[200];
+      char tmp[200];
 
       switch( ch->type_ )
       {
         case synqry::colhead::t_integer:
-          SNPRINTF( tmp, sizeof(tmp)-1,L"%lld",fd->intval_ );
+          SNPRINTF( tmp, sizeof(tmp)-1,"%lld",fd->intval_ );
           value_ = tmp;
           break;
 
         case synqry::colhead::t_double:
-          SNPRINTF( tmp, sizeof(tmp)-1,L"%.10f", fd->doubleval_ );
+          SNPRINTF( tmp, sizeof(tmp)-1,"%.10f", fd->doubleval_ );
           value_ = tmp;
           break;
 
         case synqry::colhead::t_string:
           if( fd->size_ == 0 ) { value_.reset(); break; }
-          // TODO carefully check results
-          value_.assign(fd->stringval_,fd->stringval_+fd->size_);
+          value_ = fd->stringval_;
           break;
 
         case synqry::colhead::t_blob:
           if( fd->size_ == 0 ) { value_.reset(); break; }
-          value_.assign(fd->stringval_,fd->stringval_+fd->size_);
           // TODO carefully check results
+          value_.assign(fd->stringval_,fd->stringval_+fd->size_);
           break;
 
         case synqry::colhead::t_null:
@@ -413,36 +413,36 @@ namespace csl
       return true;
     }
 
-    intvar::intvar(const wchar_t * name, obj & parent,const wchar_t * flags) : var(parent), value_(0)
+    intvar::intvar(const char * name, obj & parent,const char * flags) : var(parent), value_(0)
     {
       sql::helper & h(parent.sql_helper());
       var::helper & v(parent.var_helper());
-      h.add_field(name,L"INTEGER",flags);
+      h.add_field(name,"INTEGER",flags);
       v.add_field(name,*this);
     }
 
-    strvar::strvar(const wchar_t * name, obj & parent,const wchar_t * flags) : var(parent)
+    strvar::strvar(const char * name, obj & parent,const char * flags) : var(parent)
     {
       value_.ensure_trailing_zero();
       sql::helper & h(parent.sql_helper());
       var::helper & v(parent.var_helper());
-      h.add_field(name,L"TEXT",flags);
+      h.add_field(name,"TEXT",flags);
       v.add_field(name,*this);
     }
 
-    doublevar::doublevar(const wchar_t * name, obj & parent,const wchar_t * flags) : var(parent), value_(0.0)
+    doublevar::doublevar(const char * name, obj & parent,const char * flags) : var(parent), value_(0.0)
     {
       sql::helper & h(parent.sql_helper());
       var::helper & v(parent.var_helper());
-      h.add_field(name,L"REAL",flags);
+      h.add_field(name,"REAL",flags);
       v.add_field(name,*this);
     }
 
-    blobvar::blobvar(const wchar_t * name, obj & parent,const wchar_t * flags) : var(parent)
+    blobvar::blobvar(const char * name, obj & parent,const char * flags) : var(parent)
     {
       sql::helper & h(parent.sql_helper());
       var::helper & v(parent.var_helper());
-      h.add_field(name,L"BLOB",flags);
+      h.add_field(name,"BLOB",flags);
       v.add_field(name,*this);
     }
 
@@ -464,7 +464,7 @@ namespace csl
     long long intvar::operator*() const { return value_; }
     long long intvar::get() const { return value_; }
 
-    strvar & strvar::operator=(const wchar_t * other)
+    strvar & strvar::operator=(const char * other)
     {
       if( !other )
       {
@@ -473,14 +473,30 @@ namespace csl
       }
       else
       {
-        size_t sz = sizeof(wchar_t)*(wcslen(other)+1);
         value_ = other; //.assign( other,other+sz );
       }
       parent()->on_change();
       return *this;
     }
 
-    strvar & strvar::operator=(const common::str & other)
+    strvar & strvar::operator=(const str & wother)
+    {
+      ustr other(wother);
+
+      if( other.size() )
+      {
+        value_ = other;
+      }
+      else
+      {
+        value_.reset();
+        value_.ensure_trailing_zero();
+      }
+      parent()->on_change();
+      return *this;
+    }
+
+    strvar & strvar::operator=(const ustr & other)
     {
       if( other.size() )
       {
@@ -502,7 +518,7 @@ namespace csl
       return *this;
     }
 
-    strvar & strvar::operator=(const common::pbuf & other)
+    strvar & strvar::operator=(const pbuf & other)
     {
       value_ = other;
       parent()->on_change();
@@ -512,7 +528,7 @@ namespace csl
     const strvar::value_t & strvar::operator*() const { return value_; }
     const strvar::value_t & strvar::get() const { return value_; }
 
-    const wchar_t * strvar::c_str()
+    const char * strvar::c_str()
     {
       value_.ensure_trailing_zero();
       return value_.data();
@@ -557,16 +573,24 @@ namespace csl
       return *this;
     }
 
-    blobvar & blobvar::operator=(const common::pbuf & other)
+    blobvar & blobvar::operator=(const pbuf & other)
     {
       value_ = other;
       parent()->on_change();
       return *this;
     }
 
-    blobvar & blobvar::operator=(const common::str & other)
+    blobvar & blobvar::operator=(const ustr & other)
     {
-      if( other.size() > 0 ) value_.set( (const unsigned char *)other.data(), other.size() );
+      if( other.size() > 0 ) value_.set( (const unsigned char *)other.data(), other.nbytes() );
+      else                   value_.reset();
+      parent()->on_change();
+      return *this;
+    }
+
+    blobvar & blobvar::operator=(const str & other)
+    {
+      if( other.size() > 0 ) value_.set( (const unsigned char *)other.data(), other.nbytes() );
       else                   value_.reset();
       parent()->on_change();
       return *this;

@@ -39,15 +39,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 
 #ifndef SCHED_HEAD_DB_NAME
-#define SCHED_HEAD_DB_NAME L"sched_head"
+#define SCHED_HEAD_DB_NAME "sched_head"
 #endif /*SCHED_HEAD_DB_NAME*/
 
 #ifndef SCHED_HEAD_TABLE_NAME
-#define SCHED_HEAD_TABLE_NAME L"head"
+#define SCHED_HEAD_TABLE_NAME "head"
 #endif /*SCHED_HEAD_TABLE_NAME*/
 
 #ifndef SCHED_HEAD_DB_DEFAULT_PATH
-#define SCHED_HEAD_DB_DEFAULT_PATH L"head.db"
+#define SCHED_HEAD_DB_DEFAULT_PATH "head.db"
 #endif /*SCHED_HEAD_DB_DEFAULT_PATH*/
 
 namespace csl
@@ -64,10 +64,10 @@ namespace csl
       public:
         inline head():
           /* database fields */
-          id_(         L"id",        *this, L"PRIMARY KEY ASC AUTOINCREMENT"),
-          item_id_(    L"item_id",   *this, L"NOT NULL"),
-          name_(       L"name",      *this, L"NOT NULL"),
-          value_(      L"value",     *this, L"NOT NULL")
+          id_(         "id",        *this, "PRIMARY KEY ASC AUTOINCREMENT"),
+          item_id_(    "item_id",   *this, "NOT NULL"),
+          name_(       "name",      *this, "NOT NULL"),
+          value_(      "value",     *this, "NOT NULL")
         {}
 
         inline ~head() { }

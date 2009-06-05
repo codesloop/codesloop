@@ -64,9 +64,7 @@ namespace csl
 
       /* internal */
       unsigned long long new_tran_id();
-      static exc create_exc(int rc,int component, const common::ustr & str);
-      bool exec_noret(const char * sql);
-      bool exec(const char * sql,common::ustr & res);
+      static exc create_exc(int rc,int component, const common::str & str);
       bool exec_noret(const char * sql);
       bool exec(const char * sql,common::ustr & res);
       bool valid_db_ptr();
@@ -129,7 +127,7 @@ namespace csl
       common::mpool<>  param_pool_;
       common::mpool<>  data_pool_;
       sqlite3_stmt *   stmt_;
-      const void *     tail_;
+      const char *     tail_;
       bool             use_exc_;
       bool             autoreset_data_;
       long long        last_insert_id_;

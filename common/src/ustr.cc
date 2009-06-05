@@ -24,6 +24,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ustr.hh"
+#include "str.hh"
 #include "exc.hh"
 #include "common.h"
 
@@ -36,6 +37,46 @@ namespace csl
 {
   namespace common
   {
+    ustr::ustr(const str & other) : csl::common::obj(), buf_((unsigned char)0)
+    {
+      size_t sz = other.size();
+
+      /* over allocating, but this saves our arse when utf-8 results more then 1 character */
+      char * b = (char *)buf_.allocate( other.nbytes() );
+
+      if( sz && b )
+      {
+        size_t szz = wcstombs( b, other.data(), sz );
+        buf_.allocate( szz );
+      }
+
+      ensure_trailing_zero();
+    }
+
+    ustr& ustr::operator+=(const str& other)
+    {
+      *this += ustr(other);
+      return *this;
+    }
+
+    ustr & ustr::operator=(const str & other)
+    {
+      size_t sz = other.size();
+
+      /* over allocating, but this saves our arse when utf-8 results more then 1 character */
+      char * b = (char *)buf_.allocate( other.nbytes() );
+
+      if( sz && b )
+      {
+        size_t szz = wcstombs( b, other.data(), sz );
+        buf_.allocate( szz );
+      }
+
+      ensure_trailing_zero();
+
+      return *this;
+    }
+
     void ustr::ensure_trailing_zero()
     {
       unsigned char c = 0;

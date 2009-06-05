@@ -86,15 +86,9 @@ namespace csl
         bool changed() { return changed_; }
         void changed(bool c) { changed_ = c; }
 
-        /** @brief Specifies whether param should throw sched::exc exceptions
-        @param yesno is the desired value to be set
-
-        the default value for use_exc() is true, so it throws exceptions by default */
         inline void use_exc(bool yesno) { use_exc_ = yesno; }
+        inline bool use_exc() const     { return use_exc_; }
 
-        /** @brief Returns the current value of use_exc
-        @return true if exc exceptions are used */
-        inline bool use_exc() const { return use_exc_; }
       private:
         var::helper var_helper_;
         bool changed_;

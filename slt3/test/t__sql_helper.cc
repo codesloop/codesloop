@@ -46,7 +46,7 @@ namespace test_sql_helper {
   /** @test baseline for comparison */
   void baseline()
   {
-    sql::helper h(L"xtable");
+    sql::helper h("xtable");
     (void)h.init_sql();
   }
 
@@ -55,8 +55,8 @@ namespace test_sql_helper {
   {
     public:
       virtual ~X() {}
-      X() : id_(L"id",*this,L"PRIMARY KEY ASC AUTOINCREMENT"), name_(L"name",*this,L"NOT NULL"),
-        height_(L"height",*this,L"DEFAULT (0.1)"), pk_(L"pk",*this) {}
+      X() : id_("id",*this,"PRIMARY KEY ASC AUTOINCREMENT"), name_("name",*this,"NOT NULL"),
+        height_("height",*this,"DEFAULT (0.1)"), pk_("pk",*this) {}
 
       virtual conn & db() { return reg_.db(); }
       virtual sql::helper & sql_helper() const { return sql_helper_; }
@@ -70,8 +70,8 @@ namespace test_sql_helper {
       blobvar     pk_;
   };
 
-  sql::helper X::sql_helper_(L"Xtable");
-  reg::helper X::reg_(L"test_mapper",L"test_mapper.db");
+  sql::helper X::sql_helper_("Xtable");
+  reg::helper X::reg_("test_mapper","test_mapper.db");
 
   /** @test calls init_sql() */
   void usage1()

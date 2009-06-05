@@ -36,6 +36,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mpool.hh"
 #include "tbuf.hh"
 #include "var.hh"
+#include "ustr.hh"
 #ifdef __cplusplus
 
 namespace csl
@@ -62,14 +63,14 @@ namespace csl
                 : name_(name), type_(typ), flags_(flags) {}
             };
 
-            typedef common::tbuf<256> buf_t;
+            typedef common::ustr buf_t;
             typedef common::pvlist< 32,data,common::delete_destructor<data> > fieldlist_t;
             typedef common::mpool<> strpool_t;
 
             inline const char * table_name() { return table_name_; }
 
             helper(const char * tablename);
-            bool add_field(const char * name,const char * typ, const char * flags=L"");
+            bool add_field(const char * name,const char * typ, const char * flags="");
 
             const char * init_sql();
             const char * create_sql();
@@ -82,6 +83,9 @@ namespace csl
                                     int field4=-1,
                                     int field5=-1);
 
+            inline void use_exc(bool yesno) { use_exc_ = yesno; }
+            inline bool use_exc() const     { return use_exc_; }
+
           private:
             helper() {}
 
@@ -91,13 +95,14 @@ namespace csl
             //strpool_t    pool_;
 
             /**/
-            buf_t init_sql_;
-            buf_t create_sql_;
-            buf_t save_sql_;
-            buf_t remove_sql_;
-            buf_t find_by_id_sql_;
-            buf_t find_by_sql_;
-            int   find_by_fields_[5];
+            buf_t  init_sql_;
+            buf_t  create_sql_;
+            buf_t  save_sql_;
+            buf_t  remove_sql_;
+            buf_t  find_by_id_sql_;
+            buf_t  find_by_sql_;
+            int    find_by_fields_[5];
+            bool   use_exc_;
         };
     };
   }

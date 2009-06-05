@@ -24,6 +24,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "str.hh"
+#include "ustr.hh"
 #include "exc.hh"
 #include "common.h"
 
@@ -36,6 +37,44 @@ namespace csl
 {
   namespace common
   {
+    str::str(const ustr & other) : csl::common::obj(), buf_((wchar_t)L'\0')
+    {
+      size_t sz = other.size();
+
+      wchar_t * b = (wchar_t *)buf_.allocate( sz * sizeof(wchar_t) );
+
+      if( sz && b )
+      {
+        size_t szz = mbstowcs( b, other.data(), sz );
+        buf_.allocate( szz * sizeof(wchar_t) );
+      }
+
+      ensure_trailing_zero();
+    }
+
+    str& str::operator+=(const ustr& other)
+    {
+      *this += str(other);
+      return *this;
+    }
+
+    str & str::operator=(const ustr & other)
+    {
+      size_t sz = other.size();
+
+      wchar_t * b = (wchar_t *)buf_.allocate( sz * sizeof(wchar_t) );
+
+      if( sz && b )
+      {
+        size_t szz = mbstowcs( b, other.data(), sz );
+        buf_.allocate( szz * sizeof(wchar_t) );
+      }
+
+      ensure_trailing_zero();
+
+      return *this;
+    }
+
     void str::ensure_trailing_zero()
     {
 

@@ -42,7 +42,8 @@ namespace csl
   using sec::ecdh_key;
   using sec::bignum;
 
-  using common::str; 
+  using common::str;
+  using common::ustr;
 
   namespace comm
   {

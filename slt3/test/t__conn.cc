@@ -45,8 +45,8 @@ namespace test_conn {
   {
     conn c;
     c.use_exc(false);
-    fprintf(stderr,"Must get an error message here:\n");
-    assert( c.open(L".") == false );
+    FPRINTF(stderr,L"Must get an error message here:\n");
+    assert( c.open(".") == false );
     assert( c.close() == false );
   }
 
@@ -59,7 +59,7 @@ namespace test_conn {
 
     try
     {
-      assert( c.open(L".") == false );
+      assert( c.open(".") == false );
       assert( c.close() == false );
     }
     catch( exc e )
@@ -75,7 +75,7 @@ namespace test_conn {
   {
     conn c;
     assert( c.close() == false );
-    assert( c.open(L"test.db") == true );
+    assert( c.open("test.db") == true );
     assert( c.close() == true );
     assert( c.close() == false );
   }

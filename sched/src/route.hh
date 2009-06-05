@@ -38,15 +38,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 
 #ifndef SCHED_ROUTE_DB_NAME
-#define SCHED_ROUTE_DB_NAME L"sched_route"
+#define SCHED_ROUTE_DB_NAME "sched_route"
 #endif /*SCHED_ROUTE_DB_NAME*/
 
 #ifndef SCHED_ROUTE_TABLE_NAME
-#define SCHED_ROUTE_TABLE_NAME L"route"
+#define SCHED_ROUTE_TABLE_NAME "route"
 #endif /*SCHED_ROUTE_TABLE_NAME*/
 
 #ifndef SCHED_ROUTE_DB_DEFAULT_PATH
-#define SCHED_ROUTE_DB_DEFAULT_PATH L"route.db"
+#define SCHED_ROUTE_DB_DEFAULT_PATH "route.db"
 #endif /*SCHED_ROUTE_DB_DEFAULT_PATH*/
 
 namespace csl
@@ -63,12 +63,12 @@ namespace csl
       public:
         inline route():
           /* database fields */
-          id_(         L"id",        *this, L"PRIMARY KEY ASC AUTOINCREMENT"),
-          peer_id_(    L"peer_id",   *this, L"NOT NULL"),
-          protocol_(   L"protocol",  *this, L"NOT NULL DEFAULT('UDP')"),
-          port_(       L"port",      *this, L"NOT NULL DEFAULT(53535)"),
-          type_(       L"port",      *this, L"NOT NULL DEFAULT('UNICAST')"),
-          host_(       L"port",      *this, L"NOT NULL")
+          id_(         "id",        *this, "PRIMARY KEY ASC AUTOINCREMENT"),
+          peer_id_(    "peer_id",   *this, "NOT NULL"),
+          protocol_(   "protocol",  *this, "NOT NULL DEFAULT('UDP')"),
+          port_(       "port",      *this, "NOT NULL DEFAULT(53535)"),
+          type_(       "port",      *this, "NOT NULL DEFAULT('UNICAST')"),
+          host_(       "port",      *this, "NOT NULL")
         {}
 
         inline ~route() { }

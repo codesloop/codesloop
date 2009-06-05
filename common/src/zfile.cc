@@ -317,7 +317,7 @@ namespace csl
         wchar_t tmp[32];
         str.clear();
 
-        SNPRINTF(tmp,sizeof(tmp),L"[sz=%ld]\n",(unsigned long)get_size_common(bf));
+        SWPRINTF(tmp,sizeof(tmp),L"[sz=%ld]\n",(unsigned long)get_size_common(bf));
         str += tmp;
 
         size_t b = 0;
@@ -332,7 +332,7 @@ namespace csl
           size_t k=0;
           while( k<(bx)->size_ )
           {
-            SNPRINTF( tmp,sizeof(tmp),L"%c[%.2d:%.2d:%.4d:%.4d]: ",
+            SWPRINTF( tmp,sizeof(tmp),L"%c[%.2d:%.2d:%.4d:%.4d]: ",
                 prefix,
                 (unsigned short)b,
                 (unsigned short)l,
@@ -341,7 +341,7 @@ namespace csl
             str += tmp;
             for( i=0;(k<(bx->size_)&& i<16);++i )
             {
-              SNPRINTF( tmp,sizeof(tmp),L"%.2x", bx->data_[k] );
+              SWPRINTF( tmp,sizeof(tmp),L"%.2x", bx->data_[k] );
               str += tmp;
               ++k;
             }

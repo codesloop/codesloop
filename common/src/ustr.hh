@@ -45,6 +45,8 @@ namespace csl
 {
   namespace common
   {
+    class str;
+
     /** @todo document me */
     class ustr : public csl::common::obj
     {
@@ -58,11 +60,15 @@ namespace csl
         inline ustr() : csl::common::obj(), buf_((unsigned char)0) { }
 
         /** @brief destructor
-        *   since there are not virtual functions, and we do not expect inherited
-        *   classes from ustr the destructor is not virtual. this casues a bit
-        *   faster initalization, because no vptr table is required, i guess
-        **/
+         *  since there are not virtual functions, and we do not expect inherited
+         *  classes from ustr the destructor is not virtual. this casues a bit
+         *  faster initalization, because no vptr table is required, i guess
+         **/
         ~ustr() {}
+
+        /* ------------------------------------------------------------------------ *
+        **    pbuf operations
+        ** ------------------------------------------------------------------------ */
 
         /** @brief copy operator */
         inline ustr & operator=(const pbuf & other)
@@ -72,11 +78,66 @@ namespace csl
           return *this;
         }
 
+        /* ------------------------------------------------------------------------ *
+        **    str operations
+        ** ------------------------------------------------------------------------ */
+
+        /** @brief copy constructor */
+        ustr(const str & other);
+
+        /** @brief copy operator */
+        ustr & operator=(const str & other);
+
+        /** @brief append operator */
+        ustr& operator+=(const str&);
+
+        /* ------------------------------------------------------------------------ *
+        **    ustr operations
+        ** ------------------------------------------------------------------------ */
+
         /** @brief copy constructor */
         inline ustr(const ustr& s) : csl::common::obj(), buf_((unsigned char)0)
         {
           buf_ = s.buf_;
         }
+
+        /** @brief copy operator */
+        inline ustr& operator=(const ustr& s)
+        {
+          buf_ = s.buffer();
+          return *this;
+        }
+
+        /** @brief append operator */
+        ustr& operator+=(const ustr&);
+
+        /** @brief append operator with two parameters */
+        inline friend ustr operator+(const ustr& lhs, const ustr& rhs)
+        {
+          return ustr(lhs) += rhs;
+        }
+
+        /** @brief is equal operator */
+        inline bool operator==(const ustr& s) const
+        {
+          return (::strncmp( data(), s.data(), nbytes()) == 0);
+        }
+
+        /** @brief find a string
+         *  @param s is the string to be found
+         *  @returns npos if not found or the position
+         **/
+        size_t find(const ustr & s) const;
+
+        /** @brief substr
+         *  @param start start from this position
+         *  @param length take length bytes from origin str
+         **/
+        ustr substr(const size_t start, const size_t length) const;
+
+        /* ------------------------------------------------------------------------ *
+        **    char * operations
+        ** ------------------------------------------------------------------------ */
 
         /** @brief copy constructor */
         inline ustr(const char * us) : csl::common::obj(), buf_((unsigned char)0)
@@ -93,30 +154,8 @@ namespace csl
           return *this;
         }
 
-        /** @brief let equal operator */
-        ustr& operator=(const std::string & s)
-        {
-          return operator=(s.c_str());
-        }
-
-        /** @brief let equal operator */
-        inline ustr& operator=(const ustr& s)
-        {
-          buf_ = s.buffer();
-          return *this;
-        }
-
-        /** @brief append operator */
-        ustr& operator+=(const ustr&);
-
         /** @brief append operator */
         ustr& operator+=(const char * s);
-
-        /** @brief append operator with two parameters */
-        inline friend ustr operator+(const ustr& lhs, const ustr& rhs)
-        {
-          return ustr(lhs) += rhs;
-        }
 
         /** @brief is equal operator */
         inline bool operator==(const char * s) const
@@ -124,11 +163,78 @@ namespace csl
           return (::strncmp( data(), s, nbytes()) == 0);
         }
 
-        /** @brief is equal operator */
-        inline bool operator==(const ustr& s) const
+        /** @brief returns the background c str */
+        inline const char * c_str() const
         {
-          return (::strncmp( data(), s.data(), nbytes()) == 0);
+          return( data() );
         }
+
+        /** @brief assign string
+         *  @param start is the start of the string
+         *  @param lend is the end of the string
+         **/
+        inline ustr & assign(const char * start, const char * end)
+        {
+          buf_.set( (unsigned char *)start, end-start);
+          return *this;
+        }
+
+        /** @brief find a wide character in the string
+         *  @param s is the string to be found
+         *  @returns npos if not found or the position
+         **/
+        size_t find(const char * s) const;
+
+        /** @brief get data as char * */
+        inline const char * data() const
+        {
+          return (const char *)buf_.data();
+        }
+
+        /* ------------------------------------------------------------------------ *
+        **    wchar_t * operations
+        ** ------------------------------------------------------------------------ */
+
+        /* ------------------------------------------------------------------------ *
+        **    std::string operations
+        ** ------------------------------------------------------------------------ */
+
+        /** @brief let equal operator */
+        ustr& operator=(const std::string & s)
+        {
+          return operator=(s.c_str());
+        }
+
+        /* ------------------------------------------------------------------------ *
+        **    char operations
+        ** ------------------------------------------------------------------------ */
+
+        /** @brief unchecked access to buffer */
+        inline char operator[](const size_t n) const
+        {
+          return data()[n];
+        }
+
+        /** @brief check access to buffer */
+        char at(const size_t n) const;
+
+        /** @brief find a wide character in the string
+         *  @param w is the character to be found
+         *  @returns npos if not found or the position
+         **/
+        size_t find(char w) const;
+
+        /** @brief reverse find a wide character in the string
+         *  @param w is the character to be found
+         *  @returns npos if not found or the position
+         **/
+        size_t rfind(char w) const;
+
+        /* ------------------------------------------------------------------------ *
+        **    wchar_t operations
+        ** ------------------------------------------------------------------------ */
+
+        /* ------------------------------------------------------------------------ */
 
         /** @brief resets ustr buffer */
         inline void clear()
@@ -161,37 +267,6 @@ namespace csl
           return !buf_.has_data();
         }
 
-        /** @brief returns the background c str */
-        inline const char * c_str() const
-        {
-          return( data() );
-        }
-
-        /** @brief assign string
-        *   @param start is the start of the string
-        *   @param lend is the end of the string
-        **/
-        inline ustr & assign(const char * start, const char * end)
-        {
-          buf_.set( (unsigned char *)start, end-start);
-          return *this;
-        }
-
-        /** @brief unchecked access to buffer */
-        inline char operator[](const size_t n) const
-        {
-          return data()[n];
-        }
-
-        /** @brief check access to buffer */
-        char at(const size_t n) const;
-
-        /** @brief get data as wchar_t */
-        inline const char * data() const
-        {
-          return (const char *)buf_.data();
-        }
-
         inline const tbuf<buf_size> & buffer() const
         {
           return buf_;
@@ -203,36 +278,6 @@ namespace csl
         }
 
         void ensure_trailing_zero();
-
-        /** @brief substr
-        *   @param start start from this position
-        *   @param length take length bytes from origin str
-        **/
-        ustr substr(const size_t start, const size_t length) const;
-
-        /** @brief find a wide character in the string
-        *   @param w is the character to be found
-        *   @returns npos if not found or the position
-        **/
-        size_t find(char w) const;
-
-        /** @brief find a wide character in the string
-        *   @param s is the string to be found
-        *   @returns npos if not found or the position
-        **/
-        size_t find(const char * s) const;
-
-        /** @brief find a string
-        *   @param s is the string to be found
-        *   @returns npos if not found or the position
-        **/
-        size_t find(const ustr & s) const;
-
-        /** @brief reverse find a wide character in the string
-        *   @param w is the character to be found
-        *   @returns npos if not found or the position
-        **/
-        size_t rfind(char w) const;
 
       private:
         tbuf<buf_size>   buf_;

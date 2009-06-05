@@ -41,15 +41,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 
 #ifndef SCHED_PEER_DB_NAME
-#define SCHED_PEER_DB_NAME L"sched_peer"
+#define SCHED_PEER_DB_NAME "sched_peer"
 #endif /*SCHED_PEER_DB_NAME*/
 
 #ifndef SCHED_PEER_TABLE_NAME
-#define SCHED_PEER_TABLE_NAME L"peers"
+#define SCHED_PEER_TABLE_NAME "peers"
 #endif /*SCHED_PEER_TABLE_NAME*/
 
 #ifndef SCHED_PEER_DB_DEFAULT_PATH
-#define SCHED_PEER_DB_DEFAULT_PATH L"peer.db"
+#define SCHED_PEER_DB_DEFAULT_PATH "peer.db"
 #endif /*SCHED_PEER_DB_DEFAULT_PATH*/
 
 namespace csl
@@ -68,10 +68,10 @@ namespace csl
       public:
         inline peer() :
               /* database fields */
-              id_(           L"id",          *this, L"PRIMARY KEY ASC AUTOINCREMENT"),
-              common_name_(  L"common_name", *this, L"UNIQUE NOT NULL"),
-              public_key_(   L"public_key",  *this, L"UNIQUE NOT NULL"),
-              private_key_(  L"private_key", *this) { }
+              id_(           "id",          *this, "PRIMARY KEY ASC AUTOINCREMENT"),
+              common_name_(  "common_name", *this, "UNIQUE NOT NULL"),
+              public_key_(   "public_key",  *this, "UNIQUE NOT NULL"),
+              private_key_(  "private_key", *this) { }
 
         inline ~peer() { }
 

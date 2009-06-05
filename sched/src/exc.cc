@@ -74,7 +74,7 @@ namespace csl
       if( file_.size() > 0 && line_ > 0 )
       {
         wchar_t tx[200];
-        SNPRINTF(tx,199,L"(%s:%d): ",file_.c_str(),line_);
+        SWPRINTF(tx,199,L"(%s:%d): ",file_.c_str(),line_);
         t += tx;
       }
       t += L" [";

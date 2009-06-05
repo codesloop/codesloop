@@ -38,15 +38,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 
 #ifndef SCHED_REMOTE_PEER_DB_NAME
-#define SCHED_REMOTE_PEER_DB_NAME L"sched_remote_peer"
+#define SCHED_REMOTE_PEER_DB_NAME "sched_remote_peer"
 #endif /*SCHED_REMOTE_PEER_DB_NAME*/
 
 #ifndef SCHED_REMOTE_PEER_TABLE_NAME
-#define SCHED_REMOTE_PEER_TABLE_NAME L"remote_peer"
+#define SCHED_REMOTE_PEER_TABLE_NAME "remote_peer"
 #endif /*SCHED_REMOTE_PEER_TABLE_NAME*/
 
 #ifndef SCHED_REMOTE_PEER_DB_DEFAULT_PATH
-#define SCHED_REMOTE_PEER_DB_DEFAULT_PATH L"remote_peer.db"
+#define SCHED_REMOTE_PEER_DB_DEFAULT_PATH "remote_peer.db"
 #endif /*SCHED_REMOTE_PEER_DB_DEFAULT_PATH*/
 
 namespace csl
@@ -63,10 +63,10 @@ namespace csl
       public:
         inline remote_peer():
           /* database fields */
-          id_(           L"id",           *this, L"PRIMARY KEY ASC AUTOINCREMENT"),
-          schedule_id_(  L"schedule_id",  *this, L"NOT NULL"),
-          peer_id_(      L"peer_id",      *this, L"NOT NULL"),
-          peer_state_(   L"peer_state",   *this, L"NOT NULL")
+          id_(           "id",           *this, "PRIMARY KEY ASC AUTOINCREMENT"),
+          schedule_id_(  "schedule_id",  *this, "NOT NULL"),
+          peer_id_(      "peer_id",      *this, "NOT NULL"),
+          peer_state_(   "peer_state",   *this, "NOT NULL")
         {}
 
         inline ~remote_peer() { }

@@ -25,12 +25,16 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "param.hh"
 #include "str.hh"
+#include "ustr.hh"
 #include "_shared_impl.hh"
 
 /**
   @file param.cc
   @brief implementation of slt3::param
  */
+
+using csl::common::str;
+using csl::common::ustr;
 
 namespace csl
 {
@@ -42,17 +46,20 @@ namespace csl
     void * param::get_ptr() const { return impl_->get_ptr(); }
     long long param::get_long() const { return impl_->get_long(); }
     double param::get_double() const { return impl_->get_double(); }
-    const wchar_t * param::get_string() const { return impl_->get_string(); }
+    const char * param::get_string() const { return impl_->get_string(); }
     bool param::is_empty() { return impl_->is_empty(); }
 
     bool param::get(long long & val) const { return impl_->get(val); }
     bool param::get(double & val) const { return impl_->get(val); }
     bool param::get(common::str & val) const { return impl_->get(val); }
+    bool param::get(common::ustr & val) const { return impl_->get(val); }
     bool param::get(blob_t & val) const { return impl_->get(val); }
 
     void param::set(long long val) { impl_->set(val); }
     void param::set(double val) { impl_->set(val); }
     void param::set(const common::str & val) { impl_->set(val); }
+    void param::set(const common::ustr & val) { impl_->set(val); }
+    void param::set(const char * val) { impl_->set(val); }
     void param::set(const wchar_t * val) { impl_->set(val); }
     void param::set(const blob_t & val) { impl_->set(val); }
     void param::set(const unsigned char * ptr,unsigned int size) { impl_->set(ptr,size); }

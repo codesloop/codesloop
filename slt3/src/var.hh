@@ -167,7 +167,7 @@ namespace csl
 
         virtual void set_param(param & p);
         virtual bool set_value(synqry::colhead * ch,synqry::field * fd);
-        doublevar(const char * name, obj & parent,const char * flags=L"");
+        doublevar(const char * name, obj & parent,const char * flags="");
 
         virtual doublevar & operator=(const doublevar & other);
         virtual doublevar & operator=(value_t other);
@@ -189,7 +189,7 @@ namespace csl
 
         virtual void set_param(param & p);
         virtual bool set_value(synqry::colhead * ch,synqry::field * fd);
-        blobvar(const char * name, obj & parent,const char * flags=L"");
+        blobvar(const char * name, obj & parent,const char * flags="");
 
         virtual blobvar & operator=(const blobvar & other);
         virtual blobvar & operator=(const value_t & other);

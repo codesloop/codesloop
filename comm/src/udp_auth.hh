@@ -38,6 +38,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tbuf.hh"
 #include "common.h"
 #include "str.hh"
+#include "ustr.hh"
 #ifdef __cplusplus
 
 namespace csl
@@ -52,6 +53,7 @@ namespace csl
 
   using common::tbuf;
   using common::str;
+  using common::ustr;
 
   namespace comm
   {
@@ -66,8 +68,8 @@ namespace csl
           virtual ~valid_creds_callback() {}
           virtual bool operator()( const ecdh_key & peer_public_key,    // in
                                    const SAI & addr,                    // in
-                                   const str & login,                // in
-                                   const str & pass) = 0;            // in
+                                   const ustr & login,                // in
+                                   const ustr & pass) = 0;            // in
       };
 
       /** @brief server side callback for registering authenticated clients */
@@ -76,9 +78,9 @@ namespace csl
         public:
           virtual ~register_auth_callback() {}
           virtual bool operator()( const SAI & addr,
-                                   const str & login,
-                                   const str & pass,
-                                   const str & session_key,
+                                   const ustr & login,
+                                   const ustr & pass,
+                                   const ustr & session_key,
                                    const saltbuf_t & peer_salt,
                                    saltbuf_t & my_salt ) = 0;
       };
@@ -100,16 +102,16 @@ namespace csl
 
           /* auth packet */
           bool init_auth( ecdh_key & peer_public_key,
-                          str & login,
-                          str & pass,
-                          str & session_key,
+                          ustr & login,
+                          ustr & pass,
+                          ustr & session_key,
                           saltbuf_t & salt,
                           const msg & m );
 
           /* htua packet */
           bool prepare_htua( const saltbuf_t & pkt_salt,
                              const saltbuf_t & my_salt,
-                             const str & session_key,
+                             const ustr & session_key,
                              msg & m );
       };
 
@@ -208,9 +210,9 @@ namespace csl
           saltbuf_t    server_salt_;
           saltbuf_t    my_salt_;
 
-          str          login_;
-          str          pass_;
-          str          session_key_;
+          ustr         login_;
+          ustr         pass_;
+          ustr         session_key_;
 
           bool init();
 
@@ -227,7 +229,7 @@ namespace csl
           inline const saltbuf_t & my_salt() const { return my_salt_; }
 
           /* session_key */
-          inline const str & session_key() const { return session_key_; }
+          inline const ustr & session_key() const { return session_key_; }
 
           /* auth_addr */
           inline const SAI & addr() const { return addr_; }
@@ -246,12 +248,12 @@ namespace csl
           inline void server_public_key(const ecdh_key & pk) { server_public_key_ = pk;   }
 
           /* login */
-          inline const str & login() const { return login_; }
-          inline void login(const str & l) { login_ = l; }
+          inline const ustr & login() const { return login_; }
+          inline void login(const ustr & l) { login_ = l; }
 
           /* pass */
-          inline const str & pass() const  { return pass_;  }
-          inline void pass(const str & p)  { pass_ = p; }
+          inline const ustr & pass() const  { return pass_;  }
+          inline void pass(const ustr & p)  { pass_ = p; }
 
           /* debug ? */
           inline void debug(bool yesno) { debug_ = yesno; }

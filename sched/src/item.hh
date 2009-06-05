@@ -37,15 +37,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 
 #ifndef SCHED_ITEM_DB_NAME
-#define SCHED_ITEM_DB_NAME L"sched_item"
+#define SCHED_ITEM_DB_NAME "sched_item"
 #endif /*SCHED_ITEM_DB_NAME*/
 
 #ifndef SCHED_ITEM_TABLE_NAME
-#define SCHED_ITEM_TABLE_NAME L"items"
+#define SCHED_ITEM_TABLE_NAME "items"
 #endif /*SCHED_ITEM_TABLE_NAME*/
 
 #ifndef SCHED_ITEM_DB_DEFAULT_PATH
-#define SCHED_ITEM_DB_DEFAULT_PATH L"item.db"
+#define SCHED_ITEM_DB_DEFAULT_PATH "item.db"
 #endif /*SCHED_ITEM_DB_DEFAULT_PATH*/
 
 namespace csl
@@ -62,8 +62,8 @@ namespace csl
       public:
         inline item() :
             /* database fields */
-            id_(             L"id",           *this, L"PRIMARY KEY ASC AUTOINCREMENT"),
-            schedule_id_(    L"schedule_id",  *this, L"NOT NULL")
+            id_(             "id",           *this, "PRIMARY KEY ASC AUTOINCREMENT"),
+            schedule_id_(    "schedule_id",  *this, "NOT NULL")
         {}
 
         inline ~item() { }
