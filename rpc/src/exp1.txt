@@ -1,4 +1,7 @@
-// include
+// comm1 
+/* 
+ * comm2
+ */
 
 #include "hello"
 #include <world>
@@ -7,7 +10,7 @@
 #name         interface
 #namespace    csl::rpc
 
-function_name {
+disposable function_name {
  input:
      int64 value,
      myclass myclass,

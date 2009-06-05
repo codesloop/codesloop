@@ -26,10 +26,10 @@
 
 # -- EOF --DD_DEFINITIONS(-Wall -g3)
 
-ADD_CUSTOM_COMMAND( OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/csl_rpc.cpp
+ADD_CUSTOM_COMMAND( OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/csrgen.cpp
                   PRE_BUILD
-                  COMMAND ragel -G2 ARGS -o csl_rpc.cpp csl_rpc.rl
-                  MAIN_DEPENDENCY csl_rpc.rl
+                  COMMAND ragel -G2 ARGS -o csrgen.cpp csrgen.rl
+                  MAIN_DEPENDENCY csrgen.rl
                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} )
 
-ADD_EXECUTABLE( csl_rpc csl_rpc.cpp )
+ADD_EXECUTABLE( csrgen csrgen.cpp )

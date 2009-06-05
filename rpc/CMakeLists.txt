@@ -23,6 +23,6 @@
 
 # SET(CMAKE_VERBOSE_MAKEFILE ON)
 
-SUBDIRS(src test experiment)
+SUBDIRS(src test)
 
 # -- EOF --

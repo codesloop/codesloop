@@ -80,7 +80,7 @@ using namespace std;
   parameter_spec  = type_ident ws* identifier @{printf("spec\n");};
   parameter_type  = (input|output|exc) ':'    @{printf("type\n");};
 
-  function    = disp? ws+ identifier ws* '{' ws*
+  function    = (disp ws+)? identifier ws* '{' ws*
                   ((parameter_spec ws* ',' | parameter_type) ws*)*    # parameters ended by ,
                   ( parameter_spec         | parameter_type) ws*      # last parameter without ,
                 '}'
@@ -117,7 +117,7 @@ using namespace std;
             | if_version    # version information
             | if_name       # interface name
             | if_namespc    # namespace
-            )*    # new line handler
+            )*    
             $!print_err;
 
 }%%
