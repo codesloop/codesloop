@@ -30,49 +30,73 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <fstream>
 
+#include "csrpc_types.hh"
+
+using namespace csl::rpc;
+token_info token;
+
+// forward decls
+void print_token();
+
 %%{
 
   machine  csrgen;
+  access token.;
+  variable p  token.p;
+  variable pe token.pe;
 
 
   action s { 
-    ts = p;
+    token.ts = token.p;
   }
 
   action print_err  {
     printf("\nerror at line %d:%d (%.10s...)\n",  
-              curline, 
-              (p-ls), 
-              ls < p-10 ? ls+1 : p-10 
+              token.curline, 
+              (token.p-token.ls), 
+              token.ls < token.p-10 ? token.ls+1 : token.p-10 
           );
   }
 
   action newline {
-    curline++;
-    ls = p;
+    token.curline++;
+    token.ls = token.p;
+  }
+
+  action reset {
+    print_token();
+    reset();
   }
 
   action modifier {
-    printf("\tmod:");
-    fwrite(ts,1,p-ts,stdout);    
-    printf("\n");
+    token.type = TT_PARAM_MOD;
+    print_token();
   }
+
   action type_name {
-    printf("\t\t tn:");
-    fwrite(ts,1,p-ts,stdout);
-    printf(" -> ");
+    token.type = TT_PARAM_TYPE;
+    token.array_length  = 0; /* reset array length */
+    print_token();
   }
 
   action obj_name {
-    printf("on:");
-    fwrite(ts,1,p-ts,stdout);
-    printf("\n");
+    token.type = TT_PARAM_NAME;
+    print_token();
+  }
+
+  action end_function {
+    token.type = TT_FUNCTION_END; 
+    token.ts = token.p;
   }
 
   action func_name {
-    printf("function:");
-    fwrite(ts,1,p-ts,stdout);
-    printf("\n");
+    if ( token.type != TT_DISPOSABLE_FUNCTION )
+      token.type = TT_FUNCTION;
+    print_token();
+  }
+
+  action add_arry_digit {
+    token.array_length = token.array_length * 10 + (fc - '0');
   }
 
   # new line handler with line counting
@@ -83,14 +107,14 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   ws_no_nl  = ('\t'|' '|'\r');
 
   # language constants
-  input     = 'input'       >s;
-  output    = 'output'      >s;
-  exc       = 'exception'   >s;
-  disp      = 'disposable';
-  incl      = 'include';
-  name      = 'name';
-  version   = 'version';
-  namespc   = 'namespace';
+  input     = 'input'       >s %{token.modifier = MD_INPUT;};
+  output    = 'output'      >s %{token.modifier = MD_OUTPUT;};
+  exc       = 'exception'   >s %{token.modifier = MD_EXCEPTION;};
+  disp      = 'disposable'     %{token.type     = TT_DISPOSABLE_FUNCTION;};
+  incl      = 'include'        %{token.type     = TT_INCLUDE;};
+  name      = 'name'           %{token.type     = TT_NAME;};
+  version   = 'version'        %{token.type     = TT_VERSION;};
+  namespc   = 'namespace'      %{token.type     = TT_NAMESPACE;};
   
 
   # literals, identifiers
@@ -101,13 +125,17 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   type_ident  = ( [a-zA-Z_:] ([a-zA-Z 0-9_:<>]*[a-zA-Z0-9_>])?) >s;
   version_num = ( [0-9] ( '.'? [0-9] )* )      >s;
 
+  array_decl  =   '[' ws* ']' %{token.array_length = -1;}
+                | '[' ws* ( digit* @add_arry_digit ) ws* ']'
+                ;
+
 
   # parameters and function header definition 
-  parameter_spec  = type_ident %type_name ws+ :>> identifier %obj_name;
+  parameter_spec  = type_ident %type_name ws+ :>> identifier array_decl?  %obj_name;
   parameter_type  = (input|output|exc) ':' %modifier;
 
-  func_param_line      = (ws* (parameter_type ws+)? <: parameter_spec ws*  ','); 
-  func_param_lastline  = (ws* (parameter_type ws+)? <: parameter_spec ws*  '}');
+  func_param_line      = (ws* (parameter_type ws+)? <: parameter_spec ws*  ',');
+  func_param_lastline  = (ws* (parameter_type ws+)? <: parameter_spec ws*  '}' %end_function  );
 
   function    = (disp ws+)? <: identifier %func_name ws* '{'                 
                 func_param_line*         # regular lines with comma ending
@@ -117,29 +145,29 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   # Describe both c style comments and c++ style comments. The
   # priority bump on tne terminator of the comments brings us
   # out of the extend* which matches everything.
-  c_comment   =  '/*' any_count_line* :>>  '*/' %{printf("c comment\n");} ;
-  cpp_comment = '//' [^\n]* newline             %{printf("cpp comment\n");} ;  
-  comment     = cpp_comment | c_comment;
+  c_comment   =  '/*' any_count_line* :>>  '*/';
+  cpp_comment = '//' [^\n]* newline;
+  comment     = (cpp_comment | c_comment) >s %{token.type = TT_COMMENT;};
 
   includes    = '#' ws_no_nl* incl ws_no_nl+ 
                 (dquote  | gtquote )
                 ws_no_nl* newline
-                @{printf("include\n");};
+                ;
 
   if_name     = '#' ws_no_nl* name ws_no_nl+ 
                 (dquote | identifier) 
                 ws_no_nl* newline
-                @{printf("if name\n");};
+                ;
 
   if_version  = '#' ws_no_nl* version ws_no_nl+ 
                 version_num 
                 ws_no_nl* newline
-                @{printf("if version\n");};
+                ;
 
   if_namespc  = '#' ws_no_nl* namespc ws_no_nl+ 
                 type_ident
                 ws_no_nl* newline
-                @{printf("if namespc\n");};
+                ;
 
   main  :=  ( ws            # whitespace
             | comment       # comments
@@ -149,18 +177,59 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             | if_name       # interface name
             | if_namespc    # namespace
             )* 
-            $!print_err; 
+            @reset          # reset after identified token
+            $!print_err
+            ;
 
 }%%
 
 %% write data;
 
+void reset()
+{
+  token.type          = TT_UNKNOWN;
+  token.modifier      = MD_INPUT;
+  token.len           = 0;
+  token.array_length  = 0;
+}
+
+void csrgen_init()
+{
+  %%  write  init;
+  reset();
+  token.curline = 1;
+}
+
+int csrgen_execute()
+{
+  char * eof = NULL;
+
+  %%  write  exec;
+
+  if ( token.cs == csrgen_error )
+    return(1);
+  
+  return(0);
+}
+
+void print_token()
+{
+  if ( (token.p-token.ts) == 0 || token.type <= TT_UNKNOWN || token.type >= TT_LAST ||
+        token.type == TT_COMMENT )
+  {
+    return;
+  }
+
+  printf("Token: \"");
+  fwrite(token.ts ,1,token.p-token.ts,stdout);
+  if ( token.type == TT_PARAM_NAME && token.array_length ) 
+    printf("\" array len: %d (%s)\n", token.array_length, token_type_name[token.type] );
+  else 
+    printf("\" (%s)\n", token_type_name[token.type] );
+}
+
 int  main(  int  argc,  char  **argv  )
 {
-  int cs, curline = 1;
-  char *ts = 0;
-  char * eof = NULL;
-  char * ls = NULL;
   std::string buffer;
 
   if ( argc == 1 ) 
@@ -177,16 +246,13 @@ int  main(  int  argc,  char  **argv  )
       exit(1);
     }
   }
+  
+  csrgen_init();
             
-
-  char  *p = ls  = (char*) buffer.c_str() ;
-  char  *pe  =  p  +  strlen(p);
-
-  %%  write  init;
-  %%  write  exec;
-
-  if ( cs == csrgen_error ) 
-    exit(1);
-
-  return  0;
+  token.p   = (char*) buffer.c_str() ;    // entry point
+  token.ls  = token.p;                    // first line's start
+  token.pe  = token.p + strlen(token.p);  // exit point/eof
+  
+  return csrgen_execute();
 }
+

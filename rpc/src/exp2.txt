@@ -19,10 +19,17 @@ disposable function_name {
      int64 ret,
      retclass e,
  exception:
-     exc csl_exc,
-     std::exc std_exc
+     csl :: common :: exc csl_exc,
+     std :: exc< hello > std_exc
 }
 
 func2 { 
-  double d_
+  double a_,
+  double b_[],
+  double c_[ ],
+  double d_[1 ],
+  double e_[ 2],
+  double f_[ 3 ],
+  double f_[
+                ]
 }
