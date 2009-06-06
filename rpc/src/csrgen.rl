@@ -37,6 +37,7 @@ token_info token;
 
 // forward decls
 void print_token();
+void print_error();
 
 %%{
 
@@ -50,12 +51,8 @@ void print_token();
     token.ts = token.p;
   }
 
-  action print_err  {
-    printf("\nerror at line %d:%d (%.10s...)\n",  
-              token.curline, 
-              (token.p-token.ls), 
-              token.ls < token.p-10 ? token.ls+1 : token.p-10 
-          );
+  action on_error {
+    print_error();
   }
 
   action newline {
@@ -125,8 +122,10 @@ void print_token();
   type_ident  = ( [a-zA-Z_:] ([a-zA-Z 0-9_:<>]*[a-zA-Z0-9_>])?) >s;
   version_num = ( [0-9] ( '.'? [0-9] )* )      >s;
 
-  array_decl  =   '[' ws* ']' %{token.array_length = -1;}
-                | '[' ws* ( digit* @add_arry_digit ) ws* ']'
+  array_decl  = ws* (
+                  '[' ws* ']' %{token.array_length = -1;}
+                  | '[' ws* ( digit* @add_arry_digit ) ws* ']'
+                )
                 ;
 
 
@@ -178,7 +177,7 @@ void print_token();
             | if_namespc    # namespace
             )* 
             @reset          # reset after identified token
-            $!print_err
+            $!on_error
             ;
 
 }%%
@@ -210,6 +209,29 @@ int csrgen_execute()
     return(1);
   
   return(0);
+}
+
+void print_error() 
+{
+  fprintf(stderr, "can not process file: parse error at line %d column %d\n",
+            token.curline,
+            (token.p-token.ls) );
+  if ( token.p-token.ls < 70 ) {
+    char * errloc = strdup( token.ls+1);
+    int col = 0;
+    for ( ; col < token.pe - token.ls ; col++ )
+    {
+      if ( errloc[col] == '\n' ) {
+        errloc[col] = '\0';
+        break;
+      }
+    }
+    fprintf(stderr, "\n\"%s\"\n", errloc );
+    free(errloc);
+    for ( col = 0 ; col < token.p-token.ls ; col++ )
+      fputc(' ', stderr);
+    fprintf(stderr, "^---- here\n");
+  }
 }
 
 void print_token()
