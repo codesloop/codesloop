@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -96,14 +96,20 @@ namespace test_tbuf {
     b = L"Hello";
   }
 
+  /** @test @todo */
+  void test_selfequal()
+  {
+    tbuf<10> t;
+    t = t;
+  }
+
 } // end of test_tbuf
 
 using namespace test_tbuf;
 
 int main()
 {
-  tbuf<10> t;
-  t = t;
+  test_selfequal();
 
   csl_common_print_results( "tbuf_baseline      ", csl_common_test_timer_v0(tbuf_baseline),"" );
   csl_common_print_results( "pbuf_baseline      ", csl_common_test_timer_v0(pbuf_baseline),"" );

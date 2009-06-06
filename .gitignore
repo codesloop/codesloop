@@ -90,3 +90,6 @@ common/test/t__logger
 common/test/t__str
 rpc/experiment/csl_rpc
 common/test/t__ustr
+common/test/t__binry
+common/test/t__dbl
+common/test/t__int64

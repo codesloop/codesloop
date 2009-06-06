@@ -64,5 +64,8 @@ ADD_EXECUTABLE( t__xdrbuf   t__xdrbuf.cc )
 ADD_EXECUTABLE( t__logger   t__logger.cc )
 ADD_EXECUTABLE( t__str      t__str.cc )
 ADD_EXECUTABLE( t__ustr     t__ustr.cc )
+ADD_EXECUTABLE( t__int64    t__int64.cc )
+ADD_EXECUTABLE( t__dbl      t__dbl.cc )
+ADD_EXECUTABLE( t__binry    t__binry.cc )
 
 # -- EOF --
