@@ -23,13 +23,11 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
  
-#ifndef _csl_rpc_csrpc_types_hh_included_
-#define _csl_rpc_csrpc_types_hh_included_
+#ifndef _csl_rpc_csrgen_hh_included_
+#define _csl_rpc_csrgen_hh_included_
 
 #include "common.h"
 #ifdef __cplusplus
-
-#define MAX_TOKEN_LENGTH 2048
 
 namespace csl 
 { 
@@ -52,25 +50,13 @@ namespace csl
       TT_LAST       = 12
     };
 
-    static const char * token_type_name[] = {
-      "unknown",
-      "version",
-      "name", 
-      "namespace",
-      "include",
-      "function",
-      "disposable function",
-      "end function",
-      "parameter modifier",
-      "parameter type",
-      "parameter name",
-      "comment"
-    };
-      
+    extern const char * token_type_name[];
+
     enum param_kind {
       MD_INPUT      = 0,
       MD_OUTPUT     = 1,
-      MD_EXCEPTION  = 2
+      MD_EXCEPTION  = 2,
+      MD_INOUT      = 3
     };
 
 
@@ -81,15 +67,15 @@ namespace csl
       char * ls;        ///< line start
       char * ts;        ///< token start
       int cs;           ///< current char
-      int len;          ///< token's length
       int curline;      ///< current line in file
       token_type type;  ///< token identifier
       param_kind modifier;  ///< input/output/exc
       int array_length; ///< array definition: 0 - not an array, -1 undefined size, n = n sized arry
     };
+  
 
   }
 }
 
 #endif /* __cplusplus */
-#endif /* _csl_rpc_csrpc_types_hh_included_ */
+#endif /* _csl_rpc_csrgen_hh_included_ */

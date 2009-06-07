@@ -30,10 +30,27 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <fstream>
 
-#include "csrpc_types.hh"
+#include "csrgen.hh"
+#include "iface.hh"
 
 using namespace csl::rpc;
 token_info token;
+iface iface;
+
+const char * csl::rpc::token_type_name[] = {
+  "unknown",
+  "version",
+  "name", 
+  "namespace",
+  "include",
+  "function",
+  "disposable function",
+  "end function",
+  "parameter modifier",
+  "parameter type",
+  "parameter name",
+  "comment"
+};
 
 // forward decls
 void print_token();
@@ -84,6 +101,7 @@ void print_error();
   action end_function {
     token.type = TT_FUNCTION_END; 
     token.ts = token.p;
+    printf("-- end function --\n");
   }
 
   action func_name {
@@ -128,13 +146,18 @@ void print_error();
                 )
                 ;
 
-
   # parameters and function header definition 
-  parameter_spec  = type_ident %type_name ws+ :>> identifier array_decl?  %obj_name;
+  parameter_spec  = type_ident %type_name ws+ :>> (identifier %obj_name)
+                    array_decl? 
+                    ;
   parameter_type  = (input|output|exc) ':' %modifier;
 
-  func_param_line      = (ws* (parameter_type ws+)? <: parameter_spec ws*  ',');
-  func_param_lastline  = (ws* (parameter_type ws+)? <: parameter_spec ws*  '}' %end_function  );
+  func_param_line      =  (ws* (parameter_type ws+)? <: 
+                                parameter_spec ws*  ',')
+                          ;
+  func_param_lastline  =  (ws* (parameter_type ws+)? <: 
+                                parameter_spec ws* ('}' >s %end_function) )
+                          ;
 
   function    = (disp ws+)? <: identifier %func_name ws* '{'                 
                 func_param_line*         # regular lines with comma ending
@@ -154,7 +177,7 @@ void print_error();
                 ;
 
   if_name     = '#' ws_no_nl* name ws_no_nl+ 
-                (dquote | identifier) 
+                identifier
                 ws_no_nl* newline
                 ;
 
@@ -188,7 +211,6 @@ void reset()
 {
   token.type          = TT_UNKNOWN;
   token.modifier      = MD_INPUT;
-  token.len           = 0;
   token.array_length  = 0;
 }
 
