@@ -41,39 +41,44 @@ namespace csl
     struct param {
       std::string type;
       std::string name;
+      param_kind kind;
       bool is_array;
-      bool array_size;
+      bool array_length;
     };
 
     struct func {
+      std::string name;
       bool disposable;
       std::vector<param> params;
     };
 
     class iface : public csl::common::obj
     {
-      void set_name( token_info &  );
-      void set_version( token_info & );
-      void set_namespc( token_info &);
+      public:
+        void set_name(const token_info &);
+        void set_version(const token_info &);
+        void set_namespc(const token_info &);
 
-      void add_function( token_info & );
-      void set_param_type( token_info &);
-      void set_param_name( token_info &);
+        void add_function(const token_info &);
+        void set_param_type(const token_info &);
+        void set_param_name(const token_info &);
+        void set_arry_len(int);
 
-      void add_include(token_info &);
+        void add_include(const token_info &);
 
-      std::string to_string() const;
+        std::string to_string() const;
 
-    protected:
-      std::string name_;
-      std::string version_;
-      std::string namespc_;
+      protected:
+        std::string name_;
+        std::string version_;
+        std::string namespc_;
 
-      std::vector<func> functions_;
-      std::vector<std::string> includes_;
+        std::vector<func> functions_;
+        std::vector<std::string> includes_;
 
-    private:
-      std::string token_to_string( token_info & ) const;
+      private:
+        std::string token_to_string(const token_info & ) const;
+        std::string param_type_;
     };
 
 

@@ -55,10 +55,11 @@ namespace csl
     enum param_kind {
       MD_INPUT      = 0,
       MD_OUTPUT     = 1,
-      MD_EXCEPTION  = 2,
-      MD_INOUT      = 3
+      MD_INOUT      = 2,
+      MD_EXCEPTION  = 3
     };
 
+    extern const char * param_kind_name[];
 
     struct token_info
     {
