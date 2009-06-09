@@ -33,6 +33,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "var.hh"
+#include "dbl.hh"
+#include "tbuf.hh"
 #ifdef __cplusplus
 
 namespace csl
@@ -41,41 +43,48 @@ namespace csl
   {
     class str;
     class ustr;
-    class dbl;
-    class binry;
     class xdrbuf;
 
     /** @todo document me */
-    class binry : public var
+    class binry : public csl::common::var
     {
       public:
-        binry(); ///< default destructor
+        enum { buf_size = 1024 };
+        typedef tbuf<buf_size> buf_t;
+
+      private:
+        buf_t value_;
+
+      public:
+        binry();
 
         virtual inline ~binry() {}
 
+        const buf_t & value() const { return value_; }
+
         /* conversions to other types */
-        bool to_integer(int64 & v) const;
+        inline bool to_integer(int64 & v) const { return v.from_binary(value_.data(),value_.size()); }
         bool to_integer(long long & v) const;
 
-        bool to_double(dbl & v) const;
+        inline bool to_double(dbl & v) const { return v.from_binary(value_.data(),value_.size()); }
         bool to_double(double & v) const;
 
         bool to_string(str & v) const;
         bool to_string(ustr & v) const;
         bool to_string(std::string & v) const;
 
-        bool to_binary(binry & v) const;
+        inline bool to_binary(binry & v) const { return v.from_binary(value_.data(),value_.size()); }
         bool to_binary(unsigned char * v, size_t & sz) const;
         bool to_binary(void * v, size_t & sz) const;
 
         bool to_xdr(xdrbuf & b) const;
-        bool to_var(var & v) const;
+        inline bool to_var(var & v) const { return v.from_binary(value_.data(),value_.size()); }
 
         /* conversions from other types */
-        bool from_integer(const int64 & v);
+        inline bool from_integer(const int64 & v) { return v.to_binary(*this); }
         bool from_integer(long long v);
 
-        bool from_double(const dbl & v);
+        inline bool from_double(const dbl & v)  { return v.to_binary(*this); }
         bool from_double(double v);
 
         bool from_string(const str & v);
@@ -88,7 +97,7 @@ namespace csl
         bool from_binary(const unsigned char * v,size_t sz);
         bool from_binary(const void * v,size_t sz);
 
-        bool from_xdr(const xdrbuf & v);
+        bool from_xdr(xdrbuf & v);
         bool from_var(const var & v);
     };
   }

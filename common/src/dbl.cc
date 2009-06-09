@@ -39,46 +39,89 @@ namespace csl
 {
   namespace common
   {
-    /** @todo implement */
-    dbl::dbl() : var() { }
-
     /* conversions to other types */
-    bool dbl::to_integer(int64 & v) const { return false; }
-    bool dbl::to_integer(long long & v) const { return false; }
+    bool dbl::to_string(str & v) const
+    {
+      return v.from_double(value_);
+    }
 
-    bool dbl::to_double(dbl & v) const { return false; }
-    bool dbl::to_double(double & v) const { return false; }
+    bool dbl::to_string(ustr & v) const
+    {
+      return v.from_double(value_);
+    }
 
-    bool dbl::to_string(str & v) const { return false; }
-    bool dbl::to_string(ustr & v) const { return false; }
-    bool dbl::to_string(std::string & v) const { return false; }
+    bool dbl::to_string(std::string & v) const
+    {
+      ustr s;
+      return (s.from_double(value_) && s.to_string(v));
+    }
 
-    bool dbl::to_binary(binry & v) const { return false; }
-    bool dbl::to_binary(unsigned char * v, size_t & sz) const { return false; }
-    bool dbl::to_binary(void * v, size_t & sz) const { return false; }
+    bool dbl::to_binary(binry & v) const
+    {
+      return v.from_double(value_);
+    }
 
-    bool dbl::to_xdr(xdrbuf & b) const { return false; }
-    bool dbl::to_var(var & v) const { return false; }
+    bool dbl::to_binary(unsigned char * v, size_t & sz) const
+    {
+      binry b;
+      return (b.from_double(value_) && b.to_binary(v,sz));
+    }
+
+    bool dbl::to_binary(void * v, size_t & sz) const
+    {
+      binry b;
+      return (b.from_double(value_) && b.to_binary(v,sz));
+    }
+
+    bool dbl::to_xdr(xdrbuf & b) const { return false; } // TODO
 
     /* conversions from other types */
-    bool dbl::from_integer(const int64 & v) { return false; }
-    bool dbl::from_integer(long long v) { return false; }
+    bool dbl::from_string(const str & v)
+    {
+      return v.to_double(value_);
+    }
 
-    bool dbl::from_double(const dbl & v) { return false; }
-    bool dbl::from_double(double v) { return false; }
+    bool dbl::from_string(const ustr & v)
+    {
+      return v.to_double(value_);
+    }
 
-    bool dbl::from_string(const str & v) { return false; }
-    bool dbl::from_string(const ustr & v) { return false; }
-    bool dbl::from_string(const std::string & v) { return false; }
-    bool dbl::from_string(const char * v) { return false; }
-    bool dbl::from_string(const wchar_t * v) { return false; }
+    bool dbl::from_string(const std::string & v)
+    {
+      ustr s;
+      return (s.from_string(v) && s.to_double(value_));
+    }
 
-    bool dbl::from_binary(const binry & v) { return false; }
-    bool dbl::from_binary(const unsigned char * v,size_t sz) { return false; }
-    bool dbl::from_binary(const void * v,size_t sz) { return false; }
+    bool dbl::from_string(const char * v)
+    {
+      ustr s;
+      return (s.from_string(v) && s.to_double(value_));
+    }
 
-    bool dbl::from_xdr(const xdrbuf & v) { return false; }
-    bool dbl::from_var(const var & v) { return false; }
+    bool dbl::from_string(const wchar_t * v)
+    {
+      str s;
+      return (s.from_string(v) && s.to_double(value_));
+    }
+
+    bool dbl::from_binary(const binry & v)
+    {
+      return v.to_double(value_);
+    }
+
+    bool dbl::from_binary(const unsigned char * v,size_t sz)
+    {
+      binry b;
+      return (b.from_binary(v,sz) && b.to_double(value_));
+    }
+
+    bool dbl::from_binary(const void * v,size_t sz)
+    {
+      binry b;
+      return (b.from_binary(v,sz) && b.to_double(value_));
+    }
+
+    bool dbl::from_xdr(xdrbuf & v) { return false; } // TODO
   };
 };
 

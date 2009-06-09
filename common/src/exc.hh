@@ -54,6 +54,7 @@ namespace csl
           rs_xdr_eof,        ///<End of xdr data.
           rs_xdr_invalid,    ///<Invald xdr data
           rs_empty,          ///<Empty container
+          rs_conv_error,     ///<Cannot convert character
         };
 
         enum {
@@ -63,7 +64,8 @@ namespace csl
           cm_xdrbuf,  ///<xdrbuf component
           cm_circbuf, ///<circbuf component
           cm_logger,  ///<logger component
-          cm_str      ///<str component
+          cm_str,     ///<str component
+          cm_ustr     ///<ustr component
         };
 
         /** @brief converts reason code to string */

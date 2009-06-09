@@ -46,19 +46,24 @@ namespace csl
     class xdrbuf;
 
     /** @todo document me */
-    class int64 : public var
+    class int64 : public csl::common::var
     {
+      private:
+        long long value_;
+
       public:
-        int64();
+        inline int64() : var(), value_(0) { }
 
         virtual inline ~int64() {}
 
+        inline long long value() const { return value_; }
+
         /* conversions to other types */
-        bool to_integer(int64 & v) const;
-        bool to_integer(long long & v) const;
+        inline bool to_integer(int64 & v) const      { return v.from_integer(value_); }
+        inline bool to_integer(long long & v) const  { v = value_; return true; }
 
         bool to_double(dbl & v) const;
-        bool to_double(double & v) const;
+        inline bool to_double(double & v) const   { v = (double)value_; return true; }
 
         bool to_string(str & v) const;
         bool to_string(ustr & v) const;
@@ -69,14 +74,14 @@ namespace csl
         bool to_binary(void * v, size_t & sz) const;
 
         bool to_xdr(xdrbuf & b) const;
-        bool to_var(var & v) const;
+        inline bool to_var(var & v) const { return v.from_integer(value_); }
 
         /* conversions from other types */
-        bool from_integer(const int64 & v);
-        bool from_integer(long long v);
+        inline bool from_integer(const int64 & v) { return v.to_integer(value_); }
+        inline bool from_integer(long long v)     { value_ = v; return true; }
 
         bool from_double(const dbl & v);
-        bool from_double(double v);
+        inline bool from_double(double v) { value_ = (long long)v; return true; }
 
         bool from_string(const str & v);
         bool from_string(const ustr & v);
@@ -88,8 +93,8 @@ namespace csl
         bool from_binary(const unsigned char * v,size_t sz);
         bool from_binary(const void * v,size_t sz);
 
-        bool from_xdr(const xdrbuf & v);
-        bool from_var(const var & v);
+        bool from_xdr(xdrbuf & v);
+        inline bool from_var(const var & v) { return v.to_integer(value_); }
     };
   }
 }

@@ -51,8 +51,14 @@ namespace csl
     /** @brief abstract base class of all variable types */
     class var : public obj
     {
+      private:
+        bool use_exc_;
+
       public:
-        inline var() : obj() {}
+        inline var() : obj(), use_exc_(false) {}
+
+        inline bool use_exc() const     { return use_exc_;  }
+        inline void use_exc(bool yesno) { use_exc_ = yesno; }
 
         virtual inline ~var() {}
 
@@ -91,7 +97,7 @@ namespace csl
         virtual bool from_binary(const unsigned char * v,size_t sz) = 0;
         virtual bool from_binary(const void * v,size_t sz) = 0;
 
-        virtual bool from_xdr(const xdrbuf & v) = 0;
+        virtual bool from_xdr(xdrbuf & v) = 0;
         virtual bool from_var(const var & v) = 0;
     };
   }

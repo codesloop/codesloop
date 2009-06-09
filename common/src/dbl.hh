@@ -33,6 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "var.hh"
+#include "int64.hh"
 #ifdef __cplusplus
 
 namespace csl
@@ -41,24 +42,28 @@ namespace csl
   {
     class str;
     class ustr;
-    class int64;
     class binry;
     class xdrbuf;
 
     /** @todo document me */
-    class dbl : public var
+    class dbl : public csl::common::var
     {
+      private:
+        double value_;
+
       public:
-        dbl();
+        inline dbl() : var(), value_(0.0) { }
 
         virtual inline ~dbl() {}
 
-        /* conversions to other types */
-        bool to_integer(int64 & v) const;
-        bool to_integer(long long & v) const;
+        inline double value() const { return value_; }
 
-        bool to_double(dbl & v) const;
-        bool to_double(double & v) const;
+        /* conversions to other types */
+        inline bool to_integer(int64 & v)     const { return v.from_double(value_); }
+        inline bool to_integer(long long & v) const { v = (long long)value_; return true; }
+
+        inline bool to_double(dbl & v)    const { return v.from_double(value_); }
+        inline bool to_double(double & v) const { v = value_; return true; }
 
         bool to_string(str & v) const;
         bool to_string(ustr & v) const;
@@ -69,14 +74,14 @@ namespace csl
         bool to_binary(void * v, size_t & sz) const;
 
         bool to_xdr(xdrbuf & b) const;
-        bool to_var(var & v) const;
+        inline bool to_var(var & v) const { return v.from_double(value_); }
 
         /* conversions from other types */
-        bool from_integer(const int64 & v);
-        bool from_integer(long long v);
+        inline bool from_integer(const int64 & v)  { return v.to_double( value_ ); }
+        inline bool from_integer(long long v)      { value_ = (double)v; return true; }
 
-        bool from_double(const dbl & v);
-        bool from_double(double v);
+        inline bool from_double(const dbl & v) { return v.to_double(value_); }
+        inline bool from_double(double v)      { value_ = v; return true; }
 
         bool from_string(const str & v);
         bool from_string(const ustr & v);
@@ -88,8 +93,8 @@ namespace csl
         bool from_binary(const unsigned char * v,size_t sz);
         bool from_binary(const void * v,size_t sz);
 
-        bool from_xdr(const xdrbuf & v);
-        bool from_var(const var & v);
+        bool from_xdr(xdrbuf & v);
+        inline bool from_var(const var & v) { return v.to_double(value_); }
     };
   }
 }

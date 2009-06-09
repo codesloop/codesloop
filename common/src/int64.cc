@@ -28,6 +28,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "str.hh"
 #include "ustr.hh"
 #include "binry.hh"
+#include "exc.hh"
 #include "xdrbuf.hh"
 
 /**
@@ -39,46 +40,133 @@ namespace csl
 {
   namespace common
   {
-    /** @todo implement */
-    int64::int64() : var() { }
-
     /* conversions to other types */
-    bool int64::to_integer(int64 & v) const { return false; }
-    bool int64::to_integer(long long & v) const { return false; }
+    bool int64::to_double(dbl & v) const
+    {
+      return v.from_integer(value_);
+    }
 
-    bool int64::to_double(dbl & v) const { return false; }
-    bool int64::to_double(double & v) const { return false; }
+    bool int64::to_string(str & v) const
+    {
+      return v.from_integer(value_);
+    }
 
-    bool int64::to_string(str & v) const { return false; }
-    bool int64::to_string(ustr & v) const { return false; }
-    bool int64::to_string(std::string & v) const { return false; }
+    bool int64::to_string(ustr & v) const
+    {
+      return v.from_integer(value_);
+    }
 
-    bool int64::to_binary(binry & v) const { return false; }
-    bool int64::to_binary(unsigned char * v, size_t & sz) const { return false; }
-    bool int64::to_binary(void * v, size_t & sz) const { return false; }
+    bool int64::to_string(std::string & v) const
+    {
+      ustr s;
+      return (s.from_integer(value_) && s.to_string(v));
+    }
 
-    bool int64::to_xdr(xdrbuf & b) const { return false; }
-    bool int64::to_var(var & v) const { return false; }
+    bool int64::to_binary(binry & v) const
+    {
+      return v.from_integer(value_);
+    }
+
+    bool int64::to_binary(unsigned char * v, size_t & sz) const
+    {
+      binry b;
+      return (b.from_integer(value_) && b.to_binary(v,sz));
+    }
+
+    bool int64::to_binary(void * v, size_t & sz) const
+    {
+      binry b;
+      return (b.from_integer(value_) && b.to_binary(v,sz));
+    }
+
+    bool int64::to_xdr(xdrbuf & b) const
+    {
+      int32_t high = value_>>32;
+      int32_t low  = value_&0xffffffff;
+
+      try
+      {
+        b << high;
+        b << low;
+        return true;
+      }
+      catch( exc e )
+      {
+        return false;
+      }
+    }
 
     /* conversions from other types */
-    bool int64::from_integer(const int64 & v) { return false; }
-    bool int64::from_integer(long long v) { return false; }
+    bool int64::from_double(const dbl & v)
+    {
+      return v.to_integer(value_);
+    }
 
-    bool int64::from_double(const dbl & v) { return false; }
-    bool int64::from_double(double v) { return false; }
+    bool int64::from_string(const str & v)
+    {
+      return v.to_integer(value_);
+    }
 
-    bool int64::from_string(const str & v) { return false; }
-    bool int64::from_string(const ustr & v) { return false; }
-    bool int64::from_string(const std::string & v) { return false; }
-    bool int64::from_string(const char * v) { return false; }
-    bool int64::from_string(const wchar_t * v) { return false; }
+    bool int64::from_string(const ustr & v)
+    {
+      return v.to_integer(value_);
+    }
 
-    bool int64::from_binary(const binry & v) { return false; }
-    bool int64::from_binary(const unsigned char * v,size_t sz) { return false; }
-    bool int64::from_binary(const void * v,size_t sz) { return false; }
+    bool int64::from_string(const std::string & v)
+    {
+      ustr s;
+      return (s.from_string(v) && s.to_integer(value_));
+    }
 
-    bool int64::from_xdr(const xdrbuf & v) { return false; }
-    bool int64::from_var(const var & v) { return false; }
+    bool int64::from_string(const char * v)
+    {
+      ustr s;
+      return (s.from_string(v) && s.to_integer(value_));
+    }
+
+    bool int64::from_string(const wchar_t * v)
+    {
+      str s;
+      return (s.from_string(v) && s.to_integer(value_));
+    }
+
+    bool int64::from_binary(const binry & v)
+    {
+      return v.to_integer(value_);
+    }
+
+    bool int64::from_binary(const unsigned char * v,size_t sz)
+    {
+      binry b;
+      return (b.from_binary(v,sz) && b.to_integer(value_));
+    }
+
+    bool int64::from_binary(const void * v,size_t sz)
+    {
+      binry b;
+      return (b.from_binary(v,sz) && b.to_integer(value_));
+    }
+
+    bool int64::from_xdr(xdrbuf & v)
+    {
+      int32_t high=0;
+      int32_t low=0;
+
+      try
+      {
+        v >> high;
+        v >> low;
+
+        value_ = (((long long)high)<<32) + ((long long)low);
+
+        return true;
+      }
+      catch( exc e )
+      {
+        return false;
+      }
+    }
+
   };
 };
 

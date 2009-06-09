@@ -88,6 +88,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ifndef WCSTOLD
 #  define WCSTOLD wcstold
 # endif /*WCSTOLD*/
+# ifndef WCSTOD
+#  define WCSTOD wcstod
+# endif /*WCSTOD*/
 # ifndef UNLINK
 #  define UNLINK _unlink
 # endif /*UNLINK*/
@@ -116,6 +119,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ifndef WCSTOLD
 #  define WCSTOLD wcstold
 # endif /*WCSTOLD*/
+# ifndef WCSTOD
+#  define WCSTOD wcstod
+# endif /*WCSTOD*/
 # ifndef UNLINK
 #  define UNLINK unlink
 # endif /*UNLINK*/

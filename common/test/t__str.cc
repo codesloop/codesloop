@@ -34,13 +34,17 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "exc.hh"
 #include "common.h"
 #include "str.hh"
+#include "ustr.hh"
+#include "int64.hh"
+#include "dbl.hh"
+#include "binry.hh"
 #include "pbuf.hh"
+#include "xdrbuf.hh"
 #include "test_timer.h"
 #include <assert.h>
 #include <sys/stat.h>
 
-using csl::common::str;
-using csl::common::pbuf;
+using namespace csl::common;
 
 /** @brief contains tests related to str */
 namespace test_str {
@@ -214,6 +218,221 @@ namespace test_str {
     str s2 = s.substr(2,4);
     assert( s2 == L"llo " );
   }
+
+  void to_integer_o()
+  {
+    str b(L"-111000999");
+    int64 o;
+    assert( b.to_integer(o) == true );
+    assert( o.value() == -111000999LL );
+  }
+
+  void to_integer_l()
+  {
+    str b("-111000999");
+    long long o;
+    assert( b.to_integer(o) == true );
+    assert( o == -111000999LL );
+  }
+
+  void to_double_o()
+  {
+    str b(L"1234.9876");
+    dbl o;
+    assert( b.to_double(o) == true );
+    assert( o.value() == 1234.9876 );
+  }
+
+  void to_double_d()
+  {
+    str b("-1234.9876");
+    dbl o;
+    assert( b.to_double(o) == true );
+    assert( o.value() == -1234.9876 );
+  }
+
+  void to_string_so()
+  {
+    str b("árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
+    str o;
+    assert( b.to_string(o) == true );
+    assert( b == o );
+    assert( o == L"árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP" );
+  }
+
+  void to_string_su()
+  {
+    str b(L"árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
+    ustr o;
+    assert( b.to_string(o) == true );
+    assert( o == "árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP" );
+    assert( b == o );
+  }
+
+  void to_string_ss()
+  {
+    str b(L"árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
+    std::string o;
+    assert( b.to_string(o) == true );
+    assert( o == "árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP" );
+    assert( b == o.c_str() );
+  }
+
+  void to_binary_o()
+  {
+    str b("árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
+    binry o;
+    assert( b.to_binary(o) == true );
+    assert( b == (wchar_t *)o.value().data() );
+  }
+
+  void to_binary_u()
+  {
+    str b("árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
+    unsigned char o[300];
+    size_t sz = 0;
+    assert( b.to_binary(o,sz) == true );
+    assert( sz == b.nbytes() );
+    assert( sz > 10 );
+    assert( b == (wchar_t *)o );
+  }
+
+  void to_binary_v()
+  {
+    str b("árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
+    unsigned char o[300];
+    void * vp = o;
+    size_t sz = 0;
+    assert( b.to_binary(vp,sz) == true );
+    assert( sz == b.nbytes() );
+    assert( sz > 10 );
+    assert( b == (wchar_t *)o );
+  }
+
+  void to_xdr()
+  {
+    str b;
+    // TODO
+  }
+
+  void to_var()
+  {
+    str b;
+    // TODO
+  }
+
+  void from_integer_o()
+  {
+    str b;
+    int64 o;
+    assert( o.from_string("12984788") == true );
+    assert( b.from_integer(o) == true );
+    assert( b == "12984788" );
+  }
+
+  void from_integer_l()
+  {
+    str b;
+    long long o = 12984788;
+    assert( b.from_integer(o) == true );
+    assert( b == "12984788" );
+  }
+
+  void from_double_o()
+  {
+    str b;
+    dbl o;
+    assert( o.from_string(L"-12984.78800") == true );
+    assert( b.from_double(o) == true );
+    assert( b == "-12984.788000000000" );
+  }
+
+  void from_double_d()
+  {
+    str b;
+    double o = 12984.788;
+    assert( b.from_double(o) == true );
+    assert( b == "12984.788000000000" );
+  }
+
+  void from_string_so()
+  {
+    str b;
+    str o;
+    assert( o.from_double(111.222333444) == true );
+    assert( b.from_string(o) == true );
+    assert( b == "111.222333444000" );
+  }
+
+  void from_string_uo()
+  {
+    str b;
+    ustr o;
+    assert( o.from_double(111.222333444) == true );
+    assert( b.from_string(o) == true );
+    assert( b == "111.222333444000" );
+  }
+
+  void from_string_ss()
+  {
+    str b;
+    std::string o("-111.222333444");
+    assert( b.from_string(o) == true );
+    assert( b == "-111.222333444" );
+  }
+
+  void from_string_sc()
+  {
+    str b;
+    assert( b.from_string("árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP") == true );
+    assert( b == "árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP" );
+  }
+
+  void from_string_sw()
+  {
+    str b;
+    assert( b.from_string(L"árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP") == true );
+    assert( b == "árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP" );
+  }
+
+  void from_binary_o()
+  {
+    str b;
+    binry o;
+    assert( o.from_string(L"árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP") == true );
+    assert( b.from_binary(o) == true );
+    assert( b == "árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP" );
+  }
+
+  void from_binary_u()
+  {
+    str b;
+    str o(L"árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
+    assert( b.from_binary( o.buffer().data(), o.buffer().size() ) == true );
+    assert( b == "árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP" );
+  }
+
+  void from_binary_v()
+  {
+    str b;
+    str o(L"árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
+    assert( b.from_binary( (const void *)o.buffer().data(), o.buffer().size() ) == true );
+    assert( b == "árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP" );
+  }
+
+  void from_xdr()
+  {
+    str b;
+    // TODO
+  }
+
+  void from_var()
+  {
+    str b;
+    // TODO
+  }
+
+
 } // namespace test_str
 
 
@@ -222,9 +441,9 @@ using namespace test_str;
 int main()
 {
 
-  if (!setlocale(LC_CTYPE, "")) {
-    fprintf(stderr, "Can't set the specified locale! "
-              "Check LANG, LC_CTYPE, LC_ALL.\n");
+  if (!setlocale(LC_CTYPE, ""))
+  {
+    fprintf(stderr, "Can't set the specified locale! Check LANG, LC_CTYPE, LC_ALL.\n");
     exit(-1);
   }
 
@@ -272,7 +491,35 @@ int main()
   assert( cs.buffer().size() == sizeof(wchar_t) * (cs.size() + 1) );
   assert( wcscmp(cs.c_str(), L"Árvíztűrő tükörfúrógép" ) == 0 );
 
-  // functional tests
+  /* conversions */
+  csl_common_print_results( "to_integer_o     ", csl_common_test_timer_v0(to_integer_o),"" );
+  csl_common_print_results( "to_integer_l     ", csl_common_test_timer_v0(to_integer_l),"" );
+  csl_common_print_results( "to_double_o      ", csl_common_test_timer_v0(to_double_o),"" );
+  csl_common_print_results( "to_double_d      ", csl_common_test_timer_v0(to_double_d),"" );
+  csl_common_print_results( "to_string_so     ", csl_common_test_timer_v0(to_string_so),"" );
+  csl_common_print_results( "to_string_su     ", csl_common_test_timer_v0(to_string_su),"" );
+  csl_common_print_results( "to_string_ss     ", csl_common_test_timer_v0(to_string_ss),"" );
+  csl_common_print_results( "to_binary_o      ", csl_common_test_timer_v0(to_binary_o),"" );
+  csl_common_print_results( "to_binary_u      ", csl_common_test_timer_v0(to_binary_u),"" );
+  csl_common_print_results( "to_binary_v      ", csl_common_test_timer_v0(to_binary_v),"" );
+  csl_common_print_results( "to_xdr           ", csl_common_test_timer_v0(to_xdr),"" );
+  csl_common_print_results( "to_var           ", csl_common_test_timer_v0(to_var),"" );
+  csl_common_print_results( "from_integer_o   ", csl_common_test_timer_v0(from_integer_o),"" );
+  csl_common_print_results( "from_integer_l   ", csl_common_test_timer_v0(from_integer_l),"" );
+  csl_common_print_results( "from_double_o    ", csl_common_test_timer_v0(from_double_o),"" );
+  csl_common_print_results( "from_double_d    ", csl_common_test_timer_v0(from_double_d),"" );
+  csl_common_print_results( "from_string_so   ", csl_common_test_timer_v0(from_string_so),"" );
+  csl_common_print_results( "from_string_uo   ", csl_common_test_timer_v0(from_string_uo),"" );
+  csl_common_print_results( "from_string_ss   ", csl_common_test_timer_v0(from_string_ss),"" );
+  csl_common_print_results( "from_string_sc   ", csl_common_test_timer_v0(from_string_sc),"" );
+  csl_common_print_results( "from_string_sw   ", csl_common_test_timer_v0(from_string_sw),"" );
+  csl_common_print_results( "from_binary_o    ", csl_common_test_timer_v0(from_binary_o),"" );
+  csl_common_print_results( "from_binary_u    ", csl_common_test_timer_v0(from_binary_u),"" );
+  csl_common_print_results( "from_binary_v    ", csl_common_test_timer_v0(from_binary_v),"" );
+  csl_common_print_results( "from_xdr         ", csl_common_test_timer_v0(from_xdr),"" );
+  csl_common_print_results( "from_var         ", csl_common_test_timer_v0(from_var),"" );
+
+  /* functional tests */
   csl_common_print_results( "empty_constr       ", csl_common_test_timer_v0(test_empty_constr),"" );
   csl_common_print_results( "opeq_pbuf          ", csl_common_test_timer_v0(test_opeq_pbuf),"" );
   csl_common_print_results( "cpyconstr          ", csl_common_test_timer_v0(test_cpyconstr),"" );
@@ -282,7 +529,7 @@ int main()
   csl_common_print_results( "find0              ", csl_common_test_timer_v0(test_find0),"" );
   csl_common_print_results( "substr0            ", csl_common_test_timer_v0(test_substr0),"" );
 
-  // performance
+  /* performance */
   csl_common_print_results( "str_baseline       ", csl_common_test_timer_v0(str_baseline),"" );
   csl_common_print_results( "string_baseline    ", csl_common_test_timer_v0(string_baseline),"" );
   csl_common_print_results( "str_hello          ", csl_common_test_timer_v0(str_hello),"" );
