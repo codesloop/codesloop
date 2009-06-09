@@ -37,7 +37,6 @@ namespace csl
 { 
   namespace rpc 
   {
-
     struct param {
       std::string type;
       std::string name;

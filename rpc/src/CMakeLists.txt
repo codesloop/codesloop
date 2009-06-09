@@ -35,12 +35,14 @@ INCLUDE_DIRECTORIES( ../../common/src)
 LINK_DIRECTORIES( ../../common/src )
 LINK_LIBRARIES( csl_common )
 
-ADD_CUSTOM_COMMAND( OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/csrgen.cc
+ADD_CUSTOM_COMMAND( OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/csrparser.cc
                   PRE_BUILD
-                  COMMAND ragel -G2 ARGS -o csrgen.cc csrgen.rl
-                  MAIN_DEPENDENCY csrgen.rl
+                  COMMAND ragel -G2 ARGS -o csrparser.cc csrparser.rl
+                  MAIN_DEPENDENCY csrparser.rl
                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} )
 
-ADD_EXECUTABLE( csrgen  csrgen.cc csrgen.hh
-                        iface.cc  iface.hh)
+ADD_EXECUTABLE( csrgen  csrparser.cc csrparser.hh
+                        iface.cc  iface.hh 
+                        csrgen_main.cc 
+                        csrgen.hh)
 # -- EOF 
