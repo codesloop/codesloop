@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009, David Beck
+# Copyright (c) 2008,2009, David Beck, Tamas Foldi
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -47,8 +47,12 @@ ADD_LIBRARY( csl_common STATIC
              circbuf.hh
              mpool.hh      tbuf.hh 
              logger.cc     logger.hh
+             obj.cc        obj.hh
+             var.hh
+             int64.cc      int64.hh
+             dbl.cc        dbl.hh
              str.cc        str.hh
              ustr.cc       ustr.hh
-             obj.cc        obj.hh )
+             binry.cc      binry.hh )
 
 # -- EOF --

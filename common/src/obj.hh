@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, Tamas Foldi
+Copyright (c) 2008,2009, Tamas Foldi, David Beck
 
 Rediobjibution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -43,7 +43,9 @@ namespace csl
     class obj
     {
       public:
-        obj(); ///< default destructor
+        obj();
+
+        virtual inline ~obj() {}
 
       protected:
         int logger_flags_; ///< enable or disable per instance logging

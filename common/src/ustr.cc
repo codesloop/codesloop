@@ -27,6 +27,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "str.hh"
 #include "exc.hh"
 #include "common.h"
+#include "xdrbuf.hh"
 
 /**
   @file csl_common/src/ustr.cc
@@ -37,17 +38,19 @@ namespace csl
 {
   namespace common
   {
-    ustr::ustr(const str & other) : csl::common::obj(), buf_((unsigned char)0)
+    ustr::ustr(const str & other) : csl::common::var(), buf_((unsigned char)0)
     {
-      size_t sz = other.size();
+      size_t sz = other.nbytes()-1;
 
       /* over allocating, but this saves our arse when utf-8 results more then 1 character */
-      char * b = (char *)buf_.allocate( other.nbytes() );
+      char * b = (char *)buf_.allocate( sz );
 
-      if( sz && b )
+      if( sz>0 && b!=0 )
       {
-        size_t szz = wcstombs( b, other.data(), sz );
-        buf_.allocate( szz );
+        size_t szz = ::wcstombs( b, other.data(), sz );
+
+        if( szz == (size_t)-1 )  { buf_.reset(); }
+        else                     { buf_.allocate( szz ); }
       }
 
       ensure_trailing_zero();
@@ -61,15 +64,17 @@ namespace csl
 
     ustr & ustr::operator=(const str & other)
     {
-      size_t sz = other.size();
+      size_t sz = other.nbytes()-1;
 
       /* over allocating, but this saves our arse when utf-8 results more then 1 character */
-      char * b = (char *)buf_.allocate( other.nbytes() );
+      char * b = (char *)buf_.allocate( sz );
 
       if( sz && b )
       {
-        size_t szz = wcstombs( b, other.data(), sz );
-        buf_.allocate( szz );
+        size_t szz = ::wcstombs( b, other.data(), sz );
+
+        if( szz == (size_t)-1 )  { buf_.reset(); }
+        else                     { buf_.allocate( szz ); }
       }
 
       ensure_trailing_zero();
@@ -105,7 +110,8 @@ namespace csl
 
       if( sz > 0 && data()[sz-1] == 0 ) buf_.allocate( sz-1 );
 
-      buf_.append( (unsigned char *)s, (strlen(s)+1) );
+      // strlen only cares about trailing zero, so multibyte chars will not confuse here
+      buf_.append( (unsigned char *)s, (::strlen(s)+1) );
 
       ensure_trailing_zero();
 
@@ -195,6 +201,130 @@ namespace csl
       return data()[n];
     }
 
+    /* conversions to other types */
+    bool ustr::to_integer(long long & v) const
+    {
+      v = ATOLL(data());
+      return true;
+    }
+
+    bool ustr::to_double(double & v) const
+    {
+      v = atof(data());
+      return true;
+    }
+
+    bool ustr::to_string(std::string & v) const
+    {
+      v = data();
+      return true;
+    }
+
+    bool ustr::to_binary(unsigned char * v, size_t & sz) const
+    {
+      if( !v ) { sz = 0; return false; }
+      ::memcpy( v,data(),nbytes() );
+      sz = nbytes();
+      return true;
+    }
+
+    bool ustr::to_binary(void * v, size_t & sz) const
+    {
+      if( !v ) { sz = 0; return false; }
+      ::memcpy( v,data(),nbytes() );
+      sz = nbytes();
+      return true;
+    }
+
+    bool ustr::to_xdr(xdrbuf & b) const
+    {
+      try
+      {
+        b << (*this);
+        return true;
+      }
+      catch( exc e )
+      {
+        return false;
+      }
+    }
+
+    /* conversions from other types */
+    bool ustr::from_integer(long long v)
+    {
+      char * p = (char *)buf_.allocate(buf_size-1);
+      int ret = SNPRINTF(p,(buf_size-1),"%lld",v);
+      return (buf_.allocate( ret+1 ) != 0);
+    }
+
+    bool ustr::from_double(double v)
+    {
+      char * p = (char *)buf_.allocate(buf_size-1);
+      int ret = SNPRINTF(p,(buf_size-1),"%.12f",v);
+      return (buf_.allocate( ret+1 ) != 0);
+    }
+
+    bool ustr::from_string(const std::string & v)
+    {
+      if( !v.size() ) { reset(); }
+      else            { *this = v; }
+      return true;
+    }
+
+    bool ustr::from_string(const char * v)
+    {
+      if( !v ) { reset(); }
+      else     { *this = v; }
+      return true;
+    }
+
+    bool ustr::from_string(const wchar_t * v)
+    {
+      if( !v ) { reset(); }
+      else     { *this = v; }
+      return true;
+    }
+
+    bool ustr::from_binary(const unsigned char * v,size_t sz)
+    {
+      if( !v || !sz )
+      {
+        reset();
+      }
+      else
+      {
+        buf_.set( v, sz );
+        ensure_trailing_zero();
+      }
+      return true;
+    }
+
+    bool ustr::from_binary(const void * v,size_t sz)
+    {
+      if( !v || !sz )
+      {
+        reset();
+      }
+      else
+      {
+        buf_.set( (const unsigned char *)v, sz );
+        ensure_trailing_zero();
+      }
+      return true;
+    }
+
+    bool ustr::from_xdr(xdrbuf & v)
+    {
+      try
+      {
+        v >> (*this);
+        return true;
+      }
+      catch( exc e )
+      {
+        return false;
+      }
+    }
   };
 };
 

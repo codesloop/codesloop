@@ -38,6 +38,8 @@ Credits: some techniques and code pieces are stolen from Christian
 #include "common.h"
 #include "obj.hh"
 #include "tbuf.hh"
+#include "var.hh"
+#include "binry.hh"
 #ifdef __cplusplus
 #include <string>
 
@@ -48,16 +50,13 @@ namespace csl
     class ustr;
 
     /** @todo document me */
-    class str : public csl::common::obj
+    class str : public csl::common::var
     {
       public:
         enum { buf_size = 128 * sizeof(wchar_t), npos = 0xFFFFFFFF };
 
-        /** @brief reset internal data */
-        inline void reset() { buf_.reset(); }
-
         /** @brief constructor */
-        inline str() : csl::common::obj(), buf_((wchar_t)L'\0') { }
+        inline str() : csl::common::var(), buf_((wchar_t)L'\0') { }
 
         /** @brief destructor
         *   since there are not virtual functions, and we do not expect inherited
@@ -83,7 +82,7 @@ namespace csl
         ** ------------------------------------------------------------------------ */
 
         /** @brief copy constructor */
-        inline str(const str& s) : csl::common::obj(), buf_((wchar_t)L'\0')
+        inline str(const str& s) : csl::common::var(), buf_((wchar_t)L'\0')
         {
           buf_ = s.buf_;
         }
@@ -150,17 +149,19 @@ namespace csl
         ** ------------------------------------------------------------------------ */
 
         /** @brief copy constructor */
-        inline str(const wchar_t * wcs) : csl::common::obj(), buf_((wchar_t)L'\0')
+        inline str(const wchar_t * wcs) : csl::common::var(), buf_((wchar_t)L'\0')
         {
           if( !wcs ) return;
-          buf_.set((unsigned char *)wcs,sizeof(wchar_t) * (wcslen(wcs)+1));
+          // wcslen only cares about trailing zero, so combining characters will not confuse here
+          buf_.set((unsigned char *)wcs,sizeof(wchar_t) * (::wcslen(wcs)+1));
         }
 
         /** @brief copy operator */
         inline str& operator=(const wchar_t * wcs)
         {
           if( !wcs ) return *this;
-          buf_.set((unsigned char *)wcs,sizeof(wchar_t) * (wcslen(wcs)+1));
+          // wcslen only cares about trailing zero, so combining characters will not confuse here
+          buf_.set((unsigned char *)wcs,sizeof(wchar_t) * (::wcslen(wcs)+1));
           return *this;
         }
 
@@ -243,8 +244,16 @@ namespace csl
         /* ------------------------------------------------------------------------ */
 
         /** @brief resets str buffer */
-        inline void clear() {
+        inline void clear()
+        {
+          reset();
+        }
+
+        /** @brief reset internal data */
+        inline void reset()
+        {
           buf_.reset();
+          buf_.set( (const unsigned char *)(L"\0"), sizeof(wchar_t) );
         }
 
         /** @brief gets str size  */
@@ -263,7 +272,8 @@ namespace csl
         /** @brief return the number of characters in the string, excluding the trailing zero */
         inline size_t nchars() const
         {
-          return empty() ? 0 : wcstombs(NULL, data(), 0);
+          // wcstombs should take care of 'combining characters' too
+          return empty() ? 0 : ::wcstombs(NULL, data(), 0);
         }
 
         /** @brief true if empty str ("") is defined */
@@ -283,6 +293,49 @@ namespace csl
         }
 
         void ensure_trailing_zero();
+
+        /* ------------------------------------------------------------------------ *
+        **    conversion operations
+        ** ------------------------------------------------------------------------ */
+
+        /* conversions to other types */
+        inline bool to_integer(int64 & v) const { return v.from_string(data()); }
+        bool to_integer(long long & v) const;
+
+        inline bool to_double(dbl & v) const { return v.from_string(data()); }
+        bool to_double(double & v) const;
+
+        inline bool to_string(str & v) const { return v.from_string(data()); }
+        bool to_string(ustr & v) const;
+        bool to_string(std::string & v) const;
+
+        inline bool to_binary(binry & v) const { return v.from_binary(buf_.data(),buf_.size()); }
+        bool to_binary(unsigned char * v, size_t & sz) const;
+        bool to_binary(void * v, size_t & sz) const;
+
+        bool to_xdr(xdrbuf & b) const;
+        inline bool to_var(var & v) const { return v.from_string(data()); }
+
+        /* conversions from other types */
+        inline bool from_integer(const int64 & v ) { return v.to_string(*this); }
+        bool from_integer(long long v);
+
+        inline bool from_double(const dbl & v) { return v.to_string(*this); }
+        bool from_double(double v);
+
+        inline bool from_string(const str & v)   { *this = v; return true; }
+        inline bool from_string(const ustr & v)  { *this = v; return true; }
+
+        bool from_string(const std::string & v);
+        bool from_string(const char * v);
+        bool from_string(const wchar_t * v);
+
+        inline bool from_binary(const binry & v) { return v.to_string(*this); }
+        bool from_binary(const unsigned char * v,size_t sz);
+        bool from_binary(const void * v,size_t sz);
+
+        bool from_xdr(xdrbuf & v);
+        inline bool from_var(const var & v) { return v.to_string(*this); }
 
       private:
         tbuf<buf_size>   buf_;

@@ -38,6 +38,8 @@ Credits: some techniques and code pieces are stolen from Christian
 #include "common.h"
 #include "obj.hh"
 #include "tbuf.hh"
+#include "str.hh"
+#include "var.hh"
 #ifdef __cplusplus
 #include <string>
 
@@ -45,19 +47,14 @@ namespace csl
 {
   namespace common
   {
-    class str;
-
     /** @todo document me */
-    class ustr : public csl::common::obj
+    class ustr : public csl::common::var
     {
       public:
         enum { buf_size = 128, npos = 0xFFFFFFFF };
 
-        /** @brief reset internal data */
-        inline void reset() { buf_.reset(); }
-
         /** @brief constructor */
-        inline ustr() : csl::common::obj(), buf_((unsigned char)0) { }
+        inline ustr() : csl::common::var(), buf_((unsigned char)0) { }
 
         /** @brief destructor
          *  since there are not virtual functions, and we do not expect inherited
@@ -96,7 +93,7 @@ namespace csl
         ** ------------------------------------------------------------------------ */
 
         /** @brief copy constructor */
-        inline ustr(const ustr& s) : csl::common::obj(), buf_((unsigned char)0)
+        inline ustr(const ustr& s) : csl::common::var(), buf_((unsigned char)0)
         {
           buf_ = s.buf_;
         }
@@ -140,9 +137,10 @@ namespace csl
         ** ------------------------------------------------------------------------ */
 
         /** @brief copy constructor */
-        inline ustr(const char * us) : csl::common::obj(), buf_((unsigned char)0)
+        inline ustr(const char * us) : csl::common::var(), buf_((unsigned char)0)
         {
           if( !us ) return;
+          // strlen only cares about trailing zero, so multibyte chars will not confuse here
           buf_.set((const unsigned char *)us,::strlen(us)+1);
         }
 
@@ -150,6 +148,7 @@ namespace csl
         inline ustr& operator=(const char * us)
         {
           if( !us ) return *this;
+          // strlen only cares about trailing zero, so multibyte chars will not confuse here
           buf_.set((const unsigned char *)us,::strlen(us)+1);
           return *this;
         }
@@ -239,7 +238,14 @@ namespace csl
         /** @brief resets ustr buffer */
         inline void clear()
         {
+          reset();
+        }
+
+        /** @brief reset internal data */
+        inline void reset()
+        {
           buf_.reset();
+          buf_.set( (const unsigned char *)("\0"), 1 );
         }
 
         /** @brief gets ustr size  */
@@ -258,7 +264,8 @@ namespace csl
         /** @brief return the number of characters in the string, excluding the trailing zero */
         inline size_t nchars() const
         {
-          return (empty() ? 0 : ::strlen(data()));
+          // strlen() wouldn't do here, because of multibyte utf-8 characters
+          return (empty() ? 0 : ::mbstowcs(NULL,data(),0));
         }
 
         /** @brief true if empty ustr ("") is defined */
@@ -278,6 +285,49 @@ namespace csl
         }
 
         void ensure_trailing_zero();
+
+        /* ------------------------------------------------------------------------ *
+        **    conversion operations
+        ** ------------------------------------------------------------------------ */
+
+        /* conversions to other types */
+        inline bool to_integer(int64 & v) const { return v.from_string(data()); }
+        bool to_integer(long long & v) const;
+
+        inline bool to_double(dbl & v) const { return v.from_string(data()); }
+        bool to_double(double & v) const;
+
+        inline bool to_string(str & v) const { return v.from_string(data()); }
+        inline bool to_string(ustr & v) const { return v.from_string(data()); }
+        bool to_string(std::string & v) const;
+
+        inline bool to_binary(binry & v) const { return v.from_binary(buf_.data(),buf_.size()); }
+        bool to_binary(unsigned char * v, size_t & sz) const;
+        bool to_binary(void * v, size_t & sz) const;
+
+        bool to_xdr(xdrbuf & b) const;
+        inline bool to_var(var & v) const { return v.from_string(data()); }
+
+        /* conversions from other types */
+        inline bool from_integer(const int64 & v) { return v.to_string(*this); }
+        bool from_integer(long long v);
+
+        inline bool from_double(const dbl & v) { return v.to_string(*this); }
+        bool from_double(double v);
+
+        inline bool from_string(const str & v)         { *this = v; return true; }
+        inline bool from_string(const ustr & v)        { *this = v; return true; }
+
+        bool from_string(const std::string & v);
+        bool from_string(const char * v);
+        bool from_string(const wchar_t * v);
+
+        inline bool from_binary(const binry & v) { return v.to_string(*this); }
+        bool from_binary(const unsigned char * v,size_t sz);
+        bool from_binary(const void * v,size_t sz);
+
+        bool from_xdr(xdrbuf & v);
+        bool from_var(const var & v) { return v.to_string(*this); }
 
       private:
         tbuf<buf_size>   buf_;

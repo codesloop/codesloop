@@ -46,6 +46,7 @@ namespace csl
         case rs_xdr_eof:         return L"End of XDR data";
         case rs_xdr_invalid:     return L"Invalid XDR data";
         case rs_empty:           return L"Empty container.";
+        case rs_conv_error:      return L"Cannot convert character.";
         case rs_unknown:
           default:               return L"Unknown reason";
       };
@@ -60,6 +61,8 @@ namespace csl
         case cm_xdrbuf:    return L"common::xdrbuf";
         case cm_circbuf:   return L"common::circbuf";
         case cm_logger:    return L"common::logger";
+        case cm_str:       return L"common::str";
+        case cm_ustr:      return L"common::ustr";
         case cm_unknown:
           default:         return L"unknown component";
       };

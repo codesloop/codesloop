@@ -27,6 +27,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ustr.hh"
 #include "exc.hh"
 #include "common.h"
+#include "xdrbuf.hh"
 
 /**
   @file csl_common/src/str.cc
@@ -37,7 +38,7 @@ namespace csl
 {
   namespace common
   {
-    str::str(const ustr & other) : csl::common::obj(), buf_((wchar_t)L'\0')
+    str::str(const ustr & other) : csl::common::var(), buf_((wchar_t)L'\0')
     {
       size_t sz = other.size();
 
@@ -45,7 +46,9 @@ namespace csl
 
       if( sz && b )
       {
-        size_t szz = mbstowcs( b, other.data(), sz );
+        size_t szz = ::mbstowcs( b, other.data(), sz );
+        // fix length, because utf-8 may occupy more then one character that may be converted
+        // to a single wchar_t, for this reason we may need to shrink the buffer
         buf_.allocate( szz * sizeof(wchar_t) );
       }
 
@@ -66,8 +69,13 @@ namespace csl
 
       if( sz && b )
       {
-        size_t szz = mbstowcs( b, other.data(), sz );
-        buf_.allocate( szz * sizeof(wchar_t) );
+        size_t szz = ::mbstowcs( b, other.data(), sz );
+
+        // fix length, because utf-8 may occupy more then one character that may be converted
+        // to a single wchar_t, for this reason we may need to shrink the buffer
+
+        if( szz == (size_t)-1 ) { buf_.reset(); }
+        else                    { buf_.allocate( szz * sizeof(wchar_t) ); }
       }
 
       ensure_trailing_zero();
@@ -95,7 +103,11 @@ namespace csl
     {
       size_t  sz = size();
 
-      if( nbytes() > 0 && data()[sz] == 0 ) buf_.allocate( sz * sizeof(wchar_t) );
+      if( nbytes() > 0 && data()[sz] == 0 )
+      {
+        // exclude the trailing zero character
+        buf_.allocate( sz * sizeof(wchar_t) );
+      }
 
       buf_.append( s.buffer() );
 
@@ -108,9 +120,13 @@ namespace csl
     {
       size_t  sz = size();
 
-      if( nbytes() > 0 && data()[sz] == 0 ) buf_.allocate( sz * sizeof(wchar_t) );
+      if( nbytes() > 0 && data()[sz] == 0 )
+      {
+        // exclude the trailing zero character
+        buf_.allocate( sz * sizeof(wchar_t) );
+      }
 
-      buf_.append( (unsigned char *)s, sizeof(wchar_t) * (wcslen(s)+1) );
+      buf_.append( (unsigned char *)s, sizeof(wchar_t) * (::wcslen(s)+1) );
 
       ensure_trailing_zero();
 
@@ -124,7 +140,9 @@ namespace csl
       size_t sz = size();
 
       if ( start > sz )
-        throw exc(exc::rs_invalid_param,exc::cm_str,L"out of range");
+      {
+        THRR(exc::rs_invalid_param,exc::cm_str,L"out of range",s);
+      }
 
       // shrink length to fit in
       if ( sz < length + start ) len = sz - start;
@@ -136,35 +154,50 @@ namespace csl
       return s;
     }
 
-    str::str(const char * st) : obj()
+    str::str(const char * st) : csl::common::var(), buf_((wchar_t)L'\0')
     {
       if( !st ) return;
 
-      size_t len = strlen(st)+1;
+      size_t len = ::strlen(st)+1;
+      size_t ssz = 0;
 
       wchar_t * nptr = (wchar_t *)buf_.allocate( len * sizeof(wchar_t) );
 
-      if ( mbstowcs( nptr, st, len ) != size_t(-1) )
+      if ( (ssz = ::mbstowcs( nptr, st, len )) != size_t(-1) )
       {
-        // wcstring includes trailing zero char
-        nptr[len-1] = L'\0';
+        // may need to shrink, when utf-8 chars occupy more than one character
+        buf_.allocate( ssz * sizeof(wchar_t) );
+        ensure_trailing_zero();
+      }
+      else
+      {
+        buf_.reset();
+        ensure_trailing_zero();
+        THRNORET(exc::rs_conv_error,exc::cm_str);
       }
     }
 
     str& str::operator=(const char * st)
     {
-      if( st ) return *this;
+      if( !st ) return *this;
 
       size_t len =  strlen(st)+1;
+      size_t ssz = 0;
 
       wchar_t * nptr = (wchar_t *)buf_.allocate( len * sizeof(wchar_t) );
 
-      if ( mbstowcs( nptr, st, len ) != size_t(-1) )
+      if ( (ssz = ::mbstowcs( nptr, st, len )) != size_t(-1) )
       {
-        // wcstring includes trailing zero char
-        nptr[len-1] = L'\0';
+        // may need to shrink, when utf-8 chars occupy more than one character
+        buf_.allocate( ssz * sizeof(wchar_t) );
+        ensure_trailing_zero();
       }
-
+      else
+      {
+        buf_.reset();
+        ensure_trailing_zero();
+        THRC(exc::rs_conv_error,exc::cm_str,*this);
+      }
       return *this;
     }
 
@@ -202,7 +235,7 @@ namespace csl
 
     size_t str::find(const str & s) const
     {
-      wchar_t * p = wcsstr( data(), s.data() );
+      wchar_t * p = ::wcsstr( data(), s.data() );
       size_t ret = npos;
 
       if ( p != NULL ) {
@@ -219,19 +252,159 @@ namespace csl
 
       const wchar_t * res = 0;
 
-      if( (res = wcsstr(data(),str)) == NULL ) return npos;
+      if( (res = ::wcsstr(data(),str)) == NULL ) return npos;
 
       return (res-data());
     }
 
     wchar_t str::at(const size_t n) const
     {
-      if ( n > wcslen( data() ) )
-        throw exc(exc::rs_invalid_param,exc::cm_str);
+      if ( n > ::wcslen( data() ) )
+      {
+        THR(exc::rs_invalid_param,exc::cm_str,0);
+      }
 
       return data()[n];
     }
 
+    /* conversions to other types */
+    bool str::to_integer(long long & v) const
+    {
+      wchar_t * endp = 0;
+      v = WCSTOLL( data(), &endp, 0 );
+      return (endp != 0);
+    }
+
+    bool str::to_double(double & v) const
+    {
+      wchar_t * endp = 0;
+      v = WCSTOD( data(), &endp );
+      return true;
+    }
+
+    bool str::to_string(ustr & v) const
+    {
+      v = *this;
+      return true;
+    }
+
+    bool str::to_string(std::string & v) const
+    {
+      if( nbytes() == 1 )
+      {
+        v.clear();
+        return true;
+      }
+      ustr us(*this);
+      v = us.c_str();
+      return true;
+    }
+
+    bool str::to_binary(unsigned char * v, size_t & sz) const
+    {
+      if( !v ) { sz = 0; return false; }
+      ::memcpy( v,data(),nbytes() );
+      sz = nbytes();
+      return true;
+    }
+
+    bool str::to_binary(void * v, size_t & sz) const
+    {
+      if( !v ) { sz = 0; return false; }
+      ::memcpy( v,data(),nbytes() );
+      sz = nbytes();
+      return true;
+    }
+
+    bool str::to_xdr(xdrbuf & b) const
+    {
+      try
+      {
+        b << (*this);
+        return true;
+      }
+      catch( exc e )
+      {
+        return false;
+      }
+    }
+
+    /* conversions from other types */
+    bool str::from_integer(long long v)
+    {
+      wchar_t * p = (wchar_t *)buf_.allocate(buf_size-1);
+      int ret = SWPRINTF(p,(buf_size-1),L"%lld",v);
+      return (buf_.allocate( (ret+1)*sizeof(wchar_t) ) != 0);
+    }
+
+    bool str::from_double(double v)
+    {
+      wchar_t * p = (wchar_t *)buf_.allocate(buf_size-1);
+      int ret = SWPRINTF(p,(buf_size-1),L"%.12f",v);
+      return (buf_.allocate( (ret+1)*sizeof(wchar_t) ) != 0);
+    }
+
+    bool str::from_string(const std::string & v)
+    {
+      if( !v.size() ) { reset(); }
+      else            { *this = v; }
+      return true;
+    }
+
+    bool str::from_string(const char * v)
+    {
+      if( !v ) { reset(); }
+      else     { *this = v; }
+      return true;
+    }
+
+    bool str::from_string(const wchar_t * v)
+    {
+      if( !v ) { reset(); }
+      else     { *this = v; }
+      return true;
+    }
+
+    bool str::from_binary(const unsigned char * v,size_t sz)
+    {
+      if( !v || !sz )
+      {
+        reset();
+      }
+      else
+      {
+        buf_.set( v, sz );
+        ensure_trailing_zero();
+      }
+      return true;
+    }
+
+    bool str::from_binary(const void * v,size_t sz)
+    {
+      if( !v || !sz )
+      {
+        reset();
+      }
+      else
+      {
+        buf_.set( (const unsigned char *)v, sz );
+        ensure_trailing_zero();
+      }
+      return true;
+    }
+
+    bool str::from_xdr(xdrbuf & v)
+    {
+      try
+      {
+        v >> (*this);
+        return true;
+      }
+      catch( exc e )
+      {
+        return false;
+      }
+    }
   };
 };
 
