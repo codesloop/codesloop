@@ -95,7 +95,7 @@ namespace csl
         strftime( szDateBuf, sizeof(szDateBuf), "%b %d %H:%M:%S", localtime( &ostime ) );
 
         // append line-by-line
-        std::fstream fs_log ( logfile_.c_str(), std::ios_base::out | std::ios_base::app );
+        std::wfstream fs_log ( logfile_.c_str(), std::ios_base::out | std::ios_base::app );
 
         // print header + string like: [2006-12-24 23:59] DEBUG: hello world!
         fs_log << szDateBuf 
@@ -110,14 +110,14 @@ namespace csl
         fs_log.close();
 #ifdef DEBUG
         if ( enable_stderr_ )
-          std::cerr  << szDateBuf
-                     << L" ("
-                     << getpid()
-                     << L") ["
-                     << LOGTYPE_NAMES[ (int) type ]
-                     << L"] "
-                     << st.c_str()
-                     << std::endl;
+          std::wcerr  << szDateBuf
+                      << L" ("
+                      << getpid()
+                      << L") ["
+                      << LOGTYPE_NAMES[ (int) type ]
+                      << L"] "
+                      << st.c_str()
+                      << std::endl;
 #endif
 
       } catch ( std::exception ex ) {
