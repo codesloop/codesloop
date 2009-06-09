@@ -23,57 +23,34 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
  
-#ifndef _csl_rpc_csrgen_hh_included_
-#define _csl_rpc_csrgen_hh_included_
+#ifndef _csl_rpc_csrparser_hh_included_
+#define _csl_rpc_csrparser_hh_included_
 
 #include "common.h"
 #ifdef __cplusplus
 #include "obj.hh"
+#include "iface.hh"
 
 namespace csl 
 { 
   namespace rpc 
   {
   
-    enum token_type {
-      TT_UNKNOWN    = 0,
-      TT_VERSION    = 1,
-      TT_NAME       = 2,
-      TT_NAMESPACE  = 3,
-      TT_INCLUDE    = 4,
-      TT_FUNCTION   = 5,
-      TT_DISPOSABLE_FUNCTION  = 6,
-      TT_FUNCTION_END = 7,
-      TT_PARAM_MOD  = 8,
-      TT_PARAM_TYPE = 9,
-      TT_PARAM_NAME = 10,
-      TT_COMMENT    = 11,
-      TT_LAST       = 12
-    };
-    extern const char * token_type_name[];
-
-    enum param_kind {
-      MD_INPUT      = 0,
-      MD_OUTPUT     = 1,
-      MD_INOUT      = 2,
-      MD_EXCEPTION  = 3
-    };
-    extern const char * param_kind_name[];
-
-    struct token_info
+    class csrparser : public csl::common::obj
     {
-      char * p;         ///< actual buffer pointer
-      char * pe;        ///< eof point
-      char * ls;        ///< line start
-      char * ts;        ///< token start
-      int cs;           ///< current char
-      int curline;      ///< current line in file
-      token_type type;  ///< token identifier
-      param_kind modifier;  ///< input/output/exc
-      int array_length; ///< array definition: 0 - not an array, -1 undefined size, n = n sized arry
-    };
+    public:
+      csrparser();
+      int parse(char * start, char * end);  
+  
+    private:
+      void reset();
+      void save();
+      void print_error() const;
+      iface iface_;
+      token_info token_;
+    }; 
   }
 }
 
 #endif /* __cplusplus */
-#endif /* _csl_rpc_csrgen_hh_included_ */
+#endif /* _csl_rpc_csrparser_hh_included_ */

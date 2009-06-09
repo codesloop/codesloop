@@ -31,9 +31,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 
 #include "csrgen.hh"
+#include "csrparser.hh"
 #include "iface.hh"
-
-using namespace csl::rpc;
 
 const char * csl::rpc::token_type_name[] = {
   "unknown",
@@ -60,53 +59,53 @@ const char * csl::rpc::param_kind_name[] = {
 %%{
 
   machine  csrgen;
-  access token.;
-  variable p  token.p;
-  variable pe token.pe;
+  access token_.;
+  variable p  token_.p;
+  variable pe token_.pe;
 
 
   action s { 
-    token.ts = token.p;
+    token_.ts = token_.p;
   }
 
   action on_error {
-    print_error(token);
+    print_error();
   }
 
   action newline {
-    token.curline++;
-    token.ls = token.p;
+    token_.curline++;
+    token_.ls = token_.p;
   }
 
   action save {
-    save(ifc,token);
-    reset(token);
+    save();
+    reset();
   }
 
   action type_name {
-    token.type = TT_PARAM_TYPE;
-    token.array_length  = 0; /* reset array length */
-    save(ifc,token);
+    token_.type = TT_PARAM_TYPE;
+    token_.array_length  = 0; /* reset array length */
+    save();
   }
 
   action obj_name {
-    token.type = TT_PARAM_NAME;
-    save(ifc,token);
+    token_.type = TT_PARAM_NAME;
+    save();
   }
 
   action end_function {
-    token.type = TT_FUNCTION_END; 
-    token.ts = token.p;
+    token_.type = TT_FUNCTION_END; 
+    token_.ts = token_.p;
   }
 
   action func_name {
-    if ( token.type != TT_DISPOSABLE_FUNCTION )
-      token.type = TT_FUNCTION;
-    save(ifc,token);
+    if ( token_.type != TT_DISPOSABLE_FUNCTION )
+      token_.type = TT_FUNCTION;
+    save();
   }
 
   action add_arry_digit {
-    token.array_length = token.array_length * 10 + (fc - '0');
+    token_.array_length = token_.array_length * 10 + (fc - '0');
   }
 
   # new line handler with line counting
@@ -117,15 +116,15 @@ const char * csl::rpc::param_kind_name[] = {
   ws_no_nl  = ('\t'|' '|'\r');
 
   # language constants
-  input     = 'input'       >s %{token.modifier = MD_INPUT;};
-  output    = 'output'      >s %{token.modifier = MD_OUTPUT;};
-  inout     = 'inout'       >s %{token.modifier = MD_INOUT;};
-  exc       = 'exception'   >s %{token.modifier = MD_EXCEPTION;};
-  disp      = 'disposable'     %{token.type     = TT_DISPOSABLE_FUNCTION;};
-  incl      = 'include'        %{token.type     = TT_INCLUDE;};
-  name      = 'name'           %{token.type     = TT_NAME;};
-  version   = 'version'        %{token.type     = TT_VERSION;};
-  namespc   = 'namespace'      %{token.type     = TT_NAMESPACE;};
+  input     = 'input'       >s %{token_.modifier = MD_INPUT;};
+  output    = 'output'      >s %{token_.modifier = MD_OUTPUT;};
+  inout     = 'inout'       >s %{token_.modifier = MD_INOUT;};
+  exc       = 'exception'   >s %{token_.modifier = MD_EXCEPTION;};
+  disp      = 'disposable'     %{token_.type     = TT_DISPOSABLE_FUNCTION;};
+  incl      = 'include'        %{token_.type     = TT_INCLUDE;};
+  name      = 'name'           %{token_.type     = TT_NAME;};
+  version   = 'version'        %{token_.type     = TT_VERSION;};
+  namespc   = 'namespace'      %{token_.type     = TT_NAMESPACE;};
   
 
   # literals, identifiers
@@ -139,14 +138,14 @@ const char * csl::rpc::param_kind_name[] = {
   array_decl  = ws* (
                     '[' ws* ']'
                   | '[' ws* ( digit* @add_arry_digit ) ws* ']'
-                ) %{ ifc.set_arry_len(token.array_length); }
+                ) %{ iface_.set_arry_len(token_.array_length); }
                 ;
 
   # parameters and function header definition 
   parameter_spec  = type_ident %type_name ws+ :>> (identifier %obj_name)
                     array_decl? 
                     ;
-  parameter_type  = (input|output|inout|exc) ':' %{token.type = TT_PARAM_MOD;};
+  parameter_type  = (input|output|inout|exc) ':' %{token_.type = TT_PARAM_MOD;};
 
   func_param_line      =  (ws* (parameter_type ws+)? <: 
                                 parameter_spec ws*  ',')
@@ -165,7 +164,7 @@ const char * csl::rpc::param_kind_name[] = {
   # out of the extend* which matches everything.
   c_comment   =  '/*' any_count_line* :>>  '*/';
   cpp_comment = '//' [^\n]* newline;
-  comment     = (cpp_comment | c_comment) >s %{token.type = TT_COMMENT;};
+  comment     = (cpp_comment | c_comment) >s %{token_.type = TT_COMMENT;};
 
   includes    = '#' ws_no_nl* incl ws_no_nl+ 
                 (dquote  | gtquote )
@@ -201,121 +200,105 @@ const char * csl::rpc::param_kind_name[] = {
 
 }%%
 
-%% write data;
-
-void reset(token_info & token)
+namespace csl 
 {
-  token.type          = TT_UNKNOWN;
-  token.modifier      = MD_INPUT;
-  token.array_length  = 0;
-}
+  namespace rpc
+  {
+    %% write data;
 
-void print_error(token_info & token) 
-{
-  fprintf(stderr, "can not process file: parse error at line %d column %d\n",
-            token.curline,
-            (token.p-token.ls) );
-  if ( token.p-token.ls < 70 ) {
-    char * errloc = strdup( token.ls+1);
-    int col = 0;
-    for ( ; col < token.pe - token.ls ; col++ )
+    void csrparser::reset()
     {
-      if ( errloc[col] == '\n' ) {
-        errloc[col] = '\0';
-        break;
+      token_.type          = TT_UNKNOWN;
+      token_.modifier      = MD_INPUT;
+      token_.array_length  = 0;
+    } 
+
+    void csrparser::print_error() const
+    {
+      fprintf(stderr, "can not process file: parse error at line %d column %d\n",
+          token_.curline,
+          (token_.p-token_.ls) );
+      if ( token_.p-token_.ls < 70 ) {
+        char * errloc = strdup( token_.ls+1);
+        int col = 0;
+        for ( ; col < token_.pe - token_.ls ; col++ )
+        {
+          if ( errloc[col] == '\n' ) {
+            errloc[col] = '\0';
+            break;
+          }
+        }
+        fprintf(stderr, "\n\"%s\"\n", errloc );
+        free(errloc);
+        for ( col = 0 ; col < token_.p-token_.ls ; col++ )
+          fputc(' ', stderr);
+        fprintf(stderr, "^---- here\n");
       }
     }
-    fprintf(stderr, "\n\"%s\"\n", errloc );
-    free(errloc);
-    for ( col = 0 ; col < token.p-token.ls ; col++ )
-      fputc(' ', stderr);
-    fprintf(stderr, "^---- here\n");
-  }
-}
 
-void save(iface & ifc, token_info & token)
-{
-  if ( (token.p-token.ts) == 0 || token.type <= TT_UNKNOWN || token.type >= TT_LAST  )
-    return;
-
-  switch (token.type) 
-  {
-    case TT_NAME:
-      ifc.set_name(token);
-      break;
-    case TT_NAMESPACE:
-      ifc.set_namespc(token);
-      break;
-    case TT_VERSION:
-      ifc.set_version(token);
-      break;
-    case TT_INCLUDE:
-      ifc.add_include(token);
-      break;
-    case TT_DISPOSABLE_FUNCTION:
-    case TT_FUNCTION:
-      ifc.add_function(token);
-      break;
-    case TT_PARAM_TYPE:
-      ifc.set_param_type(token);
-      break;
-    case TT_PARAM_NAME:
-      ifc.set_param_name(token);
-      break;
-    default:
-      break;
-  }
-
-}
-
-void csrgen_init(token_info & token)
-{
-  %%  write  init;
-  reset(token);
-  token.curline = 1;
-}
-
-int csrgen_execute(token_info & token)
-{
-  char * eof = NULL;
-  iface ifc;
-
-  %%  write  exec;
-
-  if ( token.cs == csrgen_error )
-    return(1);
-  
-  printf("%s", ifc.to_string().c_str() );
-
-  return(0);
-}
-
-int  main(  int  argc,  char  **argv  )
-{
-  std::string buffer;
-  token_info token;
-
-  if ( argc == 1 ) 
-  {
-    fprintf(stderr, "usage: %s <filename>\n", argv[0] );
-    exit(1);
-  } else {
-    std::ifstream in( argv[1] );
-    if ( in.good() )
+    void csrparser::save()
     {
-      buffer = std::string(std::istreambuf_iterator<char>(in),std::istreambuf_iterator<char>());
-    } else {
-      fprintf(stderr, "%s: can not open file \"%s\"\n", argv[0], argv[1] );
-      exit(1);
-    }
-  }
-  
-  csrgen_init(token);
-            
-  token.p   = (char*) buffer.c_str() ;    // entry point
-  token.ls  = token.p;                    // first line's start
-  token.pe  = token.p + strlen(token.p);  // exit point/eof
-  
-  return csrgen_execute(token);
-}
+      if ( (token_.p-token_.ts) == 0 || token_.type <= TT_UNKNOWN 
+        || token_.type >= TT_LAST  )
+      {
+        return;
+      }
 
+      switch (token_.type) 
+      {
+        case TT_NAME:
+          iface_.set_name(token_);
+          break;
+        case TT_NAMESPACE:
+          iface_.set_namespc(token_);
+          break;
+        case TT_VERSION:
+          iface_.set_version(token_);
+          break;
+        case TT_INCLUDE:
+          iface_.add_include(token_);
+          break;
+        case TT_DISPOSABLE_FUNCTION:
+        case TT_FUNCTION:
+          iface_.add_function(token_);
+          break;
+        case TT_PARAM_TYPE:
+          iface_.set_param_type(token_);
+          break;
+        case TT_PARAM_NAME:
+          iface_.set_param_name(token_);
+          break;
+        default:
+          break;
+      }
+
+    }
+
+    csrparser::csrparser()
+    {
+      memset( &token_, 0, sizeof(token_) );
+      %%  write  init;
+      reset();
+      token_.curline = 1;
+    }
+
+    int csrparser::parse(char * start, char * end)
+    {
+      char * eof = NULL;
+
+      token_.p = start;
+      token_.pe = end;
+      token_.ls = token_.p; 
+
+      %%  write  exec;
+
+      if ( token_.cs == csrgen_error )
+        return(1);
+
+      printf("%s", iface_.to_string().c_str() );
+
+      return(0);
+    } 
+
+  } /* namespace rpc */
+} /* namespace csl */
