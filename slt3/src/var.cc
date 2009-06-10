@@ -59,9 +59,6 @@ namespace csl
         synqry::colhead ch;
         common::int64 fd(id);
 
-        //synqry::field fd;
-        //fd.intval_ = id;
-        //fd.size_   = sizeof(fd.intval_);
         ch.type_   = synqry::colhead::t_integer;
         dx->var_->set_value(&ch,&fd);
       }
@@ -481,7 +478,6 @@ namespace csl
     {
       value_t b;
       b = other;
-      //value_ = other;
       value_.from_binary(b.data(),b.size());
       parent()->on_change();
       return *this;
