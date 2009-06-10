@@ -53,10 +53,15 @@ namespace csl
 
       public:
         inline int64() : var(), value_(0) { }
+        inline int64(long long v) : var(), value_(v) { }
 
         virtual inline ~int64() {}
 
         inline long long value() const { return value_; }
+
+        inline int var_type() { return CSL_TYPE_INT64; }
+
+        inline void reset() { value_ = 0LL; }
 
         /* conversions to other types */
         inline bool to_integer(int64 & v) const      { return v.from_integer(value_); }

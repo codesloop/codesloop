@@ -57,10 +57,15 @@ namespace csl
 
       public:
         binry();
+        binry(const unsigned char * ptr,size_t sz);
 
         virtual inline ~binry() {}
 
         const buf_t & value() const { return value_; }
+
+        inline int var_type() { return CSL_TYPE_BIN; }
+
+        inline void reset() { value_.reset(); }
 
         /* conversions to other types */
         inline bool to_integer(int64 & v) const { return v.from_binary(value_.data(),value_.size()); }

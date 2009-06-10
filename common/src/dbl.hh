@@ -53,10 +53,15 @@ namespace csl
 
       public:
         inline dbl() : var(), value_(0.0) { }
+        inline dbl(double v) : var(), value_(v) { }
 
         virtual inline ~dbl() {}
 
         inline double value() const { return value_; }
+
+        inline int var_type() { return CSL_TYPE_DOUBLE; }
+
+        inline void reset() { value_ = 0.0; }
 
         /* conversions to other types */
         inline bool to_integer(int64 & v)     const { return v.from_double(value_); }

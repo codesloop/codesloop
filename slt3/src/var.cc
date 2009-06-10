@@ -51,17 +51,18 @@ namespace csl
     {
       datalist_t::iterator it(dtalst_.begin());
       datalist_t::iterator end(dtalst_.end());
+
       if( it != end )
       {
         data * dx = *it;
 
         synqry::colhead ch;
-        synqry::field fd;
+        common::int64 fd(id);
 
-        fd.intval_ = id;
-        fd.size_   = sizeof(fd.intval_);
+        //synqry::field fd;
+        //fd.intval_ = id;
+        //fd.size_   = sizeof(fd.intval_);
         ch.type_   = synqry::colhead::t_integer;
-
         dx->var_->set_value(&ch,&fd);
       }
     }
@@ -279,141 +280,44 @@ namespace csl
       return true;
     }
 
-    void intvar::set_param(param & p)    { p.set(value_); }
-    void strvar::set_param(param & p)    { p.set((const char *)value_.data()); }
-    void doublevar::set_param(param & p) { p.set(value_); }
-    void blobvar::set_param(param & p)   { p.set(value_.data(),value_.size()); }
+    void intvar::set_param(param & p)    { p.set(value_.value()); }
+    void strvar::set_param(param & p)    { p.set((const char *)value_.c_str()); }
+    void doublevar::set_param(param & p) { p.set(value_.value()); }
+    void blobvar::set_param(param & p)   { p.set(value_.value().data(),value_.value().size()); }
 
     bool intvar::set_value(synqry::colhead * ch,synqry::field * fd)
     {
       if( !ch || !fd ) return false;
-
-      switch( ch->type_ )
-      {
-        case synqry::colhead::t_integer:
-          if( fd->size_ != sizeof(long long) ) return false;
-          value_ = fd->intval_;
-          break;
-
-        case synqry::colhead::t_string:
-          if( !fd->stringval_ || !fd->size_ ) return false;
-          value_ = ATOLL(fd->stringval_);
-          break;
-
-        case synqry::colhead::t_double:
-          if( fd->size_ != sizeof(double) ) return false;
-          value_ = (long long)(fd->doubleval_);
-          break;
-
-        case synqry::colhead::t_blob:
-          if( fd->size_ != sizeof(long long) ) return false;
-          value_ = fd->intval_;
-          break;
-
-        case synqry::colhead::t_null:
-          value_ = 0;
-          break;
-
-        default:
-          return false;
-      };
+      bool ret = value_.from_var(*fd);
       parent()->on_change();
-      return true;
+      return ret;
     }
 
     bool doublevar::set_value(synqry::colhead * ch,synqry::field * fd)
     {
       if( !ch || !fd ) return false;
-
-      switch( ch->type_ )
-      {
-        case synqry::colhead::t_integer:
-          if( fd->size_ != sizeof(long long) ) return false;
-          value_ = (double)fd->intval_;
-          break;
-
-        case synqry::colhead::t_string:
-          if( !fd->stringval_ || !fd->size_ ) return false;
-          value_ = atof(fd->stringval_);
-          break;
-
-        case synqry::colhead::t_double:
-          if( fd->size_ != sizeof(double) ) return false;
-          value_ = fd->doubleval_;
-          break;
-
-        case synqry::colhead::t_blob:
-          if( fd->size_ != sizeof(double) ) return false;
-          value_ = fd->doubleval_;
-          break;
-
-        case synqry::colhead::t_null:
-          value_ = 0.0;
-          break;
-
-        default:
-          return false;
-      };
+      bool ret = value_.from_var(*fd);
       parent()->on_change();
-      return true;
+      return ret;
     }
 
     bool strvar::set_value(synqry::colhead * ch,synqry::field * fd)
     {
       if( !ch || !fd ) return false;
-
-      char tmp[200];
-
-      switch( ch->type_ )
-      {
-        case synqry::colhead::t_integer:
-          SNPRINTF( tmp, sizeof(tmp)-1,"%lld",fd->intval_ );
-          value_ = tmp;
-          break;
-
-        case synqry::colhead::t_double:
-          SNPRINTF( tmp, sizeof(tmp)-1,"%.10f", fd->doubleval_ );
-          value_ = tmp;
-          break;
-
-        case synqry::colhead::t_string:
-          if( fd->size_ == 0 ) { value_.reset(); break; }
-          value_ = fd->stringval_;
-          break;
-
-        case synqry::colhead::t_blob:
-          if( fd->size_ == 0 ) { value_.reset(); break; }
-          // TODO carefully check results
-          value_.assign(fd->stringval_,fd->stringval_+fd->size_);
-          break;
-
-        case synqry::colhead::t_null:
-          value_.reset();
-          break;
-
-        default:
-          return false;
-      };
+      bool ret = value_.from_var(*fd);
       parent()->on_change();
-      return true;
+      return ret;
     }
 
     bool blobvar::set_value(synqry::colhead * ch,synqry::field * fd)
     {
       if( !ch || !fd ) return false;
-      if( ch->type_ == synqry::colhead::t_null || fd->size_ == 0 || fd->blobval_ == 0 )
-      {
-        value_.reset();
-      }
-      else
-      {
-        value_.set(fd->blobval_,fd->size_);
-      }
+      bool ret = value_.from_var(*fd);
       parent()->on_change();
-      return true;
+      return ret;
     }
 
-    intvar::intvar(const char * name, obj & parent,const char * flags) : var(parent), value_(0)
+    intvar::intvar(const char * name, slt3::obj & parent,const char * flags) : slt3::var(parent)
     {
       sql::helper & h(parent.sql_helper());
       var::helper & v(parent.var_helper());
@@ -421,16 +325,15 @@ namespace csl
       v.add_field(name,*this);
     }
 
-    strvar::strvar(const char * name, obj & parent,const char * flags) : var(parent)
+    strvar::strvar(const char * name, slt3::obj & parent,const char * flags) : slt3::var(parent)
     {
-      value_.ensure_trailing_zero();
       sql::helper & h(parent.sql_helper());
       var::helper & v(parent.var_helper());
       h.add_field(name,"TEXT",flags);
       v.add_field(name,*this);
     }
 
-    doublevar::doublevar(const char * name, obj & parent,const char * flags) : var(parent), value_(0.0)
+    doublevar::doublevar(const char * name, slt3::obj & parent,const char * flags) : slt3::var(parent)
     {
       sql::helper & h(parent.sql_helper());
       var::helper & v(parent.var_helper());
@@ -438,7 +341,7 @@ namespace csl
       v.add_field(name,*this);
     }
 
-    blobvar::blobvar(const char * name, obj & parent,const char * flags) : var(parent)
+    blobvar::blobvar(const char * name, slt3::obj & parent,const char * flags) : slt3::var(parent)
     {
       sql::helper & h(parent.sql_helper());
       var::helper & v(parent.var_helper());
@@ -449,20 +352,20 @@ namespace csl
     /* operators */
     intvar & intvar::operator=(const intvar & other)
     {
-      value_ = other.value_;
+      value_.from_integer(other.value_);
       parent()->on_change();
       return *this;
     }
 
     intvar & intvar::operator=(long long v)
     {
-      value_ = v;
+      value_.from_integer(v);
       parent()->on_change();
       return *this;
     }
 
-    long long intvar::operator*() const { return value_; }
-    long long intvar::get() const { return value_; }
+    long long intvar::operator*() const { return value_.value(); }
+    long long intvar::get() const { return value_.value(); }
 
     strvar & strvar::operator=(const char * other)
     {
@@ -473,7 +376,7 @@ namespace csl
       }
       else
       {
-        value_ = other; //.assign( other,other+sz );
+        value_ = other;
       }
       parent()->on_change();
       return *this;
@@ -548,8 +451,8 @@ namespace csl
       return *this;
     }
 
-    double doublevar::operator*() const { return value_; }
-    double doublevar::get() const { return value_; }
+    double doublevar::operator*() const { return value_.value(); }
+    double doublevar::get() const { return value_.value(); }
 
     blobvar & blobvar::operator=(const blobvar & other)
     {
@@ -560,46 +463,50 @@ namespace csl
 
     blobvar & blobvar::operator=(const value_t & other)
     {
-      value_ = other;
+      //value_ = other;
+      value_.from_binary(other.data(),other.size());
       parent()->on_change();
       return *this;
     }
 
     blobvar & blobvar::operator=(const std::vector<unsigned char> & other)
     {
-      if( other.size() > 0 ) value_.set( &(other[0]), other.size());
-      else                   value_.reset();
+      if( other.size() > 0 ) { value_.from_binary( &(other[0]), other.size()); }
+      else                   { value_.reset(); }
       parent()->on_change();
       return *this;
     }
 
     blobvar & blobvar::operator=(const pbuf & other)
     {
-      value_ = other;
+      value_t b;
+      b = other;
+      //value_ = other;
+      value_.from_binary(b.data(),b.size());
       parent()->on_change();
       return *this;
     }
 
     blobvar & blobvar::operator=(const ustr & other)
     {
-      if( other.size() > 0 ) value_.set( (const unsigned char *)other.data(), other.nbytes() );
-      else                   value_.reset();
+      if( other.size() > 0 ) { value_.from_string(other); }
+      else                   { value_.reset(); }
       parent()->on_change();
       return *this;
     }
 
     blobvar & blobvar::operator=(const str & other)
     {
-      if( other.size() > 0 ) value_.set( (const unsigned char *)other.data(), other.nbytes() );
-      else                   value_.reset();
+      if( other.size() > 0 ) { value_.from_string(other); }
+      else                   { value_.reset(); }
       parent()->on_change();
       return *this;
     }
 
-    const blobvar::value_t & blobvar::operator*() const { return value_; }
-    const blobvar::value_t & blobvar::get() const  { return value_; }
+    const blobvar::value_t & blobvar::operator*() const { return value_.value(); }
+    const blobvar::value_t & blobvar::get() const       { return value_.value(); }
 
-    unsigned int blobvar::size() { return value_.size(); }
+    unsigned int blobvar::size() { return value_.value().size(); }
   };
 };
 

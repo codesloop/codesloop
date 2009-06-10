@@ -34,18 +34,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   @brief implementation of slt3::reg
  */
 
-#ifndef SLT3_REGISTRY_PATH1
-#define SLT3_REGISTRY_PATH1 "/var/db/csl/slt3/registry.db"
-#endif /*SLT3_REGISTRY_PATH1*/
-
-#ifndef SLT3_REGISTRY_PATH2
-#define SLT3_REGISTRY_PATH2 "/etc/csl/slt3/registry.db"
-#endif /*SLT3_REGISTRY_PATH2*/
-
-#ifndef SLT3_REGISTRY_PATH3
-#define SLT3_REGISTRY_PATH3 "./registry.db"
-#endif /*SLT3_REGISTRY_PATH3*/
-
 using csl::common::str;
 using csl::common::ustr;
 
@@ -206,9 +194,9 @@ namespace csl
 
         if( fd.size() > 0 )
         {
-          i.id_ = fd.get_at(0)->intval_;
-          i.name_ = pool.strdup(fd.get_at(1)->stringval_);
-          i.path_ = pool.strdup(fd.get_at(2)->stringval_);
+          fd.get_at(0)->to_integer(i.id_);
+          fd.get_at(1)->to_string(i.name_);
+          fd.get_at(2)->to_string(i.path_);
           return true;
         }
         else
@@ -243,7 +231,9 @@ namespace csl
 
         if( q.next(ch,fd) )
         {
-          return cn.open( fd.get_at(0)->stringval_ );
+          ustr s;
+          fd.get_at(0)->to_string(s);
+          return cn.open( s.c_str() );
         }
         return false;
       }
@@ -272,7 +262,9 @@ namespace csl
 
         while( q.next(ch,fd) )
         {
-          nms.push_back( pool.strdup(fd.get_at(0)->stringval_) );
+          ustr s;
+          fd.get_at(0)->to_string(s);
+          nms.push_back( pool.strdup(s.c_str()) );
           ret = true;
         }
 
@@ -304,9 +296,9 @@ namespace csl
         while( q.next(ch,fd) )
         {
           item * p = (item *)pool.allocate( sizeof(item) );
-          p->id_ = fd.get_at(0)->intval_;
-          p->name_ = pool.strdup(fd.get_at(1)->stringval_);
-          p->path_ = pool.strdup(fd.get_at(2)->stringval_);
+          fd.get_at(0)->to_integer(p->id_);
+          fd.get_at(1)->to_string(p->name_);
+          fd.get_at(2)->to_string(p->path_);
           itms.push_back( p );
           ret = true;
         }

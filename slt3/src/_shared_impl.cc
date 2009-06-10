@@ -25,12 +25,18 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "_shared_impl.hh"
 #include "common.h"
+#include "int64.hh"
+#include "dbl.hh"
+#include "binry.hh"
 #include "str.hh"
 #include "ustr.hh"
 #include <map>
 
 using csl::common::str;
 using csl::common::ustr;
+using csl::common::int64;
+using csl::common::dbl;
+using csl::common::binry;
 
 /**
   @file _shared_impl.cc
@@ -534,7 +540,7 @@ namespace csl
         for( ;it!=end;++it )
         {
           param * p = *it;
-          if( p && p->impl_->changed_ && which > 0 )
+          if( p && p->impl_->changed_ && which > 0 && p->impl_->v_ != 0 )
           {
             int t = p->get_type();
             switch( t )
@@ -548,11 +554,17 @@ namespace csl
                 break;
 
               case synqry::colhead::t_string:
-                sqlite3_bind_text( stmt_, which, p->get_string(), p->get_size(), SQLITE_TRANSIENT );
+                sqlite3_bind_text( stmt_, which,
+                                   ((ustr *)p->impl_->v_)->c_str(),
+                                     ((ustr *)p->impl_->v_)->size(),
+                                       SQLITE_TRANSIENT );
                 break;
 
               case synqry::colhead::t_blob:
-                sqlite3_bind_blob( stmt_, which, p->get_ptr(), p->get_size(), SQLITE_TRANSIENT );
+                sqlite3_bind_blob( stmt_, which,
+                                   ((binry *)p->impl_->v_)->value().data(),
+                                     ((binry *)p->impl_->v_)->value().size(),
+                                       SQLITE_TRANSIENT );
                 break;
 
               case synqry::colhead::t_null:
@@ -587,34 +599,30 @@ namespace csl
         unsigned int ac=0;
         for( ;it!=end;++it )
         {
-          synqry::field * f = new synqry::field();
+          synqry::field * f = 0;
           switch( (*it)->type_ )
           {
             case synqry::colhead::t_integer:
-              f->intval_   = sqlite3_column_int64(stmt_,ac);
-              f->size_     = sizeof(long long);
+              f = new common::int64(sqlite3_column_int64(stmt_,ac));
               break;
 
             case synqry::colhead::t_double:
-              f->doubleval_  = sqlite3_column_double(stmt_,ac);
-              f->size_       = sizeof(double);
+              f = new common::dbl(sqlite3_column_double(stmt_,ac));
               break;
 
             case synqry::colhead::t_blob:
-              f->blobval_ =
-                  (unsigned char *)data_pool_.memdup( sqlite3_column_blob(stmt_,ac),
-                                                      sqlite3_column_bytes(stmt_,ac) );
-              f->size_ = sqlite3_column_bytes(stmt_,ac);
+              f = new common::binry();
+              f->from_binary( sqlite3_column_blob(stmt_,ac), sqlite3_column_bytes(stmt_,ac) );
               break;
 
             case synqry::colhead::t_string:
-              f->stringval_  = data_pool_.strdup((const char *)sqlite3_column_text(stmt_,ac));
-              f->size_       = sqlite3_column_bytes(stmt_,ac);
+              f = new common::ustr((const char *)sqlite3_column_text(stmt_,ac));
               break;
 
             case synqry::colhead::t_null:
             default:
-              f->size_ = 0;
+              //f = new common::ustr();
+              f = 0;
               break;
           };
           field_pool_.push_back(f);
@@ -670,7 +678,7 @@ namespace csl
         for( ;it!=end;++it )
         {
           param * p = *it;
-          if( p && p->impl_->changed_ && which > 0 )
+          if( p && p->impl_->changed_ && which > 0 && p->impl_->v_ != 0 )
           {
             int t = p->get_type();
             switch( t )
@@ -684,11 +692,17 @@ namespace csl
                 break;
 
               case synqry::colhead::t_string:
-                sqlite3_bind_text( stmt_, which, p->get_string(), p->get_size(), SQLITE_TRANSIENT );
+                sqlite3_bind_text( stmt_, which,
+                                   ((ustr *)p->impl_->v_)->c_str(),
+                                     ((ustr *)p->impl_->v_)->size(),
+                                       SQLITE_TRANSIENT );
                 break;
 
               case synqry::colhead::t_blob:
-                sqlite3_bind_blob( stmt_, which, p->get_ptr(), p->get_size(), SQLITE_TRANSIENT );
+                sqlite3_bind_blob( stmt_, which,
+                                   ((binry *)p->impl_->v_)->value().data(),
+                                     ((binry *)p->impl_->v_)->value().size(),
+                                       SQLITE_TRANSIENT );
                 break;
 
               case synqry::colhead::t_null:
@@ -881,7 +895,7 @@ namespace csl
 
     /* param */
     param::impl::impl(synqry::impl & q)
-      : q_(&q), changed_(false), type_(synqry::colhead::t_null), size_(0), ptr_(0), use_exc_(q.use_exc_)
+      : q_(&q), changed_(false), v_(0), use_exc_(q.use_exc_)
       { }
 
     void param::impl::debug()
@@ -892,230 +906,183 @@ namespace csl
       m[synqry::colhead::t_double]  = "double";
       m[synqry::colhead::t_blob]    = "blob";
       m[synqry::colhead::t_null]    = "null";
-      if( ptr_ ) PRINTF(L"Param[%s]: %s\n",m[type_].c_str(),get_string());
-      else       PRINTF(L"Param[%s]: null\n",m[type_].c_str());
+
+      if( v_ )
+      {
+        ustr us;
+        v_->to_string(us);
+        PRINTF(L"Param[%s]: %s\n",m[v_->var_type()].c_str(),us.c_str());
+      }
+      else
+      {
+        PRINTF(L"Param[%s]: null\n",m[v_->var_type()].c_str());
+      }
     }
 
     param::impl::~impl() {}
 
     int param::impl::get_type() const
     {
-      return type_;
-    }
-// 
-    unsigned int param::impl::get_size() const
-    {
-      return size_;
-    }
-
-    void * param::impl::get_ptr() const
-    {
-      return ptr_;
+      return (v_ == 0 ? synqry::colhead::t_null : v_->var_type());
     }
 
     long long param::impl::get_long() const
     {
-      if( !ptr_ ) THR(exc::rs_nullparam,exc::cm_param,false);
+      if( !v_ ) THR(exc::rs_nullparam,exc::cm_param,false);
       //
-      switch( type_ )
-      {
-        case synqry::colhead::t_integer:  return *((long long *)ptr_);
-        case synqry::colhead::t_string:   return ATOLL((const char *)ptr_);
-        case synqry::colhead::t_double:   return (long long)(*((double *)ptr_));
-        case synqry::colhead::t_blob:     return (*((long long *)ptr_));
-        case synqry::colhead::t_null:
-        default:
-          break;
-      };
-      return 0;
+      long long ret = 0;
+      v_->to_integer(ret);
+      return ret;
     }
 
     double param::impl::get_double() const
     {
-      if( !ptr_ ) THR(exc::rs_nullparam,exc::cm_param,0.0);
+      if( !v_ ) THR(exc::rs_nullparam,exc::cm_param,0.0);
       //
       double ret = 0.0;
-
-      switch( type_ )
-      {
-        case synqry::colhead::t_integer:  ret = (double)(*((long long *)ptr_)); break;
-        case synqry::colhead::t_string:   ret = atof((const char *)ptr_); break;
-        case synqry::colhead::t_double:   ret = (*((double *)ptr_)); break;
-        case synqry::colhead::t_blob:     ret = (*((double *)ptr_)); break;
-        case synqry::colhead::t_null:
-        default:
-          break;
-      };
+      v_->to_double(ret);
       return ret;
-    }
-
-    const char * param::impl::get_string() const
-    {
-      if( !ptr_ ) THR(exc::rs_nullparam,exc::cm_param,"");
-      //
-      char tmp[200];
-      switch( type_ )
-      {
-        case synqry::colhead::t_integer:
-          SNPRINTF( tmp, 199,"%lld",(*((long long *)ptr_)) );
-          return q_->param_pool_.strdup(tmp);
-
-        case synqry::colhead::t_double:
-          SNPRINTF( tmp, 199,"%.10f", (*((double *)ptr_)) );
-          return q_->param_pool_.strdup(tmp);
-
-        case synqry::colhead::t_string:
-          return (char *)ptr_;
-
-        case synqry::colhead::t_blob:
-          return (char *)ptr_;
-
-        case synqry::colhead::t_null:
-        default:
-          break;
-      };
-      return "";
     }
 
     bool param::impl::get(long long & val) const
     {
-      if( !ptr_ ) THR(exc::rs_nullparam,exc::cm_param,false);
-      val = get_long();
-      return true;
+      if( !v_ ) THR(exc::rs_nullparam,exc::cm_param,false);
+      return v_->to_integer(val);
     }
 
     bool param::impl::get(double & val) const
     {
-      if( !ptr_ ) THR(exc::rs_nullparam,exc::cm_param,false);
-      val = get_double();
-      return true;
+      if( !v_ ) THR(exc::rs_nullparam,exc::cm_param,false);
+      return v_->to_double(val);
     }
 
     bool param::impl::get(str & val) const
     {
-      if( !ptr_ ) THR(exc::rs_nullparam,exc::cm_param,false);
-      val = get_string();
-      return true;
+      if( !v_ ) THR(exc::rs_nullparam,exc::cm_param,false);
+      return v_->to_string(val);
     }
 
     bool param::impl::get(ustr & val) const
     {
-      if( !ptr_ ) THR(exc::rs_nullparam,exc::cm_param,false);
-      val = get_string();
-      return true;
+      if( !v_ ) THR(exc::rs_nullparam,exc::cm_param,false);
+      return v_->to_string(val);
     }
 
     bool param::impl::get(blob_t & val) const
     {
-      if( !ptr_ ) THR(exc::rs_nullparam,exc::cm_param,false);
-      val.set( (unsigned char *)ptr_, size_ );
-      return true;
+      if( !v_ ) THR(exc::rs_nullparam,exc::cm_param,false);
+      return v_->to_binary(val);
     }
 
     void param::impl::set(long long val)
     {
-      ptr_      = q_->param_pool_.memdup(&val,sizeof(val));
-      size_     = sizeof(val);
-      type_     = synqry::colhead::t_integer;
+      if( !v_ || v_->var_type() != synqry::colhead::t_integer )
+      {
+        v_ = new int64(val);
+        q_->param_pool_.push_back(v_);
+      }
+      else
+      {
+        v_->from_integer(val);
+      }
       changed_  = true;
     }
 
     void param::impl::set(double val)
     {
-      ptr_      = q_->param_pool_.memdup(&val,sizeof(val));
-      size_     = sizeof(val);
-      type_     = synqry::colhead::t_double;
+      if( !v_ || v_->var_type() != synqry::colhead::t_double )
+      {
+        v_ = new dbl(val);
+        q_->param_pool_.push_back(v_);
+      }
+      else
+      {
+        v_->from_double(val);
+      }
       changed_  = true;
     }
 
     void param::impl::set(const str & val)
     {
-      if( val.size() > 0 )
+      if( !v_ || v_->var_type() != synqry::colhead::t_string )
       {
-        ptr_  = q_->param_pool_.wcsdup(val.c_str());
-        size_ = val.size();
+        v_ = new ustr(val);
+        q_->param_pool_.push_back(v_);
       }
       else
       {
-        ptr_  = q_->param_pool_.memdup(L"\0",sizeof(wchar_t));
-        size_ = 0;
+        v_->from_string(val);
       }
-      type_    = synqry::colhead::t_string;
       changed_ = true;
     }
 
     void param::impl::set(const ustr & val)
     {
-      if( val.size() > 0 )
+      if( !v_ || v_->var_type() != synqry::colhead::t_string )
       {
-        ptr_  = q_->param_pool_.strdup(val.c_str());
-        size_ = val.size();
+        v_ = new ustr(val);
+        q_->param_pool_.push_back(v_);
       }
       else
       {
-        ptr_  = q_->param_pool_.memdup("\0",1);
-        size_ = 0;
+        v_->from_string(val);
       }
-      type_    = synqry::colhead::t_string;
       changed_ = true;
     }
 
     void param::impl::set(const wchar_t * val)
     {
-      if( val )
+      if( !v_ || v_->var_type() != synqry::colhead::t_string )
       {
-        ptr_  = q_->param_pool_.wcsdup(val);
-        size_ = ::wcslen(val);
+        v_ = new ustr(val);
+        q_->param_pool_.push_back(v_);
       }
       else
       {
-        ptr_  = q_->param_pool_.memdup(L"\0",sizeof(wchar_t));
-        size_ = 0;
+        v_->from_string(val);
       }
-      type_    = synqry::colhead::t_string;
       changed_ = true;
     }
 
     void param::impl::set(const char * val)
     {
-      if( val )
+      if( !v_ || v_->var_type() != synqry::colhead::t_string )
       {
-        ptr_  = q_->param_pool_.strdup(val);
-        size_ = ::strlen(val);
+        v_ = new ustr(val);
+        q_->param_pool_.push_back(v_);
       }
       else
       {
-        ptr_  = q_->param_pool_.memdup("\0",1);
-        size_ = 0;
+        v_->from_string(val);
       }
-      type_    = synqry::colhead::t_string;
       changed_ = true;
     }
 
     void param::impl::set(const blob_t & val)
     {
-      if( val.size() > 0 )
+      if( !v_ || v_->var_type() != synqry::colhead::t_blob )
       {
-        ptr_ = q_->param_pool_.memdup(val.data(),val.size());
+        v_ = new binry(val);
+        q_->param_pool_.push_back(v_);
       }
-      size_    = val.size();
-      type_    = synqry::colhead::t_blob;
+      else
+      {
+        v_->from_binary(val);
+      }
       changed_ = true;
     }
 
     void param::impl::set(const unsigned char * ptr,unsigned int size)
     {
-      if( ptr > 0 && size > 0 )
+      if( !v_ || v_->var_type() != synqry::colhead::t_blob )
       {
-        ptr_  = q_->param_pool_.memdup(ptr,size);
-        size_ = size;
+        v_ = new binry(ptr,size);
+        q_->param_pool_.push_back(v_);
       }
       else
       {
-        ptr_  = 0;
-        size_ = 0;
+        v_->from_binary(ptr,size);
       }
-      type_    = synqry::colhead::t_blob;
       changed_ = true;
     }
   }

@@ -284,4 +284,33 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # define getpid()  0
 #endif /* WIN32 */
 
+/* types */
+#ifndef CSL_TYPE_UNKNOWN
+#define CSL_TYPE_UNKNOWN 0
+#endif /*CSL_TYPE_UNKNOWN*/
+
+#ifndef CSL_TYPE_NULL
+#define CSL_TYPE_NULL 0
+#endif /*CSL_TYPE_NULL*/
+
+#ifndef CSL_TYPE_INT64
+#define CSL_TYPE_INT64 1
+#endif /*CSL_TYPE_INT64*/
+
+#ifndef CSL_TYPE_DOUBLE
+#define CSL_TYPE_DOUBLE 2
+#endif /*CSL_TYPE_DOUBLE*/
+
+#ifndef CSL_TYPE_STR
+#define CSL_TYPE_STR 3
+#endif /*CSL_TYPE_STR*/
+
+#ifndef CSL_TYPE_USTR
+#define CSL_TYPE_USTR 4
+#endif /*CSL_TYPE_USTR*/
+
+#ifndef CSL_TYPE_BIN
+#define CSL_TYPE_BIN 5
+#endif /*CSL_TYPE_BIN*/
+
 #endif /* _csl_common_common_h_included_ */

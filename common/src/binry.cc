@@ -39,8 +39,12 @@ namespace csl
 {
   namespace common
   {
-    /** @todo implement */
     binry::binry() : var() { }
+
+    binry::binry(const unsigned char * ptr,size_t sz) : var()
+    {
+      if( ptr && sz ) value_.set( ptr,sz );
+    }
 
     /* conversions to other types */
     bool binry::to_integer(long long & v) const

@@ -91,9 +91,6 @@ namespace test_synqry {
   /** @test declare colhead */
   void test_colhead() { synqry::colhead ch; }
 
-  /** @test declare field */
-  void test_field()   { synqry::field   fd; }
-
   /** @test parameter handling */
   void test_param()
   {
@@ -124,24 +121,44 @@ namespace test_synqry {
 
     assert( pa1.get_long() == pb1.get_long() );
     assert( pa1.get_double() == pb1.get_double() );
-    assert( str(pa1.get_string()) == pb1.get_string() );
+
+    ustr lhs,rhs;
+    assert( pa1.get(lhs) == true );
+    assert( pb1.get(rhs) == true );
+    assert( lhs == rhs );
+
     assert( pb1.get_long() == 1ll );
     assert( pb1.get_double() == 1.0 );
-    assert( str(pb1.get_string()) == "1.0000000000" );
+
+    assert( pb1.get(lhs) == true );
+    assert( lhs == "1.000000000000" );
 
     assert( pa2.get_long() == pb2.get_long() );
     assert( pa2.get_double() == pb2.get_double() );
-    assert( str(pa2.get_string()) == pb2.get_string() );
+
+    assert( pa2.get(lhs) == true );
+    assert( pb2.get(rhs) == true );
+
+    assert( lhs == rhs );
     assert( pb2.get_long() == 10000ll );
     assert( pb2.get_double() == 10000.001 );
-    assert( str(pb2.get_string()) == "10000.001" );
+
+    assert( pb2.get(lhs) == true );
+    assert( lhs == "10000.001" );
 
     assert( pa3.get_long() == pb3.get_long() );
     assert( pa3.get_double() == pb3.get_double() );
-    assert( str(pa3.get_string()) == pb3.get_string() );
+
+    assert( pa3.get(lhs) == true );
+    assert( pb3.get(rhs) == true );
+
+    assert( lhs == rhs );
     assert( pb3.get_long() == 100ll );
     assert( pb3.get_double() == 100.0 );
-    assert( str(pb3.get_string()) == "100" );
+
+
+    assert( pb3.get(lhs) == true );
+    assert( lhs == "100" );
 
     q.clear_params();
     param & pc1(q.get_param(1));
@@ -235,8 +252,9 @@ namespace test_synqry {
         p.set("Hello");
         assert( q.next(ch,fd) == true );
         assert( q.reset() == true );
-        assert( str("Hello") == fd.get_at(0)->stringval_ );
-        assert( fd.get_at(0)->size_ == 5 );
+        ustr * s0 = (ustr *)fd.get_at(0);
+        assert( *s0 == "Hello" );
+        assert( s0->nchars() == 5 );
       }
 
       assert( q.execute("DROP TABLE stepw_ret_noaut;") == true );
@@ -273,8 +291,9 @@ namespace test_synqry {
         p.set("Hello");
         assert( q.next(ch,fd) == true );
         assert( q.reset() == true );
-        assert( str("Hello") == fd.get_at(0)->stringval_ );
-        assert( fd.get_at(0)->size_ == 5 );
+        ustr * s0 = (ustr *)fd.get_at(0);
+        assert( *s0 == "Hello" );
+        assert( s0->size() == 5 );
       }
 
       assert( q.execute("DROP TABLE stepw_ret_aut;") == true );
@@ -442,7 +461,6 @@ int main()
   UNLINK( "test.db" );
   csl_common_print_results( "baseline           ", csl_common_test_timer_v0(baseline),"" );
   csl_common_print_results( "test_colhead       ", csl_common_test_timer_v0(test_colhead),"" );
-  csl_common_print_results( "test_field         ", csl_common_test_timer_v0(test_field),"" );
   csl_common_print_results( "test_param         ", csl_common_test_timer_v0(test_param),"" );
   csl_common_print_results( "stepw_noret_noaut  ", csl_common_test_timer_v0(stepw_noret_noaut),"" );
   csl_common_print_results( "stepw_noret_aut    ", csl_common_test_timer_v0(stepw_noret_aut),"" );

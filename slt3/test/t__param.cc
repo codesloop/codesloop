@@ -78,6 +78,7 @@ namespace test_param {
     assert( tx == t );
   }
 
+#if 0
   /** @test convert between different datatypes */
   void test_conv()
   {
@@ -90,7 +91,7 @@ namespace test_param {
     // int to anything
     long long intval = 123456789ll;
     param::blob_t b;
-    b.set((unsigned char *)(&intval),sizeof(intval));
+    b.from_binary((unsigned char *)(&intval),sizeof(intval));
 
     test_conv( intval, (double)123456789.0, p );
     test_conv( intval, ustr("123456789"), p );
@@ -98,7 +99,7 @@ namespace test_param {
 
     // double to anything
     double dblval = 357987.12345;
-    b.set((unsigned char *)(&dblval),sizeof(dblval));
+    b.from_binary((unsigned char *)(&dblval),sizeof(dblval));
 
     test_conv( dblval, (long long)357987ll, p );
     test_conv( dblval, ustr("357987.1234500000"), p );
@@ -106,39 +107,40 @@ namespace test_param {
 
     // string to anything
     ustr strval("Hello world");
-    b.set( (unsigned char *)strval.data(), strval.size() );
+    b.from_binary( (unsigned char *)strval.data(), strval.size() );
 
     test_conv( strval, (long long)0ll, p );
     test_conv( strval, (double)0.0, p );
     test_conv( strval, b, p );
 
     strval = "12345678";
-    b.set( (unsigned char *)strval.data(), strval.size() );
+    b.from_binary( (unsigned char *)strval.data(), strval.size() );
 
     test_conv( strval, (long long)12345678ll, p );
     test_conv( strval, (double)12345678.0, p );
     test_conv( strval, b, p );
 
     strval = "12345678.12345678";
-    b.set( (unsigned char *)strval.data(), strval.size() );
+    b.from_binary( (unsigned char *)strval.data(), strval.size() );
 
     test_conv( strval, (long long)12345678ll, p );
     test_conv( strval, (double)12345678.12345678, p );
     test_conv( strval, b, p );
 
     // blob to anything (reasonable)
-    b.set( (unsigned char *)(&intval), sizeof(intval) );
+    b.from_binary( (unsigned char *)(&intval), sizeof(intval) );
 
     test_conv( b, intval, p );
 
-    b.set( (unsigned char *)(&dblval), sizeof(dblval) );
+    b.from_binary( (unsigned char *)(&dblval), sizeof(dblval) );
 
     test_conv( b, dblval, p );
 
-    b.set( (unsigned char *)strval.data(), strval.nbytes() );
+    b.from_binary( (unsigned char *)strval.data(), strval.nbytes() );
 
     test_conv( b, strval, p );
   }
+#endif
 
 } // end of test_param
 
@@ -147,7 +149,7 @@ using namespace test_param;
 int main()
 {
   csl_common_print_results( "baseline    ", csl_common_test_timer_v0(baseline),"" );
-  csl_common_print_results( "test_conv   ", csl_common_test_timer_v0(test_conv),"" );
+  //csl_common_print_results( "test_conv   ", csl_common_test_timer_v0(test_conv),"" );
   return 0;
 }
 

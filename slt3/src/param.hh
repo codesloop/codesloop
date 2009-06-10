@@ -59,7 +59,7 @@ namespace csl
     {
       public:
         /** @brief blob values may be passed as unsigned char vectors */
-        typedef common::tbuf<128> blob_t;
+        typedef common::binry blob_t;
 
         /** @brief returns the param type
             @return the type as in synqry::colhead
@@ -67,22 +67,11 @@ namespace csl
             types are set as a result of set() calls */
         int get_type() const;
 
-        /** @brief returns the size of the parameter
-            @return the parameter size in bytes */
-        unsigned int get_size() const;
-
-        /** @brief return a pointer to the underlying parameter data
-            @return a pointer to the underlying data */
-        void * get_ptr() const;
-
         /** @brief return the parameter value as a 64 bit long integer */
         long long get_long() const;
 
         /** @brief return the parameter value as a double precision value */
         double get_double() const;
-
-        /** @brief return the parameter value as a C string */
-        const char * get_string() const;
 
         /** @brief returns true if not set */
         bool is_empty();

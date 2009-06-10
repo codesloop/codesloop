@@ -60,6 +60,7 @@ namespace test_peer {
     {
       conn & db(p.db());
       tran t(db);
+      // init() was intentionally omitted from here
       assert( p.create(t) == false );
     }
     catch( csl::sched::exc e )
@@ -184,6 +185,9 @@ using namespace test_peer;
 
 int main()
 {
+  csl_common_print_results( "baseline           ", csl_common_test_timer_v0(baseline),"" );
+  csl_common_print_results( "usage1             ", csl_common_test_timer_v0(usage1),"" );
+
   {
     peer p;
     conn & db(p.db());
@@ -191,8 +195,6 @@ int main()
     p.init(t);
   }
 
-  csl_common_print_results( "baseline           ", csl_common_test_timer_v0(baseline),"" );
-  csl_common_print_results( "usage1             ", csl_common_test_timer_v0(usage1),"" );
   csl_common_print_results( "usage2             ", csl_common_test_timer_v0(usage2),"" );
   csl_common_print_results( "usage3             ", csl_common_test_timer_v0(usage3),"" );
   usage3_nodel();
@@ -206,6 +208,9 @@ int main()
     synqry q(t);
     q.execute("DELETE FROM peers;");
   }
+
+  UNLINK(SCHED_PEER_DB_DEFAULT_PATH);
+  UNLINK(SLT3_REGISTRY_PATH3);
 
   return 0;
 }

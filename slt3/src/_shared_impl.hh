@@ -124,7 +124,7 @@ namespace csl
       fieldpool_t      field_pool_;
       parampool_t      params_;
       common::mpool<>  coldata_pool_;
-      common::mpool<>  param_pool_;
+      fieldpool_t      param_pool_;
       common::mpool<>  data_pool_;
       sqlite3_stmt *   stmt_;
       const char *     tail_;
@@ -177,9 +177,7 @@ namespace csl
       /* variables */
       synqry::impl * q_;
       bool           changed_;
-      unsigned int   type_;
-      unsigned int   size_;
-      void *         ptr_;
+      common::var *  v_;
       bool           use_exc_;
 
       /* initialization */
@@ -189,11 +187,8 @@ namespace csl
       /* internal */
       /* interface */
       int get_type() const;
-      unsigned int get_size() const;
-      void * get_ptr() const;
       long long get_long() const;
       double get_double() const;
-      const char * get_string() const;
 
       bool get(long long & val) const;
       bool get(double & val) const;
@@ -216,7 +211,7 @@ namespace csl
       inline void use_exc(bool yesno) { use_exc_ = yesno; }
       inline bool use_exc() const     { return use_exc_;  }
 
-      inline bool is_empty() const { return ((!ptr_ || !size_) ? true : false); }
+      inline bool is_empty() const { return (v_==0); }
     };
   }
 }

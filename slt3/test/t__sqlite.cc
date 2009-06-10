@@ -35,6 +35,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tran.hh"
 #include "synqry.hh"
 #include "param.hh"
+#include "int64.hh"
+#include "dbl.hh"
+#include "binry.hh"
 #include "str.hh"
 #include <math.h>
 #include <assert.h>
@@ -42,6 +45,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace csl::slt3;
 using csl::common::str;
 using csl::common::ustr;
+using csl::common::int64;
+using csl::common::dbl;
+using csl::common::binry;
 
 /** @brief contains tests related to sqlite */
 namespace test_sqlite {
@@ -202,15 +208,10 @@ namespace test_sqlite {
       }
 
       {
-        assert( flds.get_at(0)->size_ == sizeof(long long) );
-        assert( flds.get_at(1)->size_ == sizeof(long long) );
-        assert( flds.get_at(2)->size_ == sizeof(long long) );
-        assert( flds.get_at(3)->size_ == sizeof(long long) );
-
-        assert( flds.get_at(0)->intval_ == 100ll+i );
-        assert( flds.get_at(1)->intval_ == 200ll+i );
-        assert( flds.get_at(2)->intval_ == 300ll+i );
-        assert( flds.get_at(3)->intval_ == 400ll+i );
+        assert( ((int64 *)flds.get_at(0))->value() == 100ll+i );
+        assert( ((int64 *)flds.get_at(1))->value() == 200ll+i );
+        assert( ((int64 *)flds.get_at(2))->value() == 300ll+i );
+        assert( ((int64 *)flds.get_at(3))->value() == 400ll+i );
       }
 
       assert( q.next(cols,flds) == false );
@@ -282,15 +283,10 @@ namespace test_sqlite {
       }
 
       {
-        assert( flds.get_at(0)->size_ == sizeof(double) );
-        assert( flds.get_at(1)->size_ == sizeof(double) );
-        assert( flds.get_at(2)->size_ == sizeof(double) );
-        assert( flds.get_at(3)->size_ == sizeof(double) );
-
-        assert( fabs(flds.get_at(0)->doubleval_ - (0.11+i)) < 0.00000000001 );
-        assert( fabs(flds.get_at(1)->doubleval_ - (0.12+i)) < 0.00000000001 );
-        assert( fabs(flds.get_at(2)->doubleval_ - (0.13+i)) < 0.00000000001 );
-        assert( fabs(flds.get_at(3)->doubleval_ - (0.14+i)) < 0.00000000001 );
+        assert( fabs(((dbl *)flds.get_at(0))->value() - (0.11+i)) < 0.00000000001 );
+        assert( fabs(((dbl *)flds.get_at(1))->value() - (0.12+i)) < 0.00000000001 );
+        assert( fabs(((dbl *)flds.get_at(2))->value() - (0.13+i)) < 0.00000000001 );
+        assert( fabs(((dbl *)flds.get_at(3))->value() - (0.14+i)) < 0.00000000001 );
       }
       assert( q.next(cols,flds) == false );
       assert( q.reset() );
@@ -342,14 +338,14 @@ namespace test_sqlite {
     }
 
     {
-      synqry::field * f0 = flds.get_at(0);
-      assert( f0->size_ == 4 );
+      ustr * f0 = (ustr *)flds.get_at(0);
+      assert( (f0)->nchars() == 4 );
 
-      synqry::field * f1 = flds.get_at(1);
-      assert( f1->size_ == 7 );
+      ustr * f1 = (ustr *)flds.get_at(1);
+      assert( (f1)->nchars() == 7 );
 
-      assert( str(f0->stringval_) == "'_.\"" );
-      assert( str(f1->stringval_) == "0123.'\"" );
+      assert( *f0 == "'_.\"" );
+      assert( *f1 == "0123.'\"" );
     }
 
     assert( q.next(cols,flds) == false );
@@ -408,11 +404,11 @@ namespace test_sqlite {
     }
 
     {
-      assert( flds.get_at(0)->size_ == sizeof(tx) );
-      assert( flds.get_at(1)->size_ == sizeof(qx) );
+      binry * f0 = (binry *)flds.get_at(0);
+      binry * f1 = (binry *)flds.get_at(1);
 
-      assert( memcmp(flds.get_at(0)->blobval_,tx,sizeof(tx)) == 0 );
-      assert( memcmp(flds.get_at(1)->blobval_,qx,sizeof(qx)) == 0 );
+      assert( memcmp(f0->value().data(),tx,sizeof(tx)) == 0 );
+      assert( memcmp(f1->value().data(),qx,sizeof(qx)) == 0 );
     }
 
     assert( q.next(cols,flds) == false );

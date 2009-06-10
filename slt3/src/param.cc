@@ -42,11 +42,8 @@ namespace csl
   {
     void param::debug() { impl_->debug(); }
     int param::get_type() const { return impl_->get_type(); }
-    unsigned int param::get_size() const { return impl_->get_size(); }
-    void * param::get_ptr() const { return impl_->get_ptr(); }
     long long param::get_long() const { return impl_->get_long(); }
     double param::get_double() const { return impl_->get_double(); }
-    const char * param::get_string() const { return impl_->get_string(); }
     bool param::is_empty() { return impl_->is_empty(); }
 
     bool param::get(long long & val) const { return impl_->get(val); }

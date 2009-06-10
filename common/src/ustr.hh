@@ -53,6 +53,8 @@ namespace csl
       public:
         enum { buf_size = 128, npos = 0xFFFFFFFF };
 
+        inline virtual int var_type() { return CSL_TYPE_USTR; }
+
         /** @brief constructor */
         inline ustr() : csl::common::var(), buf_((unsigned char)0) { }
 

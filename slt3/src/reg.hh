@@ -38,6 +38,18 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ustr.hh"
 #ifdef __cplusplus
 
+#ifndef SLT3_REGISTRY_PATH1
+#define SLT3_REGISTRY_PATH1 "/var/db/csl/slt3/registry.db"
+#endif /*SLT3_REGISTRY_PATH1*/
+
+#ifndef SLT3_REGISTRY_PATH2
+#define SLT3_REGISTRY_PATH2 "/etc/csl/slt3/registry.db"
+#endif /*SLT3_REGISTRY_PATH2*/
+
+#ifndef SLT3_REGISTRY_PATH3
+#define SLT3_REGISTRY_PATH3 "./registry.db"
+#endif /*SLT3_REGISTRY_PATH3*/
+
 namespace csl
 {
   namespace slt3
@@ -79,8 +91,8 @@ namespace csl
         struct item
         {
           long long       id_;
-          char *       name_;
-          char *       path_;
+          common::ustr    name_;
+          common::ustr    path_;
         };
 
         typedef common::pvlist< 64,char,common::nop_destructor<char> > strlist_t;

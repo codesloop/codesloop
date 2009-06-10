@@ -37,10 +37,14 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tbuf.hh"
 #include "pbuf.hh"
 #include "synqry.hh"
+#include "int64.hh"
+#include "dbl.hh"
+#include "binry.hh"
 #include "str.hh"
 #include "ustr.hh"
 #ifdef __cplusplus
 #include <vector>
+#include <memory>
 
 namespace csl
 {
@@ -59,6 +63,7 @@ namespace csl
       public:
         virtual void set_param(param & p) = 0;
         virtual bool set_value(synqry::colhead * ch,synqry::field * fd) = 0;
+        virtual common::var * get_value() = 0;
         virtual int type() = 0;
         virtual ~var() {}
 
@@ -101,7 +106,7 @@ namespace csl
       private:
         var() {}
         var(const var & other) {}
-        var & operator=(const var & other) { return *this; }
+        var & operator=(const slt3::var & other) { return *this; }
 
       protected:
         inline obj * parent() { return parent_; }
@@ -110,7 +115,7 @@ namespace csl
     };
 
     /** @todo document me */
-    class intvar : public var
+    class intvar : public slt3::var
     {
       public:
         enum { typ = synqry::colhead::t_integer };
@@ -119,19 +124,21 @@ namespace csl
 
         virtual void set_param(param & p);
         virtual bool set_value(synqry::colhead * ch,synqry::field * fd);
-        intvar(const char * name, obj & parent,const char * flags="");
+        intvar(const char * name, slt3::obj & parent,const char * flags="");
 
         virtual intvar & operator=(const intvar & other);
         virtual intvar & operator=(long long v);
         virtual long long operator*() const;
         virtual long long get() const;
 
+        common::var * get_value() { return &value_; }
+
       private:
-        long long value_;
+        common::int64 value_;
     };
 
     /** @todo document me */
-    class strvar : public var
+    class strvar : public slt3::var
     {
       public:
         enum { typ = synqry::colhead::t_string };
@@ -141,7 +148,7 @@ namespace csl
 
         virtual void set_param(param & p);
         virtual bool set_value(synqry::colhead * ch,synqry::field * fd);
-        strvar(const char * name, obj & parent,const char * flags="");
+        strvar(const char * name, slt3::obj & parent,const char * flags="");
 
         virtual strvar & operator=(const strvar & other);
         virtual strvar & operator=(const char * other);
@@ -152,12 +159,14 @@ namespace csl
         virtual const value_t & get() const;
         virtual const char * c_str();
 
+        common::var * get_value() { return &value_; }
+
       private:
-        value_t value_;
+        common::ustr value_;
     };
 
     /** @todo document me */
-    class doublevar : public var
+    class doublevar : public slt3::var
     {
       public:
         enum { typ = synqry::colhead::t_double };
@@ -167,29 +176,31 @@ namespace csl
 
         virtual void set_param(param & p);
         virtual bool set_value(synqry::colhead * ch,synqry::field * fd);
-        doublevar(const char * name, obj & parent,const char * flags="");
+        doublevar(const char * name, slt3::obj & parent,const char * flags="");
 
         virtual doublevar & operator=(const doublevar & other);
         virtual doublevar & operator=(value_t other);
         virtual double operator*() const;
         virtual double get() const;
 
+        common::var * get_value() { return &value_; }
+
       private:
-        value_t value_;
+        common::dbl value_;
     };
 
     /** @todo document me */
-    class blobvar : public var
+    class blobvar : public slt3::var
     {
       public:
         enum { typ = synqry::colhead::t_blob };
-        typedef common::tbuf<128> value_t;
+        typedef common::binry::buf_t value_t;
 
         virtual inline int type() { return typ; }
 
         virtual void set_param(param & p);
         virtual bool set_value(synqry::colhead * ch,synqry::field * fd);
-        blobvar(const char * name, obj & parent,const char * flags="");
+        blobvar(const char * name, slt3::obj & parent,const char * flags="");
 
         virtual blobvar & operator=(const blobvar & other);
         virtual blobvar & operator=(const value_t & other);
@@ -201,8 +212,10 @@ namespace csl
         virtual const value_t & get() const;
         virtual unsigned int size();
 
+        common::var * get_value() { return &value_; }
+
       private:
-        value_t value_;
+        common::binry value_;
     };
   }
 }

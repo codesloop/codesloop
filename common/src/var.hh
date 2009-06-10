@@ -62,6 +62,10 @@ namespace csl
 
         virtual inline ~var() {}
 
+        inline virtual int var_type() { return CSL_TYPE_UNKNOWN; }
+
+        virtual void reset() = 0;
+
         /* conversions to other types */
         virtual bool to_integer(int64 & v) const = 0;
         virtual bool to_integer(long long & v) const = 0;

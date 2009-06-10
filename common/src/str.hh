@@ -55,6 +55,8 @@ namespace csl
       public:
         enum { buf_size = 128 * sizeof(wchar_t), npos = 0xFFFFFFFF };
 
+        inline virtual int var_type() { return CSL_TYPE_STR; }
+
         /** @brief constructor */
         inline str() : csl::common::var(), buf_((wchar_t)L'\0') { }
 

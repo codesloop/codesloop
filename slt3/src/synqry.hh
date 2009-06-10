@@ -29,6 +29,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pvlist.hh"
 #include "str.hh"
 #include "ustr.hh"
+#include "common.h"
 #ifdef __cplusplus
 #include <memory>
 
@@ -84,11 +85,11 @@ namespace csl
         struct colhead
         {
           enum {
-            t_null,      ///<Null column
-            t_integer,   ///<64 bit integer column
-            t_double,    ///<standard 8 byte double precision column
-            t_string,    ///<string column
-            t_blob       ///<blob column
+            t_null    = CSL_TYPE_NULL,      ///<Null column
+            t_integer = CSL_TYPE_INT64,     ///<64 bit integer column
+            t_double  = CSL_TYPE_DOUBLE,    ///<standard 8 byte double precision column
+            t_string  = CSL_TYPE_USTR,      ///<string column
+            t_blob    = CSL_TYPE_BIN        ///<blob column
           };
           //
           int    type_;    ///<the column type: t_null,t_integer,t_double,t_string or t_blob
@@ -108,18 +109,11 @@ namespace csl
         typedef common::pvlist< 32,colhead,common::nop_destructor<colhead> > columns_t;
 
         /** @brief field is used to return the field data
+         *
+         *  the underlying memory is managed by the synqry object
+        ***/
 
-            the underlying memory is managed by the synqry object */
-        struct field
-        {
-          union {
-            long long         intval_;    ///<the 64 bit integer value
-            double            doubleval_; ///<the 8 byte double precision value
-            char *            stringval_; ///<the string value
-            unsigned char *   blobval_;   ///<pointer to the blob data
-          };
-          unsigned int size_; ///<the size of the returned value
-        };
+        typedef common::var field;
 
         /** @brief used as a pointer vector to the returned fields
 
