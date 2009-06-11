@@ -28,6 +28,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common.h"
 #include "str.hh"
 #include "ustr.hh"
+#include "int64.hh"
 
 /**
   @file slt3/src/reg.cc
@@ -36,6 +37,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using csl::common::str;
 using csl::common::ustr;
+using csl::common::int64;
 
 namespace csl
 {
@@ -64,11 +66,11 @@ namespace csl
       reg::item i;
 
       /* lookup path */
-      if( path_.size() != 0 ) { return path_.c_str(); }
-      else if( r.get(name(),i,p) == false )
+      if( path_ != 0 ) { return path_; }
+      else if( r.get(name(),i,pool_) == false )
       {
-        i.name_ = p.strdup(name_.c_str());
-        i.path_ = p.strdup(default_path_.c_str());
+        i.name_ = p.strdup(name_);
+        i.path_ = p.strdup(default_path_);
 
         /* should be able to register the peer db */
         if( r.set(i) == false )
@@ -77,12 +79,12 @@ namespace csl
 
           THRR( slt3::exc::rs_cannot_reg, slt3::exc::cm_reg, nm.c_str(), NULL );
         }
-        return default_path_.c_str();
+        return default_path_;
       }
       else
       {
-        if( path_.size() == 0 ) { path_ = i.path_; }
-        return path_.c_str();
+        if( path_ == 0 ) { path_ = i.path_; }
+        return path_;
       }
     }
 
@@ -194,9 +196,9 @@ namespace csl
 
         if( fd.size() > 0 )
         {
-          fd.get_at(0)->to_integer(i.id_);
-          fd.get_at(1)->to_string(i.name_);
-          fd.get_at(2)->to_string(i.path_);
+          i.id_   = ((int64 *)fd.get_at(0))->value();
+          i.name_ = pool.strdup( ((ustr *)fd.get_at(1))->c_str() );
+          i.path_ = pool.strdup( ((ustr *)fd.get_at(2))->c_str() );
           return true;
         }
         else
@@ -296,9 +298,9 @@ namespace csl
         while( q.next(ch,fd) )
         {
           item * p = (item *)pool.allocate( sizeof(item) );
-          fd.get_at(0)->to_integer(p->id_);
-          fd.get_at(1)->to_string(p->name_);
-          fd.get_at(2)->to_string(p->path_);
+          p->id_   = ((int64 *)fd.get_at(0))->value();
+          p->name_ = pool.strdup( ((ustr *)fd.get_at(1))->c_str() );
+          p->path_ = pool.strdup( ((ustr *)fd.get_at(2))->c_str() );
           itms.push_back( p );
           ret = true;
         }

@@ -128,7 +128,7 @@ namespace csl
         ** ------------------------------------------------------------------------ */
 
         /** @brief copy constructor */
-        str(const ustr & other);
+        explicit str(const ustr & other);
 
         /** @brief copy operator */
         str & operator=(const ustr & other);
@@ -136,15 +136,29 @@ namespace csl
         /** @brief append operator */
         str& operator+=(const ustr&);
 
+        /** @brief is equal operator */
+        inline bool operator==(const ustr & s) const
+        {
+          str rhs(s);
+          return (*this == rhs);
+        }
+
         /* ------------------------------------------------------------------------ *
         **    char * operations
         ** ------------------------------------------------------------------------ */
 
         /** @brief copy constructor */
-        str(const char *);
+        explicit str(const char *);
 
         /** @brief copy operator */
         str& operator=(const char *);
+
+        /** @brief is equal operator */
+        inline bool operator==(const char * s) const
+        {
+          str rhs(s);
+          return (*this == rhs);
+        }
 
         /* ------------------------------------------------------------------------ *
         **    wchar_t * operations

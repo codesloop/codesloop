@@ -62,12 +62,14 @@ namespace csl
         static reg & instance(const char * path);
         static reg & instance(const common::ustr & path);
 
+        typedef common::mpool<> pool_t;
+
         class helper
         {
           public:
             helper(const char * default_db_name, const char * default_db_path);
 
-            const char * name() { return name_.c_str(); }
+            const char * name() { return name_; }
             const char * path();
             conn & db();
 
@@ -81,23 +83,23 @@ namespace csl
             helper(const helper & other) {}
             helper & operator=(const helper & other) { return *this; }
 
-            common::ustr  name_;
-            common::ustr  default_path_;
-            common::ustr  path_;
-            conn          conn_;
-            bool          use_exc_;
+            const char *   name_;
+            const char *   default_path_;
+            const char *   path_;
+            conn           conn_;
+            bool           use_exc_;
+            pool_t         pool_;
         };
 
         struct item
         {
           long long       id_;
-          common::ustr    name_;
-          common::ustr    path_;
+          char *          name_;
+          char *          path_;
         };
 
         typedef common::pvlist< 64,char,common::nop_destructor<char> > strlist_t;
         typedef common::pvlist< 64,item,common::nop_destructor<item> > itemlist_t;
-        typedef common::mpool<> pool_t;
 
         bool get( const char * name, conn & c );
         bool get( const common::ustr & name, conn & c );
@@ -110,8 +112,9 @@ namespace csl
         bool dbs( itemlist_t & itms, pool_t & pool );
 
         /* inline functions */
-        const common::ustr & path() const { return path_; }
-        void path(const common::ustr & p) { path_ = p; }
+        const char * path() const           { return path_.c_str(); }
+        void path(const char * p)           { path_ = p; }
+        void path(const common::ustr & p)   { path_ = p; }
 
         inline void use_exc(bool yesno) { use_exc_ = yesno; }
         inline bool use_exc() const     { return use_exc_; }

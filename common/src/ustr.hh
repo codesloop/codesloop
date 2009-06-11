@@ -82,13 +82,20 @@ namespace csl
         ** ------------------------------------------------------------------------ */
 
         /** @brief copy constructor */
-        ustr(const str & other);
+        explicit ustr(const str & other);
 
         /** @brief copy operator */
         ustr & operator=(const str & other);
 
         /** @brief append operator */
         ustr& operator+=(const str&);
+
+        /** @brief is equal operator */
+        inline bool operator==(const str& s) const
+        {
+          ustr rhs(s);
+          return (*this == rhs);
+        }
 
         /* ------------------------------------------------------------------------ *
         **    ustr operations
@@ -139,7 +146,7 @@ namespace csl
         ** ------------------------------------------------------------------------ */
 
         /** @brief copy constructor */
-        inline ustr(const char * us) : csl::common::var(), buf_((unsigned char)0)
+        inline explicit ustr(const char * us) : csl::common::var(), buf_((unsigned char)0)
         {
           if( !us ) return;
           // strlen only cares about trailing zero, so multibyte chars will not confuse here
@@ -153,6 +160,18 @@ namespace csl
           // strlen only cares about trailing zero, so multibyte chars will not confuse here
           buf_.set((const unsigned char *)us,::strlen(us)+1);
           return *this;
+        }
+
+        /** @brief append operator with two parameters */
+        inline friend ustr operator+(const char * lhs, const ustr& rhs)
+        {
+          return ustr(lhs) += rhs;
+        }
+
+        /** @brief append operator with two parameters */
+        inline friend ustr operator+(const ustr& lhs, const char * rhs)
+        {
+          return ustr(lhs) += rhs;
         }
 
         /** @brief append operator */

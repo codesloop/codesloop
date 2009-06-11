@@ -64,6 +64,8 @@ namespace csl
 
       /* internal */
       unsigned long long new_tran_id();
+      static exc create_exc(int rc,int component, const char * str);
+      static exc create_exc(int rc,int component, const wchar_t * str);
       static exc create_exc(int rc,int component, const common::str & str);
       bool exec_noret(const char * sql);
       bool exec(const char * sql,common::ustr & res);

@@ -138,6 +138,7 @@ namespace csl
         inline void x(const bignum & v)              { x_ = v; }        ///<sets x
         inline void y(const bignum & v)              { y_ = v; }        ///<sets y
         inline void algname(const common::ustr & v)  { algname_ = v; }  ///<sets algname
+        inline void algname(const char * v)          { algname_ = v; }  ///<sets algname
 
         inline bignum & x()              { return x_; }         ///<gets x
         inline bignum & y()              { return y_; }         ///<gets y

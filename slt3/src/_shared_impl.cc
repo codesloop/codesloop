@@ -167,6 +167,16 @@ namespace csl
       }
     }
 
+    exc conn::impl::create_exc(int rc,int component, const char * s)
+    {
+      return create_exc(rc,component,str(s));
+    }
+
+    exc conn::impl::create_exc(int rc,int component, const wchar_t * s)
+    {
+      return create_exc(rc,component,str(s));
+    }
+
     exc conn::impl::create_exc(int rc,int component, const str & s)
     {
       exc e(exc::cm_conn);

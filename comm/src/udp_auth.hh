@@ -250,10 +250,12 @@ namespace csl
           /* login */
           inline const ustr & login() const { return login_; }
           inline void login(const ustr & l) { login_ = l; }
+          inline void login(const char * l) { login_ = l; }
 
           /* pass */
           inline const ustr & pass() const  { return pass_;  }
           inline void pass(const ustr & p)  { pass_ = p; }
+          inline void pass(const char * p)  { pass_ = p; }
 
           /* debug ? */
           inline void debug(bool yesno) { debug_ = yesno; }

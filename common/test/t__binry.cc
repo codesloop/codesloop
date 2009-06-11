@@ -250,6 +250,12 @@ using namespace test_binry;
 
 int main()
 {
+  if (!setlocale(LC_CTYPE, ""))
+  {
+    fprintf(stderr, "Can't set the specified locale! Check LANG, LC_CTYPE, LC_ALL.\n");
+    exit(-1);
+  }
+
   csl_common_print_results( "baseline         ", csl_common_test_timer_v0(baseline),"" );
 
   /* conversions */
