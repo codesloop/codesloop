@@ -89,6 +89,8 @@ namespace csl
         @brief appends the string pointed by str to the internal buffers
         @param str is the string
         @return true if successful
+
+        please note that the trailing zero is also appended
          */
         bool append(const char * str)
         {
@@ -101,6 +103,8 @@ namespace csl
         @brief appends the string pointed by str to the internal buffers
         @param str is the string
         @return true if successful
+
+        please note that the trailing zero is also appended
          */
         bool append(const wchar_t * str)
         {
@@ -109,10 +113,31 @@ namespace csl
           return append((unsigned char *)str,(l+1)*sizeof(wchar_t));
         }
 
+        /**
+        @brief appends a string to the buffer
+        @param str is the string to be appended
+
+        please note that the trailing zero is also appended
+         */
         pbuf & operator<<(const char * str) { append(str); return *this; }
 
+        /**
+        @brief appends a wide character string to the buffer
+        @param str is the string to be appended
+
+        please note that the trailing zero is also appended
+         */
         pbuf & operator<<(const wchar_t * str) { append(str); return *this; }
 
+        /**
+        @brief copy to template
+        @param t is the destination where to copy the pbuf data
+        @param max_size may give an upper limit of the allocated space
+
+        this templated function may be used to copy the pbuf content to the
+        templated parameter t. t must have an allocate() function that returns
+        a pointer to the allocated buffer.
+         */
         template <typename T> bool t_copy_to(T & t,unsigned int max_size=0)
         {
           if( !max_size ) max_size = size();
@@ -143,17 +168,17 @@ namespace csl
         typedef bufpool_t::iterator iterator;                      ///<iterator over the buffer pool
         typedef bufpool_t::const_iterator const_iterator;          ///<constant iterator over the buffer pool
 
-        inline iterator begin() { return bufpool_.begin(); }
-        inline iterator end()   { return bufpool_.end();   }
-        inline iterator last()  { return bufpool_.last();  }
+        inline iterator begin() { return bufpool_.begin(); }  ///<iterator to the first page
+        inline iterator end()   { return bufpool_.end();   }  ///<iterator after the last page
+        inline iterator last()  { return bufpool_.last();  }  ///<iterator to the last page
 
-        inline const_iterator begin() const { return bufpool_.begin(); }
-        inline const_iterator end() const   { return bufpool_.end();   }
-        inline const_iterator last() const  { return bufpool_.last();  }
+        inline const_iterator begin() const { return bufpool_.begin(); } ///<constant iterator to the first page
+        inline const_iterator end() const   { return bufpool_.end();   } ///<constant iterator after the last page
+        inline const_iterator last() const  { return bufpool_.last();  } ///<constant iterator to the last page
 
-        inline const_iterator const_begin() const { return bufpool_.const_begin(); }
-        inline const_iterator const_end() const   { return bufpool_.const_end();   }
-        inline const_iterator const_last() const  { return bufpool_.const_last();  }
+        inline const_iterator const_begin() const { return bufpool_.const_begin(); } ///<constant iterator to the first page
+        inline const_iterator const_end() const   { return bufpool_.const_end();   } ///<constant iterator after the last page
+        inline const_iterator const_last() const  { return bufpool_.const_last();  } ///<constant iterator to the last page
 
         /** @brief free all allocated data */
         inline void free_all()
