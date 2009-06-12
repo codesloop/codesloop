@@ -118,20 +118,20 @@ namespace csl
         bool to_double(double & v) const;
 
         /**
-        @brief convert to str
+        @brief convert to common::str
         @param v is where to put the data
         @return true if successful
 
-        this function delegates the conversion to str class
+        this function delegates the conversion to common::str class
          */
         bool to_string(str & v) const;
 
         /**
-        @brief convert to ustr
+        @brief convert to common::ustr
         @param v is where to put the data
         @return true if successful
 
-        this function delegates the conversion to ustr class
+        this function delegates the conversion to common::ustr class
          */
         bool to_string(ustr & v) const;
 

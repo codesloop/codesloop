@@ -32,7 +32,6 @@ Credits: some techniques and code pieces are stolen from Christian
 /**
    @file ustr.hh
    @brief simple but efficient utf-8 based string class
-   @todo document me
  */
 
 #include "common.h"
@@ -47,23 +46,32 @@ namespace csl
 {
   namespace common
   {
-    /** @todo document me */
+    /**
+    @brief UTF-8 ready C-String class
+
+    this class is part of the common::var family and implements all neccesary abstract
+    functions that are mainly related to conversions to and from other variable classes.
+
+    strings are stored as a sequence of 1-byte characters. the class ensures that a trailing
+    zero character is always present for traditional C-String compatibility.
+
+    other functions, such as comparison and copy operators, copy constructors are present
+     */
     class ustr : public csl::common::var
     {
       public:
-        enum { buf_size = 128, npos = 0xFFFFFFFF };
+        enum {
+          buf_size = 128,     ///<amount of preallocated memory in bytes
+          npos = 0xFFFFFFFF   ///<constant for find: not found
+        };
 
-        inline virtual int var_type() { return CSL_TYPE_USTR; }
+        inline virtual int var_type() { return CSL_TYPE_USTR; } ///<value type helps distinguish from other var types
 
         /** @brief constructor */
         inline ustr() : csl::common::var(), buf_((unsigned char)0) { }
 
-        /** @brief destructor
-         *  since there are not virtual functions, and we do not expect inherited
-         *  classes from ustr the destructor is not virtual. this casues a bit
-         *  faster initalization, because no vptr table is required, i guess
-         **/
-        ~ustr() {}
+        /** @brief destructor */
+        virtual ~ustr() {}
 
         /* ------------------------------------------------------------------------ *
         **    pbuf operations
@@ -117,7 +125,13 @@ namespace csl
         /** @brief append operator */
         ustr& operator+=(const ustr&);
 
-        /** @brief append operator with two parameters */
+        /**
+        @brief append operator with two parameters
+        @param lhs is the left-hand-side of add
+        @param rhs is the right-hand-side of add
+
+        adds lhs+rhs and returns a fresh new result string
+         */
         inline friend ustr operator+(const ustr& lhs, const ustr& rhs)
         {
           return ustr(lhs) += rhs;
@@ -129,16 +143,18 @@ namespace csl
           return (::strncmp( data(), s.data(), nbytes()) == 0);
         }
 
-        /** @brief find a string
-         *  @param s is the string to be found
-         *  @returns npos if not found or the position
-         **/
+        /**
+        @brief find a substring of string
+        @param s is the substring to be found
+        @returns npos if not found or the position
+         */
         size_t find(const ustr & s) const;
 
-        /** @brief substr
-         *  @param start start from this position
-         *  @param length take length bytes from origin str
-         **/
+        /**
+        @brief extracts a substring from a given position
+        @param start start from this position
+        @param length is the amount to be extracted
+         */
         ustr substr(const size_t start, const size_t length) const;
 
         /* ------------------------------------------------------------------------ *
@@ -153,7 +169,7 @@ namespace csl
           buf_.set((const unsigned char *)us,::strlen(us)+1);
         }
 
-        /** @brief let equal operator */
+        /** @brief copy operator */
         inline ustr& operator=(const char * us)
         {
           if( !us ) return *this;
@@ -162,13 +178,25 @@ namespace csl
           return *this;
         }
 
-        /** @brief append operator with two parameters */
+        /**
+        @brief append operator with two parameters
+        @param lhs is the left-hand-side of add
+        @param rhs is the right-hand-side of add
+
+        adds lhs+rhs and returns a fresh new result string
+         */
         inline friend ustr operator+(const char * lhs, const ustr& rhs)
         {
           return ustr(lhs) += rhs;
         }
 
-        /** @brief append operator with two parameters */
+        /**
+        @brief append operator with two parameters
+        @param lhs is the left-hand-side of add
+        @param rhs is the right-hand-side of add
+
+        adds lhs+rhs and returns a fresh new result string
+         */
         inline friend ustr operator+(const ustr& lhs, const char * rhs)
         {
           return ustr(lhs) += rhs;
@@ -189,20 +217,22 @@ namespace csl
           return( data() );
         }
 
-        /** @brief assign string
-         *  @param start is the start of the string
-         *  @param lend is the end of the string
-         **/
+        /**
+        @brief assign string
+        @param start is the start of the string
+        @param lend is the end of the string
+         */
         inline ustr & assign(const char * start, const char * end)
         {
           buf_.set( (unsigned char *)start, end-start);
           return *this;
         }
 
-        /** @brief find a wide character in the string
-         *  @param s is the string to be found
-         *  @returns npos if not found or the position
-         **/
+        /**
+        @brief find a wide character in the string
+        @param s is the string to be found
+        @returns npos if not found or the position
+         */
         size_t find(const char * s) const;
 
         /** @brief get data as char * */
@@ -238,16 +268,18 @@ namespace csl
         /** @brief check access to buffer */
         char at(const size_t n) const;
 
-        /** @brief find a wide character in the string
-         *  @param w is the character to be found
-         *  @returns npos if not found or the position
-         **/
+        /**
+        @brief find a wide character in the string
+        @param w is the character to be found
+        @returns npos if not found or the position
+         */
         size_t find(char w) const;
 
-        /** @brief reverse find a wide character in the string
-         *  @param w is the character to be found
-         *  @returns npos if not found or the position
-         **/
+        /**
+        @brief reverse find a wide character in the string
+        @param w is the character to be found
+        @returns npos if not found or the position
+         */
         size_t rfind(char w) const;
 
         /* ------------------------------------------------------------------------ *
@@ -289,22 +321,34 @@ namespace csl
           return (empty() ? 0 : ::mbstowcs(NULL,data(),0));
         }
 
-        /** @brief true if empty ustr ("") is defined */
+        /**
+        @brief checks if string has data
+        @return true if the string is empty
+        */
         inline bool empty() const
         {
           return !buf_.has_data();
         }
 
+        /** @brief returns the internal buffer that stores the string */
         inline const tbuf<buf_size> & buffer() const
         {
           return buf_;
         }
 
+        /** @brief returns the internal buffer that stores the string */
         inline tbuf<buf_size> & buffer()
         {
           return buf_;
         }
 
+        /**
+        @brief ensures that the string has a trailing zero
+
+        this is mainly called internally. member functions use this, but users are free
+        to call as well. member functions are expected to make sure that a trailing zero
+        exists so it makes little sense for users, to call this function.
+         */
         void ensure_trailing_zero();
 
         /* ------------------------------------------------------------------------ *
@@ -312,42 +356,265 @@ namespace csl
         ** ------------------------------------------------------------------------ */
 
         /* conversions to other types */
+
+        /**
+        @brief convert to common::int64
+        @param v is where to put the data
+        @return true if successful
+
+        this function delegates the conversion to common::int64 class
+         */
         inline bool to_integer(int64 & v) const { return v.from_string(data()); }
+
+        /**
+        @brief convert to long long
+        @param v is where to put the data
+        @return true if successful
+
+        The function assumes that the internal string contains a max 64 bit integer in a string form.
+         */
         bool to_integer(long long & v) const;
 
+        /**
+        @brief convert to common::dbl
+        @param v is where to put the data
+        @return true if successful
+
+        this function delegates the conversion to common::dbl class
+         */
         inline bool to_double(dbl & v) const { return v.from_string(data()); }
+
+        /**
+        @brief convert to double
+        @param v is where to put the data
+        @return true if successful
+
+        The function assumes that the internal string contains a floating point value in a string form.
+         */
         bool to_double(double & v) const;
 
+        /**
+        @brief convert to common::str
+        @param v is where to put the data
+        @return true if successful
+
+        this function delegates the conversion to common::str class
+         */
         inline bool to_string(str & v) const { return v.from_string(data()); }
+
+        /**
+        @brief convert to common::ustr
+        @param v is where to put the data
+        @return true if successful
+
+        this function delegates the conversion to common::ustr class
+         */
         inline bool to_string(ustr & v) const { return v.from_string(data()); }
+
+        /**
+        @brief convert to std::string
+        @param v is where to put the data
+        @return true if successful
+
+        This function treats the internal data as a (char) string. This representation
+        is then copied to v byte-by-byte. This function checks wether the string is terminated
+        by 0. If so, that character is not copied.
+         */
         bool to_string(std::string & v) const;
 
+        /**
+        @brief convert to common::binry
+        @param v is where to put the data
+        @return true if successful
+
+        this function delegates the conversion to the other common::binry instance (this class)
+         */
         inline bool to_binary(binry & v) const { return v.from_binary(buf_.data(),buf_.size()); }
+
+        /**
+        @brief convert to ptr,size
+        @param v points to a memory region where to store the data
+        @param sz will contain the number of bytes copied
+        @return true if successful
+
+        this function assumes that v has enough space. sz will be updated to indicate, how
+        many bytes were stored. this function will place the trailing zero as well. to check
+        how much space is needed use the nbytes() function.
+         */
         bool to_binary(unsigned char * v, size_t & sz) const;
+
+        /**
+        @brief convert to ptr,size
+        @param v points to a memory region where to store the data
+        @param sz will contain the number of bytes copied
+        @return true if successful
+
+        this function assumes that v has enough space. sz will be updated to indicate, how
+        many bytes were stored. this function will place the trailing zero as well. to check
+        how much space is needed use the nbytes() function.
+         */
         bool to_binary(void * v, size_t & sz) const;
 
+        /**
+        @brief stores the content of this instance to an XDR stream
+        @param b is the XDR stream to be used
+        @return true if successful
+
+        note that usual XDR conversion will apply as any buffer to be stored in an XDR stream.
+        that is a 32bit integer is stored first that tells how many bytes will follow.
+        then the buffer content is stored. and finally 1-3 optional padding bytes may follow
+        depending on the buffer size. XDR values are always stored in a multiple of 4 chunks.
+        the first 32bit integer value will not include the padding.
+
+        traling zero character will not be placed into the XDR stream.
+         */
         bool to_xdr(xdrbuf & b) const;
+
+        /**
+        @brief polymorphic call to store the data into common::var type
+        @param v is where to place the data
+        @return true if successful
+
+        this function delegates the conversion to v
+         */
         inline bool to_var(var & v) const { return v.from_string(data()); }
 
         /* conversions from other types */
+        /**
+        @brief convert an common::int64
+        @param v is the value to be read in
+        @return true if successful
+
+        this function delegates the conversion task to the common::int64 class
+         */
         inline bool from_integer(const int64 & v) { return v.to_string(*this); }
+
+        /**
+        @brief convert a long long
+        @param v is the value to be stored
+        @return true if successful
+
+        the result of this conversion is a formatted character string. conversion
+        specification used is: "%lld"
+         */
         bool from_integer(long long v);
 
+        /**
+        @brief convert a common::dbl
+        @param v is the value to be read in
+
+        this function delegates the conversion task to the common::dbl class
+         */
         inline bool from_double(const dbl & v) { return v.to_string(*this); }
+
+        /**
+        @brief convert a double
+        @param v is the value to be stored
+        @return true if successful
+
+        the result of this conversion is a formatted character string. conversion
+        specification used is: "%.12f"
+         */
         bool from_double(double v);
 
+        /**
+        @brief convert a common::str
+        @param v is the value to be read in
+        @return true if successful
+
+        this function uses the internal copy operator for conversion
+         */
         inline bool from_string(const str & v)         { *this = v; return true; }
+
+        /**
+        @brief convert a common::ustr
+        @param v is the value to be read in
+        @return true if successful
+
+        this function uses the internal copy operator
+         */
         inline bool from_string(const ustr & v)        { *this = v; return true; }
 
+        /**
+        @brief convert a std::string
+        @param v is the value to be read in
+        @return true if successful
+
+        this function uses the internal copy operator for conversion
+         */
         bool from_string(const std::string & v);
+
+        /**
+        @brief convert a char* string
+        @param v is the value to be read in
+        @return true if successful
+
+        this function uses the internal copy operator for conversion
+         */
         bool from_string(const char * v);
+
+        /**
+        @brief convert a wchar_t* string
+        @param v is the value to be read in
+        @return true if successful
+
+        this function uses the internal copy operator for conversion
+         */
         bool from_string(const wchar_t * v);
 
+        /**
+        @brief convert a common::binry
+        @param v is the value to be read in
+        @return true if successful
+
+        this function delegates the conversion task to the common::binry class
+         */
         inline bool from_binary(const binry & v) { return v.to_string(*this); }
+
+        /**
+        @brief convert a memory region
+        @param v is the pointer to the start of the memory region
+        @param sz is the number of bytes to be read
+        @return true if successful
+
+        the given memory region will be copied in. this function assumes that the memory
+        region contains a char* string. after copying it ensures that the string will
+        contain a trailing zero.
+         */
         bool from_binary(const unsigned char * v,size_t sz);
+
+        /**
+        @brief convert a memory region
+        @param v is the pointer to the start of the memory region
+        @param sz is the number of bytes to be read
+        @return true if successful
+
+        the given memory region will be copied in. this function assumes that the memory
+        region contains a char* string. after copying it ensures that the string will
+        contain a trailing zero.
+         */
         bool from_binary(const void * v,size_t sz);
 
+        /**
+        @brief read the content of this instance from an XDR stream
+        @param b is the XDR stream to be used
+        @return true if successful
+
+        note that usual XDR conversion will apply as any buffer to be stored in an XDR stream.
+        that is a 32bit integer is stored first that tells how many bytes will follow.
+        then the buffer content is stored. and finally 1-3 optional padding bytes may follow
+        depending on the buffer size. XDR values are always stored in a multiple of 4 chunks.
+        the first 32bit integer value will not include the padding.
+         */
         bool from_xdr(xdrbuf & v);
+
+        /**
+        @brief polymorphic call to let v store its value in this buffer
+        @param v is where to read the data from
+        @return true if successful
+
+        this function delegates the conversion to v
+         */
         bool from_var(const var & v) { return v.to_string(*this); }
 
       private:
