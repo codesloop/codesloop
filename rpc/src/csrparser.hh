@@ -32,15 +32,31 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "iface.hh"
 
 namespace csl 
-{ 
+{
+  /** @brief remote procedure call related classes
+   * 
+   * "rpc" namespace is responsible for codesloop
+   * remote procedure call implementation, like
+   * stub generation, serialization and transport 
+   * management, etc. 
+   */
   namespace rpc 
   {
-  
+ 
+    /** @brief codesloop rpc interface parser */
     class csrparser : public csl::common::obj
     {
     public:
+      /** @brief default constructor */
       csrparser();
-      int parse(char * start, char * end);  
+
+      /** @brief parse input 
+       *
+       * @param start pointer to char * data to parse
+       * @param end pointer of "eof"
+       * @return 0 on success, otherwise 1
+       */
+      int parse(char * start, char * end); 
   
     private:
       void reset();

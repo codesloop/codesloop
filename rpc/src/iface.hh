@@ -37,47 +37,50 @@ namespace csl
 { 
   namespace rpc 
   {
-    struct param {
-      std::string type;
-      std::string name;
-      param_kind kind;
-      bool is_array;
-      bool array_length;
-    };
-
-    struct func {
-      std::string name;
-      bool disposable;
-      std::vector<param> params;
-    };
-
+    /** @brief stores parsed interface description */
     class iface : public csl::common::obj
     {
       public:
-        void set_name(const token_info &);
-        void set_version(const token_info &);
-        void set_namespc(const token_info &);
+        void set_name(const token_info &);    ///< sets interface name
+        void set_version(const token_info &); ///< sets version string
+        void set_namespc(const token_info &); ///< sets namespace 
 
-        void add_function(const token_info &);
-        void set_param_type(const token_info &);
-        void set_param_name(const token_info &);
-        void set_arry_len(int);
+        void add_function(const token_info &);   ///< adds one function 
+        void set_param_type(const token_info &); ///< adds a parameter type 
+        void set_param_name(const token_info &); ///< adds a parameter name
+        void set_arry_len(int);                  ///< sets parameter's array attribute
 
-        void add_include(const token_info &);
+        /** @brief adds an include statement from interface file */
+        void add_include(const token_info &);   
 
+        /** @brief dump iface content (for debug) */
         std::string to_string() const;
 
-      protected:
+      private:
         std::string name_;
         std::string version_;
         std::string namespc_;
 
-        std::vector<func> functions_;
-        std::vector<std::string> includes_;
-
-      private:
         std::string token_to_string(const token_info & ) const;
         std::string param_type_;
+    
+        struct param {
+          std::string type;
+          std::string name;
+          param_kind kind;
+          bool is_array;
+          bool array_length;
+        };
+
+        struct func {
+          std::string name;
+          bool disposable;
+          std::vector<param> params;
+        };
+
+
+        std::vector<func> functions_;
+        std::vector<std::string> includes_;
     };
 
 
