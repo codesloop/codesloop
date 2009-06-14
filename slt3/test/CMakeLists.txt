@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009, David Beck
+# Copyright (c) 2008,2009, David Beck, Tamas Foldi
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -21,18 +21,42 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-LINK_DIRECTORIES( ../src
+LINK_DIRECTORIES(
+                  ../src
                   ../../nthread/src
-                  ../../common/src )
-INCLUDE_DIRECTORIES( ../src
+                  ../../common/src
+                )
+
+INCLUDE_DIRECTORIES(
+                     ../src
                      ../../nthread/src
-                     ../../common/src )
+                     ../../common/src
+                   )
 
 IF(WIN32)
-  LINK_LIBRARIES( csl_slt3
-                  csl_nthread
-                  csl_common )
+
+  IF(MSYS)
+
+    LINK_LIBRARIES(
+                    csl_slt3
+                    csl_nthread
+                    csl_common
+                    wsock32
+                  )
+
+  ELSE(MSYS)
+
+    LINK_LIBRARIES(
+                    csl_slt3
+                    csl_nthread
+                    csl_common
+                    wsock32
+                  )
+
+  ENDIF(MSYS)
+
 ELSE(WIN32)
+
   find_library(DLOPEN_FOUND NAMES dl PATH /usr/lib /lib /usr/local/lib)
   set(LIBDL)
 

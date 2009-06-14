@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009, David Beck
+# Copyright (c) 2008,2009, David Beck, Tamas Foldi
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -25,42 +25,82 @@
 
 IF(WIN32)
 
-  LINK_LIBRARIES(
-      csl_sched
-      csl_slt3
-      csl_sec
-      csl_nthread
-      csl_common
-      ssleay32MT
-      libeay32MT
-      zlib
-      wsock32 )
+  IF(MSYS)
 
-  INCLUDE_DIRECTORIES(
-      ../src
-      ../../common/src
-      ../../nthread/src
-      ../../sec/src
-      ../../slt3/src
-      $ENV{OPENSSL_DEV_ENV}/include
-      ../../../3rdparty/OpenSSL/include
-      $ENV{ZLIB_DEV_ENV}/include
-      "C:/Program Files/GnuWin32/include/"
-      ../../../3rdparty/zlib/GnuWin32/include
-      $ENV{AFS_DEV_ENV}/include )
+    LINK_LIBRARIES(
+                    csl_sched
+                    csl_slt3
+                    csl_sec
+                    csl_nthread
+                    csl_common
+                    eay32
+                    z
+                    wsock32
+                  )
 
-  LINK_DIRECTORIES(
-      ../src
-      ../../common/src
-      ../../nthread/src
-      ../../sec/src
-      ../../slt3/src
-      $ENV{OPENSSL_DEV_ENV}/lib/VC/static
-      ../../../3rdparty/OpenSSL/lib/VC/static
-      $ENV{ZLIB_DEV_ENV}/lib
-      "C:/Program Files/GnuWin32/lib/"
-      ../../../3rdparty/zlib/GnuWin32/lib
-      $ENV{AFS_DEV_ENV}/lib )
+    INCLUDE_DIRECTORIES(
+                         ../src
+                         ../../common/src
+                         ../../nthread/src
+                         ../../sec/src
+                         ../../slt3/src
+                         c:/OpenSSL/include
+                         $ENV{OPENSSL_DEV_ENV}/include
+                         ../../../3rdparty/OpenSSL/include
+                       )
+
+    LINK_DIRECTORIES(
+                      ../src
+                      ../../common/src
+                      ../../nthread/src
+                      ../../sec/src
+                      ../../slt3/src
+                      c:/OpenSSL/lib/MinGW
+                      $ENV{OPENSSL_DEV_ENV}/lib/MinGW
+                      ../../../3rdparty/OpenSSL/lib/MinGW
+                    )
+
+  ELSE(MSYS)
+  
+    LINK_LIBRARIES(
+                    csl_sched
+                    csl_slt3
+                    csl_sec
+                    csl_nthread
+                    csl_common
+                    ssleay32MT
+                    libeay32MT
+                    zlib
+                    wsock32
+                  )
+
+    INCLUDE_DIRECTORIES(
+                         ../src
+                         ../../common/src
+                         ../../nthread/src
+                         ../../sec/src
+                         ../../slt3/src
+                         $ENV{OPENSSL_DEV_ENV}/include
+                         ../../../3rdparty/OpenSSL/include
+                         $ENV{ZLIB_DEV_ENV}/include
+                         "C:/Program Files/GnuWin32/include/"
+                         ../../../3rdparty/zlib/GnuWin32/include
+                       )
+
+    LINK_DIRECTORIES(
+                      ../src
+                      ../../common/src
+                      ../../nthread/src
+                      ../../sec/src
+                      ../../slt3/src
+                      $ENV{OPENSSL_DEV_ENV}/lib/VC/static
+                      ../../../3rdparty/OpenSSL/lib/VC/static
+                      $ENV{ZLIB_DEV_ENV}/lib
+                      "C:/Program Files/GnuWin32/lib/"
+                      ../../../3rdparty/zlib/GnuWin32/lib
+                    )
+
+  ENDIF(MSYS)  
 
 ELSE(WIN32)
 
@@ -75,32 +115,35 @@ ELSE(WIN32)
   ADD_DEFINITIONS( -Wall -g3 -pthread )
 
   INCLUDE_DIRECTORIES(
-      ../src
-      ../../common/src
-      ../../nthread/src
-      ../../sec/src
-      ../../slt3/src
-      /usr/local/ssl/include )
+                       ../src
+                       ../../common/src
+                       ../../nthread/src
+                       ../../sec/src
+                       ../../slt3/src
+                       /usr/local/ssl/include
+                     )
 
   LINK_LIBRARIES(
-      csl_sched
-      csl_slt3
-      csl_sec
-      csl_nthread
-      csl_common
-      ssl
-      crypto
-      z
-      stdc++
-      pthread
-      ${LIBDL} )
+                  csl_sched
+                  csl_slt3
+                  csl_sec
+                  csl_nthread
+                  csl_common
+                  ssl
+                  crypto
+                  z
+                  stdc++
+                  pthread
+                  ${LIBDL}
+                )
 
   LINK_DIRECTORIES(
-      ../src
-      ../../common/src
-      ../../sec/src
-      ../../slt3/src
-       /usr/local/ssl/lib )
+                    ../src
+                    ../../common/src
+                    ../../sec/src
+                    ../../slt3/src
+                    /usr/local/ssl/lib
+                  )
 
 ENDIF(WIN32)
 

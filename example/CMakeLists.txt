@@ -22,6 +22,13 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IF(WIN32)
+
+  IF(MSYS)
+    set(ZLIB z)
+  ELSE(MSYS)
+    set(ZLIB zlib)
+  ENDIF(MSYS)
+
   LINK_DIRECTORIES(
                   ../common/src
                   ../sec/src
@@ -47,7 +54,8 @@ IF(WIN32)
                   csl_slt3
                   csl_nthread
                   csl_common
-                  zlib
+                  ${ZLIB}
+                  wsock32
                   )
 ELSE(WIN32)
 

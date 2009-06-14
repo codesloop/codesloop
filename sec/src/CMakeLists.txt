@@ -32,6 +32,7 @@ IF(WIN32)
 
   INCLUDE_DIRECTORIES( ../../common/src
                        $ENV{OPENSSL_DEV_ENV}/include
+                       c:/OpenSSL/include
                        ../../../3rdparty/OpenSSL/include
                        $ENV{ZLIB_DEV_ENV}/include
                        ../../../3rdparty/zlib/GnuWin32/include
@@ -39,6 +40,7 @@ IF(WIN32)
 
   LINK_DIRECTORIES( ../../common/src
                     $ENV{OPENSSL_DEV_ENV}/lib/VC/static
+                    c:/OpenSSL/lib/VC/static
                     $ENV{ZLIB_DEV_ENV}/lib
                   )
 

@@ -25,31 +25,61 @@
 
 IF(WIN32)
 
-  LINK_LIBRARIES( csl_sec
-                  csl_common
-                  ssleay32MT
-                  libeay32MT
-                  zlib
-                  wsock32
-                )
+  IF(MSYS)
+  
+    LINK_LIBRARIES(
+                    csl_sec
+                    csl_common
+                    eay32
+                    z
+                    wsock32
+                  )
 
-  INCLUDE_DIRECTORIES( ../src
-                       ../../common/src 
-                       $ENV{OPENSSL_DEV_ENV}/include
-                       ../../../3rdparty/OpenSSL/include
-                       $ENV{ZLIB_DEV_ENV}/include
-                       ../../../3rdparty/zlib/GnuWin32/include
-                       $ENV{AFS_DEV_ENV}/include
-                     )
+    INCLUDE_DIRECTORIES(
+                         ../src
+                         ../../common/src 
+                         c:/OpenSSL/include
+                         $ENV{OPENSSL_DEV_ENV}/include
+                         ../../../3rdparty/OpenSSL/include
+                       )
 
-  LINK_DIRECTORIES( ../src
-                    ../../common/src
-                    $ENV{OPENSSL_DEV_ENV}/lib/VC/static
-                    ../../../3rdparty/OpenSSL/lib/VC/static
-                    $ENV{ZLIB_DEV_ENV}/lib
-                    ../../../3rdparty/zlib/GnuWin32/lib
-                    $ENV{AFS_DEV_ENV}/lib
-                    )
+    LINK_DIRECTORIES( ../src
+                      ../../common/src
+                      c:/OpenSSL/lib/MinGW
+                      $ENV{OPENSSL_DEV_ENV}/lib/MinGW
+                      ../../../3rdparty/OpenSSL/lib/MinGW
+                      )
+
+  ELSE(MSYS)
+
+    LINK_LIBRARIES(
+                    csl_sec
+                    csl_common
+                    ssleay32MT
+                    libeay32MT
+                    zlib
+                    wsock32
+                  )
+
+    INCLUDE_DIRECTORIES(
+                         ../src
+                         ../../common/src 
+                         c:/OpenSSL/include
+                         $ENV{OPENSSL_DEV_ENV}/include
+                         ../../../3rdparty/OpenSSL/include
+                         $ENV{ZLIB_DEV_ENV}/include
+                         ../../../3rdparty/zlib/GnuWin32/include
+                       )
+
+    LINK_DIRECTORIES( ../src
+                      ../../common/src
+                      c:/OpenSSL/lib/VC/static
+                      $ENV{OPENSSL_DEV_ENV}/lib/VC/static
+                      ../../../3rdparty/OpenSSL/lib/VC/static
+                      $ENV{ZLIB_DEV_ENV}/lib
+                      ../../../3rdparty/zlib/GnuWin32/lib
+                      )
+  ENDIF(MSYS)
 
 ELSE(WIN32)
 

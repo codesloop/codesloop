@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009, David Beck
+# Copyright (c) 2008,2009, David Beck, Tamas Foldi
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -23,35 +23,70 @@
 
 IF(WIN32)
 
-  LINK_DIRECTORIES( ../src
-                    ../../nthread/src
-                    ../../sec/src
-                    ../../common/src
-                    $ENV{OPENSSL_DEV_ENV}/lib/VC/static
-                    ../../../3rdparty/OpenSSL/lib/VC/static
-                    $ENV{ZLIB_DEV_ENV}/lib
-                    ../../../3rdparty/zlib/GnuWin32/lib
+  IF(MSYS)
+  
+    LINK_LIBRARIES(
+                    csl_comm
+                    csl_sec
+                    csl_nthread
+                    csl_common
+                    eay32
+                    z
+                    wsock32
                   )
 
-  INCLUDE_DIRECTORIES( ../src
-                       ../../nthread/src
-                       ../../sec/src
-                       ../../common/src
-                       $ENV{OPENSSL_DEV_ENV}/include
-                       ../../../3rdparty/OpenSSL/include
-                       $ENV{ZLIB_DEV_ENV}/include
-                       ../../../3rdparty/zlib/GnuWin32/include
-                     )
+    INCLUDE_DIRECTORIES(
+                         ../src
+                         ../../nthread/src
+                         ../../sec/src
+                         ../../common/src 
+                         c:/OpenSSL/include
+                         $ENV{OPENSSL_DEV_ENV}/include
+                         ../../../3rdparty/OpenSSL/include
+                       )
 
-  LINK_LIBRARIES( csl_comm
-                  csl_sec
-                  csl_nthread
-                  csl_common
-                  ssleay32MT
-                  libeay32MT
-                  zlib
-                  wsock32
-                )
+    LINK_DIRECTORIES(
+                      ../src
+                      ../../nthread/src
+                      ../../sec/src
+                      ../../common/src
+                      c:/OpenSSL/lib/MinGW
+                      $ENV{OPENSSL_DEV_ENV}/lib/MinGW
+                      ../../../3rdparty/OpenSSL/lib/MinGW
+                      )
+
+  ELSE(MSYS)
+
+    LINK_LIBRARIES(
+                    csl_comm
+                    csl_sec
+                    csl_nthread
+                    csl_common
+                    ssleay32MT
+                    libeay32MT
+                    zlib
+                    wsock32
+                  )
+
+    INCLUDE_DIRECTORIES(
+                         ../src
+                         ../../common/src 
+                         c:/OpenSSL/include
+                         $ENV{OPENSSL_DEV_ENV}/include
+                         ../../../3rdparty/OpenSSL/include
+                         $ENV{ZLIB_DEV_ENV}/include
+                         ../../../3rdparty/zlib/GnuWin32/include
+                       )
+
+    LINK_DIRECTORIES( ../src
+                      ../../common/src
+                      c:/OpenSSL/lib/VC/static
+                      $ENV{OPENSSL_DEV_ENV}/lib/VC/static
+                      ../../../3rdparty/OpenSSL/lib/VC/static
+                      $ENV{ZLIB_DEV_ENV}/lib
+                      ../../../3rdparty/zlib/GnuWin32/lib
+                      )
+  ENDIF(MSYS)
 
 ELSE(WIN32)
 

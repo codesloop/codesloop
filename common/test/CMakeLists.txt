@@ -22,6 +22,13 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IF(WIN32)
+
+  IF(MSYS)
+    set(ZLIB z)
+  ELSE(MSYS)
+    set(ZLIB zlib)
+  ENDIF(MSYS)
+
   LINK_DIRECTORIES(
                     ../src
                     "C:/Program Files/GnuWin32/lib/"
@@ -35,9 +42,10 @@ IF(WIN32)
                        $ENV{ZLIB_DEV_ENV}/include
                        ../../../3rdparty/zlib/GnuWin32/include
                      )
+
   LINK_LIBRARIES(
                   csl_common
-                  zlib
+                  ${ZLIB}
                   wsock32
                 )
 

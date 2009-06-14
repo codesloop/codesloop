@@ -45,8 +45,8 @@ namespace csl
       {
         throw comm::exc( comm::exc::rs_wsa_startup,
                          comm::exc::cm_wsa,
-                         "",
-                         __FILE__,
+                         L"",
+                         L""__FILE__,
                          __LINE__ );
       }
 #endif

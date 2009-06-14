@@ -1,4 +1,4 @@
-# Copyright (c) 2008, David Beck
+# Copyright (c) 2008, David Beck, Tamas Foldi
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -23,19 +23,39 @@
 
 IF(WIN32)
 
-  LINK_LIBRARIES( csl_nthread
-                  csl_common
-                  zlib )
+  IF(MSYS)
 
-  INCLUDE_DIRECTORIES( ../src
-                       ../../common/src
-                       $ENV{ZLIB_DEV_ENV}/include
-                       ../../../3rdparty/zlib/GnuWin32/include )
+    LINK_LIBRARIES(
+                    csl_nthread
+                    csl_common
+                    z
+                    wsock32
+                  )
 
-  LINK_DIRECTORIES( ../src
+  ELSE(MSYS)
+
+    LINK_LIBRARIES(
+                    csl_nthread
+                    csl_common
+                    zlib
+                    wsock32
+                  )
+
+  ENDIF(MSYS)
+
+  INCLUDE_DIRECTORIES(
+                        ../src
+                        ../../common/src
+                        $ENV{ZLIB_DEV_ENV}/include
+                        ../../../3rdparty/zlib/GnuWin32/include
+                      )
+
+  LINK_DIRECTORIES(
+                    ../src
                     ../../common/src
                     $ENV{ZLIB_DEV_ENV}/lib
-                    ../../../3rdparty/zlib/GnuWin32/lib )
+                    ../../../3rdparty/zlib/GnuWin32/lib
+                  )
 
 ELSE(WIN32)
 

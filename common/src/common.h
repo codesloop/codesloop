@@ -71,7 +71,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #  define SNPRINTF _snprintf
 # endif /*SNPRINTF*/
 # ifndef SWPRINTF
-#  define SWPRINTF swprintf
+#  ifdef __MINGW32__
+/* brain dead mingw does not support buffer size ... */
+#   define SWPRINTF(BUF,SZ,FMT,...) swprintf(BUF,FMT,__VA_ARGS__)
+#  else /*!__MINGW32__ && SWPRINTF && WIN32 */
+#   define SWPRINTF swprintf
+#  endif /*__MINGW32__ && SWPRINTF && WIN32 */
 # endif /*SWPRINTF*/
 # ifndef FPRINTF
 #  define FPRINTF fwprintf
@@ -217,13 +222,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #  include <unistd.h>
 # endif /*CSL_UNISTD_H_INCLUDED*/
 # ifndef CSL_SYS_SOCKET_H_INCLUDED
-# define CSL_SYS_SOCKET_H_INCLUDED
-#include <sys/socket.h>
+#  define CSL_SYS_SOCKET_H_INCLUDED
+#  include <sys/socket.h>
 # endif /*CSL_SYS_SOCKET_H_INCLUDED*/
 # ifndef CSL_SYS_TIME_H_INCLUDED
-# define CSL_SYS_TIME_H_INCLUDED
-#include <sys/time.h>
-#endif /*CSL_SYS_TIME_H_INCLUDED*/
+#  define CSL_SYS_TIME_H_INCLUDED
+#  include <sys/time.h>
+# endif /*CSL_SYS_TIME_H_INCLUDED*/
 # ifndef SleepSeconds
 #  define SleepSeconds(A) ::sleep(A)
 # endif /*SleepSeconds*/
@@ -234,6 +239,20 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #  define ShutdownCloseSocket(S) { ::shutdown(S,2); ::close(S); }
 # endif /*SleepMiliseconds*/
 #else
+# ifdef __MINGW32__
+#  ifndef CSL_UNISTD_H_INCLUDED
+#   define CSL_UNISTD_H_INCLUDED
+#   include <unistd.h>
+#  endif /*CSL_UNISTD_H_INCLUDED*/
+#  ifndef CSL_SYS_TIME_H_INCLUDED
+#   define CSL_SYS_TIME_H_INCLUDED
+#   include <sys/time.h>
+#  endif /*CSL_SYS_TIME_H_INCLUDED*/
+#  ifndef CSL_TIME_H_INCLUDED
+#   define CSL_TIME_H_INCLUDED
+#   include <time.h>
+#  endif /*CSL_TIME_H_INCLUDED*/
+# endif /*__MINGW32__*/
 # ifndef ShutdownCloseSocket
 #  define ShutdownCloseSocket(S) { ::shutdown(S,2); ::closesocket(S); }
 # endif /*SleepMiliseconds*/
@@ -265,6 +284,16 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # endif /*CSL_SOCKLEN_T_DEFINED*/
 #endif /* WIN32 */
 
+#ifndef CSL_STDIO_H_INCLUDED
+# define CSL_STDIO_H_INCLUDED
+# include <stdio.h>
+#endif /*CSL_STDIO_H_INCLUDED*/
+
+#ifndef CSL_STDLIB_H_INCLUDED
+# define CSL_STDLIB_H_INCLUDED
+# include <stdlib.h>
+#endif /*CSL_STDLIB_H_INCLUDED*/
+
 #ifndef CSL_STRING_H_INCLUDED
 # define CSL_STRING_H_INCLUDED
 # include <string.h>
@@ -281,7 +310,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif /*CSL_WCHAR_H_INCLUDED*/
 
 #ifdef WIN32
-# define getpid()  0
+# ifndef __MINGW32__
+#  define getpid()  0
+# endif
 #endif /* WIN32 */
 
 /* types */
