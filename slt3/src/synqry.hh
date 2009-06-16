@@ -36,6 +36,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
    @file synqry.hh
    @brief Represents a SQLite3 query object
+   
+   @todo rewrite to use common::var instead of slt3::param
  */
 
 namespace csl
