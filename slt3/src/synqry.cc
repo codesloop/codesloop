@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -23,7 +23,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "param.hh"
 #include "synqry.hh"
 #include "_shared_impl.hh"
 #include "str.hh"
@@ -54,7 +53,7 @@ namespace csl
     long long synqry::last_insert_id() { return impl_->last_insert_id(); }
     long long synqry::change_count() { return impl_->change_count(); }
     void synqry::debug() { impl_->debug(); }
-    param & synqry::get_param(unsigned int pos) { return impl_->get_param(pos); }
+    common::var & synqry::get_param(unsigned int pos) { return impl_->get_param(pos); }
     void synqry::clear_params() { impl_->clear_params(); }
     bool synqry::prepare(const char * sql) { return impl_->prepare(sql); }
     bool synqry::reset()  { return impl_->reset(); }

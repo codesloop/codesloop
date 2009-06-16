@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -105,22 +105,26 @@ namespace csl
           void debug();
         };
 
-        /** @brief used as a pointer vector to column data
+        /**
+        @brief used as a pointer vector to column data
 
-            the underlying memory is managed by the synqry object */
+        the underlying memory is managed by the synqry object
+         */
         typedef common::pvlist< 32,colhead,common::nop_destructor<colhead> > columns_t;
 
-        /** @brief field is used to return the field data
-         *
-         *  the underlying memory is managed by the synqry object
-        ***/
-
+        /**
+        @brief field is used to return the field data
+        
+        the underlying memory is managed by the synqry object
+         */
         typedef common::var field;
 
-        /** @brief used as a pointer vector to the returned fields
+        /**
+        @brief used as a pointer vector to the returned fields
 
-           the underlying memory is managed by the synqry object 
-           see reset_data() for more information */
+        the underlying memory is managed by the synqry object 
+        see reset_data() for more information 
+         */
         typedef common::pvlist< 32,field,common::nop_destructor<field> > fields_t;
 
         /** @brief returns a reference to the given parameter
@@ -135,7 +139,7 @@ namespace csl
             to change its value
 
             param references are indexed by number and the first index starts at 1 */
-        param & get_param(unsigned int pos);
+        common::var & get_param(unsigned int pos); /* TODO XXX */
 
         /** @brief clears all allocated parameter data */
         void clear_params();
