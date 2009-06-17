@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -23,27 +23,22 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "common.h"
 #include "pvlist.hh"
 #include "mpool.hh"
-#include "mutex.hh"
-#include "thread.hh"
 #include "conn.hh"
 #include "tran.hh"
-#include "synqry.hh"
-#include "param.hh"
+#include "query.hh"
 #include "exc.hh"
 #include "sqlite3.h"
 #include "mpool.hh"
 #include "str.hh"
 #include "ustr.hh"
+#include "common.h"
 
 /**
   @file _shared_impl.hh
   @brief private implementation of slt3 classes
  */
-
-using namespace csl::nthread;
 
 namespace csl
 {
@@ -52,11 +47,10 @@ namespace csl
     struct conn::impl
     {
       /* variables */
-      sqlite3 *            db_;
-      mutex                mtx_;
+      sqlite3 *              db_;
       unsigned long long   tran_id_;
-      bool                 use_exc_;
-      common::ustr         name_;
+      bool                   use_exc_;
+      common::ustr           name_;
 
       /* initialization */
       impl();
@@ -86,14 +80,13 @@ namespace csl
     struct tran::impl
     {
       /* variables */
-      conn::impl *         cn_;
-      tran::impl *         tr_;
+      conn::impl *           cn_;
+      tran::impl *           tr_;
       unsigned long long   tran_id_;
-      bool                 do_rollback_;
-      bool                 do_commit_;
-      bool                 use_exc_;
-      bool                 started_;
-      mutex                mtx_;
+      bool                   do_rollback_;
+      bool                   do_commit_;
+      bool                   use_exc_;
+      bool                   started_;
 
       /* initialization */
       impl(conn::impl_t & c);
@@ -114,16 +107,16 @@ namespace csl
       inline bool use_exc() const     { return use_exc_;  }
     };
 
-    struct synqry::impl
+    struct query::impl
     {
       /* variables */
-      typedef common::pvlist< 32,param,common::delete_destructor<param> > parampool_t;
-      typedef common::pvlist< 32,synqry::colhead,common::delete_destructor<colhead> > columnpool_t;
-      typedef common::pvlist< 32,synqry::field,common::delete_destructor<field> > fieldpool_t;
+      typedef common::pvlist< 32,common::var,common::delete_destructor<common::var> > parampool_t;
+      typedef common::pvlist< 32,query::colhead,common::delete_destructor<colhead> > columnpool_t;
+      typedef common::pvlist< 32,common::var,common::delete_destructor<common::var> > fieldpool_t;
 
-      tran::impl *     tran_;
-      columnpool_t     column_pool_;
-      fieldpool_t      field_pool_;
+      tran::impl *      tran_;
+      columnpool_t      column_pool_;
+      fieldpool_t       field_pool_;
       parampool_t      params_;
       common::mpool<>  coldata_pool_;
       fieldpool_t      param_pool_;
@@ -134,7 +127,6 @@ namespace csl
       bool             autoreset_data_;
       long long        last_insert_id_;
       long long        change_count_;
-      mutex            mtx_;
 
       /* initialization */
       impl(tran::impl_t & t);
@@ -143,9 +135,82 @@ namespace csl
       /* internal */
       bool fill_columns();
       void finalize();
+      
+      template <typename T>
+      T & get_at(unsigned int pos)
+      {
+        if( pos > 2000 ) { THR(exc::rs_toobig,exc::cm_query,*((T *)params_.push_back(new T()))); }
+        unsigned int sz = params_.n_items();
+
+        /* ensure we have enough space */
+        if( sz <= pos )
+          for( unsigned int i=sz;i<=pos;++i )
+            params_.push_back(0);
+        
+        common::var * q = 0;
+        
+        if( (q=params_.get_at(pos))!=NULL )
+        {
+          if( q->var_type() == T::var_type_v )
+          {
+            return *((T*)q);
+          }
+          else
+          {
+            delete q;            
+          }
+        }
+        
+        T * t = new T();
+        params_.set_at( pos, t );
+        return *t;
+      }
 
       /* interface */
-      param & get_param(unsigned int pos);
+      common::int64 & int64_param(unsigned int pos) { return get_at<common::int64>(pos); }
+      common::dbl   & dbl_param(unsigned int pos)   { return get_at<common::dbl>(pos); }
+      common::ustr  & ustr_param(unsigned int pos)  { return get_at<common::ustr>(pos); }
+      common::binry & binry_param(unsigned int pos) { return get_at<common::binry>(pos); }
+      
+      common::var & set_param(unsigned int pos,const common::var & p)
+      {
+        switch( p.var_type() )
+        {
+          case query::colhead::t_integer:
+          {
+            common::int64 & ret(int64_param(pos));
+            ret.from_var(p);
+            return ret;
+          }
+            
+          case query::colhead::t_string:
+          {
+            common::ustr & ret(ustr_param(pos));
+            ret.from_var(p);
+            return ret;
+          }
+
+          case query::colhead::t_double:
+          {
+            common::dbl & ret(dbl_param(pos));
+            ret.from_var(p);
+            return ret;
+          }
+
+          case query::colhead::t_blob:
+          default:
+          {
+            common::binry & ret(binry_param(pos));
+            ret.from_var(p);
+            return ret;
+          }
+        };
+        /* should never happen */
+        common::binry & ret(binry_param(pos));
+        ret.from_var(p);
+        return ret;
+      }
+
       unsigned int n_params();
       void clear_params();
       void copy_columns(columns_t & cols);
@@ -172,48 +237,6 @@ namespace csl
 
       inline void autoreset_data(bool yesno) { autoreset_data_ = yesno; }
       inline bool autoreset_data() const     { return autoreset_data_; }
-    };
-
-    struct param::impl
-    {
-      /* variables */
-      synqry::impl * q_;
-      bool           changed_;
-      common::var *  v_;
-      bool           use_exc_;
-
-      /* initialization */
-      impl(synqry::impl & q);
-      ~impl();
-
-      /* internal */
-      /* interface */
-      int get_type() const;
-      long long get_long() const;
-      double get_double() const;
-
-      bool get(long long & val) const;
-      bool get(double & val) const;
-      bool get(common::str & val) const;
-      bool get(common::ustr & val) const;
-      bool get(blob_t & val) const;
-
-      void set(long long val);
-      void set(double val);
-      void set(const common::str & val);
-      void set(const common::ustr & val);
-      void set(const char * val);
-      void set(const wchar_t * val);
-      void set(const blob_t & val);
-      void set(const unsigned char * ptr,unsigned int size);
-
-      void debug();
-
-      /* inline functions */
-      inline void use_exc(bool yesno) { use_exc_ = yesno; }
-      inline bool use_exc() const     { return use_exc_;  }
-
-      inline bool is_empty() const { return (v_==0); }
     };
   }
 }

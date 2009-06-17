@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -81,7 +81,7 @@ namespace csl
         virtual void on_change() { changed_ = true; }
 
         virtual const char * table_name() const { return sql_helper().table_name(); }
-        virtual var::helper & var_helper() { return var_helper_; }
+        virtual var_base::helper & var_helper() { return var_helper_; }
 
         bool changed() { return changed_; }
         void changed(bool c) { changed_ = c; }
@@ -90,7 +90,7 @@ namespace csl
         inline bool use_exc() const     { return use_exc_; }
 
       private:
-        var::helper var_helper_;
+        var_base::helper var_helper_;
         bool changed_;
         bool use_exc_;
         inline obj(const obj & other) {}

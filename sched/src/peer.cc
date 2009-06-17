@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -52,10 +52,10 @@ namespace csl
     {
       {
         // convert pubkey
-        if( public_key_.size() > 0 )
+        if( public_key_.get().size() > 0 )
         {
           pbuf pb;
-          pb.append(public_key_.get().data(),public_key_.size());
+          pb.append(public_key_.get().data(),public_key_.get().size());
           xdrbuf xb(pb);
           if( !tmp_public_.from_xdr(xb) ) THRNORET(exc::rs_xdr,exc::cm_peer);
         }
@@ -63,10 +63,10 @@ namespace csl
 
       {
         // convert privkey
-        if( private_key_.size() > 0 )
+        if( private_key_.get().size() > 0 )
         {
           pbuf pb;
-          pb.append(private_key_.get().data(),private_key_.size());
+          pb.append(private_key_.get().data(),private_key_.get().size());
           xdrbuf xb(pb);
           if( !tmp_private_.from_xdr(xb) ) THRNORET(exc::rs_xdr,exc::cm_peer);
         }
@@ -91,7 +91,9 @@ namespace csl
       pbuf pb;
       xdrbuf xb(pb);
       if( tmp_public_.to_xdr(xb) == false ) THRNORET(exc::rs_xdr,exc::cm_peer);
-      public_key_ = pb;
+      common::binry::buf_t v;
+      if( pb.t_copy_to(v) == false ) THRNORET(exc::rs_internal,exc::cm_peer);
+      public_key_ = v;
     }
 
     /* private key */
@@ -106,7 +108,9 @@ namespace csl
       pbuf pb;
       xdrbuf xb(pb);
       if( !tmp_private_.to_xdr(xb) ) THRNORET(exc::rs_xdr,exc::cm_peer);
-      private_key_ = pb;
+      common::binry::buf_t v;
+      if( pb.t_copy_to(v) == false ) THRNORET(exc::rs_internal,exc::cm_peer);
+      private_key_ = v;
     }
 
     /* copy */

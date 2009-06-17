@@ -54,8 +54,9 @@ namespace csl
     class binry : public csl::common::var
     {
       public:
-        enum { buf_size = 1024 };
+        enum { buf_size = 1024, var_type_v = CSL_TYPE_BIN };
         typedef tbuf<buf_size> buf_t; ///<The internal buffer type that stores the data
+        typedef const buf_t & value_t;
 
       private:
         buf_t value_; ///<The member variable that stores the data
@@ -63,6 +64,13 @@ namespace csl
       public:
         binry(); ///<default constructor
 
+        /** @brief copy operator */
+        inline binry & operator=(const binry & other)
+        {
+          value_ = other.value_;
+          return *this;
+        }
+      
         /**
         @brief initializing constructor
         @param ptr is a memory location
@@ -71,12 +79,15 @@ namespace csl
         binry(const unsigned char * ptr,size_t sz);
 
         virtual inline ~binry() {} ///<destructor
-
-        const buf_t & value() const { return value_; } ///<constant reference to the internal buffer
-
-        inline int var_type() { return CSL_TYPE_BIN; } ///<value type helps distinguish from other var types
-
+        inline value_t value() const { return value_; } ///<constant reference to the internal buffer
+        inline int var_type() const { return var_type_v; } ///<value type helps distinguish from other var types
         inline void reset() { value_.reset(); } ///<reset the internal buffer
+        
+        /** @brief returns a const pointer to internal data */
+        inline operator const unsigned char *() const { return value_.data(); }
+        
+        /** @brief returns the size of the variable data */
+        inline size_t var_size() const { return value_.size(); }
 
         /* conversions to other types */
         /**

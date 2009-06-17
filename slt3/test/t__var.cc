@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -29,8 +29,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "test_timer.h"
-#include "var.hh"
 #include "obj.hh"
+#include "var.hh"
 #include "sql.hh"
 #include "reg.hh"
 #include "conn.hh"
@@ -40,10 +40,14 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "str.hh"
 #include "ustr.hh"
 #include <assert.h>
+#include <vector>
 
 using namespace csl::slt3;
 using csl::common::str;
 using csl::common::ustr;
+using csl::common::int64;
+using csl::common::dbl;
+using csl::common::binry;
 
 /** @brief contains tests related to slt3::var */
 namespace test_var {

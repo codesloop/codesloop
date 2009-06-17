@@ -58,12 +58,28 @@ namespace csl
         long long value_;
 
       public:
+        typedef long long value_t;
+        enum { var_type_v =  CSL_TYPE_INT64 }; 
+      
         inline int64() : var(), value_(0) { }             ///<default constructor
         inline int64(long long v) : var(), value_(v) { }  ///<copy constructor
         virtual inline ~int64() {}                        ///<destructor
-        inline long long value() const { return value_; } ///< returns the long long value
-        inline int var_type() { return CSL_TYPE_INT64; }  ///<value type helps distinguish from other var types
+        inline value_t value() const { return value_; } ///< returns the long long value
+        inline int var_type() const { return var_type_v; }   ///<value type helps distinguish from other var types
         inline void reset() { value_ = 0LL; }             ///<resets the internal value to 0LL
+
+        /** @brief copy operator */
+        inline int64 & operator=(const int64 & other)
+        {
+          value_ = other.value_;
+          return *this;
+        }
+
+        /** @brief returns a const pointer to internal data */
+        inline operator const unsigned char *() const { return (unsigned char *)(&value_); }
+        
+        /** @brief returns the size of the variable data */
+        inline size_t var_size() const { return sizeof(value_); }
 
         /* conversions to other types */
         /**

@@ -24,16 +24,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
-   @file t__synqry.cc
-   @brief Tests to check and measure various slt3::synqry features
+   @file t__query.cc
+   @brief Tests to check and measure various slt3::query features
  */
 
 #include "test_timer.h"
-#include "synqry.hh"
+#include "query.hh"
 #include "tran.hh"
 #include "conn.hh"
 #include "exc.hh"
-#include "param.hh"
 #include "str.hh"
 #include "common.h"
 #include <assert.h>
@@ -41,9 +40,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace csl::slt3;
 using csl::common::str;
 using csl::common::ustr;
+using csl::common::int64;
+using csl::common::binry;
+using csl::common::dbl;
 
-/** @brief contains tests related to slt3::synqry */
-namespace test_synqry {
+/** @brief contains tests related to slt3::query */
+namespace test_query {
 
   /** @test baseline for performance comparison */
   void baseline()
@@ -51,7 +53,7 @@ namespace test_synqry {
     conn c;
     c.use_exc(false);
     tran t(c);
-    synqry q(t);
+    query q(t);
 
     assert( c.use_exc() == false );
     assert( t.use_exc() == false );
@@ -64,7 +66,7 @@ namespace test_synqry {
     conn c;
     c.use_exc(false);
     tran t(c);
-    synqry q(t);
+    query q(t);
     FPRINTF(stderr,L"Error message should follow here:\n");
     assert( q.execute("CREATE TABLE nothrow (i INT);") == false );
   }
@@ -78,7 +80,7 @@ namespace test_synqry {
     try
     {
       tran t(c);
-      synqry q(t);
+      query q(t);
       assert( q.execute("CREATE TABLE nothrow (i INT);") == false );
     }
     catch( exc e )
@@ -89,7 +91,7 @@ namespace test_synqry {
   }
 
   /** @test declare colhead */
-  void test_colhead() { synqry::colhead ch; }
+  void test_colhead() { query::colhead ch; }
 
   /** @test parameter handling */
   void test_param()
@@ -97,27 +99,19 @@ namespace test_synqry {
     conn c;
     c.use_exc(false);
     tran t(c);
-    synqry q(t);
+    query q(t);
 
-    param & pa1(q.get_param(1));
-    param & pa2(q.get_param(2));
-    param & pa3(q.get_param(3));
-
-    assert( pa1.is_empty() == true );
-    assert( pa2.is_empty() == true );
-    assert( pa3.is_empty() == true );
+    dbl & pa1(q.dbl_param(1));
+    ustr & pa2(q.ustr_param(2));
+    int64 & pa3(q.int64_param(3));
 
     pa1.set(1.0);
     pa2.set("10000.001");
     pa3.set(100ll);
 
-    param & pb1(q.get_param(1));
-    param & pb2(q.get_param(2));
-    param & pb3(q.get_param(3));
-
-    assert( pb1.is_empty() == false );
-    assert( pb2.is_empty() == false );
-    assert( pb3.is_empty() == false );
+    dbl & pb1(q.dbl_param(1));
+    ustr & pb2(q.ustr_param(2));
+    int64 & pb3(q.int64_param(3));
 
     assert( pa1.get_long() == pb1.get_long() );
     assert( pa1.get_double() == pb1.get_double() );
@@ -161,8 +155,8 @@ namespace test_synqry {
     assert( lhs == "100" );
 
     q.clear_params();
-    param & pc1(q.get_param(1));
-    assert( pc1.is_empty() == true );
+    ustr & pc1(q.ustr_param(1));
+    assert( pc1.empty() == true );
   }
 
   /** @test iterative query w/o retval (no automatic reset) */
@@ -173,10 +167,10 @@ namespace test_synqry {
     try
     {
       tran t(c);
-      synqry q(t);
+      query q(t);
       q.autoreset_data(false);
       assert( q.execute("CREATE TABLE stepw_noret_noaut (o string);") == true );
-      param & p(q.get_param(1));
+      ustr & p(q.ustr_param(1));
       assert( q.prepare("INSERT INTO stepw_noret_noaut (o) VALUES (?);") == true );
       for( unsigned int i=0;i<100;++i )
       {
@@ -207,10 +201,10 @@ namespace test_synqry {
     try
     {
       tran t(c);
-      synqry q(t);
+      query q(t);
       q.autoreset_data(true);
       assert( q.execute("CREATE TABLE stepw_noret_aut (o string);") == true );
-      param & p(q.get_param(1));
+      ustr & p(q.ustr_param(1));
       assert( q.prepare("INSERT INTO stepw_noret_aut (o) VALUES (?);") == true );
       for( unsigned int i=0;i<100;++i )
       {
@@ -236,16 +230,16 @@ namespace test_synqry {
     try
     {
       tran t(c);
-      synqry q(t);
+      query q(t);
       q.autoreset_data(false);
       assert( q.execute("CREATE TABLE stepw_ret_noaut (o string);") == true );
       assert( q.execute("INSERT INTO stepw_ret_noaut (o) VALUES ('Hello');") == true );
 
-      param & p(q.get_param(1));
+      ustr & p(q.ustr_param(1));
       assert( q.prepare("SELECT o FROM stepw_ret_noaut WHERE o=?;") == true );
 
-      synqry::columns_t ch;
-      synqry::fields_t  fd;
+      query::columns_t ch;
+      query::fields_t  fd;
 
       for( unsigned int i=0;i<100;++i )
       {
@@ -274,17 +268,17 @@ namespace test_synqry {
     try
     {
       tran t(c);
-      synqry q(t);
+      query q(t);
       q.autoreset_data(true);
       assert( q.execute("CREATE TABLE stepw_ret_aut (o string);") == true );
       assert( q.execute("INSERT INTO stepw_ret_aut (o) VALUES ('Hello');") == true );
       assert( q.last_insert_id() > 0 );
 
-      param & p(q.get_param(1));
+      ustr & p(q.ustr_param(1));
       assert( q.prepare("SELECT o FROM stepw_ret_aut WHERE o=?;") == true );
 
-      synqry::columns_t ch;
-      synqry::fields_t  fd;
+      query::columns_t ch;
+      query::fields_t  fd;
 
       for( unsigned int i=0;i<100;++i )
       {
@@ -313,7 +307,7 @@ namespace test_synqry {
     try
     {
       tran t(c);
-      synqry q(t);
+      query q(t);
       q.autoreset_data(false);
       assert( q.execute("CREATE TABLE onesht_noret_noaut (o string);") == true );
       assert( q.execute("INSERT INTO onesht_noret_noaut (o) VALUES ('Hello');") == true );
@@ -335,7 +329,7 @@ namespace test_synqry {
     try
     {
       tran t(c);
-      synqry q(t);
+      query q(t);
       q.autoreset_data(true);
       assert( q.execute("CREATE TABLE onesht_noret_aut (o string);") == true );
       assert( q.execute("INSERT INTO onesht_noret_aut (o) VALUES ('Hello');") == true );
@@ -357,7 +351,7 @@ namespace test_synqry {
     try
     {
       tran t(c);
-      synqry q(t);
+      query q(t);
       q.autoreset_data(false);
       assert( q.execute("CREATE TABLE onesht_ret_noaut (o string);") == true );
       assert( q.execute("INSERT INTO onesht_ret_noaut (o) VALUES ('Hello');") == true );
@@ -381,7 +375,7 @@ namespace test_synqry {
     try
     {
       tran t(c);
-      synqry q(t);
+      query q(t);
       q.autoreset_data(true);
       assert( q.execute("CREATE TABLE onesht_ret_aut (o string);") == true );
       assert( q.execute("INSERT INTO onesht_ret_aut (o) VALUES ('Hello');") == true );
@@ -404,7 +398,7 @@ namespace test_synqry {
   void ins_del_int()
   {
     tran t(*perf_conn_);
-    synqry q(t);
+    query q(t);
     assert( q.execute("INSERT INTO perftest (i) VALUES(1);") == true );
     assert( q.last_insert_id() > 0 );
     assert( q.execute("DELETE FROM perftest WHERE i=1;") == true );
@@ -414,7 +408,7 @@ namespace test_synqry {
   void ins_del_double()
   {
     tran t(*perf_conn_);
-    synqry q(t);
+    query q(t);
     assert( q.execute("INSERT INTO perftest (d) VALUES('3.14123');") == true );
     assert( q.last_insert_id() > 0 );
     assert( q.execute("DELETE FROM perftest WHERE d='3.14123';") == true );
@@ -424,7 +418,7 @@ namespace test_synqry {
   void ins_del_str()
   {
     tran t(*perf_conn_);
-    synqry q(t);
+    query q(t);
     assert( q.execute("INSERT INTO perftest (s) VALUES('3.14123');") == true );
     assert( q.last_insert_id() > 0 );
     assert( q.execute("DELETE FROM perftest WHERE s='3.14123';") == true );
@@ -434,7 +428,7 @@ namespace test_synqry {
   void ins_del_blob()
   {
     tran t(*perf_conn_);
-    synqry q(t);
+    query q(t);
     assert( q.execute("INSERT INTO perftest (b) VALUES('3.14123');") == true );
     assert( q.last_insert_id() > 0 );
     assert( q.execute("DELETE FROM perftest WHERE b='3.14123';") == true );
@@ -443,15 +437,15 @@ namespace test_synqry {
   /** @test insert and delete integer */
   void insdel_int_notran()
   {
-    synqry q(*perf_tran_);
+    query q(*perf_tran_);
     assert( q.execute("INSERT INTO perftest (i) VALUES(1);") == true );
     assert( q.last_insert_id() > 0 );
     assert( q.execute("DELETE FROM perftest WHERE i=1;") == true );
   }
 
-} // end of test_synqry
+} // end of test_query
 
-using namespace test_synqry;
+using namespace test_query;
 
 int main()
 {
@@ -478,7 +472,7 @@ int main()
     perf_conn_ = &c;
     assert( c.open("test2.db") == true );
     {
-      tran t(c); synqry q(t);
+      tran t(c); query q(t);
       assert( q.execute("CREATE TABLE perftest (i int, d real, s string, b blob);") == true );
     }
     csl_common_print_results( "ins_del_int        ", csl_common_test_timer_v0(ins_del_int),"" );

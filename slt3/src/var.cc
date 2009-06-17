@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -23,16 +23,14 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "common.h"
 #include "obj.hh"
 #include "var.hh"
 #include "sql.hh"
 #include "conn.hh"
 #include "tran.hh"
-#include "synqry.hh"
-#include "param.hh"
-#include "str.hh"
+#include "query.hh"
 #include "ustr.hh"
+#include "common.h"
 
 /**
   @file var.cc
@@ -47,7 +45,7 @@ namespace csl
 {
   namespace slt3
   {
-    void var::helper::set_id(long long id)
+    void var_base::helper::set_id(long long id)
     {
       datalist_t::iterator it(dtalst_.begin());
       datalist_t::iterator end(dtalst_.end());
@@ -56,10 +54,10 @@ namespace csl
       {
         data * dx = *it;
 
-        synqry::colhead ch;
+        query::colhead ch;
         common::int64 fd(id);
 
-        ch.type_   = synqry::colhead::t_integer;
+        ch.type_   = query::colhead::t_integer;
         dx->var_->set_value(&ch,&fd);
       }
     }
@@ -68,18 +66,18 @@ namespace csl
                                             name TEXT NOT NULL ,
                                             height REAL DEFAULT (0.1) ,
                                             pk BLOB  ); */
-    bool var::helper::init(tran & t, const char * sql_query)
+    bool var_base::helper::init(tran & t, const char * sql_query)
     {
-      synqry q(t);
+      query q(t);
       if( q.prepare(sql_query) == false ) return false;
       q.next();
       return true;
     }
 
     /* 'INSERT INTO Xtable ( name,height,pk ) VALUES ( ?,?,? );' */
-    bool var::helper::create(tran & t, const char * sql_query)
+    bool var_base::helper::create(tran & t, const char * sql_query)
     {
-      synqry q(t);
+      query q(t);
 
       datalist_t::iterator it(dtalst_.begin());
       datalist_t::iterator end(dtalst_.end());
@@ -91,9 +89,8 @@ namespace csl
         /* skip the first parameter, assuming it is the primary key ... */
         if( i > 0 )
         {
-          param & p(q.get_param(i));
           data * d = *it;
-          d->var_->set_param(p);
+          q.set_param( (int)i,*(d->var_->get_value()) );
         }
         ++i;
       }
@@ -116,9 +113,9 @@ namespace csl
     }
 
     /* 'UPDATE Xtable SET name=? , height=? , pk=?  WHERE id=? ;' */
-    bool var::helper::save(tran & t, const char * sql_query)
+    bool var_base::helper::save(tran & t, const char * sql_query)
     {
-      synqry q(t);
+      query q(t);
 
       datalist_t::iterator it(dtalst_.begin());
       datalist_t::iterator end(dtalst_.end());
@@ -130,18 +127,16 @@ namespace csl
         /* set parameters while skipping id */
         if( i > 0 )
         {
-          param & p(q.get_param(i));
           data * d = *it;
-          d->var_->set_param(p);
+          q.set_param( (int)i,*(d->var_->get_value()) );          
         }
         ++i;
       }
 
       /* set id at last */
       datalist_t::iterator ix(dtalst_.begin());
-      param & p_id(q.get_param(i));
       data * dx = *ix;
-      dx->var_->set_param(p_id);
+      q.set_param( (int)i,*(dx->var_->get_value()) );
       ++i;
 
       if( !q.prepare(sql_query) ) return false;
@@ -154,14 +149,13 @@ namespace csl
     }
 
     /* 'DELETE FROM Xtable WHERE id=?;' */
-    bool var::helper::remove(tran & t, const char * sql_query)
+    bool var_base::helper::remove(tran & t, const char * sql_query)
     {
-      synqry q(t);
+      query q(t);
 
       datalist_t::iterator it(dtalst_.begin());
-      param & p_id(q.get_param(1));
       data * dx = *it;
-      dx->var_->set_param(p_id);
+      q.set_param( 1,*(dx->var_->get_value()) );
 
       if( !q.prepare(sql_query) ) return false;
 
@@ -173,30 +167,29 @@ namespace csl
     }
 
     /* 'SELECT id,name,height,pk FROM Xtable WHERE id=? LIMIT 1;' */
-    bool var::helper::find_by_id(tran & t, const char * sql_query)
+    bool var_base::helper::find_by_id(tran & t, const char * sql_query)
     {
-      synqry q(t);
+      query q(t);
 
       /* set id */
       datalist_t::iterator ix(dtalst_.begin());
-      param & p_id(q.get_param(1));
       data * dx = *ix;
-      dx->var_->set_param(p_id);
+      q.set_param( 1,*(dx->var_->get_value()) );
 
       if( !q.prepare(sql_query) ) return false;
 
-      synqry::columns_t ch;
-      synqry::fields_t  fd;
+      query::columns_t ch;
+      query::fields_t  fd;
 
       q.next(ch,fd);
 
       if( ch.size() > 0 && fd.size() > 0 )
       {
-        synqry::columns_t::iterator chit(ch.begin());
-        synqry::columns_t::iterator chend(ch.end());
+        query::columns_t::iterator chit(ch.begin());
+        query::columns_t::iterator chend(ch.end());
 
-        synqry::fields_t::iterator fdit(fd.begin());
-        synqry::fields_t::iterator fdend(fd.end());
+        query::fields_t::iterator fdit(fd.begin());
+        query::fields_t::iterator fdend(fd.end());
 
         datalist_t::iterator dit(dtalst_.begin());
         datalist_t::iterator dend(dtalst_.end());
@@ -215,7 +208,7 @@ namespace csl
       return false;
     }
 
-    bool var::helper::find_by(tran & t,
+    bool var_base::helper::find_by(tran & t,
                               const char * sql_query,
                               int field1,
                               int field2,
@@ -225,32 +218,31 @@ namespace csl
     {
       int tmpi[5] = { field1, field2, field3, field4, field5 };
 
-      synqry q(t);
+      query q(t);
 
       for( int k=0;k<5 && tmpi[k] != -1; ++k )
       {
         data * d = dtalst_.get_at(tmpi[k]);
         if( d )
         {
-          param & p(q.get_param(k+1));
-          d->var_->set_param(p);
+          q.set_param( k+1,*(d->var_->get_value()) );
         }
       }
 
       if( !q.prepare(sql_query) ) return false;
 
-      synqry::columns_t ch;
-      synqry::fields_t  fd;
+      query::columns_t ch;
+      query::fields_t  fd;
 
       q.next(ch,fd);
 
       if( ch.size() > 0 && fd.size() > 0 )
       {
-        synqry::columns_t::iterator chit(ch.begin());
-        synqry::columns_t::iterator chend(ch.end());
+        query::columns_t::iterator chit(ch.begin());
+        query::columns_t::iterator chend(ch.end());
 
-        synqry::fields_t::iterator fdit(fd.begin());
-        synqry::fields_t::iterator fdend(fd.end());
+        query::fields_t::iterator fdit(fd.begin());
+        query::fields_t::iterator fdend(fd.end());
 
         datalist_t::iterator dit(dtalst_.begin());
         datalist_t::iterator dend(dtalst_.end());
@@ -269,241 +261,26 @@ namespace csl
       return false;
     }
 
-
-    bool var::helper::add_field(const char * name, var & v)
+    bool var_base::helper::add_field(const char * name, var_base & v)
     {
       data * d = new data(name,v);
       dtalst_.push_back(d);
       return true;
     }
-
-    void intvar::set_param(param & p)    { p.set(value_.value()); }
-    void strvar::set_param(param & p)    { p.set((const char *)value_.c_str()); }
-    void doublevar::set_param(param & p) { p.set(value_.value()); }
-    void blobvar::set_param(param & p)   { p.set(value_.value().data(),value_.value().size()); }
-
-    bool intvar::set_value(synqry::colhead * ch,synqry::field * fd)
-    {
-      if( !ch || !fd ) return false;
-      bool ret = value_.from_var(*fd);
-      parent()->on_change();
-      return ret;
-    }
-
-    bool doublevar::set_value(synqry::colhead * ch,synqry::field * fd)
-    {
-      if( !ch || !fd ) return false;
-      bool ret = value_.from_var(*fd);
-      parent()->on_change();
-      return ret;
-    }
-
-    bool strvar::set_value(synqry::colhead * ch,synqry::field * fd)
-    {
-      if( !ch || !fd ) return false;
-      bool ret = value_.from_var(*fd);
-      parent()->on_change();
-      return ret;
-    }
-
-    bool blobvar::set_value(synqry::colhead * ch,synqry::field * fd)
-    {
-      if( !ch || !fd ) return false;
-      bool ret = value_.from_var(*fd);
-      parent()->on_change();
-      return ret;
-    }
-
-    intvar::intvar(const char * name, slt3::obj & parent,const char * flags) : slt3::var(parent)
+    
+    const char * var_col_type<common::int64>::coltype_s = "INTEGER";
+    const char * var_col_type<common::dbl>::coltype_s = "REAL";
+    const char * var_col_type<common::ustr>::coltype_s = "TEXT";
+    const char * var_col_type<common::binry>::coltype_s = "BLOB";
+    
+    void var_base::register_variable(var_base * vb, const char * name, const char * coltype, slt3::obj & parent, const char * flags)
     {
       sql::helper & h(parent.sql_helper());
-      var::helper & v(parent.var_helper());
-      h.add_field(name,"INTEGER",flags);
-      v.add_field(name,*this);
+      var_base::helper & v(parent.var_helper());
+      h.add_field(name,coltype,flags);
+      v.add_field(name,*vb);
     }
-
-    strvar::strvar(const char * name, slt3::obj & parent,const char * flags) : slt3::var(parent)
-    {
-      sql::helper & h(parent.sql_helper());
-      var::helper & v(parent.var_helper());
-      h.add_field(name,"TEXT",flags);
-      v.add_field(name,*this);
-    }
-
-    doublevar::doublevar(const char * name, slt3::obj & parent,const char * flags) : slt3::var(parent)
-    {
-      sql::helper & h(parent.sql_helper());
-      var::helper & v(parent.var_helper());
-      h.add_field(name,"REAL",flags);
-      v.add_field(name,*this);
-    }
-
-    blobvar::blobvar(const char * name, slt3::obj & parent,const char * flags) : slt3::var(parent)
-    {
-      sql::helper & h(parent.sql_helper());
-      var::helper & v(parent.var_helper());
-      h.add_field(name,"BLOB",flags);
-      v.add_field(name,*this);
-    }
-
-    /* operators */
-    intvar & intvar::operator=(const intvar & other)
-    {
-      value_.from_integer(other.value_);
-      parent()->on_change();
-      return *this;
-    }
-
-    intvar & intvar::operator=(long long v)
-    {
-      value_.from_integer(v);
-      parent()->on_change();
-      return *this;
-    }
-
-    long long intvar::operator*() const { return value_.value(); }
-    long long intvar::get() const { return value_.value(); }
-
-    strvar & strvar::operator=(const char * other)
-    {
-      if( !other )
-      {
-        value_.reset();
-        value_.ensure_trailing_zero();
-      }
-      else
-      {
-        value_ = other;
-      }
-      parent()->on_change();
-      return *this;
-    }
-
-    strvar & strvar::operator=(const str & wother)
-    {
-      ustr other(wother);
-
-      if( other.size() )
-      {
-        value_ = other;
-      }
-      else
-      {
-        value_.reset();
-        value_.ensure_trailing_zero();
-      }
-      parent()->on_change();
-      return *this;
-    }
-
-    strvar & strvar::operator=(const ustr & other)
-    {
-      if( other.size() )
-      {
-        value_ = other;
-      }
-      else
-      {
-        value_.reset();
-        value_.ensure_trailing_zero();
-      }
-      parent()->on_change();
-      return *this;
-    }
-
-    strvar & strvar::operator=(const strvar & other)
-    {
-      value_ = other.value_;
-      parent()->on_change();
-      return *this;
-    }
-
-    strvar & strvar::operator=(const pbuf & other)
-    {
-      value_ = other;
-      parent()->on_change();
-      return *this;
-    }
-
-    const strvar::value_t & strvar::operator*() const { return value_; }
-    const strvar::value_t & strvar::get() const { return value_; }
-
-    const char * strvar::c_str()
-    {
-      value_.ensure_trailing_zero();
-      return value_.data();
-    }
-
-    doublevar & doublevar::operator=(const doublevar & other)
-    {
-      value_ = other.value_;
-      parent()->on_change();
-      return *this;
-    }
-
-    doublevar & doublevar::operator=(value_t other)
-    {
-      value_ = other;
-      parent()->on_change();
-      return *this;
-    }
-
-    double doublevar::operator*() const { return value_.value(); }
-    double doublevar::get() const { return value_.value(); }
-
-    blobvar & blobvar::operator=(const blobvar & other)
-    {
-      value_ = other.value_;
-      parent()->on_change();
-      return *this;
-    }
-
-    blobvar & blobvar::operator=(const value_t & other)
-    {
-      //value_ = other;
-      value_.from_binary(other.data(),other.size());
-      parent()->on_change();
-      return *this;
-    }
-
-    blobvar & blobvar::operator=(const std::vector<unsigned char> & other)
-    {
-      if( other.size() > 0 ) { value_.from_binary( &(other[0]), other.size()); }
-      else                   { value_.reset(); }
-      parent()->on_change();
-      return *this;
-    }
-
-    blobvar & blobvar::operator=(const pbuf & other)
-    {
-      value_t b;
-      b = other;
-      value_.from_binary(b.data(),b.size());
-      parent()->on_change();
-      return *this;
-    }
-
-    blobvar & blobvar::operator=(const ustr & other)
-    {
-      if( other.size() > 0 ) { value_.from_string(other); }
-      else                   { value_.reset(); }
-      parent()->on_change();
-      return *this;
-    }
-
-    blobvar & blobvar::operator=(const str & other)
-    {
-      if( other.size() > 0 ) { value_.from_string(other); }
-      else                   { value_.reset(); }
-      parent()->on_change();
-      return *this;
-    }
-
-    const blobvar::value_t & blobvar::operator*() const { return value_.value(); }
-    const blobvar::value_t & blobvar::get() const       { return value_.value(); }
-
-    unsigned int blobvar::size() { return value_.value().size(); }
-  };
-};
+  }; /* end of slt3 namespace */
+}; /* end of csl namespace */
 
 /* EOF */

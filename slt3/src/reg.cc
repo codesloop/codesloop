@@ -155,7 +155,7 @@ namespace csl
         if( c.open(path.c_str()) )
         {
           tran t(c);
-          synqry q(t);
+          query q(t);
           return q.execute(
                "CREATE TABLE IF NOT EXISTS registry ( "
                " id INTEGER PRIMARY KEY ASC AUTOINCREMENT, "
@@ -179,16 +179,16 @@ namespace csl
         conn c;
         if( !init_db(c,path_) ) return false;
 
-        synqry::columns_t ch;
-        synqry::fields_t  fd;
+        query::columns_t ch;
+        query::fields_t  fd;
 
         c.use_exc(true);
 
         tran t(c);
-        synqry q(t);
+        query q(t);
 
-        param & p(q.get_param(1));
-        p.set(name);
+        ustr & p(q.ustr_param(1));
+        p = name;
 
         if( !q.prepare("SELECT id,name,path FROM registry where name=?;") ) return false;
 
@@ -220,14 +220,14 @@ namespace csl
         conn c;
         if( !init_db(c,path_) ) return false;
 
-        synqry::columns_t ch;
-        synqry::fields_t  fd;
+        query::columns_t ch;
+        query::fields_t  fd;
 
         tran t(c);
-        synqry q(t);
+        query q(t);
 
-        param & p(q.get_param(1));
-        p.set(name);
+        ustr & p(q.ustr_param(1));
+        p = name;
 
         if( !q.prepare("SELECT path FROM registry WHERE name=? limit 1;") ) return false;
 
@@ -252,11 +252,11 @@ namespace csl
         conn c;
         if( !init_db(c,path_) ) return false;
 
-        synqry::columns_t ch;
-        synqry::fields_t  fd;
+        query::columns_t ch;
+        query::fields_t  fd;
 
         tran t(c);
-        synqry q(t);
+        query q(t);
 
         if( !q.prepare("SELECT name FROM registry;") ) return false;
 
@@ -285,11 +285,11 @@ namespace csl
         conn c;
         if( !init_db(c,path_) ) return false;
 
-        synqry::columns_t ch;
-        synqry::fields_t  fd;
+        query::columns_t ch;
+        query::fields_t  fd;
 
         tran t(c);
-        synqry q(t);
+        query q(t);
 
         if( !q.prepare("SELECT id,name,path FROM registry;") ) return false;
 
@@ -321,14 +321,14 @@ namespace csl
         if( !init_db(c,path_) ) return false;
 
         tran t(c);
-        synqry q(t);
+        query q(t);
 
         q.use_exc(true);
 
-        param & p1(q.get_param(1));
-        param & p2(q.get_param(2));
-        p1.set(it.name_);
-        p2.set(it.path_);
+        ustr & p1(q.ustr_param(1));
+        ustr & p2(q.ustr_param(2));
+        p1 = it.name_;
+        p2 = it.path_;
 
         if( !q.prepare("INSERT INTO registry (name,path) VALUES(?,?);") ) return false;
 

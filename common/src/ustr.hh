@@ -61,11 +61,15 @@ namespace csl
     {
       public:
         enum {
-          buf_size = 128,     ///<amount of preallocated memory in bytes
-          npos = 0xFFFFFFFF   ///<constant for find: not found
+          buf_size = 128,            ///<amount of preallocated memory in bytes
+          npos = 0xFFFFFFFF,         ///<constant for find: not found
+          var_type_v = CSL_TYPE_USTR ///<variable type
         };
+        
+        typedef const char * value_t;
+        inline value_t value() const { return c_str(); }
 
-        inline virtual int var_type() { return CSL_TYPE_USTR; } ///<value type helps distinguish from other var types
+        inline virtual int var_type() const { return var_type_v; } ///<value type helps distinguish from other var types
 
         /** @brief constructor */
         inline ustr() : csl::common::var(), buf_((unsigned char)0) { }
@@ -350,6 +354,12 @@ namespace csl
         exists so it makes little sense for users, to call this function.
          */
         void ensure_trailing_zero();
+
+        /** @brief returns a const pointer to internal data */
+        inline operator const unsigned char *() const { return buf_.data(); }
+        
+        /** @brief returns the size of the variable data */
+        inline size_t var_size() const { return buf_.size(); }
 
         /* ------------------------------------------------------------------------ *
         **    conversion operations

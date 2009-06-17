@@ -32,10 +32,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #define CSL_WINDOWS_H_INCLUDED
-#include "synqry.hh"
+#include "query.hh"
 #include "conn.hh"
 #include "tran.hh"
-#include "param.hh"
 #include "exc.hh"
 #include "reg.hh"
 #include "var.hh"

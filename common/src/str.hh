@@ -64,10 +64,14 @@ namespace csl
       public:
         enum {
           buf_size = 128 * sizeof(wchar_t), ///<amount of preallocated memory in bytes
-          npos = 0xFFFFFFFF                 ///<constant for find: not found
+          npos = 0xFFFFFFFF,                 ///<constant for find: not found
+          var_type_v = CSL_TYPE_STR           ///<variable type
         };
+        
+        typedef const wchar_t * value_t;
+        inline value_t value() const { return c_str(); }
 
-        inline virtual int var_type() { return CSL_TYPE_STR; } ///<value type helps distinguish from other var types
+        inline virtual int var_type() const { return var_type_v; } ///<value type helps distinguish from other var types
 
         /** @brief constructor */
         inline str() : csl::common::var(), buf_((wchar_t)L'\0') { }
@@ -200,6 +204,30 @@ namespace csl
         /** @brief append operator */
         str& operator+=(const wchar_t * str);
 
+        /**
+        @brief append operator with two parameters
+        @param lhs is the left-hand-side of add
+        @param rhs is the right-hand-side of add
+
+        adds lhs+rhs and returns a fresh new result string
+         */
+        inline friend str operator+(const wchar_t * lhs, const str& rhs)
+        {
+          return str(lhs) += rhs;
+        }
+
+        /**
+        @brief append operator with two parameters
+        @param lhs is the left-hand-side of add
+        @param rhs is the right-hand-side of add
+
+        adds lhs+rhs and returns a fresh new result string
+         */
+        inline friend str operator+(const str& lhs, const wchar_t * rhs)
+        {
+          return str(lhs) += rhs;
+        }
+        
         /** @brief is equal operator */
         inline bool operator==(const wchar_t * s) const
         {
@@ -316,7 +344,6 @@ namespace csl
         @brief checks if string has data
         @return true if the string is empty
          */
-
         inline bool empty() const
         {
           return !buf_.has_data();
@@ -342,6 +369,12 @@ namespace csl
         exists so it makes little sense for users, to call this function.
          */
         void ensure_trailing_zero();
+
+        /** @brief returns a const pointer to internal data */
+        inline operator const unsigned char *() const { return buf_.data(); }
+        
+        /** @brief returns the size of the variable data */
+        inline size_t var_size() const { return buf_.size(); }
 
         /* ------------------------------------------------------------------------ *
         **    conversion operations

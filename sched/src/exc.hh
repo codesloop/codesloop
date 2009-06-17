@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -53,6 +53,7 @@ namespace csl
           rs_insufficient,   ///<More data needed
           rs_xdr,            ///<XDR conversion error
           rs_private_fun,    ///<Function is private
+          rs_internal,       ///<Internal error
         };
 
         enum {

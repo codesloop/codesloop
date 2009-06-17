@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -44,7 +44,7 @@ int main()
     tran t(c);
 
     /* create a query object */
-    synqry q(t);
+    query q(t);
 
     if( q.execute("create table test(i int);") == false )
     {

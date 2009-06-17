@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -60,56 +60,70 @@ namespace csl
     use_exc tells wether to throw slt3::exc exceptions on errors. if they are not used
     then the return value of the given function tells that it is failed. the error message
     is sent to stderr.
-    */
+     */
     class tran
     {
-      public:
-        /** @brief this constructor starts a main transaction
-            @param c is the database connection */
-        tran(conn & c);
+    public:
+      /**
+      @brief this constructor starts a main transaction
+      @param c is the database connection 
+        */
+      tran(conn & c);
 
-        /** @brief this constructor starts a nested transaction of t
-            @param t is the parent transaction */
-        tran(tran & t);
+      /**
+      @brief this constructor starts a nested transaction of t
+      @param t is the parent transaction 
+        */
+      tran(tran & t);
 
-        ~tran();
+      ~tran();
+    
+      /**
+      @brief sets the destructor behaviour
+      @param yesno tells wether to commit on destruction 
+        */
+      void commit_on_destruct(bool yesno=true);
 
-        /** @brief sets the destructor behaviour
-            @param yesno tells wether to commit on destruction */
-        void commit_on_destruct(bool yesno=true);
+      /**
+      @brief sets the destructor behaviour
+      @param yesno tells wether to rollback on destruction 
+        */
+      void rollback_on_destruct(bool yesno=true);
 
-        /** @brief sets the destructor behaviour
-            @param yesno tells wether to rollback on destruction */
-        void rollback_on_destruct(bool yesno=true);
+      /** @brief commit the current transaction */
+      void commit();
 
-        /** @brief commit the current transaction */
-        void commit();
+      /** @brief rollback the current transaction */
+      void rollback();
 
-        /** @brief rollback the current transaction */
-        void rollback();
+      /**
+      @brief Specifies whether tran should throw slt3::exc exceptions
+      @param yesno is the desired value to be set
 
-        /** @brief Specifies whether tran should throw slt3::exc exceptions
-            @param yesno is the desired value to be set
+      the default value for use_exc() is true, so it throws exceptions by default 
+       */
+      void use_exc(bool yesno);
 
-            the default value for use_exc() is true, so it throws exceptions by default */
-        void use_exc(bool yesno);
+      /**
+      @brief Returns the current value of use_exc
+      @return true if exc exceptions are used 
+       */
+      bool use_exc();
 
-        /** @brief Returns the current value of use_exc
-            @return true if exc exceptions are used */
-        bool use_exc();
+    private:
+      /* private implementation hidden in impl */
+      struct impl;
+      typedef std::auto_ptr<impl> impl_t;
 
-      private:
-        /* types */
-        struct impl;
-        typedef std::auto_ptr<impl> impl_t;
-        /* private data */
-        friend class synqry;
-        friend class asynqry;
-        impl_t impl_;
-        /* copying not allowed */
-        tran & operator=(const tran & other);
-        /* transactions should only be created in conn, or tran context */
-        tran();
+      friend class query;
+      /* private data */
+      impl_t impl_;
+
+      /* copying not allowed */
+      tran & operator=(const tran & other);
+
+      /* transactions should only be created in conn, or tran context */
+      tran();
     };
   }
 }

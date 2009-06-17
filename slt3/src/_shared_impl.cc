@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -88,7 +88,6 @@ namespace csl
 
     unsigned long long conn::impl::new_tran_id()
     {
-      scoped_mutex m(mtx_);
       ++tran_id_;
       return tran_id_;
     }
@@ -98,7 +97,6 @@ namespace csl
       long long ret = -1;
       if( !db_ ) THR(exc::rs_notopened,exc::cm_conn,-1);
       {
-        scoped_mutex m(mtx_);
         ret = sqlite3_last_insert_rowid(db_);
         if( !ret ) ret = -1;
       }
@@ -110,7 +108,6 @@ namespace csl
       long long ret = -1;
       if( !db_ ) THR(exc::rs_notopened,exc::cm_conn,-1);
       {
-        scoped_mutex m(mtx_);
         ret = sqlite3_changes(db_);
         if( !ret ) ret = -1;
       }
@@ -119,7 +116,6 @@ namespace csl
 
     bool conn::impl::open(const char * db)
     {
-      scoped_mutex m(mtx_);
       sqlite3 * td = 0;
       int rc = 0;
       if( !db ) { return false; }
@@ -140,7 +136,6 @@ namespace csl
     {
       bool ret = false;
       {
-        scoped_mutex m(mtx_);
         ret = (db_ == 0 ? false : true);
       }
       return ret;
@@ -148,7 +143,6 @@ namespace csl
 
     bool conn::impl::close()
     {
-      scoped_mutex m(mtx_);
       if( !db_ ) { return false; }
       else       { sqlite3_busy_timeout(db_,1000); }
       //
@@ -213,7 +207,6 @@ namespace csl
 
     bool conn::impl::exec_noret(const char * sql)
     {
-      scoped_mutex m(mtx_);
       char * zErr = 0;
       if( !db_ ) THR(exc::rs_notopened,exc::cm_conn,false);
       if( !sql ) THR(exc::rs_nullparam,exc::cm_conn,false);
@@ -235,7 +228,6 @@ namespace csl
 
     bool conn::impl::exec(const char * sql,common::ustr & res)
     {
-      scoped_mutex m(mtx_);
       char * zErr = 0;
       if( !db_ ) THR(exc::rs_notopened,exc::cm_conn,false);
       if( !sql ) THR(exc::rs_nullparam,exc::cm_conn,false);
@@ -290,7 +282,6 @@ namespace csl
 
     void tran::impl::start()
     {
-      scoped_mutex m(mtx_);
       if( !started_ )
       {
         if( tr_ )
@@ -311,7 +302,6 @@ namespace csl
     {
       try
       {
-        scoped_mutex m(mtx_);
         if( !started_ ) { }
         else if( do_rollback_ )
         {
@@ -330,19 +320,16 @@ namespace csl
 
     void tran::impl::commit_on_destruct(bool yesno)
     {
-      scoped_mutex m(mtx_);
       do_commit_ = yesno;
     }
 
     void tran::impl::rollback_on_destruct(bool yesno)
     {
-      scoped_mutex m(mtx_);
       do_rollback_ = yesno;
     }
 
     void tran::impl::commit()
     {
-      scoped_mutex m(mtx_);
       if( !started_ ) { }
       else if( cn_->valid_db_ptr() == false ) { THRNORET(exc::rs_notopened,exc::cm_tran); return; }
       else if( tr_ )
@@ -361,7 +348,6 @@ namespace csl
 
     void tran::impl::rollback()
     {
-      scoped_mutex m(mtx_);
       if( !started_ ) { }
       else if( cn_->valid_db_ptr() == false ) { THRNORET(exc::rs_notopened,exc::cm_tran); return; }
       else if( tr_ )
@@ -378,33 +364,31 @@ namespace csl
       }
     }
 
-    /* synqry */
-    synqry::impl::impl(tran::impl_t & t)
+    /* query */
+    query::impl::impl(tran::impl_t & t)
       : tran_(&(*t)), stmt_(0), tail_(0), 
                  use_exc_(t->use_exc_), autoreset_data_(true),
                           last_insert_id_(-1), change_count_(-1)
     {
     }
 
-    synqry::impl::~impl()
+    query::impl::~impl()
     {
       finalize();
     }
 
-    void synqry::impl::finalize()
+    void query::impl::finalize()
     {
-      scoped_mutex m(mtx_);
       if( stmt_ )
       {
-        scoped_mutex m2(tran_->cn_->mtx_);
         sqlite3_finalize(stmt_);
         stmt_ = 0;
       }
     }
 
-    void synqry::impl::debug()
+    void query::impl::debug()
     {
-      printf("== synqry::impl::debug ==\n");
+      printf("== query::impl::debug ==\n");
       printf("== ////// column_pool_ ==\n");
       column_pool_.debug();
       printf("== /////// field_pool_ ==\n");
@@ -418,56 +402,25 @@ namespace csl
       for( ;it!=end;++it )
       {
         printf("--");
-        param * p = (*it);
-        if( p ) { p->debug(); }
-        else    { printf("Param is null\n"); }
+        // TODO var * p = (*it);
+        // TODO if( p ) { p->debug(); }
+        // TODO else    { printf("Param is null\n"); }
       }
     }
-
-    param & synqry::impl::get_param(unsigned int pos)
+    
+    void query::impl::clear_params()
     {
-      scoped_mutex m(mtx_);
-
-      unsigned int sz = params_.n_items();
-      param * ret = 0;
-      param * q = 0;
-      //
-      if( pos > 2000 ) { THRNORET(exc::rs_toobig,exc::cm_synqry); goto bail; }
-      // ensure items to be there
-      if( sz <= pos )
-        for( unsigned int i=sz;i<=pos;++i )
-          params_.push_back(0);
-    bail:
-      //
-      if( (q=params_.get_at(pos))!=NULL )
-      {
-        ret = q;
-      }
-      else
-      {
-        ret = new param(*this);
-        params_.set_at(pos,ret);
-      }
-      return *ret;
-    }
-
-    void synqry::impl::clear_params()
-    {
-      scoped_mutex m(mtx_);
-
       params_.free_all();
       param_pool_.free_all();
     }
 
     // stepwise query
-    bool synqry::impl::prepare(const char * sql)
+    bool query::impl::prepare(const char * sql)
     {
-      scoped_mutex m(mtx_);
-
-      if( !sql )               THR(exc::rs_nullparam,exc::cm_synqry,false);
-      if( !tran_ )             THR(exc::rs_nulltran,exc::cm_synqry,false);
-      if( !(tran_->cn_) )      THR(exc::rs_nullconn,exc::cm_synqry,false);
-      if( !(tran_->cn_->db_) ) THR(exc::rs_nulldb,exc::cm_synqry,false);
+      if( !sql )               THR(exc::rs_nullparam,exc::cm_query,false);
+      if( !tran_ )             THR(exc::rs_nulltran,exc::cm_query,false);
+      if( !(tran_->cn_) )      THR(exc::rs_nullconn,exc::cm_query,false);
+      if( !(tran_->cn_->db_) ) THR(exc::rs_nulldb,exc::cm_query,false);
 
       finalize();
       tran_->start();
@@ -482,61 +435,47 @@ namespace csl
 
       int rc = 0;
 
-      {
-        scoped_mutex m2(tran_->cn_->mtx_);
-        rc = sqlite3_prepare(tran_->cn_->db_, sql, strlen(sql), &stmt_, &tail_);
-      }
+      rc = sqlite3_prepare(tran_->cn_->db_, sql, strlen(sql), &stmt_, &tail_);
 
       if(rc != SQLITE_OK)
       {
-        scoped_mutex m2(tran_->cn_->mtx_);
         str s(sqlite3_errmsg(tran_->cn_->db_));
-        THRE(conn::impl::create_exc,rc,exc::cm_synqry,s.c_str(),false);
+        THRE(conn::impl::create_exc,rc,exc::cm_query,s.c_str(),false);
       }
       //
       return true;
     }
 
-    bool synqry::impl::reset()
+    bool query::impl::reset()
     {
-      scoped_mutex m(mtx_);
-
-      if( !stmt_ )        THR(exc::rs_nullstmnt,exc::cm_synqry,false);
-      if( !tran_ )        THR(exc::rs_nulltran,exc::cm_synqry,false);
-      if( !(tran_->cn_) ) THR(exc::rs_nullconn,exc::cm_synqry,false);
+      if( !stmt_ )        THR(exc::rs_nullstmnt,exc::cm_query,false);
+      if( !tran_ )        THR(exc::rs_nulltran,exc::cm_query,false);
+      if( !(tran_->cn_) ) THR(exc::rs_nullconn,exc::cm_query,false);
 
       int rc = 0;
 
-      {
-        scoped_mutex m2(tran_->cn_->mtx_);
-        rc = sqlite3_reset(stmt_);
-      }
+      rc = sqlite3_reset(stmt_);
 
       if( rc != SQLITE_OK )
       {
-        scoped_mutex m2(tran_->cn_->mtx_);
         str s(sqlite3_errmsg(tran_->cn_->db_));
-        THRE(conn::impl::create_exc,rc,exc::cm_synqry,s.c_str(),false);
+        THRE(conn::impl::create_exc,rc,exc::cm_query,s.c_str(),false);
       }
 
       return true;
     }
 
-    void synqry::impl::reset_data()
+    void query::impl::reset_data()
     {
-      scoped_mutex m(mtx_);
-
       field_pool_.free_all();
       data_pool_.free_all();
     }
 
-    bool synqry::impl::next(columns_t & cols, fields_t & fields)
+    bool query::impl::next(columns_t & cols, fields_t & fields)
     {
-      scoped_mutex m(mtx_);
-
-      if( !stmt_ )        THR(exc::rs_nullstmnt,exc::cm_synqry,false);
-      if( !tran_ )        THR(exc::rs_nulltran,exc::cm_synqry,false);
-      if( !(tran_->cn_) ) THR(exc::rs_nullconn,exc::cm_synqry,false);
+      if( !stmt_ )        THR(exc::rs_nullstmnt,exc::cm_query,false);
+      if( !tran_ )        THR(exc::rs_nulltran,exc::cm_query,false);
+      if( !(tran_->cn_) ) THR(exc::rs_nullconn,exc::cm_query,false);
 
       parampool_t::iterator it(params_.begin());
       parampool_t::iterator end(params_.end());
@@ -546,38 +485,32 @@ namespace csl
 
       // bind params
       {
-        scoped_mutex m2(tran_->cn_->mtx_);
         for( ;it!=end;++it )
         {
-          param * p = *it;
-          if( p && p->impl_->changed_ && which > 0 && p->impl_->v_ != 0 )
+          common::var * p = *it;
+          if( p && which > 0 )
           {
-            int t = p->get_type();
+            int t = p->var_type();
             switch( t )
             {
-              case synqry::colhead::t_integer:
-                sqlite3_bind_int64( stmt_, which, p->get_long() );
+              case query::colhead::t_integer:
+                sqlite3_bind_int64( stmt_, which, (long long)*p );
                 break;
 
-              case synqry::colhead::t_double:
-                sqlite3_bind_double( stmt_, which, p->get_double() );
+              case query::colhead::t_double:
+                sqlite3_bind_double( stmt_, which, (double)*p );
                 break;
 
-              case synqry::colhead::t_string:
-                sqlite3_bind_text( stmt_, which,
-                                   ((ustr *)p->impl_->v_)->c_str(),
-                                     ((ustr *)p->impl_->v_)->size(),
-                                       SQLITE_TRANSIENT );
+              case query::colhead::t_string:
+                /* assume string always has a trailing zero */
+                sqlite3_bind_text( stmt_, which, p->charp_data(),p->var_size()-1, SQLITE_TRANSIENT );
                 break;
 
-              case synqry::colhead::t_blob:
-                sqlite3_bind_blob( stmt_, which,
-                                   ((binry *)p->impl_->v_)->value().data(),
-                                     ((binry *)p->impl_->v_)->value().size(),
-                                       SQLITE_TRANSIENT );
+              case query::colhead::t_blob:
+                sqlite3_bind_blob( stmt_, which, p->charp_data(),p->var_size(), SQLITE_TRANSIENT );
                 break;
 
-              case synqry::colhead::t_null:
+              case query::colhead::t_null:
               default:
                 break;
             };
@@ -589,15 +522,10 @@ namespace csl
       // step query
       int rc = 0;
 
-      {
-        scoped_mutex m2(tran_->cn_->mtx_);
-        rc = sqlite3_step( stmt_ );
-      }
+      rc = sqlite3_step( stmt_ );
 
       if( rc == SQLITE_ROW )
       {
-        scoped_mutex m2(tran_->cn_->mtx_);
-
         fill_columns();
         if( cols.n_items() == 0 ) copy_columns( cols );
 
@@ -609,27 +537,27 @@ namespace csl
         unsigned int ac=0;
         for( ;it!=end;++it )
         {
-          synqry::field * f = 0;
+          query::field * f = 0;
           switch( (*it)->type_ )
           {
-            case synqry::colhead::t_integer:
+            case query::colhead::t_integer:
               f = new common::int64(sqlite3_column_int64(stmt_,ac));
               break;
 
-            case synqry::colhead::t_double:
+            case query::colhead::t_double:
               f = new common::dbl(sqlite3_column_double(stmt_,ac));
               break;
 
-            case synqry::colhead::t_blob:
+            case query::colhead::t_blob:
               f = new common::binry();
               f->from_binary( sqlite3_column_blob(stmt_,ac), sqlite3_column_bytes(stmt_,ac) );
               break;
 
-            case synqry::colhead::t_string:
+            case query::colhead::t_string:
               f = new common::ustr((const char *)sqlite3_column_text(stmt_,ac));
               break;
 
-            case synqry::colhead::t_null:
+            case query::colhead::t_null:
             default:
               //f = new common::ustr();
               f = 0;
@@ -654,21 +582,18 @@ namespace csl
       }
       else
       {
-        scoped_mutex m2(tran_->cn_->mtx_);
         str s(sqlite3_errmsg(tran_->cn_->db_));
-        THRE(conn::impl::create_exc,rc,exc::cm_synqry,s.c_str(),false);
+        THRE(conn::impl::create_exc,rc,exc::cm_query,s.c_str(),false);
       }
 
       return true;
     }
 
-    bool synqry::impl::next()
+    bool query::impl::next()
     {
-      scoped_mutex m(mtx_);
-
-      if( !stmt_ )         THR(exc::rs_nullstmnt,exc::cm_synqry,false);
-      if( !tran_ )         THR(exc::rs_nulltran,exc::cm_synqry,false);
-      if( !(tran_->cn_) )  THR(exc::rs_nullconn,exc::cm_synqry,false);
+      if( !stmt_ )         THR(exc::rs_nullstmnt,exc::cm_query,false);
+      if( !tran_ )         THR(exc::rs_nulltran,exc::cm_query,false);
+      if( !(tran_->cn_) )  THR(exc::rs_nullconn,exc::cm_query,false);
 
       parampool_t::iterator it(params_.begin());
       parampool_t::iterator end(params_.end());
@@ -684,38 +609,32 @@ namespace csl
 
       // bind params
       {
-        scoped_mutex m2(tran_->cn_->mtx_);
         for( ;it!=end;++it )
         {
-          param * p = *it;
-          if( p && p->impl_->changed_ && which > 0 && p->impl_->v_ != 0 )
+          common::var * p = *it;
+          if( p && which > 0 )
           {
-            int t = p->get_type();
+            int t = p->var_type();
             switch( t )
             {
-              case synqry::colhead::t_integer:
-                sqlite3_bind_int64( stmt_, which, p->get_long() );
+              case query::colhead::t_integer:
+                sqlite3_bind_int64( stmt_, which, (long long)*p );
                 break;
 
-              case synqry::colhead::t_double:
-                sqlite3_bind_double( stmt_, which, p->get_double() );
+              case query::colhead::t_double:
+                sqlite3_bind_double( stmt_, which, (double)*p );
                 break;
 
-              case synqry::colhead::t_string:
-                sqlite3_bind_text( stmt_, which,
-                                   ((ustr *)p->impl_->v_)->c_str(),
-                                     ((ustr *)p->impl_->v_)->size(),
-                                       SQLITE_TRANSIENT );
+              case query::colhead::t_string:
+                /* assume string always has a trailing zero */
+                sqlite3_bind_text( stmt_, which, p->charp_data(),p->var_size()-1, SQLITE_TRANSIENT );
                 break;
 
-              case synqry::colhead::t_blob:
-                sqlite3_bind_blob( stmt_, which,
-                                   ((binry *)p->impl_->v_)->value().data(),
-                                     ((binry *)p->impl_->v_)->value().size(),
-                                       SQLITE_TRANSIENT );
+              case query::colhead::t_blob:
+                sqlite3_bind_blob( stmt_, which, p->charp_data(),p->var_size(), SQLITE_TRANSIENT );
                 break;
 
-              case synqry::colhead::t_null:
+              case query::colhead::t_null:
               default:
                 break;
             };
@@ -727,10 +646,7 @@ namespace csl
       // step query
       int rc = 0;
 
-      {
-        scoped_mutex m2(tran_->cn_->mtx_);
-        rc = sqlite3_step( stmt_ );
-      }
+      rc = sqlite3_step( stmt_ );
 
       if( rc == SQLITE_ROW )
       {
@@ -750,42 +666,29 @@ namespace csl
       }
       else
       {
-        scoped_mutex m2(tran_->cn_->mtx_);
         str s(sqlite3_errmsg(tran_->cn_->db_));
-        THRE(conn::impl::create_exc,rc,exc::cm_synqry,s.c_str(),false);
+        THRE(conn::impl::create_exc,rc,exc::cm_query,s.c_str(),false);
       }
 
       return true;
     }
 
-    long long synqry::impl::last_insert_id()
+    long long query::impl::last_insert_id()
     {
-      long long ret = -1;
-      {
-        scoped_mutex m(mtx_);
-        ret = last_insert_id_;
-      }
-      return ret;
+      return last_insert_id_;
     }
 
-    long long synqry::impl::change_count()
+    long long query::impl::change_count()
     {
-      long long ret = -1;
-      {
-        scoped_mutex m(mtx_);
-        ret = change_count_;
-      }
-      return ret;
+      return change_count_;
     }
 
     // oneshot query
-    bool synqry::impl::execute(const char * sql)
+    bool query::impl::execute(const char * sql)
     {
-      scoped_mutex m(mtx_);
-
-      if( !sql )          THR(exc::rs_nullparam,exc::cm_synqry,false);
-      if( !tran_ )        THR(exc::rs_nulltran,exc::cm_synqry,false);
-      if( !(tran_->cn_) ) THR(exc::rs_nullconn,exc::cm_synqry,false);
+      if( !sql )          THR(exc::rs_nullparam,exc::cm_query,false);
+      if( !tran_ )        THR(exc::rs_nulltran,exc::cm_query,false);
+      if( !(tran_->cn_) ) THR(exc::rs_nullconn,exc::cm_query,false);
 
       finalize();
       tran_->start();
@@ -807,13 +710,11 @@ namespace csl
       return ret;
     }
 
-    bool synqry::impl::execute(const char * sql, ustr & result)
+    bool query::impl::execute(const char * sql, ustr & result)
     {
-      scoped_mutex m(mtx_);
-
-      if( !sql )          THR(exc::rs_nullparam,exc::cm_synqry,false);
-      if( !tran_ )        THR(exc::rs_nulltran,exc::cm_synqry,false);
-      if( !(tran_->cn_) ) THR(exc::rs_nullconn,exc::cm_synqry,false);
+      if( !sql )          THR(exc::rs_nullparam,exc::cm_query,false);
+      if( !tran_ )        THR(exc::rs_nulltran,exc::cm_query,false);
+      if( !(tran_->cn_) ) THR(exc::rs_nullconn,exc::cm_query,false);
 
       finalize();
       tran_->start();
@@ -836,10 +737,8 @@ namespace csl
       return ret;
     }
 
-    void synqry::impl::copy_columns(columns_t & cols)
+    void query::impl::copy_columns(columns_t & cols)
     {
-      scoped_mutex m(mtx_);
-
       if( column_pool_.n_items() > 0 && cols.n_items() == 0 )
       {
         columnpool_t::iterator it(column_pool_.begin());
@@ -851,44 +750,40 @@ namespace csl
       }
     }
 
-    bool synqry::impl::fill_columns()
+    bool query::impl::fill_columns()
     {
-      scoped_mutex m(mtx_);
-
       if( !stmt_ ) return false;
 
       if( column_pool_.n_items() == 0 )
       {
-        scoped_mutex m2(tran_->cn_->mtx_);
-
         int ncols = sqlite3_column_count(stmt_);
         if( ncols > 0 )
         {
           for(int i=0;i<ncols;++i )
           {
-            synqry::colhead * h = new synqry::colhead();
+            query::colhead * h = new query::colhead();
             //
             switch( sqlite3_column_type(stmt_,i) )
             {
               case SQLITE_INTEGER:
-                h->type_ = synqry::colhead::t_integer;
+                h->type_ = query::colhead::t_integer;
                 break;
 
               case SQLITE_FLOAT:
-                h->type_ = synqry::colhead::t_double;
+                h->type_ = query::colhead::t_double;
                 break;
 
               case SQLITE_NULL:
-                h->type_ = synqry::colhead::t_null;
+                h->type_ = query::colhead::t_null;
                 break;
 
               case SQLITE_TEXT:
-                h->type_ = synqry::colhead::t_string;
+                h->type_ = query::colhead::t_string;
                 break;
 
               case SQLITE_BLOB:
               default:
-                h->type_ = synqry::colhead::t_blob;
+                h->type_ = query::colhead::t_blob;
                 break;
             };
             //
@@ -903,199 +798,7 @@ namespace csl
       return (column_pool_.n_items() > 0 ? true : false);
     }
 
-    /* param */
-    param::impl::impl(synqry::impl & q)
-      : q_(&q), changed_(false), v_(0), use_exc_(q.use_exc_)
-      { }
-
-    void param::impl::debug()
-    {
-      std::map<int,str> m;
-      m[synqry::colhead::t_integer] = "integer";
-      m[synqry::colhead::t_string]  = "string";
-      m[synqry::colhead::t_double]  = "double";
-      m[synqry::colhead::t_blob]    = "blob";
-      m[synqry::colhead::t_null]    = "null";
-
-      if( v_ )
-      {
-        ustr us;
-        v_->to_string(us);
-        PRINTF(L"Param[%s]: %s\n",m[v_->var_type()].c_str(),us.c_str());
-      }
-      else
-      {
-        PRINTF(L"Param[%s]: null\n",m[v_->var_type()].c_str());
-      }
-    }
-
-    param::impl::~impl() {}
-
-    int param::impl::get_type() const
-    {
-      return (v_ == 0 ? synqry::colhead::t_null : v_->var_type());
-    }
-
-    long long param::impl::get_long() const
-    {
-      if( !v_ ) THR(exc::rs_nullparam,exc::cm_param,false);
-      //
-      long long ret = 0;
-      v_->to_integer(ret);
-      return ret;
-    }
-
-    double param::impl::get_double() const
-    {
-      if( !v_ ) THR(exc::rs_nullparam,exc::cm_param,0.0);
-      //
-      double ret = 0.0;
-      v_->to_double(ret);
-      return ret;
-    }
-
-    bool param::impl::get(long long & val) const
-    {
-      if( !v_ ) THR(exc::rs_nullparam,exc::cm_param,false);
-      return v_->to_integer(val);
-    }
-
-    bool param::impl::get(double & val) const
-    {
-      if( !v_ ) THR(exc::rs_nullparam,exc::cm_param,false);
-      return v_->to_double(val);
-    }
-
-    bool param::impl::get(str & val) const
-    {
-      if( !v_ ) THR(exc::rs_nullparam,exc::cm_param,false);
-      return v_->to_string(val);
-    }
-
-    bool param::impl::get(ustr & val) const
-    {
-      if( !v_ ) THR(exc::rs_nullparam,exc::cm_param,false);
-      return v_->to_string(val);
-    }
-
-    bool param::impl::get(blob_t & val) const
-    {
-      if( !v_ ) THR(exc::rs_nullparam,exc::cm_param,false);
-      return v_->to_binary(val);
-    }
-
-    void param::impl::set(long long val)
-    {
-      if( !v_ || v_->var_type() != synqry::colhead::t_integer )
-      {
-        v_ = new int64(val);
-        q_->param_pool_.push_back(v_);
-      }
-      else
-      {
-        v_->from_integer(val);
-      }
-      changed_  = true;
-    }
-
-    void param::impl::set(double val)
-    {
-      if( !v_ || v_->var_type() != synqry::colhead::t_double )
-      {
-        v_ = new dbl(val);
-        q_->param_pool_.push_back(v_);
-      }
-      else
-      {
-        v_->from_double(val);
-      }
-      changed_  = true;
-    }
-
-    void param::impl::set(const str & val)
-    {
-      if( !v_ || v_->var_type() != synqry::colhead::t_string )
-      {
-        v_ = new ustr(val);
-        q_->param_pool_.push_back(v_);
-      }
-      else
-      {
-        v_->from_string(val);
-      }
-      changed_ = true;
-    }
-
-    void param::impl::set(const ustr & val)
-    {
-      if( !v_ || v_->var_type() != synqry::colhead::t_string )
-      {
-        v_ = new ustr(val);
-        q_->param_pool_.push_back(v_);
-      }
-      else
-      {
-        v_->from_string(val);
-      }
-      changed_ = true;
-    }
-
-    void param::impl::set(const wchar_t * val)
-    {
-      if( !v_ || v_->var_type() != synqry::colhead::t_string )
-      {
-        v_ = new ustr(val);
-        q_->param_pool_.push_back(v_);
-      }
-      else
-      {
-        v_->from_string(val);
-      }
-      changed_ = true;
-    }
-
-    void param::impl::set(const char * val)
-    {
-      if( !v_ || v_->var_type() != synqry::colhead::t_string )
-      {
-        v_ = new ustr(val);
-        q_->param_pool_.push_back(v_);
-      }
-      else
-      {
-        v_->from_string(val);
-      }
-      changed_ = true;
-    }
-
-    void param::impl::set(const blob_t & val)
-    {
-      if( !v_ || v_->var_type() != synqry::colhead::t_blob )
-      {
-        v_ = new binry(val);
-        q_->param_pool_.push_back(v_);
-      }
-      else
-      {
-        v_->from_binary(val);
-      }
-      changed_ = true;
-    }
-
-    void param::impl::set(const unsigned char * ptr,unsigned int size)
-    {
-      if( !v_ || v_->var_type() != synqry::colhead::t_blob )
-      {
-        v_ = new binry(ptr,size);
-        q_->param_pool_.push_back(v_);
-      }
-      else
-      {
-        v_->from_binary(ptr,size);
-      }
-      changed_ = true;
-    }
-  }
-}
+  } /* end of slt3 namespace */
+} /* end of cls namespace */
 
 /* EOF */

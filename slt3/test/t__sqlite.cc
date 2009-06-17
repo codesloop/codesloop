@@ -33,12 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "sqlite3.h"
 #include "conn.hh"
 #include "tran.hh"
-#include "synqry.hh"
-#include "param.hh"
-#include "int64.hh"
-#include "dbl.hh"
-#include "binry.hh"
-#include "str.hh"
+#include "query.hh"
 #include <math.h>
 #include <assert.h>
 
@@ -89,7 +84,7 @@ namespace test_sqlite {
       tran t(c);
       {
         tran st(t);
-        synqry q(st);
+        query q(st);
         assert( q.execute("CREATE TABLE T(i INT);") == true );
         assert( q.execute("DROP TABLE T;;") == true );
       }
@@ -105,7 +100,7 @@ namespace test_sqlite {
       tran t(c);
       {
         tran st(t);
-        synqry q(st);
+        query q(st);
         ustr v;
         assert( q.execute("CREATE TABLE t(i INT);") == true );
         assert( q.execute("INSERT INTO t (i) VALUES(1);") == true );
@@ -126,14 +121,14 @@ namespace test_sqlite {
       tran t(c);
       {
         tran st(t);
-        synqry q(st);
+        query q(st);
         ustr v;
         assert( q.execute("CREATE TABLE tint(i INT NOT NULL);") == true );
         assert( q.prepare("INSERT INTO tint (i) VALUES(?);") == true );
-        param & p(q.get_param(1));
+        int64 & p(q.int64_param(1));
         for( int i=0; i<10; ++i )
         {
-          p.set(100ll+i);
+          p.from_integer(100ll+i);
           assert( q.next() == false );
           assert( q.reset() == true );
         }
@@ -152,44 +147,44 @@ namespace test_sqlite {
     conn c;
     assert( c.open("test.db") == true );
     tran t(c);
-    synqry q(t);
+    query q(t);
     assert( q.execute("CREATE TABLE IF NOT EXISTS intp (i1 INT,i2 INT,i3 INT,i4 INT);") == true );
     assert( q.prepare("INSERT INTO intp (i1,i2,i3,i4) VALUES(?,?,?,?);") == true );
     //
-    param & p1(q.get_param(1));
-    param & p2(q.get_param(2));
-    param & p3(q.get_param(3));
-    param & p4(q.get_param(4));
+    int64 & p1(q.int64_param(1));
+    int64 & p2(q.int64_param(2));
+    int64 & p3(q.int64_param(3));
+    int64 & p4(q.int64_param(4));
     //
     for( int i=0; i<10; ++i )
     {
-      p1.set(100ll+i);
-      p2.set(200ll+i);
-      p3.set(300ll+i);
-      p4.set(400ll+i);
+      p1.from_integer(100ll+i);
+      p2.from_integer(200ll+i);
+      p3.from_integer(300ll+i);
+      p4.from_integer(400ll+i);
       assert( q.next() == false );
       assert( q.reset() == true );
     }
     //
     assert( q.prepare("SELECT * FROM intp WHERE i1=? AND i2=? AND i3=? AND i4=?;") == true );
     //
-    synqry::columns_t cols;
-    synqry::fields_t  flds;
+    query::columns_t cols;
+    query::fields_t  flds;
     //
     for( int i=0; i<10; ++i )
     {
-      p1.set(100ll+i);
-      p2.set(200ll+i);
-      p3.set(300ll+i);
-      p4.set(400ll+i);
+      p1.from_integer(100ll+i);
+      p2.from_integer(200ll+i);
+      p3.from_integer(300ll+i);
+      p4.from_integer(400ll+i);
 
       assert( q.next(cols,flds) == true );
 
       {
-        assert( cols.get_at(0)->type_ == synqry::colhead::t_integer );
-        assert( cols.get_at(1)->type_ == synqry::colhead::t_integer );
-        assert( cols.get_at(2)->type_ == synqry::colhead::t_integer );
-        assert( cols.get_at(3)->type_ == synqry::colhead::t_integer );
+        assert( cols.get_at(0)->type_ == query::colhead::t_integer );
+        assert( cols.get_at(1)->type_ == query::colhead::t_integer );
+        assert( cols.get_at(2)->type_ == query::colhead::t_integer );
+        assert( cols.get_at(3)->type_ == query::colhead::t_integer );
 
         assert( str("i1") == cols.get_at(0)->name_ );
         assert( str("i2") == cols.get_at(1)->name_ );
@@ -227,44 +222,44 @@ namespace test_sqlite {
     conn c;
     assert( c.open("test.db") == true );
     tran t(c);
-    synqry q(t);
+    query q(t);
     assert( q.execute("CREATE TABLE IF NOT EXISTS doublep (d1 REAL,d2 REAL,d3 REAL,d4 REAL);") == true );
     assert( q.prepare("INSERT INTO doublep (d1,d2,d3,d4) VALUES(?,?,?,?);") == true );
     //
-    param & p1(q.get_param(1));
-    param & p2(q.get_param(2));
-    param & p3(q.get_param(3));
-    param & p4(q.get_param(4));
+    dbl & p1(q.dbl_param(1));
+    dbl & p2(q.dbl_param(2));
+    dbl & p3(q.dbl_param(3));
+    dbl & p4(q.dbl_param(4));
     //
     for( int i=0; i<10; ++i )
     {
-      p1.set(0.11+i);
-      p2.set(0.12+i);
-      p3.set(0.13+i);
-      p4.set(0.14+i);
+      p1.from_double(0.11+i);
+      p2.from_double(0.12+i);
+      p3.from_double(0.13+i);
+      p4.from_double(0.14+i);
       assert( q.next() == false );
       assert( q.reset() == true );
     }
     //
     assert( q.prepare("SELECT * FROM doublep WHERE d1=? AND d2=? AND d3=? AND d4=?;") == true );
     //
-    synqry::columns_t cols;
-    synqry::fields_t  flds;
+    query::columns_t cols;
+    query::fields_t  flds;
     //
     for( int i=0; i<10; ++i )
     {
-      p1.set(0.11+i);
-      p2.set(0.12+i);
-      p3.set(0.13+i);
-      p4.set(0.14+i);
+      p1.from_double(0.11+i);
+      p2.from_double(0.12+i);
+      p3.from_double(0.13+i);
+      p4.from_double(0.14+i);
 
       assert( q.next(cols,flds) == true );
 
       {
-        assert( cols.get_at(0)->type_ == synqry::colhead::t_double );
-        assert( cols.get_at(1)->type_ == synqry::colhead::t_double );
-        assert( cols.get_at(2)->type_ == synqry::colhead::t_double );
-        assert( cols.get_at(3)->type_ == synqry::colhead::t_double );
+        assert( cols.get_at(0)->type_ == query::colhead::t_double );
+        assert( cols.get_at(1)->type_ == query::colhead::t_double );
+        assert( cols.get_at(2)->type_ == query::colhead::t_double );
+        assert( cols.get_at(3)->type_ == query::colhead::t_double );
 
         assert( str("d1") == cols.get_at(0)->name_ );
         assert( str("d2") == cols.get_at(1)->name_ );
@@ -301,40 +296,40 @@ namespace test_sqlite {
     conn c;
     assert( c.open("test.db") == true );
     tran t(c);
-    synqry q(t);
+    query q(t);
     assert( q.execute("CREATE TABLE IF NOT EXISTS textp (t1 TEXT,t2 TEXT);") == true );
     assert( q.prepare("INSERT INTO textp (t1,t2) VALUES(?,?);") == true );
     //
-    param & p1(q.get_param(1));
-    param & p2(q.get_param(2));
+    ustr & p1(q.ustr_param(1));
+    ustr & p2(q.ustr_param(2));
     //
-    p1.set("'_.\"");
-    p2.set("0123.'\"");
+    p1.from_string("'_.\"");
+    p2.from_string("0123.'\"");
     assert( q.next() == false );
     assert( q.reset() == true );
     //
     assert( q.prepare("SELECT * FROM textp WHERE t1=? AND t2=?;") == true );
     //
-    synqry::columns_t cols;
-    synqry::fields_t  flds;
+    query::columns_t cols;
+    query::fields_t  flds;
     //
-    p1.set("'_.\"");
-    p2.set("0123.'\"");
+    p1.from_string("'_.\"");
+    p2.from_string("0123.'\"");
 
     assert( q.next(cols,flds) == true );
 
     {
-      assert( cols.get_at(0)->type_ == synqry::colhead::t_string );
-      assert( cols.get_at(1)->type_ == synqry::colhead::t_string );
+      assert( cols.get_at(0)->type_ == query::colhead::t_string );
+      assert( cols.get_at(1)->type_ == query::colhead::t_string );
 
-      assert( str("t1") == cols.get_at(0)->name_ );
-      assert( str("t2") == cols.get_at(1)->name_ );
+      assert( ustr("t1") == cols.get_at(0)->name_ );
+      assert( ustr("t2") == cols.get_at(1)->name_ );
 
-      assert( str("textp") == cols.get_at(0)->table_ );
-      assert( str("textp") == cols.get_at(1)->table_ );
+      assert( ustr("textp") == cols.get_at(0)->table_ );
+      assert( ustr("textp") == cols.get_at(1)->table_ );
 
-      assert( str("main") == cols.get_at(0)->db_ );
-      assert( str("main") == cols.get_at(1)->db_ );
+      assert( ustr("main") == cols.get_at(0)->db_ );
+      assert( ustr("main") == cols.get_at(1)->db_ );
     }
 
     {
@@ -360,7 +355,7 @@ namespace test_sqlite {
     conn c;
     assert( c.open("test.db") == true );
     tran t(c);
-    synqry q(t);
+    query q(t);
     assert( q.execute("CREATE TABLE IF NOT EXISTS blobp (b1 BLOB,b2 BLOB);") == true );
     assert( q.prepare("INSERT INTO blobp (b1,b2) VALUES(?,?);") == true );
     //
@@ -370,28 +365,28 @@ namespace test_sqlite {
     for( unsigned int i=0;i<sizeof(tx);++i ) { tx[i] = (unsigned char)(i%99); }
     for( unsigned int i=0;i<sizeof(qx);++i ) { qx[i] = (unsigned char)(i%111); }
     //
-    param & p1(q.get_param(1));
-    param & p2(q.get_param(2));
+    binry & p1(q.binry_param(1));
+    binry & p2(q.binry_param(2));
     //
-    p1.set(tx,sizeof(tx));
-    p2.set(qx,sizeof(qx));
+    p1.from_binary(tx,sizeof(tx));
+    p2.from_binary(qx,sizeof(qx));
     //
     assert( q.next() == false );
     assert( q.reset() == true );
     //
     assert( q.prepare("SELECT * FROM blobp WHERE b1=? AND b2=?;") == true );
     //
-    synqry::columns_t cols;
-    synqry::fields_t  flds;
+    query::columns_t cols;
+    query::fields_t  flds;
     //
-    p1.set(tx,sizeof(tx));
-    p2.set(qx,sizeof(qx));
+    p1.from_binary(tx,sizeof(tx));
+    p2.from_binary(qx,sizeof(qx));
 
     assert( q.next(cols,flds) == true );
 
     {
-      assert( cols.get_at(0)->type_ == synqry::colhead::t_blob );
-      assert( cols.get_at(1)->type_ == synqry::colhead::t_blob );
+      assert( cols.get_at(0)->type_ == query::colhead::t_blob );
+      assert( cols.get_at(1)->type_ == query::colhead::t_blob );
 
       assert( str("b1") == cols.get_at(0)->name_ );
       assert( str("b2") == cols.get_at(1)->name_ );

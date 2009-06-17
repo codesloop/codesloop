@@ -29,196 +29,180 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
   @file var.hh
   @brief slt3 var
-  @todo document me
+  
+  implementation of slt3 variables that helps 'instrumenting' classes to easily use the
+  simple object relational mapping provided by slt3. these variables bind member variables to
+  database fields.
  */
 
 #include "pvlist.hh"
-#include "mpool.hh"
-#include "tbuf.hh"
 #include "pbuf.hh"
-#include "synqry.hh"
+#include "query.hh"
 #include "int64.hh"
 #include "dbl.hh"
 #include "binry.hh"
-#include "str.hh"
 #include "ustr.hh"
 #ifdef __cplusplus
 #include <vector>
-#include <memory>
 
 namespace csl
 {
   namespace slt3
   {
     class obj;
-    class intvar;
-    class strvar;
-    class doublevar;
-    class blobvar;
-    class param;
 
-    /** @todo document me */
-    class var
+    /**
+    @brief slt3::var is the base class of other slt3 variable mappers
+    
+    slt3::var variables represents the mapping between member variables of classes and database fields.
+    this is part of the object relational mapping facilities of slt3. the mapping is done with the help of
+    member variables that are registered by var::helper.
+    */
+    class var_base
     {
+    public:
+      /* abstract functions */
+      //virtual void set_param(common::var & p) = 0;
+      virtual bool set_value(query::colhead * ch,query::field * fd) = 0;
+      virtual common::var * get_value() = 0;
+      virtual int type() = 0;
+
+      inline virtual ~var_base() {}
+      inline var_base(obj & parent) : parent_(&parent) {}
+
+    protected:
+      /* helpers */
+      virtual void register_variable(var_base * v,const char * name,const char * coltype,slt3::obj & parent,const char * flags); 
+
+      inline virtual obj * parent() { return parent_; }
+
+      obj * parent_;
+        
+    public:
+      /** @todo document me */
+      class helper
+      {
       public:
-        virtual void set_param(param & p) = 0;
-        virtual bool set_value(synqry::colhead * ch,synqry::field * fd) = 0;
-        virtual common::var * get_value() = 0;
-        virtual int type() = 0;
-        virtual ~var() {}
+        bool add_field(const char * name, var_base & v);
+      
+          struct data
+          {
+            const char * name_;
+            var_base  * var_;
+            data(const char * nm,var_base & v) : name_(nm), var_(&v) {}
+          };
 
-        /** @todo document me */
-        class helper
-        {
-          public:
-            bool add_field(const char * name, var & v);
+        typedef common::pvlist< 32,data,common::delete_destructor<data> > datalist_t;
 
-            struct data
-            {
-              const char * name_;
-              var  * var_;
-              data(const char * nm,var & v) : name_(nm), var_(&v) {}
-            };
+        bool init(tran & t, const char * sql_query);
+        bool create(tran & t, const char * sql_query);
+        bool save(tran & t, const char * sql_query);
+        bool remove(tran & t, const char * sql_query);
+        bool find_by_id(tran & t, const char * sql_query);
+        bool find_by(tran & t,
+                      const char * sql_query,
+                      int field1,
+                      int field2=-1,
+                      int field3=-1,
+                      int field4=-1,
+                      int field5=-1);
 
-            typedef common::pvlist< 32,data,common::delete_destructor<data> > datalist_t;
-
-            bool init(tran & t, const char * sql_query);
-            bool create(tran & t, const char * sql_query);
-            bool save(tran & t, const char * sql_query);
-            bool remove(tran & t, const char * sql_query);
-            bool find_by_id(tran & t, const char * sql_query);
-            bool find_by(tran & t,
-                         const char * sql_query,
-                         int field1,
-                         int field2=-1,
-                         int field3=-1,
-                         int field4=-1,
-                         int field5=-1);
-
-            void set_id(long long id);
-
-          private:
-            datalist_t dtalst_;
-        };
-
-        inline var(obj & parent) : parent_(&parent) {}
+        void set_id(long long id);
 
       private:
-        var() {}
-        var(const var & other) {}
-        var & operator=(const slt3::var & other) { return *this; }
+        datalist_t dtalst_;
+      };
 
-      protected:
-        inline obj * parent() { return parent_; }
-
-        obj * parent_;
+    private:
+      /* not allowed to call these */
+      var_base() {}
+      var_base(const var_base & other) {}
+      var_base & operator=(const var_base & other) { return *this; }
     };
-
-    /** @todo document me */
-    class intvar : public slt3::var
+    
+    template <typename T> struct var_col_type {};
+    template <> struct var_col_type<common::int64> { static const char * coltype_s; };
+    template <> struct var_col_type<common::dbl> { static const char * coltype_s; };
+    template <> struct var_col_type<common::ustr> { static const char * coltype_s; };
+    template <> struct var_col_type<common::binry> { static const char * coltype_s; };
+    
+    template <typename T> class varT : public var_base
     {
-      public:
-        enum { typ = synqry::colhead::t_integer };
+    public:
+      inline varT(const char * name, slt3::obj & parent,const char * flags="") : var_base(parent)
+      {
+        register_variable(this,name,var_col_type<T>::coltype_s,parent,flags);
+      }
+      
+      enum { type_v = T::var_type_v };
 
-        virtual inline int type() { return typ; }
+      inline int type() { return type_v; }
+      
+      inline bool set_value(query::colhead * ch,query::field * fd)
+      {
+        if( !ch || !fd ) return false;
+        bool ret = value_.from_var(*fd);
+        parent()->on_change();
+        return ret;
+      }
+      
+      typedef T tval_t;
+      typedef typename T::value_t value_t;
+      
+      inline value_t get() const { value_.value(); }
 
-        virtual void set_param(param & p);
-        virtual bool set_value(synqry::colhead * ch,synqry::field * fd);
-        intvar(const char * name, slt3::obj & parent,const char * flags="");
+      template <typename V> inline bool get(V & v) const { return value_.get(v); }
+      template <typename V> inline bool set(V & v) { return value_.set(v); }
 
-        virtual intvar & operator=(const intvar & other);
-        virtual intvar & operator=(long long v);
-        virtual long long operator*() const;
-        virtual long long get() const;
+      inline varT & operator=(const char * other)
+      {
+        value_.from_string(other);
+        return *this;
+      }
+      
+      inline varT & operator=(const wchar_t * other)
+      {
+        value_.from_string(other);
+        return *this;
+      }
+      
+      inline varT & operator=(const T & other)
+      {
+        value_ = other;
+        return *this;
+      }
+      
+      inline varT & operator=(const varT & other)
+      {
+        value_ = other.value_;
+        return *this;
+      }
+      
+      inline varT & operator=(const common::binry::buf_t & other)
+      {
+        value_.from_binary(other.data(),other.size());
+        return *this;
+      }
 
-        common::var * get_value() { return &value_; }
-
-      private:
-        common::int64 value_;
+      inline varT & operator=(const std::vector<unsigned char> & vref)
+      {
+        value_.from_binary( &(vref[0]), vref.size() );
+        return *this;
+      }
+      
+      inline common::var * get_value() { return &value_; }
+      
+    private:
+      T value_;
     };
+    
+    typedef varT<common::int64> intvar;
+    typedef varT<common::dbl>   doublevar;
+    typedef varT<common::ustr>  strvar;
+    typedef varT<common::binry> blobvar;
 
-    /** @todo document me */
-    class strvar : public slt3::var
-    {
-      public:
-        enum { typ = synqry::colhead::t_string };
-        typedef common::ustr value_t;
-
-        virtual inline int type() { return typ; }
-
-        virtual void set_param(param & p);
-        virtual bool set_value(synqry::colhead * ch,synqry::field * fd);
-        strvar(const char * name, slt3::obj & parent,const char * flags="");
-
-        virtual strvar & operator=(const strvar & other);
-        virtual strvar & operator=(const char * other);
-        virtual strvar & operator=(const common::str & other);
-        virtual strvar & operator=(const common::ustr & other);
-        virtual strvar & operator=(const common::pbuf & other);
-        virtual const value_t & operator*() const;
-        virtual const value_t & get() const;
-        virtual const char * c_str();
-
-        common::var * get_value() { return &value_; }
-
-      private:
-        common::ustr value_;
-    };
-
-    /** @todo document me */
-    class doublevar : public slt3::var
-    {
-      public:
-        enum { typ = synqry::colhead::t_double };
-        typedef double value_t;
-
-        virtual inline int type() { return typ; }
-
-        virtual void set_param(param & p);
-        virtual bool set_value(synqry::colhead * ch,synqry::field * fd);
-        doublevar(const char * name, slt3::obj & parent,const char * flags="");
-
-        virtual doublevar & operator=(const doublevar & other);
-        virtual doublevar & operator=(value_t other);
-        virtual double operator*() const;
-        virtual double get() const;
-
-        common::var * get_value() { return &value_; }
-
-      private:
-        common::dbl value_;
-    };
-
-    /** @todo document me */
-    class blobvar : public slt3::var
-    {
-      public:
-        enum { typ = synqry::colhead::t_blob };
-        typedef common::binry::buf_t value_t;
-
-        virtual inline int type() { return typ; }
-
-        virtual void set_param(param & p);
-        virtual bool set_value(synqry::colhead * ch,synqry::field * fd);
-        blobvar(const char * name, slt3::obj & parent,const char * flags="");
-
-        virtual blobvar & operator=(const blobvar & other);
-        virtual blobvar & operator=(const value_t & other);
-        virtual blobvar & operator=(const std::vector<unsigned char> & other);
-        virtual blobvar & operator=(const common::pbuf & other);
-        virtual blobvar & operator=(const common::str & other);
-        virtual blobvar & operator=(const common::ustr & other);
-        virtual const value_t & operator*() const;
-        virtual const value_t & get() const;
-        virtual unsigned int size();
-
-        common::var * get_value() { return &value_; }
-
-      private:
-        common::binry value_;
-    };
-  }
-}
+  } /* end of slt3 namespace */
+} /* end of csl namespace */
 
 #endif /* __cplusplus */
 #endif /* _csl_slt3_var_hh_included_ */

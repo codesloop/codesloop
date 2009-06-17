@@ -58,13 +58,29 @@ namespace csl
         double value_;
 
       public:
-        inline dbl() : var(), value_(0.0) { }             ///<default constructor
-        inline dbl(double v) : var(), value_(v) { }       ///<copy constructor
-        virtual inline ~dbl() {}                          ///<destructor
-        inline double value() const { return value_; }    ///<returns the long long value
-        inline int var_type() { return CSL_TYPE_DOUBLE; } ///<value type helps distinguish from other var types
-        inline void reset() { value_ = 0.0; }             ///<resets the internal value to 0.0
+       typedef double value_t;
+       enum { var_type_v =  CSL_TYPE_DOUBLE }; 
+      
+       inline dbl() : var(), value_(0.0) { }             ///<default constructor
+       inline dbl(double v) : var(), value_(v) { }       ///<copy constructor
+       virtual inline ~dbl() {}                          ///<destructor
+       inline value_t value() const { return value_; }    ///<returns the long long value
+       inline int var_type() const { return var_type_v; } ///<value type helps distinguish from other var types
+       inline void reset() { value_ = 0.0; }             ///<resets the internal value to 0.0
+       
+        /** @brief copy operator */
+        inline dbl & operator=(const dbl & other)
+        {
+          value_ = other.value_;
+          return *this;
+        }
 
+        /** @brief returns a const pointer to internal data */
+        inline operator const unsigned char *() const { return (unsigned char *)(&value_); }
+        
+        /** @brief returns the size of the variable data */
+        inline size_t var_size() const { return sizeof(value_); }
+        
         /* conversions to other types */
         /**
         @brief convert to common::int64

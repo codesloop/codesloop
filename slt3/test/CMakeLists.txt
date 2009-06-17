@@ -77,7 +77,6 @@ ENDIF(WIN32)
 
 ADD_EXECUTABLE(t__sqlite       t__sqlite.cc)
 ADD_EXECUTABLE(t__conn         t__conn.cc)
-ADD_EXECUTABLE(t__param        t__param.cc)
 ADD_EXECUTABLE(t__tran         t__tran.cc)
 ADD_EXECUTABLE(t__synqry       t__synqry.cc)
 ADD_EXECUTABLE(t__reg          t__reg.cc)

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -175,7 +175,7 @@ namespace test_peer {
     assert( p3.public_key().is_empty() == false );
     assert( p3.private_key().has_data() == true );
     assert( p3.public_key().algname() == "prime192v3" );
-    assert( str(p3.common_name_.c_str()) == "Hello" );
+    assert( p3.common_name_.get() == "Hello" );
     assert( p3.id_.get() == p2.id_.get() );
   }
 
@@ -205,7 +205,7 @@ int main()
     peer p;
     conn & db(p.db());
     tran t(db);
-    synqry q(t);
+    query q(t);
     q.execute("DELETE FROM peers;");
   }
 
