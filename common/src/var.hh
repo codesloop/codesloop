@@ -165,7 +165,7 @@ namespace csl
         virtual size_t var_size() const = 0;
 
         /** @brief returns a const pointer to internal data */
-        virtual operator const unsigned char *() const = 0;
+        virtual const unsigned char * ucharp_data() const = 0;
 
         /** @brief convert variable to signed 64 bit integer using built in conversion */
         virtual inline operator long long () const
@@ -197,9 +197,6 @@ namespace csl
         
         /** @brief returns a const pointer to internal data */
         virtual const char * charp_data() const { return (const char *)(this->ucharp_data()); };
-
-        /** @brief returns a const pointer to internal data */
-        virtual const unsigned char * ucharp_data() const { return ((const unsigned char *)*this); };
         
         /** @brief initialize from C string */
         virtual inline bool set(const char * v) { return (this->from_string(v)); }

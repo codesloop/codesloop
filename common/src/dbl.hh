@@ -76,7 +76,7 @@ namespace csl
         }
 
         /** @brief returns a const pointer to internal data */
-        inline operator const unsigned char *() const { return (unsigned char *)(&value_); }
+        inline const unsigned char * ucharp_data() const { return (unsigned char *)(&value_); }
         
         /** @brief returns the size of the variable data */
         inline size_t var_size() const { return sizeof(value_); }

@@ -285,7 +285,7 @@ namespace csl
         /** @brief unchecked access to buffer */
         inline wchar_t operator[](const size_t n) const
         {
-          return data()[n];
+          return (data())[n];
         }
 
         /** @brief check access to buffer */
@@ -371,7 +371,7 @@ namespace csl
         void ensure_trailing_zero();
 
         /** @brief returns a const pointer to internal data */
-        inline operator const unsigned char *() const { return buf_.data(); }
+        inline const unsigned char * ucharp_data() const { return buf_.data(); }
         
         /** @brief returns the size of the variable data */
         inline size_t var_size() const { return buf_.size(); }

@@ -84,7 +84,7 @@ namespace csl
         inline void reset() { value_.reset(); } ///<reset the internal buffer
         
         /** @brief returns a const pointer to internal data */
-        inline operator const unsigned char *() const { return value_.data(); }
+        inline const unsigned char * ucharp_data() const { return value_.data(); }
         
         /** @brief returns the size of the variable data */
         inline size_t var_size() const { return value_.size(); }
