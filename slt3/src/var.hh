@@ -300,7 +300,7 @@ namespace csl
       @li tbuf<>
       
       */
-      inline value_t get() const { value_.value(); }
+      inline value_t get() const { return value_.value(); }
 
       /**
       @brief forwards the get() operation to the value's get() operation

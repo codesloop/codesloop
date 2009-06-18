@@ -64,7 +64,7 @@ namespace csl
        inline dbl() : var(), value_(0.0) { }             ///<default constructor
        inline dbl(double v) : var(), value_(v) { }       ///<copy constructor
        virtual inline ~dbl() {}                          ///<destructor
-       inline value_t value() const { return value_; }    ///<returns the long long value
+       inline value_t value() const { return value_; }    ///<returns the double value
        inline int var_type() const { return var_type_v; } ///<value type helps distinguish from other var types
        inline void reset() { value_ = 0.0; }             ///<resets the internal value to 0.0
        
