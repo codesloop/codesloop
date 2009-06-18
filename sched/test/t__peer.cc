@@ -175,7 +175,7 @@ namespace test_peer {
     assert( p3.public_key().is_empty() == false );
     assert( p3.private_key().has_data() == true );
     assert( p3.public_key().algname() == "prime192v3" );
-    assert( p3.common_name_.get() == "Hello" );
+    assert( p3.common_name_ == "Hello" );
     assert( p3.id_.get() == p2.id_.get() );
   }
 

@@ -319,6 +319,12 @@ namespace csl
         return ret;
       }
 
+      /** @brief forward operator checks for equality */
+      template <typename V> inline bool operator==(V & other) const
+      {
+        return (value_ == other);
+      }
+
       /** @brief copy constructor (initialize from char * string) */
       inline varT & operator=(const char * other)
       {
