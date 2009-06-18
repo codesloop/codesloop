@@ -331,7 +331,7 @@ namespace csl
         */
         inline bool empty() const
         {
-          return !buf_.has_data();
+          return (buf_.size() <= 1);
         }
 
         /** @brief returns the internal buffer that stores the string */
