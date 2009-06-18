@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -57,7 +57,7 @@ namespace csl
     bool obj::find_by_id(tran & t)
     {
       bool r = var_helper().find_by_id(t,sql_helper().find_by_id_sql());
-      if( r ) on_load();
+      if( r ) this->on_load();
       return r;
     }
 
@@ -73,7 +73,7 @@ namespace csl
                      t,
                      sql_helper().find_by(field1, field2, field3, field4, field5),
                      field1, field2, field3, field4, field5);
-      if( r ) on_load();
+      if( r ) this->on_load();
       return r;
     }
 
@@ -119,6 +119,7 @@ namespace csl
       tran t(dbr);
       t.use_exc(true);
       bool ret = find_by_id(t);
+      if( ret ) this->on_load();
       return ret;
     }
 
@@ -132,6 +133,7 @@ namespace csl
       tran t(dbr);
       t.use_exc(true);
       bool ret = find_by(field1,field2,field3,field4,field5);
+      if( ret ) this->on_load();
       return ret;
     }
 

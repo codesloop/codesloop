@@ -38,8 +38,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
    @file query.hh
    @brief Represents a SQLite3 query object
-   
-   @todo rewrite to use common::var instead of slt3::param
  */
 
 namespace csl
@@ -204,7 +202,6 @@ namespace csl
         /** @brief returns the current setting of autoreset_data */
         bool autoreset_data();
 
-
         /**
         @brief step of iterative or parametrized query
         @param cols is used to return the result column data
@@ -222,7 +219,6 @@ namespace csl
         all query allocated memory will be freed at destruction 
          */
         bool next(columns_t & cols, fields_t & fields);
-
 
         /**
         @brief step of iterative or parametrized query

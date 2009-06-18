@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -65,49 +65,63 @@ namespace csl
         conn();
         ~conn();
 
-        /** @brief Opens an SQLite3 (main) database
-            @param db is the filename of the database
-            @return true if successful
-            @throw slt3::exc error description
+        /**
+        @brief Opens an SQLite3 (main) database
+        @param db is the filename of the database
+        @return true if successful
+        @throw slt3::exc error description
 
-            depending on the use_exc() value it may throw an slt3::exc exception
+        depending on the use_exc() value it may throw an slt3::exc exception
 
-            if use_exc is true it throws otherwise it displays an error message on stderr */
+        if use_exc is true it throws otherwise it displays an error message on stderr 
+         */
         bool open(const char * db);
 
-        /** @brief Returns the name used for opening the database
-            @return the pathname of the database opened 
+        /**
+        @brief Returns the name used for opening the database
+        @return the pathname of the database opened 
 
-           if the open() was not successful than name().empty() == true */
+        if the open() was not successful than name().empty() == true 
+         */
         const common::ustr & name() const;
 
-        /** @brief Closes an SQLite3 connection
-            @return true if successful
-            @throw slt3::exc error description
+        /**
+        @brief Closes an SQLite3 connection
+        @return true if successful
+        @throw slt3::exc error description
 
-            depending on the use_exc() value it may throw an slt3::exc exception
+        depending on the use_exc() value it may throw an slt3::exc exception
 
-            if use_exc is true it throws otherwise it displays an error message on stderr */
+        if use_exc is true it throws otherwise it displays an error message on stderr 
+         */
         bool close();
 
-        /** @brief returns the last insert rowid of the last insert query
-            @return the insert id or -1 on error
-            @throw slt3::exc */
+        /**
+        @brief returns the last insert rowid of the last insert query
+        @return the insert id or -1 on error
+        @throw slt3::exc 
+         */
         long long last_insert_id();
 
-        /** @brief returns the number of changed rows of the last query
-            @return the number or -1 on error 
-            @throw slt3::exc */
+        /**
+        @brief returns the number of changed rows of the last query
+        @return the number or -1 on error 
+        @throw slt3::exc 
+         */
         long long change_count();
 
-        /** @brief Specifies whether conn should throw slt3::exc exceptions
-            @param yesno is the desired value to be set
+        /**
+        @brief Specifies whether conn should throw slt3::exc exceptions
+        @param yesno is the desired value to be set
 
-            the default value for use_exc() is true, so it throws exceptions by default */
+        the default value for use_exc() is true, so it throws exceptions by default 
+         */
         void use_exc(bool yesno);
 
-        /** @brief Returns the current value of use_exc
-            @return true if exc exceptions are used */
+        /** 
+        @brief Returns the current value of use_exc
+        @return true if exc exceptions are used 
+        */
         bool use_exc();
 
         /* types */

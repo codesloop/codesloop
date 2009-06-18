@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -56,8 +56,8 @@ namespace csl
       }
     }
 
-    reg::helper::helper(const char * default_db_name, const char * default_db_path)
-      : name_(default_db_name), default_path_(default_db_path), use_exc_(true) { }
+    reg::helper::helper(const char * name, const char * default_db_path)
+      : name_(name), default_path_(default_db_path), use_exc_(true) { }
 
     const char * reg::helper::path()
     {
@@ -129,10 +129,15 @@ namespace csl
       }
     }
 
+    std::auto_ptr<reg> reg::instance_;
+
     reg & reg::instance(const char * p)
     {
-      static reg * instance_ = 0;
-      if( !instance_ ) instance_ = new reg();
+      /* TODO fix multithreading here */
+      if( !(instance_.get()) )
+      {
+        instance_ = std::auto_ptr<reg>(new reg());
+      }
 
       if( p )
       {

@@ -57,6 +57,8 @@ namespace csl
       fieldlist_t::iterator it(fields_.begin());
       fieldlist_t::iterator end(fields_.end());
 
+      /** @todo this is highly inefficient. performance improvement needed */
+
       for( ;it!=end;++it )
       {
         if( ::strcmp(name,(*it)->name_) == 0 )

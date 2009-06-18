@@ -57,7 +57,7 @@ namespace csl
         query::colhead ch;
         common::int64 fd(id);
 
-        ch.type_   = query::colhead::t_integer;
+        ch.type_  = query::colhead::t_integer;
         dx->var_->set_value(&ch,&fd);
       }
     }
