@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -51,8 +51,8 @@ namespace csl
              msgs_.ev_, cb ) ) return false;
 
         /* copy addr to temporary */
-        SAI addr = this->addr();
-        socklen_t len = sizeof(addr);
+        SAI addrv = this->addr();
+        socklen_t len = sizeof(addrv);
 
         /* the caller may supply a preinited socket, so we check that first
            we assume that socket don't need to be bound */
@@ -65,14 +65,14 @@ namespace csl
           int sock = tsock;
 
           /* check socket address */
-          if( ::getsockname(sock,(struct sockaddr *)&addr,&len) )
+          if( ::getsockname(sock,reinterpret_cast<struct sockaddr *>(&addrv),&len) )
           {
             ShutdownCloseSocket( sock );
             THRC(exc::rs_getsockname_failed,exc::cm_udp_recvr,false);
           }
 
           /* copy the address */
-          this->addr( addr );
+          this->addr( addrv );
           socket_ = sock;
 
           return true;
@@ -86,21 +86,21 @@ namespace csl
           if( sock <= 0 ) { THRC(exc::rs_socket_failed,exc::cm_udp_recvr,false); }
 
           /* bind socket */
-          if( ::bind(sock,(struct sockaddr *)&addr, sizeof(addr)) )
+          if( ::bind(sock,reinterpret_cast<struct sockaddr *>(&addrv), sizeof(addrv)) )
           {
             ShutdownCloseSocket( sock );
             THRC(exc::rs_bind_failed,exc::cm_udp_recvr,false);
           }
 
           /* check internal address */
-          if( ::getsockname(sock,(struct sockaddr *)&addr,&len) )
+          if( ::getsockname(sock,reinterpret_cast<struct sockaddr *>(&addrv),&len) )
           {
             ShutdownCloseSocket( sock );
             THRC(exc::rs_getsockname_failed,exc::cm_udp_recvr,false);
           }
 
           /* copy the address back, in case of OS chosen port/address */
-          this->addr( addr );
+          this->addr( addrv );
           socket_ = sock;
         }
 
@@ -140,7 +140,8 @@ namespace csl
           socklen_t len = sizeof(m.sender_);
 
           /* receive packet */
-          recvd = recvfrom( socket_, (char *)m.data_, m.max_len(), 0, (struct sockaddr *)&(m.sender_), &len );
+          recvd = ::recvfrom( socket_, reinterpret_cast<char *>(m.data_), m.max_len(), 0,
+            reinterpret_cast<struct sockaddr *>(&(m.sender_)), &len );
 
           if( recvd < 0 ) { THRNORET(exc::rs_recv_failed,exc::cm_udp_recvr); break; }
           else if( recvd == 0 )

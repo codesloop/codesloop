@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -88,7 +88,7 @@ namespace test_pbuf {
     /* if empty, then begin==end */
     assert( it == end );
 
-    assert( pb.append((const unsigned char *)"Hello",5) == true );
+    assert( pb.append( reinterpret_cast<const unsigned char *>("Hello"),5) == true );
     it = pb.begin();
 
     assert( it != end );
@@ -107,7 +107,7 @@ namespace test_pbuf {
     /* if empty, then begin==end */
     assert( it == end );
 
-    assert( pb.append((const unsigned char *)"Hello",5) == true );
+    assert( pb.append( reinterpret_cast<const unsigned char *>("Hello"),5) == true );
     it = pbc.begin();
 
     assert( it != end );
@@ -120,7 +120,7 @@ namespace test_pbuf {
     /* hello world string */
     {
       pbuf pb1;
-      assert( pb1.append((unsigned char *)"Hello world",12) == true );
+      assert( pb1.append( reinterpret_cast<const unsigned char *>("Hello world"),12) == true );
       pbuf pb2(pb1);
       assert( pb1 == pb2 );
       pbuf pb3;

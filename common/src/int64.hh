@@ -76,7 +76,7 @@ namespace csl
         }
 
         /** @brief returns a const pointer to internal data */
-        inline const unsigned char * ucharp_data() const { return (unsigned char *)(&value_); }
+        inline const unsigned char * ucharp_data() const { return reinterpret_cast<const unsigned char *>(&value_); }
         
         /** @brief returns the size of the variable data */
         inline size_t var_size() const { return sizeof(value_); }
@@ -118,7 +118,7 @@ namespace csl
 
         conversion is done using cast and assignment
          */
-        inline bool to_double(double & v) const { v = (double)value_; return true; }
+        inline bool to_double(double & v) const { v = static_cast<double>(value_); return true; }
 
         /**
         @brief convert to common::str
@@ -231,7 +231,7 @@ namespace csl
 
         conversion is done w/ cast and assignment
          */
-        inline bool from_double(double v) { value_ = (long long)v; return true; }
+        inline bool from_double(double v) { value_ = static_cast<long long>(v); return true; }
 
         /**
         @brief convert a common::str

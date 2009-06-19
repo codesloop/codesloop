@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -186,14 +186,14 @@ namespace csl
       return t->start_event().wait(10000);
     }
 
-    bool thrpool::init( unsigned int min, unsigned int max,
-                        unsigned int timeout, unsigned int attempts,
+    bool thrpool::init( unsigned int mint, unsigned int maxt,
+                        unsigned int timeoutt, unsigned int attemptst,
                         event & ev, thread::callback & handler )
     {
-      if( max < min )             { THR(nthread::exc::rs_invalid_param, nthread::exc::cm_thrpool,false); }
-      if( min < 1 || max > 2000 ) { THR(nthread::exc::rs_invalid_param, nthread::exc::cm_thrpool,false); }
-      if( attempts == 0 )         { THR(nthread::exc::rs_invalid_param, nthread::exc::cm_thrpool,false); }
-      if( timeout == 0 )          { THR(nthread::exc::rs_invalid_param, nthread::exc::cm_thrpool,false); }
+      if( maxt < mint )             { THR(nthread::exc::rs_invalid_param, nthread::exc::cm_thrpool,false); }
+      if( mint < 1 || maxt > 2000 ) { THR(nthread::exc::rs_invalid_param, nthread::exc::cm_thrpool,false); }
+      if( attemptst == 0 )          { THR(nthread::exc::rs_invalid_param, nthread::exc::cm_thrpool,false); }
+      if( timeoutt == 0 )           { THR(nthread::exc::rs_invalid_param, nthread::exc::cm_thrpool,false); }
 
       if( count() > 0 )
       {
@@ -209,15 +209,15 @@ namespace csl
       {
         scoped_mutex m(mtx_);
 
-        min_         = min;
-        max_         = max;
-        timeout_     = timeout;
-        attempts_    = attempts;
+        min_         = mint;
+        max_         = maxt;
+        timeout_     = timeoutt;
+        attempts_    = attemptst;
         ev_          = &ev;
         handler_     = &handler;
       }
 
-      for( unsigned int i=0;i<min;++i )
+      for( unsigned int i=0;i<mint;++i )
       {
         if( start_one() == false )
         {
@@ -277,7 +277,7 @@ namespace csl
         thrlist_t::iterator it = threads_.begin();
         for( ;it!=threads_.end();++it )
         {
-          ((entry *)(*it).second)->stop_me();
+          (dynamic_cast<entry *>((*it).second))->stop_me();
         }
       }
 

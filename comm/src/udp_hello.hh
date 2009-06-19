@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -138,13 +138,13 @@ namespace csl
             /* set threadpool params _before_ start */
             inline void set_threadpool_params( unsigned int min_th,
                                                unsigned int max_th,
-                                               unsigned int timeout_ms,
-                                               unsigned int retries )
+                                               unsigned int timeoutms,
+                                               unsigned int nretries )
             {
               min_threads_ = min_th;
               max_threads_ = max_th;
-              timeout_ms_  = timeout_ms;
-              retries_     = retries;
+              timeout_ms_  = timeoutms;
+              retries_     = nretries;
             }
 
             inline unsigned int min_threads() const { return min_threads_; }

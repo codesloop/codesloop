@@ -51,7 +51,7 @@ namespace csl
     {
       if( value_.size() < sizeof(long long) ) { return false; }
 
-      long long * p = (long long *)value_.data();
+      const long long * p = reinterpret_cast<const long long *>(value_.data());
       v = *p;
 
       return true;
@@ -61,7 +61,7 @@ namespace csl
     {
       if( value_.size() < sizeof(double) ) { return false; }
 
-      double * p = (double *)value_.data();
+      const double * p = reinterpret_cast<const double *>(value_.data());
       v = *p;
 
       return true;
@@ -87,7 +87,8 @@ namespace csl
       {
         size_t sz = value_.size();
         if( value_.data()[sz-1] == 0 ) --sz;
-        v.assign( (const char *)value_.data(),(const char *)(value_.data()+sz) );
+        v.assign( reinterpret_cast<const char *>(value_.data()),
+                  reinterpret_cast<const char *>(value_.data()+sz) );
       }
       return true;
     }
@@ -124,14 +125,14 @@ namespace csl
     /* conversions from other types */
     bool binry::from_integer(long long v)
     {
-      long long * p = (long long *)value_.allocate(sizeof(long long));
+      long long * p = reinterpret_cast<long long *>(value_.allocate(sizeof(long long)));
       *p = v;
       return true;
     }
 
     bool binry::from_double(double v)
     {
-      double * p = (double *)value_.allocate(sizeof(double));
+      double * p = reinterpret_cast<double *>(value_.allocate(sizeof(double)));
       *p = v;
       return true;
     }
@@ -150,7 +151,7 @@ namespace csl
     {
       if( v.size() == 0 ) { value_.reset(); return true; }
       const char * p = v.c_str();
-      return value_.set( (unsigned char *)p,v.size()+1 );
+      return value_.set( reinterpret_cast<const unsigned char *>(p),v.size()+1 );
     }
 
     bool binry::from_string(const char * v)
@@ -184,7 +185,7 @@ namespace csl
     {
       if( !v ) return false;
       if( !sz ) { value_.reset(); return true; }
-      return value_.set((const unsigned char *)v,sz);
+      return value_.set( reinterpret_cast<const unsigned char *>(v), sz );
     }
 
     bool binry::from_xdr(xdrbuf & v)

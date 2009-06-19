@@ -660,7 +660,7 @@ namespace csl
             "  -- next : %p\n"
             "  ---- : ",
                  pt->ptrs_,
-                 (unsigned long)pt->used_,
+                 static_cast<unsigned long>(pt->used_),
                  pt->next_ );
           for( size_t i=0;i<pt->used_;++i ) printf("%p ",pt->ptrs_[i]);
           printf("\n");

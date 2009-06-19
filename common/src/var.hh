@@ -196,7 +196,7 @@ namespace csl
         }
         
         /** @brief returns a const pointer to internal data */
-        virtual const char * charp_data() const { return (const char *)(this->ucharp_data()); };
+        virtual const char * charp_data() const { return reinterpret_cast<const char *>(this->ucharp_data()); };
         
         /** @brief initialize from C string */
         virtual inline bool set(const char * v) { return (this->from_string(v)); }
@@ -214,10 +214,10 @@ namespace csl
         virtual inline bool set(const unsigned char * ptr, size_t sz) { return (this->from_binary(ptr,sz)); }
         
         /** @brief returns the value as double */
-        virtual inline double get_double() const { return (double)(*this); }
+        virtual inline double get_double() const { return static_cast<double>(*this); }
         
         /** @brief returns the value as long long */
-        virtual inline long long get_long() const { return (long long)(*this); }
+        virtual inline long long get_long() const { return static_cast<long long>(*this); }
         
         /** @brief converts and copies the internal value to long long */
         virtual inline bool get(long long & v) { return (this->to_integer(v)); }

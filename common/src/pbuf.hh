@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -96,7 +96,7 @@ namespace csl
         {
           unsigned int l=0;
           if( !str || (l=::strlen(str))== 0 ) return false;
-          return append((unsigned char *)str,(l+1));
+          return append( reinterpret_cast<const unsigned char *>(str),(l+1));
         }
 
         /**
@@ -110,7 +110,7 @@ namespace csl
         {
           unsigned int l=0;
           if( !str || (l=::wcslen(str))== 0 ) return false;
-          return append((unsigned char *)str,(l+1)*sizeof(wchar_t));
+          return append( reinterpret_cast<const unsigned char *>(str),(l+1)*sizeof(wchar_t));
         }
 
         /**

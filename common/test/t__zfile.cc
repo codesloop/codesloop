@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009. David Beck
+Copyright (c) 2008,2009. David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -58,7 +58,7 @@ void test_plain_zlib()
   assert( deflateInit2( &strm, Z_BEST_SPEED, Z_DEFLATED, -MAX_WBITS, MAX_MEM_LEVEL, Z_DEFAULT_STRATEGY ) == Z_OK );
 
   strm.next_in = p;
-  strm.avail_in = strlen((const char *)p)+1;
+  strm.avail_in = strlen( reinterpret_cast<const char *>(p) )+1;
   strm.next_out = r;
   strm.avail_out = sizeof(r);
 
@@ -121,7 +121,7 @@ void test_compressed_size_dbg()
   zf.init_custom_memory( true );
 
   assert( (zf.read_file("test_4_zfile.txt")) );
-  printf("%ld [c]=> %ld \n",(unsigned long)zf.get_size(), (unsigned long)zf.get_zsize());
+  printf("%ld [c]=> %ld \n", static_cast<unsigned long>(zf.get_size()), static_cast<unsigned long>(zf.get_zsize()) );
 }
 
 /**
@@ -144,7 +144,7 @@ void test_compressed_data1()
 
   zfile zf,zf2;
 
-  assert( zf.put_data( (const unsigned char*)p, strlen(p)+1 ) );
+  assert( zf.put_data( reinterpret_cast<const unsigned char*>(p), strlen(p)+1 ) );
   assert( zf.get_size() == strlen(p)+1 );
   assert( zf.get_zsize() > 0 );
   assert( zf.get_zdata(r) );

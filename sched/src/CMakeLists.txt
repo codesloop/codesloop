@@ -34,12 +34,12 @@ INCLUDE_DIRECTORIES( ../../nthread/src
 IF(WIN32)
 
   IF(MSYS)
+
     ADD_DEFINITIONS(
                      -Wall
                      -Wwrite-strings
                      -Wcast-qual
                      -Wpointer-arith
-                     -Wmissing-declarations
                      -Wold-style-cast
                      -Wconversion
                      -Wcomment
@@ -49,6 +49,7 @@ IF(WIN32)
                      -Wredundant-decls
                      -g3
                    )
+
   ENDIF(MSYS)
 
 ELSE(WIN32)
@@ -58,7 +59,6 @@ ELSE(WIN32)
                    -Wwrite-strings
                    -Wcast-qual
                    -Wpointer-arith
-                   -Wmissing-declarations
                    -Wold-style-cast
                    -Wconversion
                    -Wcomment
@@ -68,6 +68,7 @@ ELSE(WIN32)
                    -Wredundant-decls
                    -g3
                  )
+
   ENDIF(WIN32)
 
 ADD_LIBRARY( csl_sched STATIC

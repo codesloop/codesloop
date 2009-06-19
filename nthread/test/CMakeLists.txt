@@ -37,7 +37,6 @@ IF(WIN32)
                      -Wwrite-strings
                      -Wcast-qual
                      -Wpointer-arith
-                     -Wmissing-declarations
                      -Wold-style-cast
                      -Wconversion
                      -Wcomment
@@ -80,7 +79,6 @@ ELSE(WIN32)
                    -Wwrite-strings
                    -Wcast-qual
                    -Wpointer-arith
-                   -Wmissing-declarations
                    -Wold-style-cast
                    -Wconversion
                    -Wcomment

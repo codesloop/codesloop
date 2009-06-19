@@ -291,7 +291,7 @@ namespace test_var {
   void single_blb3()
   {
     std::vector<unsigned char> ve;
-    for(int i=0;i<256;++i ) ve.push_back(i);
+    for(int i=0;i<256;++i ) ve.push_back(static_cast<unsigned char>(i));
 
     SingleBlob v0;
     {

@@ -78,7 +78,7 @@ namespace csl
          */
         inline explicit tbuf(wchar_t c) : data_(preallocated_), size_(sizeof(wchar_t))
         {
-          ((wchar_t *)preallocated_)[0] = c;
+          (reinterpret_cast<wchar_t *>(preallocated_))[0] = c;
         }
 
         /** @brief copy constructor */
@@ -106,7 +106,7 @@ namespace csl
         /** @brief copy operator */
         inline tbuf & operator=(const char * other)
         {
-          if( other ) set((const unsigned char *)other,::strlen(other)+1);
+          if( other ) set( reinterpret_cast<const unsigned char *>(other), (::strlen(other)+1) );
           return *this;
         }
 
@@ -212,7 +212,7 @@ namespace csl
           else
           {
             /* cannot use the preallocated space */
-            unsigned char * tmp = (unsigned char *)::malloc(sz);
+            unsigned char * tmp = reinterpret_cast<unsigned char *>(::malloc(sz));
             if( !tmp ) return 0;
 
             /* already have data ? */
@@ -255,7 +255,7 @@ namespace csl
           else
           {
             /* cannot use the preallocated space */
-            unsigned char * tmp = (unsigned char *)::malloc(sz);
+            unsigned char * tmp = reinterpret_cast<unsigned char *>(::malloc(sz));
             if( !tmp ) return 0;
 
             /* already have data ? */

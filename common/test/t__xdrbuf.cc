@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -133,7 +133,7 @@ namespace test_xdrbuf {
     try
     {
       /* add invalid pointer */
-      xx << (char *)0;
+      xx << reinterpret_cast<const char *>(0);
 
       str zz;
 
@@ -193,7 +193,7 @@ namespace test_xdrbuf {
     try
     {
       /* add invalid pointer */
-      xx << (char *)0;
+      xx << reinterpret_cast<const char *>(0);
 
       str zz;
 
@@ -217,7 +217,7 @@ namespace test_xdrbuf {
     assert( zf.read_file("random.204800") == true );
     assert( zf.get_size() == 204800 );
     mpool<> mp;
-    unsigned char * ptr = (unsigned char *)mp.allocate(zf.get_size());
+    unsigned char * ptr = reinterpret_cast<unsigned char *>(mp.allocate(zf.get_size()));
     assert( ptr != 0 );
     assert( zf.get_data(ptr) == true );
 
@@ -226,7 +226,7 @@ namespace test_xdrbuf {
 
     xb << xdrbuf::bindata_t(ptr,zf.get_size());
 
-    unsigned char * ptr2 = (unsigned char *)mp.allocate(zf.get_size());
+    unsigned char * ptr2 = reinterpret_cast<unsigned char *>(mp.allocate(zf.get_size()));
     assert( ptr2 != 0 );
 
     xb.rewind();

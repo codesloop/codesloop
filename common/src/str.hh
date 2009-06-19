@@ -74,7 +74,7 @@ namespace csl
         inline virtual int var_type() const { return var_type_v; } ///<value type helps distinguish from other var types
 
         /** @brief constructor */
-        inline str() : csl::common::var(), buf_((wchar_t)L'\0') { }
+        inline str() : csl::common::var(), buf_(L'\0') { }
 
         /** @brief destructor */
         virtual ~str() {}
@@ -96,7 +96,7 @@ namespace csl
         ** ------------------------------------------------------------------------ */
 
         /** @brief copy constructor */
-        inline str(const str& s) : csl::common::var(), buf_((wchar_t)L'\0')
+        inline str(const str& s) : csl::common::var(), buf_(L'\0')
         {
           buf_ = s.buf_;
         }
@@ -104,7 +104,7 @@ namespace csl
         /** @brief copy operator */
         inline str& operator=(const str& s)
         {
-          buf_ = s.buffer();
+          buf_ = s.buf_;
           return *this;
         }
 
@@ -185,11 +185,12 @@ namespace csl
         ** ------------------------------------------------------------------------ */
 
         /** @brief copy constructor */
-        inline str(const wchar_t * wcs) : csl::common::var(), buf_((wchar_t)L'\0')
+        inline str(const wchar_t * wcs) : csl::common::var(), buf_(L'\0')
         {
           if( !wcs ) return;
           // wcslen only cares about trailing zero, so combining characters will not confuse here
-          buf_.set((unsigned char *)wcs,sizeof(wchar_t) * (::wcslen(wcs)+1));
+          buf_.set( reinterpret_cast<const unsigned char *>(wcs),
+                    sizeof(wchar_t) * (::wcslen(wcs)+1));
         }
 
         /** @brief copy operator */
@@ -197,7 +198,9 @@ namespace csl
         {
           if( !wcs ) return *this;
           // wcslen only cares about trailing zero, so combining characters will not confuse here
-          buf_.set((unsigned char *)wcs,sizeof(wchar_t) * (::wcslen(wcs)+1));
+          buf_.set( reinterpret_cast<const unsigned char *>(wcs),
+                    sizeof(wchar_t) * (::wcslen(wcs)+1) );
+
           return *this;
         }
 
@@ -247,7 +250,9 @@ namespace csl
          */
         inline str & assign(const wchar_t * start, const wchar_t * end)
         {
-          buf_.set( (unsigned char *)start, (const char *)end-(const char *)start);
+          buf_.set( reinterpret_cast<const unsigned char *>(start),
+                    reinterpret_cast<const char *>(end) - 
+                    reinterpret_cast<const char *>(start) );
           return *this;
         }
 
@@ -261,7 +266,7 @@ namespace csl
         /** @brief get data as wchar_t */
         inline const wchar_t * data() const
         {
-          return (const wchar_t *)buf_.data();
+          return reinterpret_cast<const wchar_t *>(buf_.data());
         }
 
         /* ------------------------------------------------------------------------ *
@@ -317,7 +322,7 @@ namespace csl
         inline void reset()
         {
           buf_.reset();
-          buf_.set( (const unsigned char *)(L"\0"), sizeof(wchar_t) );
+          buf_.set( reinterpret_cast<const unsigned char *>(L"\0"), sizeof(wchar_t) );
         }
 
         /** @brief gets str size  */

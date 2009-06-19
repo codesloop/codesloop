@@ -89,7 +89,7 @@ namespace test_dbl {
     int64 o;
     assert( v.from_string(L"998877.22221111") == true );
     assert( v.to_integer(o) == true ); /**/
-    assert( (long long)v.value() == o.value() );
+    assert( static_cast<long long>(v.value()) == o.value() );
     assert( o.value() == 998877LL );
   }
 
@@ -99,7 +99,7 @@ namespace test_dbl {
     long long o;
     assert( v.from_string("-998877.22221111") == true );
     assert( v.to_integer(o) == true ); /**/
-    assert( (long long)v.value() == o );
+    assert( static_cast<long long>(v.value()) == o );
     assert( o == -998877LL );
   }
 

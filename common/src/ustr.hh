@@ -72,7 +72,7 @@ namespace csl
         inline virtual int var_type() const { return var_type_v; } ///<value type helps distinguish from other var types
 
         /** @brief constructor */
-        inline ustr() : csl::common::var(), buf_((unsigned char)0) { }
+        inline ustr() : csl::common::var(), buf_(static_cast<unsigned char>(0)) { }
 
         /** @brief destructor */
         virtual ~ustr() {}
@@ -114,7 +114,7 @@ namespace csl
         ** ------------------------------------------------------------------------ */
 
         /** @brief copy constructor */
-        inline ustr(const ustr& s) : csl::common::var(), buf_((unsigned char)0)
+        inline ustr(const ustr& s) : csl::common::var(), buf_(static_cast<unsigned char>(0))
         {
           buf_ = s.buf_;
         }
@@ -166,11 +166,11 @@ namespace csl
         ** ------------------------------------------------------------------------ */
 
         /** @brief copy constructor */
-        inline explicit ustr(const char * us) : csl::common::var(), buf_((unsigned char)0)
+        inline explicit ustr(const char * us) : csl::common::var(), buf_(static_cast<unsigned char>(0))
         {
           if( !us ) return;
           // strlen only cares about trailing zero, so multibyte chars will not confuse here
-          buf_.set((const unsigned char *)us,::strlen(us)+1);
+          buf_.set( reinterpret_cast<const unsigned char *>(us), (::strlen(us)+1) );
         }
 
         /** @brief copy operator */
@@ -178,7 +178,7 @@ namespace csl
         {
           if( !us ) return *this;
           // strlen only cares about trailing zero, so multibyte chars will not confuse here
-          buf_.set((const unsigned char *)us,::strlen(us)+1);
+          buf_.set( reinterpret_cast<const unsigned char *>(us), (::strlen(us)+1) );
           return *this;
         }
 
@@ -228,7 +228,7 @@ namespace csl
          */
         inline ustr & assign(const char * start, const char * end)
         {
-          buf_.set( (unsigned char *)start, end-start);
+          buf_.set( reinterpret_cast<const unsigned char *>(start), end-start);
           return *this;
         }
 
@@ -242,7 +242,7 @@ namespace csl
         /** @brief get data as char * */
         inline const char * data() const
         {
-          return (const char *)buf_.data();
+          return reinterpret_cast<const char *>(buf_.data());
         }
 
         /* ------------------------------------------------------------------------ *
@@ -302,7 +302,7 @@ namespace csl
         inline void reset()
         {
           buf_.reset();
-          buf_.set( (const unsigned char *)("\0"), 1 );
+          buf_.set( reinterpret_cast<const unsigned char *>("\0"), 1 );
         }
 
         /** @brief gets ustr size  */

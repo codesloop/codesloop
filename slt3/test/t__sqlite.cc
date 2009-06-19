@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -203,10 +203,10 @@ namespace test_sqlite {
       }
 
       {
-        assert( ((int64 *)flds.get_at(0))->value() == 100ll+i );
-        assert( ((int64 *)flds.get_at(1))->value() == 200ll+i );
-        assert( ((int64 *)flds.get_at(2))->value() == 300ll+i );
-        assert( ((int64 *)flds.get_at(3))->value() == 400ll+i );
+        assert( (reinterpret_cast<int64 *>(flds.get_at(0)))->value() == 100ll+i );
+        assert( (reinterpret_cast<int64 *>(flds.get_at(1)))->value() == 200ll+i );
+        assert( (reinterpret_cast<int64 *>(flds.get_at(2)))->value() == 300ll+i );
+        assert( (reinterpret_cast<int64 *>(flds.get_at(3)))->value() == 400ll+i );
       }
 
       assert( q.next(cols,flds) == false );
@@ -278,10 +278,10 @@ namespace test_sqlite {
       }
 
       {
-        assert( fabs(((dbl *)flds.get_at(0))->value() - (0.11+i)) < 0.00000000001 );
-        assert( fabs(((dbl *)flds.get_at(1))->value() - (0.12+i)) < 0.00000000001 );
-        assert( fabs(((dbl *)flds.get_at(2))->value() - (0.13+i)) < 0.00000000001 );
-        assert( fabs(((dbl *)flds.get_at(3))->value() - (0.14+i)) < 0.00000000001 );
+        assert( fabs( (reinterpret_cast<dbl *>(flds.get_at(0)))->value() - (0.11+i)) < 0.00000000001 );
+        assert( fabs( (reinterpret_cast<dbl *>(flds.get_at(1)))->value() - (0.12+i)) < 0.00000000001 );
+        assert( fabs( (reinterpret_cast<dbl *>(flds.get_at(2)))->value() - (0.13+i)) < 0.00000000001 );
+        assert( fabs( (reinterpret_cast<dbl *>(flds.get_at(3)))->value() - (0.14+i)) < 0.00000000001 );
       }
       assert( q.next(cols,flds) == false );
       assert( q.reset() );
@@ -333,10 +333,10 @@ namespace test_sqlite {
     }
 
     {
-      ustr * f0 = (ustr *)flds.get_at(0);
+      ustr * f0 = reinterpret_cast<ustr *>(flds.get_at(0));
       assert( (f0)->nchars() == 4 );
 
-      ustr * f1 = (ustr *)flds.get_at(1);
+      ustr * f1 = reinterpret_cast<ustr *>(flds.get_at(1));
       assert( (f1)->nchars() == 7 );
 
       assert( *f0 == "'_.\"" );
@@ -362,8 +362,8 @@ namespace test_sqlite {
     unsigned char tx[127];
     unsigned char qx[3890];
 
-    for( unsigned int i=0;i<sizeof(tx);++i ) { tx[i] = (unsigned char)(i%99); }
-    for( unsigned int i=0;i<sizeof(qx);++i ) { qx[i] = (unsigned char)(i%111); }
+    for( unsigned int i=0;i<sizeof(tx);++i ) { tx[i] = static_cast<unsigned char>(i%99); }
+    for( unsigned int i=0;i<sizeof(qx);++i ) { qx[i] = static_cast<unsigned char>(i%111); }
     //
     binry & p1(q.binry_param(1));
     binry & p2(q.binry_param(2));
@@ -399,8 +399,8 @@ namespace test_sqlite {
     }
 
     {
-      binry * f0 = (binry *)flds.get_at(0);
-      binry * f1 = (binry *)flds.get_at(1);
+      binry * f0 = reinterpret_cast<binry *>(flds.get_at(0));
+      binry * f1 = reinterpret_cast<binry *>(flds.get_at(1));
 
       assert( memcmp(f0->value().data(),tx,sizeof(tx)) == 0 );
       assert( memcmp(f1->value().data(),qx,sizeof(qx)) == 0 );

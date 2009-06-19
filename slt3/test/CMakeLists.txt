@@ -48,7 +48,6 @@ IF(WIN32)
                      -Wwrite-strings
                      -Wcast-qual
                      -Wpointer-arith
-                     -Wmissing-declarations
                      -Wold-style-cast
                      -Wconversion
                      -Wcomment
@@ -84,7 +83,6 @@ ELSE(WIN32)
                    -Wwrite-strings
                    -Wcast-qual
                    -Wpointer-arith
-                   -Wmissing-declarations
                    -Wold-style-cast
                    -Wconversion
                    -Wcomment
@@ -96,18 +94,19 @@ ELSE(WIN32)
                  )
 
   LINK_LIBRARIES(
-	  csl_slt3 
-	  csl_nthread 
-	  csl_common
-	  pthread 
-	  ${LIBDL}
-	  )
+                  csl_slt3 
+                  csl_nthread 
+                  csl_common
+                  pthread 
+                  ${LIBDL}
+                )
+
 ENDIF(WIN32)
 
 ADD_EXECUTABLE(t__sqlite       t__sqlite.cc)
 ADD_EXECUTABLE(t__conn         t__conn.cc)
 ADD_EXECUTABLE(t__tran         t__tran.cc)
-ADD_EXECUTABLE(t__synqry       t__synqry.cc)
+ADD_EXECUTABLE(t__query        t__query.cc)
 ADD_EXECUTABLE(t__reg          t__reg.cc)
 ADD_EXECUTABLE(t__var          t__var.cc)
 ADD_EXECUTABLE(t__sql_helper   t__sql_helper.cc)

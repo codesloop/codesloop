@@ -84,7 +84,7 @@ namespace csl
       inline virtual ~var_base() {}
         
       /** @brief initializing constructor */
-      inline var_base(obj & parent) : parent_(&parent) {}
+      inline var_base(obj & prn) : parent_(&prn) {}
 
     protected:
       
@@ -264,9 +264,9 @@ namespace csl
     
       this constructor registers the variable instance with the sql::helper and the var_base::helper instance
       */
-      inline varT(const char * name, slt3::obj & parent,const char * flags="") : var_base(parent)
+      inline varT(const char * name, slt3::obj & prn,const char * flags="") : var_base(prn)
       {
-        register_variable(this,name,var_col_type<T>::coltype_s,parent,flags);
+        register_variable(this,name,var_col_type<T>::coltype_s,prn,flags);
       }
       
       /** @brief the variable types are one of common::var family types */

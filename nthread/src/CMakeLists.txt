@@ -31,7 +31,6 @@ IF(WIN32)
                      -Wwrite-strings
                      -Wcast-qual
                      -Wpointer-arith
-                     -Wmissing-declarations
                      -Wold-style-cast
                      -Wconversion
                      -Wcomment
@@ -40,7 +39,6 @@ IF(WIN32)
                      -Wshadow
                      -Wredundant-decls
                      -g3
-                     -pthread
                    )
   ENDIF(MSYS)
 
@@ -51,7 +49,6 @@ ELSE(WIN32)
                    -Wwrite-strings
                    -Wcast-qual
                    -Wpointer-arith
-                   -Wmissing-declarations
                    -Wold-style-cast
                    -Wconversion
                    -Wcomment

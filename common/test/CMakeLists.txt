@@ -25,11 +25,11 @@ IF(WIN32)
 
   IF(MSYS)
     set(ZLIB z)
-    ADD_DEFINITIONS( -Wall
+    ADD_DEFINITIONS(
+                     -Wall
                      -Wwrite-strings
                      -Wcast-qual
                      -Wpointer-arith
-                     -Wmissing-declarations
                      -Wold-style-cast
                      -Wconversion
                      -Wcomment
@@ -65,7 +65,21 @@ IF(WIN32)
 
 ELSE(WIN32)
 
-  ADD_DEFINITIONS( -Wall -g3 )
+  ADD_DEFINITIONS(
+                   -Wall
+                   -Wwrite-strings
+                   -Wcast-qual
+                   -Wpointer-arith
+                   -Wold-style-cast
+                   -Wconversion
+                   -Wcomment
+                   -Wcast-align
+                   -Winline
+                   -Wshadow
+                   -Wredundant-decls
+                   -g3
+                 )
+
   LINK_DIRECTORIES( ../src )
   INCLUDE_DIRECTORIES( ../src )
 

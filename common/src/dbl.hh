@@ -76,7 +76,7 @@ namespace csl
         }
 
         /** @brief returns a const pointer to internal data */
-        inline const unsigned char * ucharp_data() const { return (unsigned char *)(&value_); }
+        inline const unsigned char * ucharp_data() const { return reinterpret_cast<const unsigned char *>(&value_); }
         
         /** @brief returns the size of the variable data */
         inline size_t var_size() const { return sizeof(value_); }
@@ -99,7 +99,7 @@ namespace csl
 
         convert using cast and assignment
          */
-        inline bool to_integer(long long & v) const { v = (long long)value_; return true; }
+        inline bool to_integer(long long & v) const { v = static_cast<long long>(value_); return true; }
 
         /**
         @brief convert to common::dbl
@@ -208,7 +208,7 @@ namespace csl
 
         the conversion is done using internal cast and assignment
          */
-        inline bool from_integer(long long v) { value_ = (double)v; return true; }
+        inline bool from_integer(long long v) { value_ = static_cast<double>(v); return true; }
 
         /**
         @brief convert a common::dbl

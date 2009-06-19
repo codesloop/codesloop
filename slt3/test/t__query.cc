@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -246,7 +246,7 @@ namespace test_query {
         p.set("Hello");
         assert( q.next(ch,fd) == true );
         assert( q.reset() == true );
-        ustr * s0 = (ustr *)fd.get_at(0);
+        ustr * s0 = reinterpret_cast<ustr *>(fd.get_at(0));
         assert( *s0 == "Hello" );
         assert( s0->nchars() == 5 );
       }
@@ -285,7 +285,7 @@ namespace test_query {
         p.set("Hello");
         assert( q.next(ch,fd) == true );
         assert( q.reset() == true );
-        ustr * s0 = (ustr *)fd.get_at(0);
+        ustr * s0 = reinterpret_cast<ustr *>(fd.get_at(0));
         assert( *s0 == "Hello" );
         assert( s0->size() == 5 );
       }

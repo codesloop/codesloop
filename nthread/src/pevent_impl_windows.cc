@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -126,9 +126,6 @@ namespace csl
       bool wait(unsigned long timeout_ms)
       {
         bool ret        = true;
-        bool invalid    = false;
-
-        unsigned int available = 0;
 
         if( timeout_ms == 0 ) { timeout_ms = INFINITE; }
 
@@ -259,8 +256,6 @@ retry_wait:
 
       void clear_available()
       {
-        long old_val = 0;
-
         if( WaitForSingleObject( *mutex_, INFINITE ) == WAIT_OBJECT_0 )
         {
           available_ = 0;

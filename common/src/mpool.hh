@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -91,7 +91,7 @@ namespace csl
         if( !str ) return 0;
         size_t len = ::strlen(str);
         char * ret = 0;
-        ret = (char *)allocate(len+1);
+        ret = reinterpret_cast<char *>(allocate(len+1));
         if( len ) ::memcpy(ret,str,len);
         ret[len] = 0;
         return ret;
@@ -106,7 +106,7 @@ namespace csl
         if( !str ) return 0;
         size_t len = ::wcslen(str);
         wchar_t * ret = 0;
-        ret = (wchar_t *)allocate((len+1)*sizeof(wchar_t));
+        ret = reinterpret_cast<wchar_t *>(allocate((len+1)*sizeof(wchar_t)));
         if( len )
         {
           wcsncpy(ret,str,len);

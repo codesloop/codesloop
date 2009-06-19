@@ -60,11 +60,11 @@ IF(WIN32)
                       ../../../3rdparty/OpenSSL/lib/MinGW
                     )
 
-    ADD_DEFINITIONS( -Wall
+    ADD_DEFINITIONS(
+                     -Wall
                      -Wwrite-strings
                      -Wcast-qual
                      -Wpointer-arith
-                     -Wmissing-declarations
                      -Wold-style-cast
                      -Wconversion
                      -Wcomment
@@ -74,6 +74,7 @@ IF(WIN32)
                      -Wredundant-decls
                      -g3
                    )
+
   ELSE(MSYS)
   
     LINK_LIBRARIES(
@@ -126,11 +127,11 @@ ELSE(WIN32)
    set(HAVE_LIBDL TRUE)
   endif (DLOPEN_FOUND)
 
-  ADD_DEFINITIONS( -Wall
+  ADD_DEFINITIONS(
+                   -Wall
                    -Wwrite-strings
                    -Wcast-qual
                    -Wpointer-arith
-                   -Wmissing-declarations
                    -Wold-style-cast
                    -Wconversion
                    -Wcomment

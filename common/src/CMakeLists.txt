@@ -28,7 +28,6 @@ IF(WIN32)
                      -Wwrite-strings
                      -Wcast-qual
                      -Wpointer-arith
-                     -Wmissing-declarations
                      -Wold-style-cast
                      -Wconversion
                      -Wcomment
@@ -49,24 +48,22 @@ IF(WIN32)
       ../../../3rdparty/zlib/GnuWin32/include )
 
 ELSE(WIN32)
-  ADD_DEFINITIONS( -Wall
+
+  ADD_DEFINITIONS(
+                   -Wall
                    -Wwrite-strings
                    -Wcast-qual
-                   -Wbad-function-cast
                    -Wpointer-arith
-                   -Wstrict-prototypes
-                   -Wmissing-prototypes
-                   -Wmissing-declarations
-                   -Wnested-externs
-                   -Wtraditional
+                   -Wold-style-cast
                    -Wconversion
                    -Wcomment
                    -Wcast-align
                    -Winline
                    -Wshadow
                    -Wredundant-decls
-                   -Wid-clash-31
-                   -g3 )
+                   -g3
+                 )
+
 ENDIF(WIN32)
 
 ADD_DEFINITIONS( -DDEBUG) 

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -43,7 +43,7 @@ namespace csl
   {
     static void print_hex(const wchar_t * prefix,const void * vp,size_t len)
     {
-      unsigned char * hx = (unsigned char *)vp;
+      const unsigned char * hx = reinterpret_cast<const unsigned char *>(vp);
       PRINTF(L"%ls [%04d] : ",prefix,len);
       for(size_t i=0;i<len;++i) PRINTF(L"%.2X",hx[i]);
       PRINTF(L"\n");
@@ -106,7 +106,7 @@ namespace csl
           pbuf    outer;
           xdrbuf  xbo(outer);
 
-          xbo << (int32_t)msg::olleh_p;
+          xbo << static_cast<int32_t>(msg::olleh_p);
 
           /* ***
             hello callback may change the server info, and
@@ -122,8 +122,8 @@ namespace csl
           pbuf inner;
           xdrbuf xbi(inner);
 
-          xbi << (int32_t)need_login;
-          xbi << (int32_t)need_pass;
+          xbi << static_cast<int32_t>(need_login);
+          xbi << static_cast<int32_t>(need_pass);
 
           if( debug() )
           {
@@ -151,8 +151,7 @@ namespace csl
           crypt_pkt::footbuf_t  foot;
 
           csl_sec_gen_rand( salt.allocate(8), 8 );
-          //salt.set( (unsigned char *)this->salt(), maxsalt() );
-          key.set( (unsigned char *)session_key.c_str(), session_key.size()+1 );
+          key.set( reinterpret_cast<const unsigned char *>(session_key.c_str()), session_key.size()+1 );
           inner.t_copy_to( data );
 
           crypt_pkt pk;
@@ -254,8 +253,8 @@ namespace csl
           /* send data back */
           socklen_t len = sizeof(ms.sender_);
 
-          if( sendto( socket_, (const char *)ms.data_, ms.size_, 0,
-              (struct sockaddr *)&(ms.sender_), len ) != (int)(ms.size_) )
+          if( ::sendto( socket_, reinterpret_cast<const char *>(ms.data_), ms.size_, 0,
+              reinterpret_cast<const struct sockaddr *>(&(ms.sender_)), len ) != static_cast<int>(ms.size_) )
           {
             FPRINTF(stderr,L"[%ls:%d] Error in sendto(%d)\n",L""__FILE__,__LINE__,socket_);
             perror("sendto");
@@ -365,7 +364,7 @@ namespace csl
           pbuf pb;
           xdrbuf xb(pb);
 
-          xb << (int32_t)msg::hello_p;
+          xb << static_cast<int32_t>(msg::hello_p);
 
           if( debug() ) { PRINTF(L" ++ [%ld] : packet_type : %d\n",xb.position(),msg::hello_p ); }
 
@@ -432,7 +431,8 @@ namespace csl
           data.set(ptrp+(crypt_pkt::header_len()),
                    lenp-crypt_pkt::footer_len()-crypt_pkt::header_len());
 
-          key.set((unsigned char *)session_key.c_str(),session_key.size()+1);
+          key.set( reinterpret_cast<const unsigned char *>(session_key.c_str()), 
+            (session_key.size()+1) );
 
           crypt_pkt pk;
           pk.use_exc(use_exc());
@@ -447,18 +447,18 @@ namespace csl
           inner.append( data.data(), data.size() );
           xdrbuf xbi(inner);
 
-          int32_t need_login, need_pass;
+          int32_t need_login_v, need_pass_v;
 
-          xbi >> need_login;
+          xbi >> need_login_v;
 
-          if( debug() ) { PRINTF(L"  -- [%ld] login: %d\n",xbi.position(),need_login); }
+          if( debug() ) { PRINTF(L"  -- [%ld] login: %d\n",xbi.position(),need_login_v); }
 
-          xbi >> need_pass;
+          xbi >> need_pass_v;
 
-          if( debug() ) { PRINTF(L"  -- [%ld] pass: %d\n",xbi.position(),need_pass); }
+          if( debug() ) { PRINTF(L"  -- [%ld] pass: %d\n",xbi.position(),need_pass_v); }
 
-          need_login_ = (need_login == 1);
-          need_pass_ = (need_pass == 1);
+          need_login_ = (need_login_v == 1);
+          need_pass_ = (need_pass_v == 1);
 
           return true;
         }
@@ -472,7 +472,6 @@ namespace csl
         return false;
       }
 
-
       namespace
       {
         static int init_sock(SAI & addr)
@@ -482,7 +481,7 @@ namespace csl
 
           socklen_t len = sizeof(addr);
 
-          if( ::connect(sock, (struct sockaddr *)&addr, len) == -1 )
+          if( ::connect(sock, reinterpret_cast<const struct sockaddr *>(&addr), len) == -1 )
           {
             ShutdownCloseSocket(sock);
             return -1;
@@ -519,7 +518,7 @@ namespace csl
           THR(exc::rs_pkt_error,exc::cm_udp_hello_cli,false);
         }
 
-        if( (err=::send( sock_, (const char *)ms.data_, ms.size_, 0 )) != (int)(ms.size_) )
+        if( (err=::send( sock_, reinterpret_cast<const char *>(ms.data_), ms.size_, 0 )) != static_cast<int>(ms.size_) )
         {
           THRC(exc::rs_send_failed,exc::cm_udp_hello_cli,false);
         }
@@ -542,7 +541,7 @@ namespace csl
 
         if( err > 0 )
         {
-          err = ::recv(sock_,(char *)ms.data_, ms.max_len(), 0);
+          err = ::recv(sock_,reinterpret_cast<char *>(ms.data_), ms.max_len(), 0);
           //
           if( err > 0 )
           {

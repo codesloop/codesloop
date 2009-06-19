@@ -81,8 +81,8 @@ namespace csl
 
     bool int64::to_xdr(xdrbuf & b) const
     {
-      int32_t high = value_>>32;
-      int32_t low  = value_&0xffffffff;
+      int32_t high = static_cast<int32_t>(value_>>32);
+      int32_t low  = static_cast<int32_t>(value_&0xffffffff);
 
       try
       {
@@ -157,7 +157,7 @@ namespace csl
         v >> high;
         v >> low;
 
-        value_ = (((long long)high)<<32) + ((long long)low);
+        value_ = ( (static_cast<long long>(high)<<32) + static_cast<long long>(low) );
 
         return true;
       }

@@ -72,14 +72,14 @@ namespace test_tbuf {
   void tbuf_hello()
   {
     tbuf<128> b;
-    b.set((unsigned char *)"Hello",6);
+    b.set( reinterpret_cast<const unsigned char *>("Hello"),6);
   }
 
   /** @test adds 6 bytes to pbuf (for performance comparison) */
   void pbuf_hello()
   {
     pbuf b;
-    b.append((unsigned char *)"Hello",6);
+    b.append( reinterpret_cast<const unsigned char *>("Hello"),6);
   }
 
   /** @test adds 6 bytes to std::string (for performance comparison) */

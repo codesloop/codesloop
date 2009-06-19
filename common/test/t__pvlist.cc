@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -113,13 +113,13 @@ namespace test_pvlist {
     
     for( int i=0;i<100;++i )
     {
-      pv.push_back( (char *)i );
-      assert( pv.n_items() == (size_t)(i+1) );
+      pv.push_back( reinterpret_cast<char *>(i) );
+      assert( pv.n_items() == static_cast<size_t>(i+1) );
     }
     
     for( int i=0;i<100;++i )
     {
-      assert( pv.get_at(i) == (char *)i );
+      assert( pv.get_at(i) == reinterpret_cast<char *>(i) );
     }
   }
 
@@ -130,15 +130,20 @@ namespace test_pvlist {
     
     for( int i=0;i<100;++i )
     {
-      pv.push_back( (char *)i );
-      assert( pv.set_at( i,(char *)(i+1) ) == true );
-      if( pv.get_at(i) != (char *)(i+1) )
+      pv.push_back( reinterpret_cast<char *>(i) );
+      assert( pv.set_at( i,reinterpret_cast<char *>(i+1) ) == true );
+      if( pv.get_at(i) != reinterpret_cast<char *>(i+1) )
       {
-        printf( "%d %p %p [nitems=%ld]\n",i,pv.get_at(i),(char *)(i+1),(unsigned long)pv.n_items() );
+        printf( "%d %p %p [nitems=%ld]\n",
+          i,
+          pv.get_at(i),
+          reinterpret_cast<char *>(i+1),
+          static_cast<unsigned long>(pv.n_items()) );
+
         pv.debug();
       }
-      assert( pv.get_at(i) == (char *)(i+1) );
-      assert( pv.n_items() == (size_t)(i+1) );
+      assert( pv.get_at(i) == reinterpret_cast<char *>(i+1) );
+      assert( pv.n_items() == static_cast<size_t>(i+1) );
     }
   }
   
@@ -177,8 +182,8 @@ namespace test_pvlist {
     char * t[2];
     pvlist< 32,char,free_destructor<char> > pv;
     
-    t[0] = (char *)malloc(1);
-    t[1] = (char *)malloc(1);
+    t[0] = reinterpret_cast<char *>(malloc(1));
+    t[1] = reinterpret_cast<char *>(malloc(1));
     
     for( int i=0;i<50;++i )
     {
@@ -194,7 +199,7 @@ namespace test_pvlist {
     assert( pv.n_items() == 100 );
     pv.free( t[0] );
     pv.free( t[1] );
-    pv.free( (char *)8 );
+    pv.free( reinterpret_cast<char *>(8) );
     assert( pv.n_items() == 100 );
     
     for( int i=0;i<100;++i )
@@ -226,7 +231,7 @@ namespace test_pvlist {
     assert( pv.n_items() == 100 );
     pv.free( t[0] );
     pv.free( t[1] );
-    pv.free( (char *)8 );
+    pv.free( reinterpret_cast<char *>(8) );
     assert( pv.n_items() == 100 );
     
     for( int i=0;i<100;++i )
@@ -274,8 +279,8 @@ namespace test_pvlist {
     char * t[2];
     pvlist< 32,char,free_destructor<char> > pv;
     
-    t[0] = (char *)malloc(1);
-    t[1] = (char *)malloc(1);
+    t[0] = reinterpret_cast<char *>(malloc(1));
+    t[1] = reinterpret_cast<char *>(malloc(1));
     
     for( int i=0;i<50;++i )
     {
@@ -291,7 +296,7 @@ namespace test_pvlist {
     assert( pv.n_items() == 100 );
     pv.free_one( t[0] );
     pv.free_one( t[1] );
-    pv.free_one( (char *)8 );
+    pv.free_one( reinterpret_cast<char *>(8) );
     assert( pv.n_items() == 100 );
     
     assert( pv.get_at(0) == 0 );
@@ -327,7 +332,7 @@ namespace test_pvlist {
     assert( pv.n_items() == 100 );
     pv.free_one( t[0] );
     pv.free_one( t[1] );
-    pv.free_one( (char *)8 );
+    pv.free_one( reinterpret_cast<char *>(8) );
     assert( pv.n_items() == 100 );
 
     assert( pv.get_at(0) == 0 );
@@ -369,7 +374,7 @@ namespace test_pvlist {
     {
       for( int i=0;i<100;++i )
       {
-        pv.push_back( (char *)malloc(1) );
+        pv.push_back( reinterpret_cast<char *>(malloc(1)) );
       }
       
       assert( pv.n_items() == 100 );
@@ -403,7 +408,7 @@ namespace test_pvlist {
     unsigned int lk = 0;
     for( int i=0;i<100;++i )
     {
-      pv.push_back((char *)i);
+      pv.push_back(reinterpret_cast<char *>(i));
       lk += i;
     }
     pvlist< 3,char,nop_destructor<char> >::iterator it(pv.begin());
@@ -415,7 +420,7 @@ namespace test_pvlist {
     assert( pv.n_items() == 100 );
     for( ;it!=end;++it )
     {
-      unsigned long l = (unsigned long)(*it);
+      unsigned long l = reinterpret_cast<unsigned long>(*it);
       lk2 += l;
       ++ll;
     }
@@ -430,7 +435,7 @@ namespace test_pvlist {
     pvlist< 32,char,nop_destructor<char> > pv;
     for( int i=0;i<100;++i )
     {
-      pv.push_back((char *)1);
+      pv.push_back(reinterpret_cast<char *>(1));
       assert( *(pv.last()) != 0 );
     }
     pvlist< 32,char,nop_destructor<char> >::iterator it(pv.begin());
