@@ -25,6 +25,20 @@ IF(WIN32)
 
   IF(MSYS)
     set(ZLIB z)
+    ADD_DEFINITIONS( -Wall
+                     -Wwrite-strings
+                     -Wcast-qual
+                     -Wpointer-arith
+                     -Wmissing-declarations
+                     -Wold-style-cast
+                     -Wconversion
+                     -Wcomment
+                     -Wcast-align
+                     -Winline
+                     -Wshadow
+                     -Wredundant-decls
+                     -g3
+                   )
   ELSE(MSYS)
     set(ZLIB zlib)
   ENDIF(MSYS)

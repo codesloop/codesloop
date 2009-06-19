@@ -32,11 +32,37 @@ INCLUDE_DIRECTORIES( ../../nthread/src
                    )
 
 IF(NOT WIN32)
-  ADD_DEFINITIONS( -Wall
-                   -g3
-                 )
-
+    ADD_DEFINITIONS( -Wall
+                     -Wwrite-strings
+                     -Wcast-qual
+                     -Wpointer-arith
+                     -Wmissing-declarations
+                     -Wold-style-cast
+                     -Wconversion
+                     -Wcomment
+                     -Wcast-align
+                     -Winline
+                     -Wshadow
+                     -Wredundant-decls
+                     -g3
+                   )
 ELSE(NOT WIN32)
+  IF(MSYS)
+    ADD_DEFINITIONS( -Wall
+                     -Wwrite-strings
+                     -Wcast-qual
+                     -Wpointer-arith
+                     -Wmissing-declarations
+                     -Wold-style-cast
+                     -Wconversion
+                     -Wcomment
+                     -Wcast-align
+                     -Winline
+                     -Wshadow
+                     -Wredundant-decls
+                     -g3
+                   )
+  ENDIF(MSYS)
 ENDIF(NOT WIN32)
 
 ADD_LIBRARY( csl_comm STATIC

@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009, David Beck
+# Copyright (c) 2008,2009, David Beck, Tamas Foldi
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,9 +32,43 @@ INCLUDE_DIRECTORIES( ../../nthread/src
                      ../../slt3/src )
 
 IF(WIN32)
+
+  IF(MSYS)
+    ADD_DEFINITIONS(
+                     -Wall
+                     -Wwrite-strings
+                     -Wcast-qual
+                     -Wpointer-arith
+                     -Wmissing-declarations
+                     -Wold-style-cast
+                     -Wconversion
+                     -Wcomment
+                     -Wcast-align
+                     -Winline
+                     -Wshadow
+                     -Wredundant-decls
+                     -g3
+                   )
+  ENDIF(MSYS)
+
 ELSE(WIN32)
-  ADD_DEFINITIONS(-Wall -g3)
-ENDIF(WIN32)
+
+  ADD_DEFINITIONS(
+                   -Wall
+                   -Wwrite-strings
+                   -Wcast-qual
+                   -Wpointer-arith
+                   -Wmissing-declarations
+                   -Wold-style-cast
+                   -Wconversion
+                   -Wcomment
+                   -Wcast-align
+                   -Winline
+                   -Wshadow
+                   -Wredundant-decls
+                   -g3
+                 )
+  ENDIF(WIN32)
 
 ADD_LIBRARY( csl_sched STATIC
              schedule.cc      schedule.hh

@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009, David Beck
+# Copyright (c) 2008,2009, David Beck, Tamas Foldi
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -25,9 +25,43 @@ IF(WIN32)
 
   INCLUDE_DIRECTORIES( ../../common/src )
 
+  IF(MSYS)
+    ADD_DEFINITIONS(
+                     -Wall
+                     -Wwrite-strings
+                     -Wcast-qual
+                     -Wpointer-arith
+                     -Wmissing-declarations
+                     -Wold-style-cast
+                     -Wconversion
+                     -Wcomment
+                     -Wcast-align
+                     -Winline
+                     -Wshadow
+                     -Wredundant-decls
+                     -g3
+                     -pthread
+                   )
+  ENDIF(MSYS)
+
 ELSE(WIN32)
 
-  ADD_DEFINITIONS( -Wall -g3 -pthread )
+  ADD_DEFINITIONS(
+                   -Wall
+                   -Wwrite-strings
+                   -Wcast-qual
+                   -Wpointer-arith
+                   -Wmissing-declarations
+                   -Wold-style-cast
+                   -Wconversion
+                   -Wcomment
+                   -Wcast-align
+                   -Winline
+                   -Wshadow
+                   -Wredundant-decls
+                   -g3
+                   -pthread
+                 )
 
   INCLUDE_DIRECTORIES( ../../common/src )
 

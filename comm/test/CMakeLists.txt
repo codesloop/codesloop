@@ -55,6 +55,23 @@ IF(WIN32)
                       ../../../3rdparty/OpenSSL/lib/MinGW
                       )
 
+    ADD_DEFINITIONS(
+                     -Wall
+                     -Wwrite-strings
+                     -Wcast-qual
+                     -Wpointer-arith
+                     -Wmissing-declarations
+                     -Wold-style-cast
+                     -Wconversion
+                     -Wcomment
+                     -Wcast-align
+                     -Winline
+                     -Wshadow
+                     -Wredundant-decls
+                     -g3
+                     -pthread
+                   )
+
   ELSE(MSYS)
 
     LINK_LIBRARIES(
@@ -110,7 +127,22 @@ ELSE(WIN32)
                        ../../common/src 
                      )
 
-  ADD_DEFINITIONS( -Wall -g3 -pthread )
+  ADD_DEFINITIONS(
+                   -Wall
+                   -Wwrite-strings
+                   -Wcast-qual
+                   -Wpointer-arith
+                   -Wmissing-declarations
+                   -Wold-style-cast
+                   -Wconversion
+                   -Wcomment
+                   -Wcast-align
+                   -Winline
+                   -Wshadow
+                   -Wredundant-decls
+                   -g3
+                   -pthread
+                 )
 
   LINK_LIBRARIES( csl_comm
                   csl_sec

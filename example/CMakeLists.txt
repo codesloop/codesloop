@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009, David Beck
+# Copyright (c) 2008,2009, David Beck, Tamas Foldi
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -25,6 +25,22 @@ IF(WIN32)
 
   IF(MSYS)
     set(ZLIB z)
+    ADD_DEFINITIONS(
+                     -Wall
+                     -Wwrite-strings
+                     -Wcast-qual
+                     -Wpointer-arith
+                     -Wmissing-declarations
+                     -Wold-style-cast
+                     -Wconversion
+                     -Wcomment
+                     -Wcast-align
+                     -Winline
+                     -Wshadow
+                     -Wredundant-decls
+                     -g3
+                     -pthread
+                   )
   ELSE(MSYS)
     set(ZLIB zlib)
   ENDIF(MSYS)
@@ -82,7 +98,23 @@ ELSE(WIN32)
                      ../slt3/src
                      )
 
-  ADD_DEFINITIONS( -Wall -O3 -pthread )
+  ADD_DEFINITIONS(
+                   -Wall
+                   -Wwrite-strings
+                   -Wcast-qual
+                   -Wpointer-arith
+                   -Wmissing-declarations
+                   -Wold-style-cast
+                   -Wconversion
+                   -Wcomment
+                   -Wcast-align
+                   -Winline
+                   -Wshadow
+                   -Wredundant-decls
+                   -g3
+                   -pthread
+                 )
+  
   LINK_LIBRARIES( csl_slt3
                   csl_nthread
                   csl_common

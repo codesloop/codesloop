@@ -23,6 +23,23 @@
 
 IF(WIN32)
 
+  IF(MSYS)
+    ADD_DEFINITIONS( -Wall
+                     -Wwrite-strings
+                     -Wcast-qual
+                     -Wpointer-arith
+                     -Wmissing-declarations
+                     -Wold-style-cast
+                     -Wconversion
+                     -Wcomment
+                     -Wcast-align
+                     -Winline
+                     -Wshadow
+                     -Wredundant-decls
+                     -g3
+                   )
+  ENDIF(MSYS)
+
   LINK_DIRECTORIES(
       $ENV{ZLIB_DEV_ENV}/lib
       ../../../3rdparty/zlib/GnuWin32/lib )
@@ -32,7 +49,24 @@ IF(WIN32)
       ../../../3rdparty/zlib/GnuWin32/include )
 
 ELSE(WIN32)
-  ADD_DEFINITIONS(-Wall -g3 )
+  ADD_DEFINITIONS( -Wall
+                   -Wwrite-strings
+                   -Wcast-qual
+                   -Wbad-function-cast
+                   -Wpointer-arith
+                   -Wstrict-prototypes
+                   -Wmissing-prototypes
+                   -Wmissing-declarations
+                   -Wnested-externs
+                   -Wtraditional
+                   -Wconversion
+                   -Wcomment
+                   -Wcast-align
+                   -Winline
+                   -Wshadow
+                   -Wredundant-decls
+                   -Wid-clash-31
+                   -g3 )
 ENDIF(WIN32)
 
 ADD_DEFINITIONS( -DDEBUG) 
