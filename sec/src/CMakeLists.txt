@@ -40,8 +40,8 @@ IF(WIN32)
                      -DUMAC_AE_USE_STDINT=1
                      -DUMAC_AE_SUPPORT=1
                      -DRUN_TESTS=0
-                     -DSSE2=1
-                     -DFORCE_C_ONLY=0
+                     -DSSE2=0
+                     -DFORCE_C_ONLY=1
                   )
 
   ELSE(MSYS)
@@ -87,8 +87,8 @@ ELSE(WIN32)
                    -DUMAC_AE_USE_STDINT=1
                    -DUMAC_AE_SUPPORT=1
                    -DRUN_TESTS=0
-                   -DSSE2=1
-                   -DFORCE_C_ONLY=0
+                   -DSSE2=0
+                   -DFORCE_C_ONLY=1
                   )
 
   INCLUDE_DIRECTORIES( ../src

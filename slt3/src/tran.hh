@@ -110,10 +110,11 @@ namespace csl
        */
       bool use_exc();
 
-    private:
       /* private implementation hidden in impl */
       struct impl;
       typedef std::auto_ptr<impl> impl_t;
+
+    private:
 
       friend class query;
       /* private data */

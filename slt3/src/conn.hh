@@ -126,8 +126,9 @@ namespace csl
 
         /* types */
         struct impl;
-      private:
         typedef std::auto_ptr<impl> impl_t;
+
+      private:
         /* private data */
         friend class tran;
         impl_t impl_;
