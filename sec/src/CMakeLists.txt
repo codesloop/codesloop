@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009, David Beck
+# Copyright (c) 2008,2009, David Beck, Tamas Foldi
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -23,12 +23,38 @@
 
 IF(WIN32)
 
-  ADD_DEFINITIONS( -DUMAC_AE_USE_STDINT=0
-                   -DUMAC_AE_SUPPORT=1
-                   -DRUN_TESTS=0
-                   -DSSE2=0
-                   -DFORCE_C_ONLY=1
-                 )
+  IF(MSYS)
+
+    ADD_DEFINITIONS(
+                     -Wall
+                     -Wwrite-strings
+                     -Wcast-qual
+                     -Wpointer-arith
+                     -Wold-style-cast
+                     -Wconversion
+                     -Wcomment
+                     -Wcast-align
+                     -Wshadow
+                     -Wredundant-decls
+                     -g3
+                     -DUMAC_AE_USE_STDINT=1
+                     -DUMAC_AE_SUPPORT=1
+                     -DRUN_TESTS=0
+                     -DSSE2=1
+                     -DFORCE_C_ONLY=0
+                  )
+
+  ELSE(MSYS)
+
+    ADD_DEFINITIONS(
+                     -DUMAC_AE_USE_STDINT=0
+                     -DUMAC_AE_SUPPORT=1
+                     -DRUN_TESTS=0
+                     -DSSE2=0
+                     -DFORCE_C_ONLY=1
+                   )
+
+  ENDIF(MSYS)
 
   INCLUDE_DIRECTORIES( ../../common/src
                        $ENV{OPENSSL_DEV_ENV}/include
@@ -46,13 +72,23 @@ IF(WIN32)
 
 ELSE(WIN32)
 
-  ADD_DEFINITIONS( -Wall
+  ADD_DEFINITIONS(
+                   -Wall
+                   -Wwrite-strings
+                   -Wcast-qual
+                   -Wpointer-arith
+                   -Wold-style-cast
+                   -Wconversion
+                   -Wcomment
+                   -Wcast-align
+                   -Wshadow
+                   -Wredundant-decls
                    -g3
                    -DUMAC_AE_USE_STDINT=1
                    -DUMAC_AE_SUPPORT=1
                    -DRUN_TESTS=0
-                   -DSSE2=0
-                   -DFORCE_C_ONLY=1
+                   -DSSE2=1
+                   -DFORCE_C_ONLY=0
                   )
 
   INCLUDE_DIRECTORIES( ../src

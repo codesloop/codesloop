@@ -139,7 +139,7 @@ namespace csl
       template <typename T>
       T & get_at(unsigned int pos)
       {
-        if( pos > 2000 ) { THR(exc::rs_toobig,exc::cm_query,*((T *)params_.push_back(new T()))); }
+        if( pos > 2000 ) { THR(exc::rs_toobig,exc::cm_query,*( reinterpret_cast<T *>(params_.push_back(new T())))); }
         unsigned int sz = params_.n_items();
 
         /* ensure we have enough space */
@@ -153,7 +153,7 @@ namespace csl
         {
           if( q->var_type() == T::var_type_v )
           {
-            return *((T*)q);
+            return *( reinterpret_cast<T*>(q) );
           }
           else
           {

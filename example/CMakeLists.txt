@@ -24,7 +24,9 @@
 IF(WIN32)
 
   IF(MSYS)
-    set(ZLIB z)
+
+    SET(ZLIB z)
+
     ADD_DEFINITIONS(
                      -Wall
                      -Wwrite-strings
@@ -34,13 +36,15 @@ IF(WIN32)
                      -Wconversion
                      -Wcomment
                      -Wcast-align
-                     -Winline
                      -Wshadow
                      -Wredundant-decls
                      -g3
                    )
+
   ELSE(MSYS)
-    set(ZLIB zlib)
+
+    SET(ZLIB zlib)
+
   ENDIF(MSYS)
 
   LINK_DIRECTORIES(
@@ -73,14 +77,13 @@ IF(WIN32)
                   )
 ELSE(WIN32)
 
-  find_library(DLOPEN_FOUND NAMES dl PATH /usr/lib /lib /usr/local/lib)
-  set(LIBDL)
+  FIND_LIBRARY(DLOPEN_FOUND NAMES dl PATH /usr/lib /lib /usr/local/lib)
+  SET(LIBDL)
 
-  if (DLOPEN_FOUND)
-   set(LIBDL dl)
-   set(HAVE_LIBDL TRUE)
-  endif (DLOPEN_FOUND)
-
+  IF(DLOPEN_FOUND)
+   SET(LIBDL dl)
+   SET(HAVE_LIBDL TRUE)
+  ENDIF(DLOPEN_FOUND)
 
   LINK_DIRECTORIES( 
                   ../common/src
@@ -105,19 +108,21 @@ ELSE(WIN32)
                    -Wconversion
                    -Wcomment
                    -Wcast-align
-                   -Winline
                    -Wshadow
                    -Wredundant-decls
                    -g3
                    -pthread
                  )
   
-  LINK_LIBRARIES( csl_slt3
+  LINK_LIBRARIES(
+                  csl_slt3
                   csl_nthread
                   csl_common
                   pthread
                   ${LIBDL}
-                  z )
+                  z
+                )
+
 ENDIF(WIN32)
 
 ADD_EXECUTABLE(ex_zfile1 ex_zfile1.cc)

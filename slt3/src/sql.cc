@@ -74,7 +74,7 @@ namespace csl
 
     const char * sql::helper::init_sql()
     {
-      if( init_sql_.size() > 0 ) { return (const char *)init_sql_.data(); }
+      if( init_sql_.size() > 0 ) { return init_sql_.c_str(); }
 
       init_sql_ = ustr("CREATE TABLE IF NOT EXISTS ") + table_name_ + " ( ";
 
@@ -93,12 +93,12 @@ namespace csl
 
       init_sql_ += " ); ";
 
-      return (const char *)init_sql_.data();
+      return init_sql_.c_str();
     }
 
     const char * sql::helper::create_sql()
     {
-      if( create_sql_.size() > 0 ) { return (const char *)create_sql_.data(); }
+      if( create_sql_.size() > 0 ) { return create_sql_.c_str(); }
 
       create_sql_ = ustr("INSERT INTO ") + table_name_ + " ( ";
 
@@ -127,12 +127,12 @@ namespace csl
 
       create_sql_ += " ); ";
 
-      return (const char *)create_sql_.data();
+      return create_sql_.c_str();
     }
 
     const char * sql::helper::save_sql()
     {
-      if( save_sql_.size() > 0 ) { return (const char *)save_sql_.data(); }
+      if( save_sql_.size() > 0 ) { return save_sql_.c_str(); }
 
       save_sql_ = ustr("UPDATE ") + table_name_ + " SET ";
 
@@ -158,23 +158,23 @@ namespace csl
         save_sql_ += ustr(" WHERE ") + (*it)->name_ + "=? ;";
       }
 
-      return (const char *)save_sql_.data();
+      return save_sql_.c_str();
     }
 
     const char * sql::helper::remove_sql()
     {
-      if( remove_sql_.size() > 0 ) { return (const char *)remove_sql_.data(); }
+      if( remove_sql_.size() > 0 ) { return remove_sql_.c_str(); }
 
       fieldlist_t::iterator it(fields_.begin());
 
       remove_sql_ = ustr("DELETE FROM ") + table_name_ + " WHERE " + (*it)->name_ + "=?;";
 
-      return (const char *)remove_sql_.data();
+      return remove_sql_.c_str();
     }
 
     const char * sql::helper::find_by_id_sql()
     {
-      if( find_by_id_sql_.size() > 0 ) { return (const char *)find_by_id_sql_.data(); }
+      if( find_by_id_sql_.size() > 0 ) { return find_by_id_sql_.c_str(); }
       common::pbuf pb;
 
       find_by_id_sql_ = "SELECT ";
@@ -199,7 +199,7 @@ namespace csl
         find_by_id_sql_ += ustr((*it)->name_) + "=? LIMIT 1;";
       }
 
-      return (const char *)find_by_id_sql_.data();
+      return find_by_id_sql_.c_str();
     }
 
     const char * sql::helper::find_by(int field1, int field2, int field3, int field4, int field5)
@@ -208,7 +208,7 @@ namespace csl
 
       if( memcmp( tmpi,find_by_fields_,sizeof(tmpi) ) == 0 )
       {
-        if( find_by_sql_.size() > 0 ) { return (const char *)find_by_sql_.data(); }
+        if( find_by_sql_.size() > 0 ) { return find_by_sql_.c_str(); }
       }
 
       find_by_sql_ = "SELECT ";
@@ -231,7 +231,7 @@ namespace csl
 
       for( int k=0;k<5 && tmpi[k]!=-1;++k )
       {
-        if( tmpi[k] != -1 && tmpi[k] < (int)fields_.size() )
+        if( tmpi[k] != -1 && tmpi[k] < static_cast<int>(fields_.size()) )
         {
           data * d = fields_.get_at(tmpi[k]);
           if( d )
@@ -244,7 +244,7 @@ namespace csl
       }
 
       find_by_sql_ += "LIMIT 1; ";
-      return (const char *)find_by_sql_.data();
+      return find_by_sql_.c_str();
     }
   };
 };

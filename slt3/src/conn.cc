@@ -55,7 +55,7 @@ namespace csl
     conn::~conn() {}
 
     /* private functions, copying not allowed */
-    conn::conn(const conn & other) : impl_((impl *)0) { }
+    conn::conn(const conn & other) : impl_( reinterpret_cast<impl *>(0) ) { }
     conn & conn::operator=(const conn & other) { return *this; }
   };
 };

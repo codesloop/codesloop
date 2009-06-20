@@ -24,6 +24,7 @@
 IF(WIN32)
 
   IF(MSYS)
+
     ADD_DEFINITIONS( -Wall
                      -Wwrite-strings
                      -Wcast-qual
@@ -32,11 +33,11 @@ IF(WIN32)
                      -Wconversion
                      -Wcomment
                      -Wcast-align
-                     -Winline
                      -Wshadow
                      -Wredundant-decls
                      -g3
                    )
+
   ENDIF(MSYS)
 
   LINK_DIRECTORIES(

@@ -77,11 +77,11 @@ namespace csl
     query::~query() {}
 
     /* private functions, copying not allowed */
-    query::query(const query & other) : impl_((impl *)0) { }
+    query::query(const query & other) : impl_( reinterpret_cast<impl *>(0) ) { }
     query & query::operator=(const query & other) { return *this; }
 
     /* no deafault constructor */
-    query::query() : impl_((impl *)0) {}
+    query::query() : impl_( reinterpret_cast<impl *>(0) ) {}
   };
 };
 

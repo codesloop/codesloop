@@ -41,7 +41,6 @@ IF(WIN32)
                      -Wconversion
                      -Wcomment
                      -Wcast-align
-                     -Winline
                      -Wshadow
                      -Wredundant-decls
                      -g3
@@ -83,7 +82,6 @@ ELSE(WIN32)
                    -Wconversion
                    -Wcomment
                    -Wcast-align
-                   -Winline
                    -Wshadow
                    -Wredundant-decls
                    -g3

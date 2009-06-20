@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -70,7 +70,7 @@ namespace csl
                        const unsigned char * rndata )
       {
         if( !key ) return false;
-        return init_crypt( buf, (const unsigned char *)key, strlen(key), encrypt, rndata );
+        return init_crypt( buf, reinterpret_cast<const unsigned char *>(key), strlen(key), encrypt, rndata );
       }
 
       bool init_crypt( unsigned char * buf,
@@ -176,7 +176,7 @@ namespace csl
 
     /* private functions, copying not allowed */
     crypt_buf::crypt_buf(const crypt_buf & other)
-      : impl_((impl *)0) {throw common::str("should never be called"); }
+      : impl_( reinterpret_cast<impl *>(0) ) {throw common::str("should never be called"); }
 
     crypt_buf &
     crypt_buf::operator=(const crypt_buf & other)

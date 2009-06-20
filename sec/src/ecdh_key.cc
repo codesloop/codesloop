@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -99,7 +99,7 @@ namespace csl
         {
           size_t sz = BN_num_bytes(from);
           to.is_negative(BN_is_negative(from));
-          BN_bn2bin(from,(unsigned char *)to.allocate(sz));
+          BN_bn2bin( from, reinterpret_cast<unsigned char *>(to.allocate(sz)) );
         }
       }
 
@@ -384,12 +384,12 @@ namespace csl
       try
       {
         oEC_KEY k;
-        oBIGNUM x,y;
+        oBIGNUM xx,yy;
 
-        if( k.gen_key(algname_) && k.get_coordinates(x,y) )
+        if( k.gen_key(algname_) && k.get_coordinates(xx,yy) )
         {
-          x.to_bignum(x_);
-          y.to_bignum(y_);
+          xx.to_bignum(x_);
+          yy.to_bignum(y_);
 
           return (k.get_private_key(private_key));
         }
@@ -485,7 +485,7 @@ namespace csl
         tmp[63] = 0;
 
         unsigned int sz = 0;
-        bool ret = buf.get_data( (unsigned char *)tmp,sz,64 );
+        ret = buf.get_data( reinterpret_cast<unsigned char *>(tmp),sz,64 );
 
         if( ret )
         {
@@ -527,11 +527,11 @@ namespace csl
       PRINTF(L"  Y key: "); y_.print();
     }
 
-    void ecdh_key::set(const common::ustr & algname, const bignum & x, const bignum & y)
+    void ecdh_key::set(const common::ustr & algnamee, const bignum & xx, const bignum & yy)
     {
-      algname_ = algname;
-      x_       = x;
-      y_       = y;
+      algname_ = algnamee;
+      x_       = xx;
+      y_       = yy;
     }
   }
 }

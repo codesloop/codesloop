@@ -494,20 +494,20 @@ namespace csl
             switch( t )
             {
               case query::colhead::t_integer:
-                sqlite3_bind_int64( stmt_, which, (long long)*p );
+                sqlite3_bind_int64( stmt_, which, p->get_long() );
                 break;
 
               case query::colhead::t_double:
-                sqlite3_bind_double( stmt_, which, (double)*p );
+                sqlite3_bind_double( stmt_, which, p->get_double() );
                 break;
 
               case query::colhead::t_string:
                 /* assume string always has a trailing zero */
-                sqlite3_bind_text( stmt_, which, p->charp_data(),p->var_size()-1, SQLITE_TRANSIENT );
+                sqlite3_bind_text( stmt_, which, p->charp_data(), (p->var_size()-1), SQLITE_TRANSIENT );
                 break;
 
               case query::colhead::t_blob:
-                sqlite3_bind_blob( stmt_, which, p->charp_data(),p->var_size(), SQLITE_TRANSIENT );
+                sqlite3_bind_blob( stmt_, which, (p->charp_data()), (p->var_size()), SQLITE_TRANSIENT );
                 break;
 
               case query::colhead::t_null:
@@ -529,16 +529,16 @@ namespace csl
         fill_columns();
         if( cols.n_items() == 0 ) copy_columns( cols );
 
-        columnpool_t::iterator it(column_pool_.begin());
-        columnpool_t::iterator end(column_pool_.end());
+        columnpool_t::iterator i( column_pool_.begin() );
+        columnpool_t::iterator e( column_pool_.end() );
 
         fields.free_all();
 
         unsigned int ac=0;
-        for( ;it!=end;++it )
+        for( ;i!=e;++i )
         {
           query::field * f = 0;
-          switch( (*it)->type_ )
+          switch( (*i)->type_ )
           {
             case query::colhead::t_integer:
               f = new common::int64(sqlite3_column_int64(stmt_,ac));
@@ -554,7 +554,7 @@ namespace csl
               break;
 
             case query::colhead::t_string:
-              f = new common::ustr((const char *)sqlite3_column_text(stmt_,ac));
+              f = new common::ustr( reinterpret_cast<const char *>(sqlite3_column_text(stmt_,ac)) );
               break;
 
             case query::colhead::t_null:
@@ -618,20 +618,20 @@ namespace csl
             switch( t )
             {
               case query::colhead::t_integer:
-                sqlite3_bind_int64( stmt_, which, (long long)*p );
+                sqlite3_bind_int64( stmt_, which, p->get_long() );
                 break;
 
               case query::colhead::t_double:
-                sqlite3_bind_double( stmt_, which, (double)*p );
+                sqlite3_bind_double( stmt_, which, p->get_double() );
                 break;
 
               case query::colhead::t_string:
                 /* assume string always has a trailing zero */
-                sqlite3_bind_text( stmt_, which, p->charp_data(),p->var_size()-1, SQLITE_TRANSIENT );
+                sqlite3_bind_text( stmt_, which, (p->charp_data()), (p->var_size()-1), SQLITE_TRANSIENT );
                 break;
 
               case query::colhead::t_blob:
-                sqlite3_bind_blob( stmt_, which, p->charp_data(),p->var_size(), SQLITE_TRANSIENT );
+                sqlite3_bind_blob( stmt_, which, (p->charp_data()), (p->var_size()), SQLITE_TRANSIENT );
                 break;
 
               case query::colhead::t_null:
@@ -787,10 +787,10 @@ namespace csl
                 break;
             };
             //
-            h->name_   = coldata_pool_.strdup((const char *)sqlite3_column_name(stmt_,i));
-            h->table_  = coldata_pool_.strdup((const char *)sqlite3_column_table_name(stmt_,i));
-            h->db_     = coldata_pool_.strdup((const char *)sqlite3_column_database_name(stmt_,i));
-            h->origin_ = coldata_pool_.strdup((const char *)sqlite3_column_origin_name(stmt_,i));
+            h->name_   = coldata_pool_.strdup( reinterpret_cast<const char *>(sqlite3_column_name(stmt_,i)) );
+            h->table_  = coldata_pool_.strdup( reinterpret_cast<const char *>(sqlite3_column_table_name(stmt_,i)) );
+            h->db_     = coldata_pool_.strdup( reinterpret_cast<const char *>(sqlite3_column_database_name(stmt_,i)) );
+            h->origin_ = coldata_pool_.strdup( reinterpret_cast<const char *>(sqlite3_column_origin_name(stmt_,i)) );
             column_pool_.push_back(h);
           }
         }

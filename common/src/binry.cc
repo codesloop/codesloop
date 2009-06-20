@@ -116,7 +116,7 @@ namespace csl
         b << xdrbuf::bindata_t(value_.data(),value_.size());
         return true;
       }
-      catch( exc e )
+      catch( exc & e )
       {
         return false;
       }
@@ -198,7 +198,7 @@ namespace csl
         else if( r == false ) return false;
         return true;
       }
-      catch( exc e )
+      catch( exc & e )
       {
         return false;
       }

@@ -24,7 +24,9 @@
 IF(WIN32)
 
   IF(MSYS)
-    set(ZLIB z)
+
+    SET(ZLIB z)
+
     ADD_DEFINITIONS(
                      -Wall
                      -Wwrite-strings
@@ -34,13 +36,15 @@ IF(WIN32)
                      -Wconversion
                      -Wcomment
                      -Wcast-align
-                     -Winline
                      -Wshadow
                      -Wredundant-decls
                      -g3
                    )
+
   ELSE(MSYS)
-    set(ZLIB zlib)
+
+    SET(ZLIB zlib)
+
   ENDIF(MSYS)
 
   LINK_DIRECTORIES(
@@ -81,6 +85,7 @@ ELSE(WIN32)
                  )
 
   LINK_DIRECTORIES( ../src )
+
   INCLUDE_DIRECTORIES( ../src )
 
   LINK_LIBRARIES(

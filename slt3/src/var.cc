@@ -90,7 +90,7 @@ namespace csl
         if( i > 0 )
         {
           data * d = *it;
-          q.set_param( (int)i,*(d->var_->get_value()) );
+          q.set_param( static_cast<int>(i),*(d->var_->get_value()) );
         }
         ++i;
       }
@@ -128,7 +128,7 @@ namespace csl
         if( i > 0 )
         {
           data * d = *it;
-          q.set_param( (int)i,*(d->var_->get_value()) );          
+          q.set_param( static_cast<int>(i),*(d->var_->get_value()) );          
         }
         ++i;
       }
@@ -136,7 +136,7 @@ namespace csl
       /* set id at last */
       datalist_t::iterator ix(dtalst_.begin());
       data * dx = *ix;
-      q.set_param( (int)i,*(dx->var_->get_value()) );
+      q.set_param( static_cast<int>(i),*(dx->var_->get_value()) );
       ++i;
 
       if( !q.prepare(sql_query) ) return false;
@@ -273,12 +273,12 @@ namespace csl
     const char * var_col_type<common::ustr>::coltype_s = "TEXT";
     const char * var_col_type<common::binry>::coltype_s = "BLOB";
     
-    void var_base::register_variable(var_base * vb, const char * name, const char * coltype, slt3::obj & parent, const char * flags)
+    void var_base::register_variable(var_base * vb, const char * namev, const char * coltype, slt3::obj & prnt, const char * flags)
     {
-      sql::helper & h(parent.sql_helper());
-      var_base::helper & v(parent.var_helper());
-      h.add_field(name,coltype,flags);
-      v.add_field(name,*vb);
+      sql::helper & h(prnt.sql_helper());
+      var_base::helper & v(prnt.var_helper());
+      h.add_field(namev,coltype,flags);
+      v.add_field(namev,*vb);
     }
   }; /* end of slt3 namespace */
 }; /* end of csl namespace */

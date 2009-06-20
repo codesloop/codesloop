@@ -23,39 +23,43 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "tran.hh"
-#include "_shared_impl.hh"
+#ifndef _csl_common_hlprs_hh_included_
+#define _csl_common_hlprs_hh_included_
 
 /**
-  @file tran.cc
-  @brief implementation of slt3::tran
+   @file hlprs.hh
+   @brief Various templated helpers
  */
+
+#include "common.h"
+#ifdef __cplusplus
 
 namespace csl
 {
-  namespace slt3
+  namespace common
   {
-    void tran::commit_on_destruct(bool yesno)   { impl_->commit_on_destruct(yesno);   }
-    void tran::rollback_on_destruct(bool yesno) { impl_->rollback_on_destruct(yesno); }
+    template <int> struct copy_n_uchars {};
+    template <> struct copy_n_uchars<1>
+    {
+      inline copy_n_uchars(unsigned char * dst, const unsigned char * src) { dst[0] = src[0]; }
+    };
+    template <> struct copy_n_uchars<2>
+    {
+      inline copy_n_uchars(unsigned char * dst, const unsigned char * src) { dst[0] = src[0]; dst[1] = src[1]; }
+    };
+    template <> struct copy_n_uchars<4>
+    {
+      inline copy_n_uchars(unsigned char * dst, const unsigned char * src)
+      { dst[0] = src[0]; dst[1] = src[1]; dst[2] = src[2]; dst[3] = src[3]; }
+    };
+    template <> struct copy_n_uchars<8>
+    {
+      inline copy_n_uchars(unsigned char * dst, const unsigned char * src)
+      { dst[0] = src[0]; dst[1] = src[1]; dst[2] = src[2]; dst[3] = src[3];
+        dst[4] = src[4]; dst[5] = src[5]; dst[6] = src[6]; dst[7] = src[7]; }
+    };
+  }
+}
 
-    void tran::commit()   { impl_->commit();   }
-    void tran::rollback() { impl_->rollback(); }
-
-    void tran::use_exc(bool yesno) { impl_->use_exc(yesno); }
-    bool tran::use_exc() { return impl_->use_exc(); }
-
-    /* public interface */
-    tran::tran(conn & c) : impl_(new impl(c.impl_)) {}
-    tran::tran(tran & t) : impl_(new impl(t.impl_)) {}
-
-    tran::~tran() {}
-
-    /* private functions, copying not allowed */
-    tran & tran::operator=(const tran & other) { return *this; }
-
-    /* transactions should only be created in conn, or tran context */
-    tran::tran() : impl_( reinterpret_cast<impl *>(0) ) { }
-  };
-};
-
-/* EOF */
+#endif /* __cplusplus */
+#endif /* _csl_common_hlprs_hh_included_ */

@@ -64,7 +64,6 @@ IF(WIN32)
                      -Wconversion
                      -Wcomment
                      -Wcast-align
-                     -Winline
                      -Wshadow
                      -Wredundant-decls
                      -g3
@@ -93,33 +92,39 @@ IF(WIN32)
                          ../../../3rdparty/zlib/GnuWin32/include
                        )
 
-    LINK_DIRECTORIES( ../src
+    LINK_DIRECTORIES(
+                      ../src
                       ../../common/src
                       c:/OpenSSL/lib/VC/static
                       $ENV{OPENSSL_DEV_ENV}/lib/VC/static
                       ../../../3rdparty/OpenSSL/lib/VC/static
                       $ENV{ZLIB_DEV_ENV}/lib
                       ../../../3rdparty/zlib/GnuWin32/lib
-                      )
+                     )
   ENDIF(MSYS)
 
 ELSE(WIN32)
 
- find_library(DLOPEN_FOUND NAMES dl PATH /usr/lib /lib /usr/local/lib)
-  set(LIBDL)
+ FIND_LIBRARY(DLOPEN_FOUND NAMES dl PATH /usr/lib /lib /usr/local/lib)
+ SET(LIBDL)
 
-  if (DLOPEN_FOUND)
-   set(LIBDL dl)
-   set(HAVE_LIBDL TRUE)
-  endif (DLOPEN_FOUND)
+ IF(DLOPEN_FOUND)
+ 
+   SET(LIBDL dl)
 
-  LINK_DIRECTORIES( ../src
+   SET(HAVE_LIBDL TRUE)
+
+ ENDIF(DLOPEN_FOUND)
+
+  LINK_DIRECTORIES(
+                    ../src
                     ../../nthread/src
                     ../../sec/src
                     ../../common/src
                   )
 
-  INCLUDE_DIRECTORIES( ../src
+  INCLUDE_DIRECTORIES(
+                       ../src
                        ../../nthread/src
                        ../../sec/src
                        ../../common/src 
@@ -134,14 +139,14 @@ ELSE(WIN32)
                    -Wconversion
                    -Wcomment
                    -Wcast-align
-                   -Winline
                    -Wshadow
                    -Wredundant-decls
                    -g3
                    -pthread
                  )
 
-  LINK_LIBRARIES( csl_comm
+  LINK_LIBRARIES(
+                  csl_comm
                   csl_sec
                   csl_nthread
                   csl_common
@@ -151,6 +156,7 @@ ELSE(WIN32)
                   pthread
                   ${LIBDL}
                 )
+
 ENDIF(WIN32)
 
 ADD_EXECUTABLE(t__mt_udp              t__mt_udp.cc)

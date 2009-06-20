@@ -56,8 +56,8 @@ namespace csl
       }
     }
 
-    reg::helper::helper(const char * name, const char * default_db_path)
-      : name_(name), default_path_(default_db_path), use_exc_(true) { }
+    reg::helper::helper(const char * namev, const char * default_db_pathv)
+      : name_(namev), default_path_(default_db_pathv), use_exc_(true) { }
 
     const char * reg::helper::path()
     {
@@ -201,9 +201,9 @@ namespace csl
 
         if( fd.size() > 0 )
         {
-          i.id_   = ((int64 *)fd.get_at(0))->value();
-          i.name_ = pool.strdup( ((ustr *)fd.get_at(1))->c_str() );
-          i.path_ = pool.strdup( ((ustr *)fd.get_at(2))->c_str() );
+          i.id_   = ( reinterpret_cast<int64 *>(fd.get_at(0)) )->value();
+          i.name_ = pool.strdup( ( reinterpret_cast<ustr *>(fd.get_at(1)) )->c_str() );
+          i.path_ = pool.strdup( ( reinterpret_cast<ustr *>(fd.get_at(2)) )->c_str() );
           return true;
         }
         else
@@ -302,10 +302,10 @@ namespace csl
 
         while( q.next(ch,fd) )
         {
-          item * p = (item *)pool.allocate( sizeof(item) );
-          p->id_   = ((int64 *)fd.get_at(0))->value();
-          p->name_ = pool.strdup( ((ustr *)fd.get_at(1))->c_str() );
-          p->path_ = pool.strdup( ((ustr *)fd.get_at(2))->c_str() );
+          item * p = reinterpret_cast<item *>(pool.allocate( sizeof(item) ));
+          p->id_   = ( reinterpret_cast<int64 *>(fd.get_at(0)))->value();
+          p->name_ = pool.strdup( ( reinterpret_cast<ustr *>(fd.get_at(1)) )->c_str() );
+          p->path_ = pool.strdup( ( reinterpret_cast<ustr *>(fd.get_at(2)) )->c_str() );
           itms.push_back( p );
           ret = true;
         }

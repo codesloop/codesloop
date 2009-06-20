@@ -21,12 +21,14 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-LINK_DIRECTORIES( ../../nthread/src
+LINK_DIRECTORIES(
+                  ../../nthread/src
                   ../../common/src
                   ../../sec/src
                 )
 
-INCLUDE_DIRECTORIES( ../../nthread/src
+INCLUDE_DIRECTORIES(
+                     ../../nthread/src
                      ../../common/src
                      ../../sec/src
                    )
@@ -42,7 +44,6 @@ IF(NOT WIN32)
                      -Wconversion
                      -Wcomment
                      -Wcast-align
-                     -Winline
                      -Wshadow
                      -Wredundant-decls
                      -g3
@@ -61,7 +62,6 @@ ELSE(NOT WIN32)
                      -Wconversion
                      -Wcomment
                      -Wcast-align
-                     -Winline
                      -Wshadow
                      -Wredundant-decls
                      -g3
@@ -81,4 +81,3 @@ ADD_LIBRARY( csl_comm STATIC
            )
 
 # -- EOF --
-

@@ -26,6 +26,7 @@ IF(WIN32)
   INCLUDE_DIRECTORIES( ../../common/src )
 
   IF(MSYS)
+
     ADD_DEFINITIONS(
                      -Wall
                      -Wwrite-strings
@@ -35,11 +36,11 @@ IF(WIN32)
                      -Wconversion
                      -Wcomment
                      -Wcast-align
-                     -Winline
                      -Wshadow
                      -Wredundant-decls
                      -g3
                    )
+
   ENDIF(MSYS)
 
 ELSE(WIN32)
@@ -53,7 +54,6 @@ ELSE(WIN32)
                    -Wconversion
                    -Wcomment
                    -Wcast-align
-                   -Winline
                    -Wshadow
                    -Wredundant-decls
                    -g3

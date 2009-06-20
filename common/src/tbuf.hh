@@ -32,6 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "pbuf.hh"
+#include "hlprs.hh"
 #include "common.h"
 #ifdef __cplusplus
 
@@ -78,7 +79,8 @@ namespace csl
          */
         inline explicit tbuf(wchar_t c) : data_(preallocated_), size_(sizeof(wchar_t))
         {
-          (reinterpret_cast<wchar_t *>(preallocated_))[0] = c;
+          const unsigned char * p = (reinterpret_cast<const unsigned char *>(&c));
+          copy_n_uchars<sizeof(wchar_t)>(preallocated_,p);
         }
 
         /** @brief copy constructor */
