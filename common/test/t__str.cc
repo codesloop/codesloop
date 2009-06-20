@@ -448,6 +448,8 @@ int main()
   }
 
   str s( L"HELLO" );
+  assert( s.nbytes() == 6*sizeof(wchar_t) );
+  assert( s.empty() == false );
   assert( s.size() == 5 );
   assert( wcscmp(s.c_str(), L"HELLO") == 0 );
 

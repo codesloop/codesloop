@@ -126,7 +126,8 @@ namespace csl
         /** @brief is equal operator */
         inline bool operator==(const str& s) const
         {
-          return !wcscmp( data(), s.data());
+          int ret = wcscmp( data(), s.data() );
+          return (ret == 0);
         }
 
         /**
@@ -234,7 +235,8 @@ namespace csl
         /** @brief is equal operator */
         inline bool operator==(const wchar_t * s) const
         {
-          return !wcscmp( data(), s);
+          int ret = wcscmp( data(), s );
+          return (ret == 0);
         }
 
         /** @brief returns the background c str */
@@ -351,7 +353,7 @@ namespace csl
          */
         inline bool empty() const
         {
-          return (buf_.has_data() <= 1);
+          return (buf_.size() <= 1);
         }
 
         /** @brief returns the internal buffer that stores the string */
@@ -430,7 +432,7 @@ namespace csl
 
         this function delegates the conversion to common::str class
          */
-        inline bool to_string(str & v) const { return v.from_string(data()); }
+        inline bool to_string(str & v) const { v.buf_ = buf_; return true; }
 
         /**
         @brief convert to common::ustr
@@ -556,7 +558,7 @@ namespace csl
 
         this function uses the internal copy operator
          */
-        inline bool from_string(const str & v)   { *this = v; return true; }
+        inline bool from_string(const str & v)   { buf_ = v.buf_; return true; }
 
         /**
         @brief convert a common::ustr

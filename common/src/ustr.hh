@@ -419,7 +419,7 @@ namespace csl
 
         this function delegates the conversion to common::ustr class
          */
-        inline bool to_string(ustr & v) const { return v.from_string(data()); }
+        inline bool to_string(ustr & v) const { v.buf_ = buf_; return true; }
 
         /**
         @brief convert to std::string
@@ -534,7 +534,7 @@ namespace csl
 
         this function uses the internal copy operator for conversion
          */
-        inline bool from_string(const str & v)         { *this = v; return true; }
+        inline bool from_string(const str & v) { *this = v; return true; }
 
         /**
         @brief convert a common::ustr
@@ -543,7 +543,7 @@ namespace csl
 
         this function uses the internal copy operator
          */
-        inline bool from_string(const ustr & v)        { *this = v; return true; }
+        inline bool from_string(const ustr & v) { buf_ = v.buf_; return true; }
 
         /**
         @brief convert a std::string
