@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -93,7 +93,7 @@ namespace test_udp_data_client {
     cd.session_key( ca.session_key() );
 
     udp::b1024_t in,out;
-    in.set( (unsigned char *)"hello",6 );
+    in.set( reinterpret_cast<const unsigned char *>("hello"),6 );
 
     assert( cd.send(in) == true );
     assert( cd.recv(out,3000) == true );
@@ -129,7 +129,7 @@ namespace test_udp_data_client {
   void data()
   {
     udp::b1024_t in,out;
-    in.set( (unsigned char *)"hello",6 );
+    in.set( reinterpret_cast<const unsigned char *>("hello"),6 );
     assert( global_data_client_->send(in) == true );
     assert( global_data_client_->recv(out,3000) == true );
     assert( memcmp( out.data(),"HELLO",6 ) == 0 );

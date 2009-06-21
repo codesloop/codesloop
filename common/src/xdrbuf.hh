@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -277,7 +277,7 @@ namespace csl
           it_  = oldit;
           pos_ = oldpos;
           if( sz <= 0 || sz > max_size ) return false;
-          return get_data( (unsigned char *)t.allocate(sz), size, max_size );
+          return get_data( reinterpret_cast<unsigned char *>(t.allocate(sz)), size, max_size );
         }
 
         /** @brief steps forward in the stream by n bytes (plus padding) */

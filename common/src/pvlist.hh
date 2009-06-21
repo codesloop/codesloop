@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -560,12 +560,13 @@ namespace csl
        the number of stored items will be increased by 1 after 
        calling this function
        */
-      inline void push_back(T * p)
+      inline T * push_back(T * p)
       {
         item * i = ensure_item();
         i->ptrs_[i->used_] = p;
         ++(i->used_);
         ++n_items_;
+        return p;
       }
 
       /**
@@ -659,7 +660,7 @@ namespace csl
             "  -- next : %p\n"
             "  ---- : ",
                  pt->ptrs_,
-                 (unsigned long)pt->used_,
+                 static_cast<unsigned long>(pt->used_),
                  pt->next_ );
           for( size_t i=0;i<pt->used_;++i ) printf("%p ",pt->ptrs_[i]);
           printf("\n");

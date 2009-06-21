@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -82,7 +82,7 @@ namespace test_circbuf {
       it = i;
       assert( cb.newest() == i );
       assert( cb.oldest() == 0 );
-      assert( cb.size() == (unsigned int)i+1 );
+      assert( cb.size() == static_cast<unsigned int>(i+1) );
     }
 
     for( int i=0;i<40;++i )
@@ -102,7 +102,7 @@ namespace test_circbuf {
       ls.push_back(i);
       assert( ls.back() == i );
       assert( ls.front() == 0 );
-      assert( ls.size() == (unsigned int)i+1 );
+      assert( ls.size() == static_cast<unsigned int>(i+1) );
     }
 
     for( int i=0;i<40;++i )
@@ -124,7 +124,7 @@ namespace test_circbuf {
       cb.commit( it );
       assert( cb.newest() == i );
       assert( cb.oldest() == 0 );
-      assert( cb.n_items() == (unsigned int)i+1 );
+      assert( cb.n_items() == static_cast<unsigned int>(i+1) );
     }
 
     for( int i=0;i<40;++i )

@@ -23,34 +23,43 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef _csl_common_hlprs_hh_included_
+#define _csl_common_hlprs_hh_included_
+
 /**
-  @file ex_sql2.cc
-  @brief basic slt3 demonstration not using exceptions
+   @file hlprs.hh
+   @brief Various templated helpers
  */
 
-#include "csl_slt3.hh"
 #include "common.h"
+#ifdef __cplusplus
 
-using namespace csl::slt3;
-
-int main()
+namespace csl
 {
-  conn c;
-  c.use_exc(false);
-
-  if( c.open("testme.db") )
+  namespace common
   {
-    /* start a transaction */
-    tran t(c);
-
-    /* create a query object */
-    query q(t);
-
-    if( q.execute("create table test(i int);") == false )
+    template <int> struct copy_n_uchars {};
+    template <> struct copy_n_uchars<1>
     {
-      /* error message will be automatically sent to stderr */
-    }
+      inline copy_n_uchars(unsigned char * dst, const unsigned char * src) { dst[0] = src[0]; }
+    };
+    template <> struct copy_n_uchars<2>
+    {
+      inline copy_n_uchars(unsigned char * dst, const unsigned char * src) { dst[0] = src[0]; dst[1] = src[1]; }
+    };
+    template <> struct copy_n_uchars<4>
+    {
+      inline copy_n_uchars(unsigned char * dst, const unsigned char * src)
+      { dst[0] = src[0]; dst[1] = src[1]; dst[2] = src[2]; dst[3] = src[3]; }
+    };
+    template <> struct copy_n_uchars<8>
+    {
+      inline copy_n_uchars(unsigned char * dst, const unsigned char * src)
+      { dst[0] = src[0]; dst[1] = src[1]; dst[2] = src[2]; dst[3] = src[3];
+        dst[4] = src[4]; dst[5] = src[5]; dst[6] = src[6]; dst[7] = src[7]; }
+    };
   }
-
-  return 0;
 }
+
+#endif /* __cplusplus */
+#endif /* _csl_common_hlprs_hh_included_ */

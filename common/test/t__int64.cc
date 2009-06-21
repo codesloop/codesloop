@@ -75,7 +75,7 @@ namespace test_int64 {
     dbl o;
     assert( v.from_integer(12345678LL) == true );
     assert( v.to_double(o) == true ); /**/
-    assert( o.value() == (double)12345678LL );
+    assert( o.value() == static_cast<double>(12345678LL) );
   }
 
   void to_double_d()
@@ -84,7 +84,7 @@ namespace test_int64 {
     double o = 0.0;
     assert( v.from_double(12345678.0) == true );
     assert( v.to_double(o) == true ); /**/
-    assert( o == (double)v.value() );
+    assert( o == static_cast<double>(v.value()) );
     assert( o == 12345678.0 );
   }
 

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -60,6 +60,7 @@ namespace test_peer {
     {
       conn & db(p.db());
       tran t(db);
+      // init() was intentionally omitted from here
       assert( p.create(t) == false );
     }
     catch( csl::sched::exc e )
@@ -174,7 +175,7 @@ namespace test_peer {
     assert( p3.public_key().is_empty() == false );
     assert( p3.private_key().has_data() == true );
     assert( p3.public_key().algname() == "prime192v3" );
-    assert( str(p3.common_name_.c_str()) == "Hello" );
+    assert( p3.common_name_ == "Hello" );
     assert( p3.id_.get() == p2.id_.get() );
   }
 
@@ -184,6 +185,9 @@ using namespace test_peer;
 
 int main()
 {
+  csl_common_print_results( "baseline           ", csl_common_test_timer_v0(baseline),"" );
+  csl_common_print_results( "usage1             ", csl_common_test_timer_v0(usage1),"" );
+
   {
     peer p;
     conn & db(p.db());
@@ -191,8 +195,6 @@ int main()
     p.init(t);
   }
 
-  csl_common_print_results( "baseline           ", csl_common_test_timer_v0(baseline),"" );
-  csl_common_print_results( "usage1             ", csl_common_test_timer_v0(usage1),"" );
   csl_common_print_results( "usage2             ", csl_common_test_timer_v0(usage2),"" );
   csl_common_print_results( "usage3             ", csl_common_test_timer_v0(usage3),"" );
   usage3_nodel();
@@ -203,9 +205,12 @@ int main()
     peer p;
     conn & db(p.db());
     tran t(db);
-    synqry q(t);
+    query q(t);
     q.execute("DELETE FROM peers;");
   }
+
+  UNLINK(SCHED_PEER_DB_DEFAULT_PATH);
+  UNLINK(SLT3_REGISTRY_PATH3);
 
   return 0;
 }

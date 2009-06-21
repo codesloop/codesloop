@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -270,10 +270,10 @@ namespace csl
 
         for( ;it!=end;++it )
         {
-          const pbuf::buf * bf = (*it);
-          if( bf->size_ )
+          const pbuf::buf * bfit = (*it);
+          if( bfit->size_ )
           {
-            if( fwrite( bf->data_, 1, bf->size_, fp) != bf->size_ ) goto bail;
+            if( fwrite( bfit->data_, 1, bfit->size_, fp) != bfit->size_ ) goto bail;
           }
         }
 
@@ -317,7 +317,7 @@ namespace csl
         wchar_t tmp[32];
         str.clear();
 
-        SWPRINTF(tmp,sizeof(tmp),L"[sz=%ld]\n",(unsigned long)get_size_common(bf));
+        SWPRINTF(tmp,sizeof(tmp),L"[sz=%ld]\n",static_cast<unsigned long>(get_size_common(bf)));
         str += tmp;
 
         size_t b = 0;
@@ -334,10 +334,10 @@ namespace csl
           {
             SWPRINTF( tmp,sizeof(tmp),L"%c[%.2d:%.2d:%.4d:%.4d]: ",
                 prefix,
-                (unsigned short)b,
-                (unsigned short)l,
-                (unsigned int)k,
-                (unsigned int)bx->size_ );
+                static_cast<unsigned short>(b),
+                static_cast<unsigned short>(l),
+                static_cast<unsigned int>(k),
+                static_cast<unsigned int>(bx->size_) );
             str += tmp;
             for( i=0;(k<(bx->size_)&& i<16);++i )
             {
@@ -400,7 +400,7 @@ namespace csl
       {
         size_t sz = get_size();
         if( !sz ) return 0;
-        unsigned char * ret = (unsigned char *)pool_.allocate( sz );
+        unsigned char * ret = reinterpret_cast<unsigned char *>(pool_.allocate( sz ));
         if( !ret || !get_data( ret ) ) return 0;
         return ret;
       }
@@ -409,7 +409,7 @@ namespace csl
       {
         size_t sz = get_zsize();
         if( !sz ) return 0;
-        unsigned char * ret = (unsigned char *)pool_.allocate( sz );
+        unsigned char * ret = reinterpret_cast<unsigned char *>(pool_.allocate( sz ));
         if( !ret || !get_zdata( ret ) ) return 0;
         return ret;
       }
@@ -598,8 +598,8 @@ namespace csl
 
       if( s1 )
       {
-        p1 = (unsigned char *)mp.allocate(s1);
-        p2 = (unsigned char *)mp.allocate(s2);
+        p1 = reinterpret_cast<unsigned char *>(mp.allocate(s1));
+        p2 = reinterpret_cast<unsigned char *>(mp.allocate(s2));
 
         if( this->get_data_const(p1) && other.get_data_const(p2) )
         {
@@ -615,8 +615,8 @@ namespace csl
         if( s1 != s2 ) return false;
         if( !s1 ) return true;
 
-        p1 = (unsigned char *)mp.allocate(s1);
-        p2 = (unsigned char *)mp.allocate(s2);
+        p1 = reinterpret_cast<unsigned char *>(mp.allocate(s1));
+        p2 = reinterpret_cast<unsigned char *>(mp.allocate(s2));
 
         if( this->get_zdata_const(p1) && other.get_zdata_const(p2) )
         {

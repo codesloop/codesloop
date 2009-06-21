@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -102,7 +102,7 @@ namespace test_mt_udp {
             }
 
             char t='?';
-            if( do_send && sendto( socket_,&t,1,0,(struct sockaddr *)&sa,sizeof(sa) ) == 1 )
+            if( do_send && ::sendto( socket_,&t,1,0,reinterpret_cast<const struct sockaddr *>(&sa),sizeof(sa) ) == 1 )
             {
               ++sent_;
             }
@@ -148,9 +148,9 @@ namespace test_mt_udp {
 
           int err = 0;
 
-          if( (err=select(socket_+1,&fds,NULL,NULL,&tv)) > 0 )
+          if( (err=::select(socket_+1,&fds,NULL,NULL,&tv)) > 0 )
           {
-            if( (err=recvfrom( socket_,&t,1,0,(struct sockaddr *)&addr,&len )) == 1 )
+            if( (err=::recvfrom( socket_,&t,1,0,reinterpret_cast<struct sockaddr *>(&addr),&len )) == 1 )
             {
               ++recvd_;
               w_->add( addr );
@@ -186,8 +186,8 @@ namespace test_mt_udp {
 
         socklen_t len = sizeof(addr_);
 
-        assert( ::bind(socket_,(struct sockaddr *)&addr_, sizeof(addr_)) == 0 );
-        assert( ::getsockname(socket_,(struct sockaddr *)&addr_,&len) == 0 );
+        assert( ::bind(socket_,reinterpret_cast<struct sockaddr *>(&addr_), sizeof(addr_)) == 0 );
+        assert( ::getsockname(socket_,reinterpret_cast<struct sockaddr *>(&addr_),&len) == 0 );
       }
 
       virtual struct sockaddr_in & addr() { return addr_; }
@@ -245,7 +245,7 @@ namespace test_mt_udp {
       {
         memcpy( &addr_,&addr,sizeof(addr) );
 
-        assert( ::connect( socket_, (struct sockaddr *)&addr_,sizeof(addr_) ) == 0 );
+        assert( ::connect( socket_, reinterpret_cast<struct sockaddr *>(&addr_),sizeof(addr_) ) == 0 );
       }
 
       virtual void operator()(void)
@@ -268,9 +268,9 @@ namespace test_mt_udp {
             break;
           }
 
-          if( (err=select(socket_+1,&fds,NULL,NULL,&tv)) > 0 )
+          if( (err=::select(socket_+1,&fds,NULL,NULL,&tv)) > 0 )
           {
-            if( (err=recv( socket_,&t,1,0 )) == 1 )
+            if( (err=::recv( socket_,&t,1,0 )) == 1 )
             {
               ++recvd_;
             }

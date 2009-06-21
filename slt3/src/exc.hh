@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -85,8 +85,7 @@ namespace csl
           cm_unknown, ///<Unknown component
           cm_conn,    ///<conn component
           cm_tran,    ///<tran component
-          cm_synqry,  ///<synqry component
-          cm_param,   ///<param component
+          cm_query,   ///<query component
           cm_reg      ///<reg component
         };
 

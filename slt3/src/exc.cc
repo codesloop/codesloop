@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -83,8 +83,7 @@ namespace csl
       {
         case cm_conn:      return L"slt3::conn";
         case cm_tran:      return L"slt3::tran";
-        case cm_synqry:    return L"slt3::synqry";
-        case cm_param:     return L"slt3::param";
+        case cm_query:     return L"slt3::query";
         case cm_reg:       return L"slt3::reg";
         case cm_unknown:
         default:           return L"unknown";

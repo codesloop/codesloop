@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -43,7 +43,7 @@ namespace csl
   {
     static void print_hex(const wchar_t * prefix,const void * vp,size_t len)
     {
-      unsigned char * hx = (unsigned char *)vp;
+      const unsigned char * hx = reinterpret_cast<const unsigned char *>(vp);
       PRINTF(L"%ls [%04d] : ",prefix,len);
       for(size_t i=0;i<len;++i) PRINTF(L"%.2X",hx[i]);
       PRINTF(L"\n");
@@ -117,7 +117,8 @@ namespace csl
           data.set(ptrp+(crypt_pkt::header_len()),
                    lenp-crypt_pkt::footer_len()-crypt_pkt::header_len());
 
-          key.set((unsigned char *)session_key.c_str(),session_key.size()+1);
+          key.set( reinterpret_cast<const unsigned char *>(session_key.c_str()),
+            (session_key.size()+1) );
 
           crypt_pkt pk;
           pk.use_exc(use_exc());
@@ -183,7 +184,7 @@ namespace csl
           pbuf    outer;
           xdrbuf  xbo(outer);
 
-          xbo << (int32_t)msg::unicast_htua_p;
+          xbo << static_cast<int32_t>(msg::unicast_htua_p);
 
           if( outer.size() > m.max_len() ) { THR(comm::exc::rs_too_big,comm::exc::cm_udp_auth_handler,false); }
 
@@ -208,7 +209,9 @@ namespace csl
           crypt_pkt::databuf_t  data;
           crypt_pkt::footbuf_t  foot;
 
-          key.set( (unsigned char *)sesskey.c_str(), sesskey.size()+1 );
+          key.set( reinterpret_cast<const unsigned char *>(sesskey.c_str()),
+            (sesskey.size()+1) );
+
           inner.t_copy_to(data);
 
           crypt_pkt pk;
@@ -327,8 +330,8 @@ namespace csl
           /* send data back */
           socklen_t len = sizeof(ms.sender_);
 
-          if( sendto( socket_, (const char *)ms.data_, ms.size_, 0,
-              (struct sockaddr *)&(ms.sender_), len ) != (int)(ms.size_) )
+          if( ::sendto( socket_, reinterpret_cast<const char *>(ms.data_), ms.size_, 0,
+              reinterpret_cast<const struct sockaddr *>(&(ms.sender_)), len ) != static_cast<int>(ms.size_) )
           {
             FPRINTF(stderr,L"[%ls:%d] Error in sendto(%d)\n",L""__FILE__,__LINE__,socket_);
             perror("sendto");
@@ -439,7 +442,7 @@ namespace csl
           pbuf    outer;
           xdrbuf  xbo(outer);
 
-          xbo << (int32_t)msg::unicast_auth_p;
+          xbo << static_cast<int32_t>(msg::unicast_auth_p);
 
           if( public_key_.to_xdr(xbo) == false ) { THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_auth_cli,false); }
 
@@ -458,7 +461,7 @@ namespace csl
           xdrbuf xbi(inner);
 
           /* salt and session key is generated in auth() */
-          xbi << xdrbuf::bindata_t( (const unsigned char *)my_salt_.data(),(unsigned int)saltbuf_t::preallocated_size );
+          xbi << xdrbuf::bindata_t( reinterpret_cast<const unsigned char *>(my_salt_.data()),static_cast<unsigned int>(saltbuf_t::preallocated_size) );
           xbi << login_;
           xbi << pass_;
           xbi << session_key_;
@@ -470,11 +473,11 @@ namespace csl
           }
 
           /* generate session key */
-          ustr session_key;
+          ustr session_key_v;
 
           if( server_public_key_.is_empty() == false )
           {
-            if( server_public_key_.gen_sha1hex_shared_key(private_key_,session_key) == false )
+            if( server_public_key_.gen_sha1hex_shared_key(private_key_,session_key_v) == false )
             {
               THR(comm::exc::rs_sec_error,comm::exc::cm_udp_auth_cli,false);
             }
@@ -484,7 +487,7 @@ namespace csl
             THR(comm::exc::rs_pubkey_empty,comm::exc::cm_udp_auth_cli,false);
           }
 
-          if( debug() ) { PRINTF(L"  ++ Session Key: '%s'\n",session_key.c_str()); }
+          if( debug() ) { PRINTF(L"  ++ Session Key: '%s'\n",session_key_v.c_str()); }
 
           /* compile packet */
           crypt_pkt::saltbuf_t  salt;
@@ -494,7 +497,7 @@ namespace csl
           crypt_pkt::footbuf_t  foot;
 
           csl_sec_gen_rand( salt.allocate(saltbuf_t::preallocated_size), saltbuf_t::preallocated_size );
-          key.set( (unsigned char *)session_key.c_str(), session_key.size()+1 );
+          key.set( reinterpret_cast<const unsigned char *>(session_key_v.c_str()), (session_key_v.size()+1) );
           inner.t_copy_to(data);
 
           crypt_pkt pk;
@@ -574,7 +577,8 @@ namespace csl
           data.set(ptrp+(crypt_pkt::header_len()),
                    lenp-crypt_pkt::footer_len()-crypt_pkt::header_len());
 
-          key.set((unsigned char *)session_key_.c_str(),session_key_.size()+1);
+          key.set( reinterpret_cast<const unsigned char *>(session_key_.c_str()),
+            (session_key_.size()+1) );
 
           if( debug() )
           {
@@ -633,7 +637,7 @@ namespace csl
 
           socklen_t len = sizeof(addr);
 
-          if( ::connect(sock, (struct sockaddr *)&addr, len) == -1 )
+          if( ::connect(sock, reinterpret_cast<const struct sockaddr *>(&addr), len) == -1 )
           {
             ShutdownCloseSocket(sock);
             return -1;
@@ -686,7 +690,7 @@ namespace csl
 
         if( !prepare_auth( m ) ) { THR(exc::rs_pkt_error,exc::cm_udp_auth_cli,false); }
 
-        if( (err=::send( sock_, (const char *)m.data_, m.size_ , 0 )) != (int)(m.size_) )
+        if( (err=::send( sock_, reinterpret_cast<const char *>(m.data_), m.size_ , 0 )) != static_cast<int>(m.size_) )
         {
           THRC(exc::rs_send_failed,exc::cm_udp_auth_cli,false);
         }
@@ -709,7 +713,7 @@ namespace csl
 
         if( err > 0 )
         {
-          err = ::recv(sock_,(char *)m.data_, m.max_len(), 0);
+          err = ::recv(sock_,reinterpret_cast<char *>(m.data_), m.max_len(), 0);
           //
           if( err > 0 )
           {

@@ -283,7 +283,7 @@ namespace test_str {
     str b("árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
     binry o;
     assert( b.to_binary(o) == true );
-    assert( b == (wchar_t *)o.value().data() );
+    assert( b == reinterpret_cast<const wchar_t *>(o.value().data()) );
   }
 
   void to_binary_u()
@@ -294,7 +294,7 @@ namespace test_str {
     assert( b.to_binary(o,sz) == true );
     assert( sz == b.nbytes() );
     assert( sz > 10 );
-    assert( b == (wchar_t *)o );
+    assert( b == reinterpret_cast<wchar_t *>(o) );
   }
 
   void to_binary_v()
@@ -306,7 +306,7 @@ namespace test_str {
     assert( b.to_binary(vp,sz) == true );
     assert( sz == b.nbytes() );
     assert( sz > 10 );
-    assert( b == (wchar_t *)o );
+    assert( b == reinterpret_cast<wchar_t *>(o) );
   }
 
   void to_xdr()
@@ -416,7 +416,7 @@ namespace test_str {
   {
     str b;
     str o(L"árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
-    assert( b.from_binary( (const void *)o.buffer().data(), o.buffer().size() ) == true );
+    assert( b.from_binary( reinterpret_cast<const void *>(o.buffer().data()), o.buffer().size() ) == true );
     assert( b == "árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP" );
   }
 
@@ -448,6 +448,8 @@ int main()
   }
 
   str s( L"HELLO" );
+  assert( s.nbytes() == 6*sizeof(wchar_t) );
+  assert( s.empty() == false );
   assert( s.size() == 5 );
   assert( wcscmp(s.c_str(), L"HELLO") == 0 );
 

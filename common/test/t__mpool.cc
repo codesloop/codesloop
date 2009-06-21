@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -49,8 +49,8 @@ namespace test_mpool {
   void test_simple()
   {
     mpool<> p;
-    char * p1 = (char *)p.allocate(10);
-    char * p2 = (char *)p.allocate(20);
+    char * p1 = reinterpret_cast<char *>(p.allocate(10));
+    char * p2 = reinterpret_cast<char *>(p.allocate(20));
     
     assert( p.is_from(p1) == true );
     assert( p.find(p1)    == true );

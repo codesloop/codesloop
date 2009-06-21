@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -60,13 +60,13 @@ namespace csl
       uint32_t new_len, pad_size;
       round_to_4( sz, new_len, pad_size );
 
-      if( !b->append((unsigned char *)&elen,sizeof(elen)) )
+      if( !b->append( reinterpret_cast<unsigned char *>(&elen),sizeof(elen)) )
       {
         throw common::exc(exc::rs_cannot_append,exc::cm_xdrbuf,L"",L""__FILE__,__LINE__);
         return;
       }
 
-      if( !b->append((unsigned char *)p,sz) )
+      if( !b->append( reinterpret_cast<const unsigned char *>(p),sz) )
       {
         throw common::exc(exc::rs_cannot_append,exc::cm_xdrbuf,L"",L""__FILE__,__LINE__);
         return;
@@ -89,7 +89,7 @@ namespace csl
     {
       int32_t v = htonl(val);
 
-      if( !b_->append((unsigned char *)&v,sizeof(int32_t)) )
+      if( !b_->append( reinterpret_cast<unsigned char *>(&v),sizeof(int32_t)) )
       {
         THR(exc::rs_cannot_append,exc::cm_xdrbuf,*this);
       }
@@ -101,7 +101,7 @@ namespace csl
     {
       uint32_t v = htonl(val);
 
-      if( !b_->append((unsigned char *)&v,sizeof(uint32_t)) )
+      if( !b_->append( reinterpret_cast<unsigned char *>(&v),sizeof(uint32_t)) )
       {
         THR(exc::rs_cannot_append,exc::cm_xdrbuf,*this);
       }
@@ -114,7 +114,7 @@ namespace csl
       uint32_t sz = 0;
       if( !val )
       {
-        uint32_t sz = 0;
+        sz = 0;
         (*this) << sz;
       }
       else
@@ -233,7 +233,7 @@ namespace csl
       int32_t tmp;
       unsigned int szrd=0;
 
-      if( (szrd=get_data((unsigned char *)&tmp,sizeof(tmp))) == sizeof(tmp) )
+      if( (szrd=get_data( reinterpret_cast<unsigned char *>(&tmp),sizeof(tmp))) == sizeof(tmp) )
       {
         val = ntohl(tmp);
       }
@@ -258,7 +258,7 @@ namespace csl
       uint32_t tmp;
       unsigned int szrd=0;
 
-      if( (szrd=get_data((unsigned char *)&tmp,sizeof(tmp))) == sizeof(tmp) )
+      if( (szrd=get_data( reinterpret_cast<unsigned char *>(&tmp),sizeof(tmp))) == sizeof(tmp) )
       {
         val = ntohl(tmp);
       }
@@ -286,11 +286,11 @@ namespace csl
 
       if( !sz ) { val.clear(); return *this; }
 
-      wchar_t * wcp = (wchar_t *)val.buffer().allocate(sz);
+      wchar_t * wcp = reinterpret_cast<wchar_t *>(val.buffer().allocate(sz));
 
       if( sz > 0 )
       {
-        if( (szrd=get_data((unsigned char *)wcp,sz)) == sz )
+        if( (szrd=get_data( reinterpret_cast<unsigned char *>(wcp),sz)) == sz )
         {
           val.ensure_trailing_zero();
         }

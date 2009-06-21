@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -52,7 +52,7 @@ namespace csl
       if( key.size() == 0 )     { THR(sec::exc::rs_null_key,sec::exc::cm_crypt_pkt,false); }
       if( data.size() > 65200 ) { THR(sec::exc::rs_too_big,sec::exc::cm_crypt_pkt,false); }
 
-      umac_ae_ctx_t * ctx = (umac_ae_ctx_t *)::malloc(sizeof(umac_ae_ctx_t));
+      umac_ae_ctx_t * ctx = reinterpret_cast<umac_ae_ctx_t *>(::malloc(sizeof(umac_ae_ctx_t)));
 
       if( !ctx ) return false;
 
@@ -62,36 +62,36 @@ namespace csl
       tbuf<65536>                            res0;
 
       /* aligned buffers */
-      char * salt2 = (char *)salt0.allocate(16+32+8+8); // alignment+padding+salt+MAC
-      char * key2  = (char *)key.private_data();
-      char * data2 = (char *)data0.allocate(data.size()+16+32+4); // alignment+padding+random4
-      char * res2  = (char *)res0.allocate(data.size()+16+32+4);  // alignment+padding+random4
+      char * salt2 = reinterpret_cast<char *>(salt0.allocate(16+32+8+8)); // alignment+padding+salt+MAC
+      char * key2  = reinterpret_cast<char *>(key.private_data());
+      char * data2 = reinterpret_cast<char *>(data0.allocate(data.size()+16+32+4)); // alignment+padding+random4
+      char * res2  = reinterpret_cast<char *>(res0.allocate(data.size()+16+32+4));  // alignment+padding+random4
 
       /* align salt if needed */
-      if( (unsigned long long)salt2 & ~(15ULL) )
+      if( (reinterpret_cast<unsigned long long>(salt2)) & ~(15ULL) )
       {
-        salt2 += (16-(((unsigned long long)salt2)&15));
+        salt2 += (16-(( (reinterpret_cast<unsigned long long>(salt2)) )&15));
       }
       memcpy( salt2,salt.data(),salt.size() );
 
       /* align key if needed */
-      if( (unsigned long long)key2 & ~(15ULL) )
+      if( (reinterpret_cast<unsigned long long>(key2)) & ~(15ULL) )
       {
-        char * key1  = (char *)key0.allocate(key.size()+48);
-        key2  = key1  + (16-(((unsigned long long)key1)&15ULL));
+        char * key1  = reinterpret_cast<char *>(key0.allocate(key.size()+48));
+        key2  = key1  + (16-(( reinterpret_cast<unsigned long long>(key1))&15ULL));
         memcpy( key2,key.data(),key.size() );
       }
 
       /* align data if needed */
-      if( (unsigned long long)data2 & ~(15ULL) )
+      if( reinterpret_cast<unsigned long long>(data2) & ~(15ULL) )
       {
-        data2 += (16-(((unsigned long long)data2)&15ULL));
+        data2 += (16-(( reinterpret_cast<unsigned long long>(data2) )&15ULL));
       }
 
-      if( RAND_bytes((unsigned char *)data2,4) != 1 )
+      if( RAND_bytes( reinterpret_cast<unsigned char *>(data2),4 ) != 1 )
       {
         /* fallback */
-        if( RAND_pseudo_bytes((unsigned char *)data2,4) != 1 )
+        if( RAND_pseudo_bytes( reinterpret_cast<unsigned char *>(data2),4) != 1 )
         {
           THR(sec::exc::rs_rand_failed,sec::exc::cm_crypt_pkt,false);
         }
@@ -99,13 +99,13 @@ namespace csl
       memcpy( data2+4,data.data(),data.size() );
 
       /* align output data if needed */
-      if( (unsigned long long)res2 & ~(15ULL) )
+      if( (reinterpret_cast<unsigned long long>(res2)) & ~(15ULL) )
       {
-        res2  += (16-(((unsigned long long)res2)&15));
+        res2  += (16-(( reinterpret_cast<unsigned long long>(res2) )&15));
       }
 
       /* copy input data */
-      header.set((const unsigned char *)salt2,8);
+      header.set( reinterpret_cast<const unsigned char *>(salt2), 8 );
 
       /* encrypt and calculate mac */
       umac_ae_set_key(key2, ctx);
@@ -115,8 +115,8 @@ namespace csl
       umac_ae_done(ctx);
 
       /* copy out data */
-      data.set((const unsigned char *)res2,data.size()+4);
-      footer.set((const unsigned char *)salt2,8);
+      data.set( reinterpret_cast<const unsigned char *>(res2),data.size()+4);
+      footer.set( reinterpret_cast<const unsigned char *>(salt2),8);
 
       free( ctx );
       return true;
@@ -133,7 +133,7 @@ namespace csl
       if( data.size() > 65200 ) { THR(sec::exc::rs_too_big,sec::exc::cm_crypt_pkt,false); }
       if( data.size() < 4 )     { THR(sec::exc::rs_null_data,sec::exc::cm_crypt_pkt,false); }
 
-      umac_ae_ctx_t * ctx = (umac_ae_ctx_t *)::malloc(sizeof(umac_ae_ctx_t));
+      umac_ae_ctx_t * ctx = reinterpret_cast<umac_ae_ctx_t *>(::malloc(sizeof(umac_ae_ctx_t)));
 
       if( !ctx ) return false;
 
@@ -143,38 +143,38 @@ namespace csl
       tbuf<65536>                            res0;
 
       /* aligned buffers */
-      char * salt2 = (char *)salt0.allocate(16+32+8+8); // alignment+padding+salt+MAC
-      char * key2  = (char *)key.private_data();
-      char * data2 = (char *)data.private_data();
-      char * res2  = (char *)res0.allocate(data.size()+16+32); // alignment+padding
+      char * salt2 = reinterpret_cast<char *>(salt0.allocate(16+32+8+8)); // alignment+padding+salt+MAC
+      char * key2  = reinterpret_cast<char *>(key.private_data());
+      char * data2 = reinterpret_cast<char *>(data.private_data());
+      char * res2  = reinterpret_cast<char *>(res0.allocate(data.size()+16+32)); // alignment+padding
 
       /* align salt if needed */
-      if( (unsigned long long)salt2 & ~(15ULL) )
+      if( (reinterpret_cast<unsigned long long>(salt2)) & ~(15ULL) )
       {
-        salt2 += (16-(((unsigned long long)salt2)&15ULL));
+        salt2 += (16-(( reinterpret_cast<unsigned long long>(salt2) )&15ULL));
       }
       memcpy( salt2,header.data(),8 );
 
       /* align key if needed */
-      if( (unsigned long long)key2 & ~(15ULL) )
+      if( (reinterpret_cast<unsigned long long>(key2)) & ~(15ULL) )
       {
-        char * key1  = (char *)key0.allocate(key.size()+48);
-        key2  = key1  + (16-(((unsigned long long)key1)&15ULL));
+        char * key1  = (reinterpret_cast<char *>(key0.allocate(key.size()+48)));
+        key2  = key1  + (16-(((reinterpret_cast<unsigned long long>(key1)))&15ULL));
         memcpy( key2,key.data(),key.size() );
       }
 
       /* align data if needed */
-      if( (unsigned long long)data2 & ~(15ULL) )
+      if( (reinterpret_cast<unsigned long long>(data2)) & ~(15ULL) )
       {
-        char * data1 = (char *)data0.allocate(data.size()+48);
-        data2 = data1 + (16-(((unsigned long long)data1)&15ULL));
+        char * data1 = (reinterpret_cast<char *>(data0.allocate(data.size()+48)));
+        data2 = data1 + (16-(((reinterpret_cast<unsigned long long>(data1)))&15ULL));
         memcpy( data2,data.data(),data.size() );
       }
 
       /* align output data if needed */
-      if( (unsigned long long)res2 & ~(15ULL) )
+      if( (reinterpret_cast<unsigned long long>(res2)) & ~(15ULL) )
       {
-        res2  += (16-(((unsigned long long)res2)&15ULL));
+        res2  += (16-(((reinterpret_cast<unsigned long long>(res2)))&15ULL));
       }
 
       /* decrypt and calculate mac */
@@ -189,7 +189,7 @@ namespace csl
 
       if( memcmp(footer.data(),salt2,8) == 0 )
       {
-        if( data.size() > 4 ) { data.set((const unsigned char *)res2+4,data.size()-4); }
+        if( data.size() > 4 ) { data.set((reinterpret_cast<const unsigned char *>(res2+4)),data.size()-4); }
         else                  { data.reset(); }
 
         ret = true;

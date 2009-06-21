@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -64,7 +64,7 @@ namespace csl
         int32_t is_neg = 0;
         buf >> is_neg;
         unsigned int allocated=0;
-        bool ret = buf.get_data( buf_,allocated,2048 );
+        ret = buf.get_data( buf_,allocated,2048 );
         if( ret ) is_negative((is_neg == 0 ? false : true));
         else      return false;
       }

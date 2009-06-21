@@ -22,6 +22,31 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IF(WIN32)
+
+  IF(MSYS)
+
+    SET(ZLIB z)
+
+    ADD_DEFINITIONS(
+                     -Wall
+                     -Wwrite-strings
+                     -Wcast-qual
+                     -Wpointer-arith
+                     -Wold-style-cast
+                     -Wconversion
+                     -Wcomment
+                     -Wcast-align
+                     -Wshadow
+                     -Wredundant-decls
+                     -g3
+                   )
+
+  ELSE(MSYS)
+
+    SET(ZLIB zlib)
+
+  ENDIF(MSYS)
+
   LINK_DIRECTORIES(
                     ../src
                     "C:/Program Files/GnuWin32/lib/"
@@ -35,16 +60,32 @@ IF(WIN32)
                        $ENV{ZLIB_DEV_ENV}/include
                        ../../../3rdparty/zlib/GnuWin32/include
                      )
+
   LINK_LIBRARIES(
                   csl_common
-                  zlib
+                  ${ZLIB}
                   wsock32
                 )
 
 ELSE(WIN32)
 
-  ADD_DEFINITIONS( -Wall -g3 )
+  ADD_DEFINITIONS(
+                   -Wall
+                   -Wwrite-strings
+                   -Wcast-qual
+                   -Wpointer-arith
+                   -Wold-style-cast
+                   -Wconversion
+                   -Wcomment
+                   -Wcast-align
+                   -Winline
+                   -Wshadow
+                   -Wredundant-decls
+                   -g3
+                 )
+
   LINK_DIRECTORIES( ../src )
+
   INCLUDE_DIRECTORIES( ../src )
 
   LINK_LIBRARIES(

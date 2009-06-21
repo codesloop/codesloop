@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -84,7 +84,7 @@ namespace csl
 
     // no-copy
     mutex::mutex(const mutex & other) 
-      : impl_((impl *)0) {throw common::str("should never be called"); }
+      : impl_( reinterpret_cast<impl *>(0) ) {throw common::str("should never be called"); }
 
     mutex & mutex::operator=(const mutex & other) { return *this; }
   }

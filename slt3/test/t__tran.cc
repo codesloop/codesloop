@@ -32,7 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "test_timer.h"
 #include "tran.hh"
 #include "conn.hh"
-#include "synqry.hh"
+#include "query.hh"
 #include "exc.hh"
 #include "str.hh"
 #include "ustr.hh"
@@ -63,7 +63,7 @@ namespace test_tran {
     assert(c.open("test.db") == true );
     {
       tran t(c);
-      synqry q(t);
+      query q(t);
       assert( q.execute("CREATE TABLE t(i INT);") == true );
       assert( q.execute("INSERT INTO t VALUES(1);") == true );
       t.commit();
@@ -72,7 +72,7 @@ namespace test_tran {
     assert(c.open("test.db") == true );
     {
       tran t(c);
-      synqry q(t);
+      query q(t);
       ustr s;
       assert( q.execute("SELECT SUM(i) FROM T;",s) == true );
       assert( s == "1" );
@@ -90,14 +90,14 @@ namespace test_tran {
     {
       tran t(c);
       t.commit_on_destruct(true);
-      synqry q(t);
+      query q(t);
       assert( q.execute("CREATE TABLE t(i INT);") == true );
       assert( q.execute("INSERT INTO t VALUES(1);") == true );
     }
     {
       tran t(c);
       t.commit_on_destruct(false);
-      synqry q(t);
+      query q(t);
       assert( q.execute("INSERT INTO t VALUES(3);") == true );
     }
     assert( c.close() == true );
@@ -105,7 +105,7 @@ namespace test_tran {
     {
       tran t(c);
       t.commit_on_destruct(true);
-      synqry q(t);
+      query q(t);
       ustr s;
       assert( q.execute("SELECT SUM(i) FROM T;",s) == true );
       assert( s == "1" );
@@ -122,7 +122,7 @@ namespace test_tran {
     assert(c.open("test.db") == true );
     {
       tran t(c);
-      synqry q(t);
+      query q(t);
       assert( q.execute("CREATE TABLE t(i INT);") == true );
       assert( q.execute("INSERT INTO t VALUES(1);") == true );
       t.rollback();
@@ -132,7 +132,7 @@ namespace test_tran {
     try
     {
       tran t(c);
-      synqry q(t);
+      query q(t);
       ustr s;
       assert( q.execute("SELECT SUM(i) FROM T;",s) == true );
       assert( s == "1" );
@@ -154,7 +154,7 @@ namespace test_tran {
     {
       tran t(c);
       t.rollback_on_destruct(true);
-      synqry q(t);
+      query q(t);
       assert( q.execute("CREATE TABLE t(i INT);") == true );
       assert( q.execute("INSERT INTO t VALUES(1);") == true );
     }
@@ -164,7 +164,7 @@ namespace test_tran {
     {
       tran t(c);
       t.rollback_on_destruct(false);
-      synqry q(t);
+      query q(t);
       ustr s;
       assert( q.execute("SELECT SUM(i) FROM T;",s) == true );
       assert( s == "1" );

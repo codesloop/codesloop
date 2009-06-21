@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -52,11 +52,15 @@ namespace test_reg {
   void usage1()
   {
     reg & r(reg::instance("test.db"));
-    reg::item i = { 0,"Hello","hello.db" };
+    char * name = ::strdup("Hello");
+    char * db = ::strdup("hello.db");
+    reg::item i = { 0,name,db };
     r.set( i );
     conn h;
     assert( r.get("Hello",h) == true );
     assert( h.close() == true );
+    ::free(name);
+    ::free(db);
   }
 
   /** @test simple usage scenario */
@@ -74,9 +78,13 @@ namespace test_reg {
   void usage3()
   {
     reg & r(reg::instance("test.db"));
-    reg::item i = { 0,"Hello","hello.db" };
+    char * name = ::strdup("Hello");
+    char * db = ::strdup("hello.db");
+    reg::item i = { 0,name,db };
     r.set( i );
     assert( r.set( i ) == false );
+    ::free(name);
+    ::free(db);
   }
 
   /** @test how lookup of nonexistent values behave */
@@ -102,7 +110,9 @@ int main()
   reg & r(reg::instance("test.db"));
   conn c;
   assert( r.get("Hello",c) == false );
-  reg::item i = { 0,"Hello","hello.db" };
+  char * name = ::strdup("Hello");
+  char * db = ::strdup("hello.db");
+  reg::item i = { 0,name,db };
   assert( r.set( i ) == true );
   assert( r.get("Hello",c) == true );
 
@@ -111,6 +121,9 @@ int main()
   csl_common_print_results( "usage2             ", csl_common_test_timer_v0(usage2),"" );
   csl_common_print_results( "usage3             ", csl_common_test_timer_v0(usage3),"" );
   csl_common_print_results( "usage4             ", csl_common_test_timer_v0(usage4),"" );
+  
+  ::free(name);
+  ::free(db);
   return 0;
 }
 

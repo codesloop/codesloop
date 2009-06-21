@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -55,7 +55,7 @@ namespace csl
     conn::~conn() {}
 
     /* private functions, copying not allowed */
-    conn::conn(const conn & other) : impl_((impl *)0) { }
+    conn::conn(const conn & other) : impl_( reinterpret_cast<impl *>(0) ) { }
     conn & conn::operator=(const conn & other) { return *this; }
   };
 };

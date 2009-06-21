@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009, David Beck
+# Copyright (c) 2008,2009, David Beck, Tamas Foldi
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -22,6 +22,31 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IF(WIN32)
+
+  IF(MSYS)
+
+    SET(ZLIB z)
+
+    ADD_DEFINITIONS(
+                     -Wall
+                     -Wwrite-strings
+                     -Wcast-qual
+                     -Wpointer-arith
+                     -Wold-style-cast
+                     -Wconversion
+                     -Wcomment
+                     -Wcast-align
+                     -Wshadow
+                     -Wredundant-decls
+                     -g3
+                   )
+
+  ELSE(MSYS)
+
+    SET(ZLIB zlib)
+
+  ENDIF(MSYS)
+
   LINK_DIRECTORIES(
                   ../common/src
                   ../sec/src
@@ -47,18 +72,18 @@ IF(WIN32)
                   csl_slt3
                   csl_nthread
                   csl_common
-                  zlib
+                  ${ZLIB}
+                  wsock32
                   )
 ELSE(WIN32)
 
-  find_library(DLOPEN_FOUND NAMES dl PATH /usr/lib /lib /usr/local/lib)
-  set(LIBDL)
+  FIND_LIBRARY(DLOPEN_FOUND NAMES dl PATH /usr/lib /lib /usr/local/lib)
+  SET(LIBDL)
 
-  if (DLOPEN_FOUND)
-   set(LIBDL dl)
-   set(HAVE_LIBDL TRUE)
-  endif (DLOPEN_FOUND)
-
+  IF(DLOPEN_FOUND)
+   SET(LIBDL dl)
+   SET(HAVE_LIBDL TRUE)
+  ENDIF(DLOPEN_FOUND)
 
   LINK_DIRECTORIES( 
                   ../common/src
@@ -74,13 +99,30 @@ ELSE(WIN32)
                      ../slt3/src
                      )
 
-  ADD_DEFINITIONS( -Wall -O3 -pthread )
-  LINK_LIBRARIES( csl_slt3
+  ADD_DEFINITIONS(
+                   -Wall
+                   -Wwrite-strings
+                   -Wcast-qual
+                   -Wpointer-arith
+                   -Wold-style-cast
+                   -Wconversion
+                   -Wcomment
+                   -Wcast-align
+                   -Wshadow
+                   -Wredundant-decls
+                   -g3
+                   -pthread
+                 )
+  
+  LINK_LIBRARIES(
+                  csl_slt3
                   csl_nthread
                   csl_common
                   pthread
                   ${LIBDL}
-                  z )
+                  z
+                )
+
 ENDIF(WIN32)
 
 ADD_EXECUTABLE(ex_zfile1 ex_zfile1.cc)

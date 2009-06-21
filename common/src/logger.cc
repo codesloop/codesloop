@@ -86,7 +86,7 @@ namespace csl
         return;
 #endif
 
-      if ( (int)type >= (int)LOG_LAST || (int)type <= LOG_UNKNOWN )
+      if ( static_cast<int>(type) >= static_cast<int>(LOG_LAST) || static_cast<int>(type) <= LOG_UNKNOWN )
         throw exc(exc::rs_invalid_param,exc::cm_logger,L"Unknown log type");
 
       try {
@@ -102,7 +102,7 @@ namespace csl
                << L" ("
                <<  getpid()
                << L") ["
-               << LOGTYPE_NAMES[ (int) type ] 
+               << LOGTYPE_NAMES[ static_cast<int>(type) ] 
                << L"] "
                << st.c_str()
                << std::endl;
@@ -114,7 +114,7 @@ namespace csl
                       << L" ("
                       << getpid()
                       << L") ["
-                      << LOGTYPE_NAMES[ (int) type ]
+                      << LOGTYPE_NAMES[ static_cast<int>(type) ]
                       << L"] "
                       << st.c_str()
                       << std::endl;

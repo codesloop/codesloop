@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -86,9 +86,9 @@ namespace csl
       return true;
     }
 
-    pbuf::buf * pbuf::allocate(unsigned int size)
+    pbuf::buf * pbuf::allocate(unsigned int sz)
     {
-      if( !size ) { return 0; }
+      if( !sz ) { return 0; }
 
       bufpool_t::iterator it = bufpool_.last();
 
@@ -110,7 +110,7 @@ namespace csl
       else
       {
         buf * ret  = new buf();
-        ret->data_ = (unsigned char *)pool_.allocate(buf_size);
+        ret->data_ = reinterpret_cast<unsigned char *>(pool_.allocate(buf_size));
         ret->size_ = 0;
 
         bufpool_.push_back(ret);
@@ -129,9 +129,9 @@ namespace csl
     {
       this->free_all();
       pbuf::const_iterator it(other.begin());
-      pbuf::const_iterator end(other.end());
+      pbuf::const_iterator e(other.end());
 
-      for( ;it!=end;++it )
+      for( ;it!=e;++it )
       {
         this->append( (*it)->data_, (*it)->size_ );
       }
@@ -143,12 +143,12 @@ namespace csl
       if( size_ != other.size_ ) return false;
 
       pbuf::const_iterator it(other.begin());
-      pbuf::const_iterator end(other.end());
+      pbuf::const_iterator e(other.end());
 
       pbuf::const_iterator thit(this->begin());
       pbuf::const_iterator thend(this->end());
 
-      for( ;it!=end;++it )
+      for( ;it!=e;++it )
       {
         const buf * lhbuf = (*thit);
         const buf * rhbuf = (*it);

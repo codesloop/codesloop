@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -105,7 +105,7 @@ namespace csl
 
     // no-copy
     thread::thread(const thread & other) 
-      : impl_((impl *)0) { throw nthread::exc(exc::rs_not_implemented,exc::cm_thread); }
+      : impl_( reinterpret_cast<impl *>(0) ) { throw nthread::exc(exc::rs_not_implemented,exc::cm_thread); }
 
     thread & thread::operator=(const thread & other) { return *this; }
   }

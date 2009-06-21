@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -28,26 +28,16 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common.h"
 #include "str.hh"
 #include "ustr.hh"
+#include "int64.hh"
 
 /**
   @file slt3/src/reg.cc
   @brief implementation of slt3::reg
  */
 
-#ifndef SLT3_REGISTRY_PATH1
-#define SLT3_REGISTRY_PATH1 "/var/db/csl/slt3/registry.db"
-#endif /*SLT3_REGISTRY_PATH1*/
-
-#ifndef SLT3_REGISTRY_PATH2
-#define SLT3_REGISTRY_PATH2 "/etc/csl/slt3/registry.db"
-#endif /*SLT3_REGISTRY_PATH2*/
-
-#ifndef SLT3_REGISTRY_PATH3
-#define SLT3_REGISTRY_PATH3 "./registry.db"
-#endif /*SLT3_REGISTRY_PATH3*/
-
 using csl::common::str;
 using csl::common::ustr;
+using csl::common::int64;
 
 namespace csl
 {
@@ -66,8 +56,8 @@ namespace csl
       }
     }
 
-    reg::helper::helper(const char * default_db_name, const char * default_db_path)
-      : name_(default_db_name), default_path_(default_db_path), use_exc_(true) { }
+    reg::helper::helper(const char * namev, const char * default_db_pathv)
+      : name_(namev), default_path_(default_db_pathv), use_exc_(true) { }
 
     const char * reg::helper::path()
     {
@@ -76,11 +66,11 @@ namespace csl
       reg::item i;
 
       /* lookup path */
-      if( path_.size() != 0 ) { return path_.c_str(); }
-      else if( r.get(name(),i,p) == false )
+      if( path_ != 0 ) { return path_; }
+      else if( r.get(name(),i,pool_) == false )
       {
-        i.name_ = p.strdup(name_.c_str());
-        i.path_ = p.strdup(default_path_.c_str());
+        i.name_ = p.strdup(name_);
+        i.path_ = p.strdup(default_path_);
 
         /* should be able to register the peer db */
         if( r.set(i) == false )
@@ -89,12 +79,12 @@ namespace csl
 
           THRR( slt3::exc::rs_cannot_reg, slt3::exc::cm_reg, nm.c_str(), NULL );
         }
-        return default_path_.c_str();
+        return default_path_;
       }
       else
       {
-        if( path_.size() == 0 ) { path_ = i.path_; }
-        return path_.c_str();
+        if( path_ == 0 ) { path_ = i.path_; }
+        return path_;
       }
     }
 
@@ -139,10 +129,15 @@ namespace csl
       }
     }
 
+    std::auto_ptr<reg> reg::instance_;
+
     reg & reg::instance(const char * p)
     {
-      static reg * instance_ = 0;
-      if( !instance_ ) instance_ = new reg();
+      /* TODO fix multithreading here */
+      if( !(instance_.get()) )
+      {
+        instance_ = std::auto_ptr<reg>(new reg());
+      }
 
       if( p )
       {
@@ -165,7 +160,7 @@ namespace csl
         if( c.open(path.c_str()) )
         {
           tran t(c);
-          synqry q(t);
+          query q(t);
           return q.execute(
                "CREATE TABLE IF NOT EXISTS registry ( "
                " id INTEGER PRIMARY KEY ASC AUTOINCREMENT, "
@@ -189,16 +184,16 @@ namespace csl
         conn c;
         if( !init_db(c,path_) ) return false;
 
-        synqry::columns_t ch;
-        synqry::fields_t  fd;
+        query::columns_t ch;
+        query::fields_t  fd;
 
         c.use_exc(true);
 
         tran t(c);
-        synqry q(t);
+        query q(t);
 
-        param & p(q.get_param(1));
-        p.set(name);
+        ustr & p(q.ustr_param(1));
+        p = name;
 
         if( !q.prepare("SELECT id,name,path FROM registry where name=?;") ) return false;
 
@@ -206,9 +201,9 @@ namespace csl
 
         if( fd.size() > 0 )
         {
-          i.id_ = fd.get_at(0)->intval_;
-          i.name_ = pool.strdup(fd.get_at(1)->stringval_);
-          i.path_ = pool.strdup(fd.get_at(2)->stringval_);
+          i.id_   = ( reinterpret_cast<int64 *>(fd.get_at(0)) )->value();
+          i.name_ = pool.strdup( ( reinterpret_cast<ustr *>(fd.get_at(1)) )->c_str() );
+          i.path_ = pool.strdup( ( reinterpret_cast<ustr *>(fd.get_at(2)) )->c_str() );
           return true;
         }
         else
@@ -230,20 +225,22 @@ namespace csl
         conn c;
         if( !init_db(c,path_) ) return false;
 
-        synqry::columns_t ch;
-        synqry::fields_t  fd;
+        query::columns_t ch;
+        query::fields_t  fd;
 
         tran t(c);
-        synqry q(t);
+        query q(t);
 
-        param & p(q.get_param(1));
-        p.set(name);
+        ustr & p(q.ustr_param(1));
+        p = name;
 
         if( !q.prepare("SELECT path FROM registry WHERE name=? limit 1;") ) return false;
 
         if( q.next(ch,fd) )
         {
-          return cn.open( fd.get_at(0)->stringval_ );
+          ustr s;
+          fd.get_at(0)->to_string(s);
+          return cn.open( s.c_str() );
         }
         return false;
       }
@@ -260,11 +257,11 @@ namespace csl
         conn c;
         if( !init_db(c,path_) ) return false;
 
-        synqry::columns_t ch;
-        synqry::fields_t  fd;
+        query::columns_t ch;
+        query::fields_t  fd;
 
         tran t(c);
-        synqry q(t);
+        query q(t);
 
         if( !q.prepare("SELECT name FROM registry;") ) return false;
 
@@ -272,7 +269,9 @@ namespace csl
 
         while( q.next(ch,fd) )
         {
-          nms.push_back( pool.strdup(fd.get_at(0)->stringval_) );
+          ustr s;
+          fd.get_at(0)->to_string(s);
+          nms.push_back( pool.strdup(s.c_str()) );
           ret = true;
         }
 
@@ -291,11 +290,11 @@ namespace csl
         conn c;
         if( !init_db(c,path_) ) return false;
 
-        synqry::columns_t ch;
-        synqry::fields_t  fd;
+        query::columns_t ch;
+        query::fields_t  fd;
 
         tran t(c);
-        synqry q(t);
+        query q(t);
 
         if( !q.prepare("SELECT id,name,path FROM registry;") ) return false;
 
@@ -303,10 +302,10 @@ namespace csl
 
         while( q.next(ch,fd) )
         {
-          item * p = (item *)pool.allocate( sizeof(item) );
-          p->id_ = fd.get_at(0)->intval_;
-          p->name_ = pool.strdup(fd.get_at(1)->stringval_);
-          p->path_ = pool.strdup(fd.get_at(2)->stringval_);
+          item * p = reinterpret_cast<item *>(pool.allocate( sizeof(item) ));
+          p->id_   = ( reinterpret_cast<int64 *>(fd.get_at(0)))->value();
+          p->name_ = pool.strdup( ( reinterpret_cast<ustr *>(fd.get_at(1)) )->c_str() );
+          p->path_ = pool.strdup( ( reinterpret_cast<ustr *>(fd.get_at(2)) )->c_str() );
           itms.push_back( p );
           ret = true;
         }
@@ -327,14 +326,14 @@ namespace csl
         if( !init_db(c,path_) ) return false;
 
         tran t(c);
-        synqry q(t);
+        query q(t);
 
         q.use_exc(true);
 
-        param & p1(q.get_param(1));
-        param & p2(q.get_param(2));
-        p1.set(it.name_);
-        p2.set(it.path_);
+        ustr & p1(q.ustr_param(1));
+        ustr & p2(q.ustr_param(2));
+        p1 = it.name_;
+        p2 = it.path_;
 
         if( !q.prepare("INSERT INTO registry (name,path) VALUES(?,?);") ) return false;
 

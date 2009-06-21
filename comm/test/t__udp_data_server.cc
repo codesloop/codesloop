@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -123,7 +123,7 @@ namespace test_udp_data_server {
       {
         assert( memcmp( data.data(),"hello",6 ) == 0 );
         udp::b1024_t rep;
-        rep.set((unsigned char *)"HELLO",6);
+        rep.set( reinterpret_cast<const unsigned char *>("HELLO"),6);
         return send_reply(old_salt, new_salt, addr, sesskey, sock, rep);
       }
   };

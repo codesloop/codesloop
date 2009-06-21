@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009, David Beck
+# Copyright (c) 2008,2009, David Beck, Tamas Foldi
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -25,31 +25,75 @@
 
 IF(WIN32)
 
-  LINK_LIBRARIES( csl_sec
-                  csl_common
-                  ssleay32MT
-                  libeay32MT
-                  zlib
-                  wsock32
-                )
+  IF(MSYS)
+  
+    LINK_LIBRARIES(
+                    csl_sec
+                    csl_common
+                    eay32
+                    z
+                    wsock32
+                  )
 
-  INCLUDE_DIRECTORIES( ../src
-                       ../../common/src 
-                       $ENV{OPENSSL_DEV_ENV}/include
-                       ../../../3rdparty/OpenSSL/include
-                       $ENV{ZLIB_DEV_ENV}/include
-                       ../../../3rdparty/zlib/GnuWin32/include
-                       $ENV{AFS_DEV_ENV}/include
-                     )
+    INCLUDE_DIRECTORIES(
+                         ../src
+                         ../../common/src 
+                         c:/OpenSSL/include
+                         $ENV{OPENSSL_DEV_ENV}/include
+                         ../../../3rdparty/OpenSSL/include
+                       )
 
-  LINK_DIRECTORIES( ../src
-                    ../../common/src
-                    $ENV{OPENSSL_DEV_ENV}/lib/VC/static
-                    ../../../3rdparty/OpenSSL/lib/VC/static
-                    $ENV{ZLIB_DEV_ENV}/lib
-                    ../../../3rdparty/zlib/GnuWin32/lib
-                    $ENV{AFS_DEV_ENV}/lib
-                    )
+    LINK_DIRECTORIES( ../src
+                      ../../common/src
+                      c:/OpenSSL/lib/MinGW
+                      $ENV{OPENSSL_DEV_ENV}/lib/MinGW
+                      ../../../3rdparty/OpenSSL/lib/MinGW
+                      )
+                      
+    ADD_DEFINITIONS(
+                     -Wall
+                     -Wwrite-strings
+                     -Wcast-qual
+                     -Wpointer-arith
+                     -Wold-style-cast
+                     -Wconversion
+                     -Wcomment
+                     -Wcast-align
+                     -Wshadow
+                     -Wredundant-decls
+                     -g3
+                   )
+
+  ELSE(MSYS)
+
+    LINK_LIBRARIES(
+                    csl_sec
+                    csl_common
+                    ssleay32MT
+                    libeay32MT
+                    zlib
+                    wsock32
+                  )
+
+    INCLUDE_DIRECTORIES(
+                         ../src
+                         ../../common/src 
+                         c:/OpenSSL/include
+                         $ENV{OPENSSL_DEV_ENV}/include
+                         ../../../3rdparty/OpenSSL/include
+                         $ENV{ZLIB_DEV_ENV}/include
+                         ../../../3rdparty/zlib/GnuWin32/include
+                       )
+
+    LINK_DIRECTORIES( ../src
+                      ../../common/src
+                      c:/OpenSSL/lib/VC/static
+                      $ENV{OPENSSL_DEV_ENV}/lib/VC/static
+                      ../../../3rdparty/OpenSSL/lib/VC/static
+                      $ENV{ZLIB_DEV_ENV}/lib
+                      ../../../3rdparty/zlib/GnuWin32/lib
+                      )
+  ENDIF(MSYS)
 
 ELSE(WIN32)
 
@@ -61,7 +105,19 @@ ELSE(WIN32)
     set(HAVE_LIBDL TRUE)
   endif (DLOPEN_FOUND)
 
-  ADD_DEFINITIONS( -Wall -g3 )
+  ADD_DEFINITIONS(
+                   -Wall
+                   -Wwrite-strings
+                   -Wcast-qual
+                   -Wpointer-arith
+                   -Wold-style-cast
+                   -Wconversion
+                   -Wcomment
+                   -Wcast-align
+                   -Wshadow
+                   -Wredundant-decls
+                   -g3
+                 )
 
   INCLUDE_DIRECTORIES(
       ../src
@@ -88,7 +144,6 @@ ADD_EXECUTABLE(t__umac               t__umac.cc)
 ADD_EXECUTABLE(t__crypt_buf          t__crypt_buf.cc)
 ADD_EXECUTABLE(t__crypt_pkt          t__crypt_pkt.cc)
 ADD_EXECUTABLE(t__derive_ec_params   t__derive_ec_params.c)
-ADD_EXECUTABLE(t__read_x509_cert     t__read_x509_cert.c)
 ADD_EXECUTABLE(t__sha1               t__sha1.c)
 ADD_EXECUTABLE(t__bignum             t__bignum.cc)
 ADD_EXECUTABLE(t__ecdh_key           t__ecdh_key.cc)

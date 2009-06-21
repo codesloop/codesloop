@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009, David Beck
+# Copyright (c) 2008,2009, David Beck, Tamas Foldi
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -28,26 +28,60 @@ INCLUDE_DIRECTORIES( ../../nthread/src
                      ../../common/src )
 
 IF(NOT WIN32)
+
+  SET( CMAKE_CXX_FLAGS "-Wconversion -Wcast-qual -Wpointer-arith -Wcast-align -Wold-style-cast" )
+
   ADD_DEFINITIONS(
-    -Wall
-    -g3
-# -O3 -Os
-    -DTHREADSAFE=1
-    -DSQLITE_DEFAULT_PAGE_SIZE=32768
-    -DSQLITE_MAX_ATTACHED=30
-    -DSQLITE_ENABLE_COLUMN_METADATA=1
-    -DSQLITE_DEFAULT_CACHE_SIZE=10000
-    )
+                    -Wall
+                    -g3
+                    # -O3 -Os
+                   -DTHREADSAFE=1
+                   -DSQLITE_DEFAULT_PAGE_SIZE=32768
+                   -DSQLITE_MAX_ATTACHED=30
+                   -DSQLITE_ENABLE_COLUMN_METADATA=1
+                   -DSQLITE_DEFAULT_CACHE_SIZE=10000
+                   -Wwrite-strings
+                   -Wcomment
+                   -Wshadow
+                   -Wredundant-decls
+                 )
+
 ELSE(NOT WIN32)
-  ADD_DEFINITIONS(
-    -DTHREADSAFE=1
-    -DSQLITE_DEFAULT_PAGE_SIZE=32768
-    -DSQLITE_MAX_ATTACHED=30
-    -DSQLITE_ENABLE_COLUMN_METADATA=1
-    -DSQLITE_DEFAULT_CACHE_SIZE=10000
-    # -DDEBUG
-    # -DPRINT_SQL
-    )
+
+  IF(MSYS)
+  
+    SET( CMAKE_CXX_FLAGS "-Wconversion -Wcast-qual -Wpointer-arith -Wcast-align -Wold-style-cast" )
+  
+    ADD_DEFINITIONS(
+                      -Wall
+                      -g3
+                      -DTHREADSAFE=1
+                      -DSQLITE_DEFAULT_PAGE_SIZE=32768
+                      -DSQLITE_MAX_ATTACHED=30
+                      -DSQLITE_ENABLE_COLUMN_METADATA=1
+                      -DSQLITE_DEFAULT_CACHE_SIZE=10000
+                      # -DDEBUG
+                      # -DPRINT_SQL
+                     -Wwrite-strings
+                     -Wcomment
+                     -Wshadow
+                     -Wredundant-decls
+                   )
+
+  ELSE(MSYS)
+  
+    ADD_DEFINITIONS(
+                     -DTHREADSAFE=1
+                     -DSQLITE_DEFAULT_PAGE_SIZE=32768
+                     -DSQLITE_MAX_ATTACHED=30
+                     -DSQLITE_ENABLE_COLUMN_METADATA=1
+                     -DSQLITE_DEFAULT_CACHE_SIZE=10000
+                     # -DDEBUG
+                     # -DPRINT_SQL    
+                   )
+
+  ENDIF(MSYS)
+    
 ENDIF(NOT WIN32)
 
 ADD_LIBRARY( csl_slt3 STATIC
@@ -59,8 +93,7 @@ ADD_LIBRARY( csl_slt3 STATIC
              reg.cc     reg.hh
              conn.cc    conn.hh
              tran.cc    tran.hh
-             synqry.cc  synqry.hh
-             param.cc   param.hh
+             query.cc   query.hh
              obj.cc     obj.hh
            )
 

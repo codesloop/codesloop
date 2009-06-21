@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -41,7 +41,7 @@ namespace test_umac {
 
   void print_hex(const char * prefix,const void * vp,size_t len)
   {
-    unsigned char * hx = (unsigned char *)vp;
+    const unsigned char * hx = reinterpret_cast<const unsigned char *>(vp);
     printf("%s: ",prefix);
     for(size_t i=0;i<len;++i) printf("%.2X",hx[i]);
     printf("\n");
@@ -49,7 +49,7 @@ namespace test_umac {
 
   void simplest(int dbg)
   {
-    umac_ae_ctx_t * ctx = (umac_ae_ctx_t *)malloc(sizeof(umac_ae_ctx_t));
+    umac_ae_ctx_t * ctx = reinterpret_cast<umac_ae_ctx_t *>(malloc(sizeof(umac_ae_ctx_t)));
     memset( ctx,0,sizeof(umac_ae_ctx_t) );
 
     tbuf<256> nonce_x0;
@@ -60,17 +60,17 @@ namespace test_umac {
 
     size_t len = 32;
 
-    char * key   = (char *) ( key_x0.allocate(16+48) );
-    char * m     = (char *) ( m_x0.allocate(64+48) );
-    char * ct    = (char *) ( ct_x0.allocate(64+48) );
-    char * nonce = (char *) ( nonce_x0.allocate(8+48) );
-    char * tag   = (char *) ( tag_x0.allocate(16+16) );
+    char * key   = reinterpret_cast<char *> ( key_x0.allocate(16+48) );
+    char * m     = reinterpret_cast<char *> ( m_x0.allocate(64+48) );
+    char * ct    = reinterpret_cast<char *> ( ct_x0.allocate(64+48) );
+    char * nonce = reinterpret_cast<char *> ( nonce_x0.allocate(8+48) );
+    char * tag   = reinterpret_cast<char *> ( tag_x0.allocate(16+16) );
 
-    key    += (16-((unsigned long long)key)&15);
-    m      += (16-((unsigned long long)m)&15);
-    ct     += (16-((unsigned long long)ct)&15);
-    nonce  += (16-((unsigned long long)nonce)&15);
-    tag    += (16-((unsigned long long)tag)&15);
+    key    += (16-((reinterpret_cast<unsigned long long>(key))&15));
+    m      += (16-((reinterpret_cast<unsigned long long>(m))&15));
+    ct     += (16-((reinterpret_cast<unsigned long long>(ct))&15));
+    nonce  += (16-((reinterpret_cast<unsigned long long>(nonce))&15));
+    tag    += (16-((reinterpret_cast<unsigned long long>(tag))&15));
 
     memcpy( key,"0123456789abcdef",16 );
     memcpy( m,"ABCDEFGHabcdefghABCDEFGHabcdefgh",32);

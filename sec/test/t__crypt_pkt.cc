@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -46,9 +46,9 @@ using csl::common::pbuf;
 /** @brief contains tests related to crypt_pkt */
 namespace test_crypt_pkt {
 
-  void print_hex(char * prefix,const void * vp,size_t len)
+  void print_hex(const char * prefix,const void * vp,size_t len)
   {
-    const unsigned char * hx = (const unsigned char *)vp;
+    const unsigned char * hx = reinterpret_cast<const unsigned char *>(vp);
     printf("%s: ",prefix);
     for(size_t i=0;i<len;++i) printf("%.2X",hx[i]);
     printf("\n");
@@ -68,14 +68,14 @@ namespace test_crypt_pkt {
     memcpy(buf2+8,"Hello World Hello World Hello World Hello World",48);
 
     crypt_buf cre;
-    assert( cre.init_crypt( (unsigned char *)buf,
-           (const unsigned char *)"Hello World 012345678",
+    assert( cre.init_crypt( reinterpret_cast<unsigned char *>(buf),
+           reinterpret_cast<const unsigned char *>("Hello World 012345678"),
             22,
             true,
-           (const unsigned char *)"012345678") == true );
+           reinterpret_cast<const unsigned char *>("012345678")) == true );
 
-    assert( cre.add_data((unsigned char *)buf+8,48,true) == true );
-    assert( cre.finalize((unsigned char *)buf+56) == true );
+    assert( cre.add_data( reinterpret_cast<unsigned char *>(buf+8),48,true ) == true );
+    assert( cre.finalize( reinterpret_cast<unsigned char *>(buf+56) ) == true );
 
     if( dbg )
     {
@@ -94,9 +94,9 @@ namespace test_crypt_pkt {
     crypt_pkt::databuf_t data,d0;
     crypt_pkt::footbuf_t foot;
 
-    salt.set((const unsigned char *)"012345678",8);
-    key.set((const unsigned char *)"Hello World 012345678",22);
-    data.set((const unsigned char *)"Hello World Hello World Hello World Hello World",48);
+    salt.set( reinterpret_cast<const unsigned char *>("012345678"),8);
+    key.set( reinterpret_cast<const unsigned char *>("Hello World 012345678"),22);
+    data.set( reinterpret_cast<const unsigned char *>("Hello World Hello World Hello World Hello World"),48);
     d0 = data;
 
     crypt_pkt pk;
@@ -119,9 +119,9 @@ namespace test_crypt_pkt {
     crypt_pkt::databuf_t data,d0;
     crypt_pkt::footbuf_t foot;
 
-    salt.set((const unsigned char *)"012345678",8);
-    key.set((const unsigned char *)"Hello World 012345678",22);
-    data.set((const unsigned char *)"Hello World Hello World Hello World Hello World",48);
+    salt.set( reinterpret_cast<const unsigned char *>("012345678"),8);
+    key.set( reinterpret_cast<const unsigned char *>("Hello World 012345678"),22);
+    data.set( reinterpret_cast<const unsigned char *>("Hello World Hello World Hello World Hello World"),48);
     d0 = data;
 
     crypt_pkt pk;
@@ -171,25 +171,25 @@ namespace test_crypt_pkt {
 
     crypt_buf cre;
 
-    assert( cre.init_crypt( (unsigned char *)buf,
-            (const unsigned char *)"Hello World 012345678",
+    assert( cre.init_crypt( reinterpret_cast<unsigned char *>(buf),
+            reinterpret_cast<const unsigned char *>("Hello World 012345678"),
              22,
              true,
-             (const unsigned char *)"012345678") == true );
+             reinterpret_cast<const unsigned char *>("012345678")) == true );
 
-    assert( cre.add_data((unsigned char *)buf+8,900,true) == true );
-    assert( cre.finalize((unsigned char *)buf+900+8) == true );
+    assert( cre.add_data( reinterpret_cast<unsigned char *>(buf+8),900,true) == true );
+    assert( cre.finalize( reinterpret_cast<unsigned char *>(buf+900+8)) == true );
 
     crypt_buf crd;
 
-    assert( crd.init_crypt( (unsigned char *)buf,
-            (const unsigned char *)"Hello World 012345678",
+    assert( crd.init_crypt( reinterpret_cast<unsigned char *>(buf),
+            reinterpret_cast<const unsigned char *>("Hello World 012345678"),
             22,
             false,
-            (const unsigned char *)"012345678") == true );
+            reinterpret_cast<const unsigned char *>("012345678")) == true );
 
-    assert( crd.add_data((unsigned char *)buf+8,900,false) == true );
-    assert( crd.finalize((unsigned char *)buf+900+8) == true );
+    assert( crd.add_data( reinterpret_cast<unsigned char *>(buf+8),900,false) == true );
+    assert( crd.finalize( reinterpret_cast<unsigned char *>(buf+900+8)) == true );
 
     assert( memcmp(buf+8,buf2+8,900) == 0 );
 
@@ -212,9 +212,9 @@ namespace test_crypt_pkt {
     crypt_pkt::databuf_t data;
     crypt_pkt::footbuf_t foot;
 
-    salt.set((const unsigned char *)"012345678",8);
-    key.set((const unsigned char *)"Hello World 012345678",22);
-    data.set((const unsigned char *)buf,900);
+    salt.set( reinterpret_cast<const unsigned char *>("012345678"),8);
+    key.set( reinterpret_cast<const unsigned char *>("Hello World 012345678"),22);
+    data.set( reinterpret_cast<const unsigned char *>(buf),900);
 
     crypt_pkt pk;
 
@@ -238,14 +238,14 @@ namespace test_crypt_pkt {
 
     crypt_buf cre;
 
-    assert( cre.init_crypt( (unsigned char *)buf,
-            (const unsigned char *)"Hello World 012345678",
+    assert( cre.init_crypt( reinterpret_cast<unsigned char *>(buf),
+            reinterpret_cast<const unsigned char *>("Hello World 012345678"),
              22,
              true,
-             (const unsigned char *)"012345678") == true );
+             reinterpret_cast<const unsigned char *>("012345678")) == true );
 
-    assert( cre.add_data((unsigned char *)buf+8,63*1024,true) == true );
-    assert( cre.finalize((unsigned char *)buf+(63*1024)+8) == true );
+    assert( cre.add_data( reinterpret_cast<unsigned char *>(buf+8),63*1024,true) == true );
+    assert( cre.finalize( reinterpret_cast<unsigned char *>(buf+(63*1024)+8)) == true );
   }
 
   void new_crypt63k0(int dbg)
@@ -260,9 +260,9 @@ namespace test_crypt_pkt {
     crypt_pkt::databuf_t data;
     crypt_pkt::footbuf_t foot;
 
-    salt.set((const unsigned char *)"012345678",8);
-    key.set((const unsigned char *)"Hello World 012345678",22);
-    data.set((const unsigned char *)buf,sizeof(buf));
+    salt.set( reinterpret_cast<const unsigned char *>("012345678"),8);
+    key.set( reinterpret_cast<const unsigned char *>("Hello World 012345678"),22);
+    data.set( reinterpret_cast<const unsigned char *>(buf),sizeof(buf));
 
     crypt_pkt pk;
 
@@ -279,25 +279,25 @@ namespace test_crypt_pkt {
 
     crypt_buf cre;
 
-    assert( cre.init_crypt( (unsigned char *)buf,
-            (const unsigned char *)"Hello World 012345678",
+    assert( cre.init_crypt( reinterpret_cast<unsigned char *>(buf),
+            reinterpret_cast<const unsigned char *>("Hello World 012345678"),
              22,
              true,
-             (const unsigned char *)"012345678") == true );
+             reinterpret_cast<const unsigned char *>("012345678")) == true );
 
-    assert( cre.add_data((unsigned char *)buf+8,63*1024,true) == true );
-    assert( cre.finalize((unsigned char *)buf+(63*1024)+8) == true );
+    assert( cre.add_data( reinterpret_cast<unsigned char *>(buf+8),63*1024,true) == true );
+    assert( cre.finalize( reinterpret_cast<unsigned char *>(buf+(63*1024)+8)) == true );
 
     crypt_buf crd;
 
-    assert( crd.init_crypt( (unsigned char *)buf,
-            (const unsigned char *)"Hello World 012345678",
+    assert( crd.init_crypt( reinterpret_cast<unsigned char *>(buf),
+            reinterpret_cast<const unsigned char *>("Hello World 012345678"),
              22,
              false,
-             (const unsigned char *)"012345678") == true );
+             reinterpret_cast<const unsigned char *>("012345678")) == true );
 
-    assert( crd.add_data((unsigned char *)buf+8,63*1024,false) == true );
-    assert( crd.finalize((unsigned char *)buf+(63*1024)+8) == true );
+    assert( crd.add_data( reinterpret_cast<unsigned char *>(buf+8),63*1024,false) == true );
+    assert( crd.finalize( reinterpret_cast<unsigned char *>(buf+(63*1024)+8)) == true );
   }
 
   void new_crypt63k(int dbg)
@@ -312,9 +312,9 @@ namespace test_crypt_pkt {
     crypt_pkt::databuf_t data;
     crypt_pkt::footbuf_t foot;
 
-    salt.set((const unsigned char *)"012345678",8);
-    key.set((const unsigned char *)"Hello World 012345678",22);
-    data.set((const unsigned char *)buf,63*1024);
+    salt.set( reinterpret_cast<const unsigned char *>("012345678"),8);
+    key.set( reinterpret_cast<const unsigned char *>("Hello World 012345678"),22);
+    data.set( reinterpret_cast<const unsigned char *>(buf),63*1024);
 
     crypt_pkt pk;
     pk.use_exc(true);
@@ -360,7 +360,7 @@ namespace test_crypt_pkt {
       crypt_pkt::databuf_t data;
       crypt_pkt::footbuf_t foot;
 
-      key.set((const unsigned char *)"Hello World 012345678",22);
+      key.set( reinterpret_cast<const unsigned char *>("Hello World 012345678"),22);
       pb.t_copy_to( salt,8 );
       pb.t_copy_to( head,8 );
       pb.t_copy_to( data );

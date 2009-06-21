@@ -38,11 +38,11 @@ namespace csl
 {
   namespace common
   {
-    str::str(const ustr & other) : csl::common::var(), buf_((wchar_t)L'\0')
+    str::str(const ustr & other) : csl::common::var(), buf_( L'\0' )
     {
       size_t sz = other.size();
 
-      wchar_t * b = (wchar_t *)buf_.allocate( sz * sizeof(wchar_t) );
+      wchar_t * b = reinterpret_cast<wchar_t *>(buf_.allocate( sz * sizeof(wchar_t) ));
 
       if( sz && b )
       {
@@ -65,7 +65,7 @@ namespace csl
     {
       size_t sz = other.size();
 
-      wchar_t * b = (wchar_t *)buf_.allocate( sz * sizeof(wchar_t) );
+      wchar_t * b = reinterpret_cast<wchar_t *>(buf_.allocate( sz * sizeof(wchar_t) ));
 
       if( sz && b )
       {
@@ -74,8 +74,14 @@ namespace csl
         // fix length, because utf-8 may occupy more then one character that may be converted
         // to a single wchar_t, for this reason we may need to shrink the buffer
 
-        if( szz == (size_t)-1 ) { buf_.reset(); }
-        else                    { buf_.allocate( szz * sizeof(wchar_t) ); }
+        if( szz == static_cast<size_t>(-1) )
+        {
+          buf_.reset();
+        }
+        else
+        {
+          buf_.allocate( szz * sizeof(wchar_t) );
+        }
       }
 
       ensure_trailing_zero();
@@ -91,11 +97,11 @@ namespace csl
 
       if( buf_.size() == 0 )
       {
-        buf_.append( (unsigned char *)(&c),sizeof(wchar_t) );
+        buf_.append( reinterpret_cast<const unsigned char *>(&c),sizeof(wchar_t) );
       }
       else if( data()[sz] != 0 )
       {
-        buf_.append( (unsigned char *)(&c),sizeof(wchar_t) );
+        buf_.append( reinterpret_cast<const unsigned char *>(&c),sizeof(wchar_t) );
       }
     }
 
@@ -126,7 +132,7 @@ namespace csl
         buf_.allocate( sz * sizeof(wchar_t) );
       }
 
-      buf_.append( (unsigned char *)s, sizeof(wchar_t) * (::wcslen(s)+1) );
+      buf_.append( reinterpret_cast<const unsigned char *>(s), sizeof(wchar_t) * (::wcslen(s)+1) );
 
       ensure_trailing_zero();
 
@@ -148,20 +154,20 @@ namespace csl
       if ( sz < length + start ) len = sz - start;
 
       // copy string
-      s.buf_.set( (unsigned char *)(data() + start), (len*sizeof(wchar_t)) );
+      s.buf_.set( reinterpret_cast<const unsigned char *>(data() + start), (len*sizeof(wchar_t)) );
       s.ensure_trailing_zero();
 
       return s;
     }
 
-    str::str(const char * st) : csl::common::var(), buf_((wchar_t)L'\0')
+    str::str(const char * st) : csl::common::var(), buf_( L'\0' )
     {
       if( !st ) return;
 
       size_t len = ::strlen(st)+1;
       size_t ssz = 0;
 
-      wchar_t * nptr = (wchar_t *)buf_.allocate( len * sizeof(wchar_t) );
+      wchar_t * nptr = reinterpret_cast<wchar_t *>(buf_.allocate( len * sizeof(wchar_t) ));
 
       if ( (ssz = ::mbstowcs( nptr, st, len )) != size_t(-1) )
       {
@@ -184,7 +190,7 @@ namespace csl
       size_t len =  strlen(st)+1;
       size_t ssz = 0;
 
-      wchar_t * nptr = (wchar_t *)buf_.allocate( len * sizeof(wchar_t) );
+      wchar_t * nptr = reinterpret_cast<wchar_t *>(buf_.allocate( len * sizeof(wchar_t) ));
 
       if ( (ssz = ::mbstowcs( nptr, st, len )) != size_t(-1) )
       {
@@ -245,14 +251,14 @@ namespace csl
       return ret;
     }
 
-    size_t str::find(const wchar_t * str) const
+    size_t str::find(const wchar_t * strv) const
     {
-      if( empty() ) return npos;
-      if( !str )    return npos;
+      if( empty() )  return npos;
+      if( !strv )    return npos;
 
       const wchar_t * res = 0;
 
-      if( (res = ::wcsstr(data(),str)) == NULL ) return npos;
+      if( (res = ::wcsstr(data(),strv)) == NULL ) return npos;
 
       return (res-data());
     }
@@ -332,14 +338,14 @@ namespace csl
     /* conversions from other types */
     bool str::from_integer(long long v)
     {
-      wchar_t * p = (wchar_t *)buf_.allocate(buf_size-1);
+      wchar_t * p = reinterpret_cast<wchar_t *>(buf_.allocate(buf_size-1));
       int ret = SWPRINTF(p,(buf_size-1),L"%lld",v);
       return (buf_.allocate( (ret+1)*sizeof(wchar_t) ) != 0);
     }
 
     bool str::from_double(double v)
     {
-      wchar_t * p = (wchar_t *)buf_.allocate(buf_size-1);
+      wchar_t * p = reinterpret_cast<wchar_t *>(buf_.allocate(buf_size-1));
       int ret = SWPRINTF(p,(buf_size-1),L"%.12f",v);
       return (buf_.allocate( (ret+1)*sizeof(wchar_t) ) != 0);
     }
@@ -387,7 +393,7 @@ namespace csl
       }
       else
       {
-        buf_.set( (const unsigned char *)v, sz );
+        buf_.set( reinterpret_cast<const unsigned char *>(v), sz );
         ensure_trailing_zero();
       }
       return true;

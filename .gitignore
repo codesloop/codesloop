@@ -6,6 +6,8 @@
 *.make
 *.xdrbin
 *.z1
+t__*.exe
+ex_*.exe
 _site/
 *.dir
 CMakeCache.txt
@@ -78,6 +80,7 @@ slt3/test/t__sqlite
 slt3/test/t__synqry
 slt3/test/t__tran
 slt3/test/t__var
+slt3/test/*.db
 comm/test/t__udp_client2
 comm/test/t__udp_server2
 comm/test/t__udp_auth_client

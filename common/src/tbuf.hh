@@ -29,10 +29,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
    @file tbuf.hh
    @brief Preallocated template buffer
-   @todo document me
  */
 
 #include "pbuf.hh"
+#include "hlprs.hh"
 #include "common.h"
 #ifdef __cplusplus
 
@@ -40,37 +40,62 @@ namespace csl
 {
   namespace common
   {
-    /** @todo document me */
+    /**
+    @brief templated buffer
+
+    this class is a dynamic memory buffer with a twist: it uses a preallocated static
+    memory area and only allocates memory if more is needed. if the SZ template parameter
+    is chosen wisely this may lead to significant performance improvements for the common case.
+
+    the SZ parameter tells how many bytes of memory will be statically allocated.
+     */
     template <int SZ>
     class tbuf
     {
       public:
         enum { preallocated_size = SZ };
 
+        inline ~tbuf() { reset(); }
+
+        /** @brief default constructor */
         inline tbuf() : data_(preallocated_), size_(0) { }
 
-        inline tbuf(unsigned char c) : data_(preallocated_), size_(1)
+        /**
+        @brief copy constructor
+        @param c is the value to be copied in
+
+        allocates 1 byte of memory and copies in c
+        */
+        inline explicit tbuf(unsigned char c) : data_(preallocated_), size_(1)
         {
           preallocated_[0] = c;
         }
 
-        inline tbuf(wchar_t c) : data_(preallocated_), size_(sizeof(wchar_t))
+        /**
+        @brief copy constructor
+        @param c is the value to be copied in
+
+        allocates sizeof(wchar_t) memory and copies in c
+         */
+        inline explicit tbuf(wchar_t c) : data_(preallocated_), size_(sizeof(wchar_t))
         {
-          ((wchar_t *)preallocated_)[0] = c;
+          const unsigned char * p = (reinterpret_cast<const unsigned char *>(&c));
+          copy_n_uchars<sizeof(wchar_t)>(preallocated_,p);
         }
 
-        inline ~tbuf() { reset(); }
-
+        /** @brief copy constructor */
         inline tbuf(const tbuf & other) : data_(preallocated_), size_(0) // TODO test copy constructor!!!
         {
           *this = other;
         }
 
-        inline tbuf(const char * other) : data_(preallocated_), size_(0) // TODO test copy constructor!!!
+        /** @brief copy constructor */
+        inline explicit tbuf(const char * other) : data_(preallocated_), size_(0) // TODO test copy constructor!!!
         {
           *this = other;
         }
 
+        /** @brief comparison operator */
         inline bool operator==(const tbuf & other) const
         {
           if( other.size_ != size_ ) return false;
@@ -80,12 +105,14 @@ namespace csl
           return (::memcmp(other.data_,data_,size_) == 0);
         }
 
+        /** @brief copy operator */
         inline tbuf & operator=(const char * other)
         {
-          if( other ) set((const unsigned char *)other,::strlen(other)+1);
+          if( other ) set( reinterpret_cast<const unsigned char *>(other), (::strlen(other)+1) );
           return *this;
         }
 
+        /** @brief copy operator */
         inline tbuf & operator=(const pbuf & other)
         {
           unsigned long sz = other.size();
@@ -100,6 +127,7 @@ namespace csl
           return *this;
         }
 
+        /** @brief copy operator */
         inline tbuf & operator=(const tbuf & other) // TODO test copy operator!!!
         {
           /* return immediately if they are the same */
@@ -120,6 +148,7 @@ namespace csl
           return *this;
         }
 
+        /** @brief resets the internal buffer */
         inline void reset()
         {
           if( data_ && data_ != preallocated_ )
@@ -130,13 +159,15 @@ namespace csl
           size_ = 0;
         }
 
+        /** @brief copies the internal data to the given buffer */
         inline bool get(unsigned char * dta)
         {
           if( !dta || !size_ || !data_ ) { return false; }
-            ::memcpy( dta,data_,size_ );
-            return true;
+          ::memcpy( dta,data_,size_ );
+          return true;
         }
 
+        /** @brief sets the internal data from the given (ptr+size) */
         inline bool set(const unsigned char * dta,unsigned int sz)
         {
           /* if no data on the other side we are done */
@@ -157,7 +188,13 @@ namespace csl
           }
         }
 
-        /** @todo test: allocate with existing data: should copy the old data!!! */
+        /**
+        @brief allocate the given amount of memory and return a pointer to it
+        @todo test: allocate with existing data: should copy the old data!!!
+
+        if new buffer is allocated and the old buffer had data, then the new buffer is
+        initialized with the old data
+         */
         inline unsigned char * allocate(unsigned int sz)
         {
           if( !sz ) { reset(); return data_; }
@@ -177,7 +214,7 @@ namespace csl
           else
           {
             /* cannot use the preallocated space */
-            unsigned char * tmp = (unsigned char *)::malloc(sz);
+            unsigned char * tmp = reinterpret_cast<unsigned char *>(::malloc(sz));
             if( !tmp ) return 0;
 
             /* already have data ? */
@@ -194,6 +231,10 @@ namespace csl
           }
         }
 
+        /**
+        @brief allocate the given amount of memory and return a pointer to it
+        @todo test: allocate with existing data: should copy the old data!!!
+         */
         inline unsigned char * allocate_nocopy(unsigned int sz)
         {
           if( !sz ) { reset(); return data_; }
@@ -216,7 +257,7 @@ namespace csl
           else
           {
             /* cannot use the preallocated space */
-            unsigned char * tmp = (unsigned char *)::malloc(sz);
+            unsigned char * tmp = reinterpret_cast<unsigned char *>(::malloc(sz));
             if( !tmp ) return 0;
 
             /* already have data ? */
@@ -228,13 +269,13 @@ namespace csl
           }
         }
 
-        /** @todo return value */
+        /** @brief append a single character to the internal buffer */
         inline void append(unsigned char c)
         {
           set_at(size_,c);
         }
 
-        /** @todo test  */
+        /** @brief append a memory region (ptr+size) to the internal buffer */
         inline bool append(const unsigned char * dta,unsigned int sz)
         {
           /* if no data on the other side we are done */
@@ -255,12 +296,17 @@ namespace csl
           }
         }
 
+        /** @brief append an other tbuf's data to the internal buffer */
         inline bool append(const tbuf & other)
         {
           return append( other.data(), other.size() );
         }
 
-        /** @todo return value */
+        /**
+        @brief set character c at position: pos
+        @param pos is where to place the given character
+        @param c is the character to be placed at pos
+         */
         inline void set_at(unsigned int pos,unsigned char c)
         {
           unsigned char * t = data_;
@@ -274,13 +320,13 @@ namespace csl
         inline bool is_static() const       { return (data_ == preallocated_); } ///<checks if statically allocated
 
         /** @brief returns the size of the allocated data */
-        inline unsigned int size() const    { return size_; }
+        inline unsigned int size() const    { return size_; }  ///<returns the used buffer size
 
         /** @brief return the allocated data */
-        inline const unsigned char * data() const { return data_; }
+        inline const unsigned char * data() const { return data_; } ///<returns a pointer to the internal buffer
 
         /** @brief return the internal data pointer */
-        inline unsigned char * private_data() const { return data_; }
+        inline unsigned char * private_data() const { return data_; } ///<returns a non-const pointer to the internal buffer
 
       private:
         unsigned char   preallocated_[SZ];   ///<the preallocated buffer

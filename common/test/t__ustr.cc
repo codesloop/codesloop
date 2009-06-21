@@ -256,7 +256,9 @@ namespace test_ustr {
     str o;
     assert( b.to_string(o) == true );
     assert( b == o );
+#ifndef __MINGW32__
     assert( o == L"árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP" );
+#endif /*__MINGW32__*/
   }
 
   void to_string_su()
@@ -264,7 +266,9 @@ namespace test_ustr {
     ustr b(L"árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
     ustr o;
     assert( b.to_string(o) == true );
+#ifndef __MINGW32__
     assert( o == "árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP" );
+#endif /*__MINGW32__*/
     assert( b == o );
   }
 
@@ -273,7 +277,9 @@ namespace test_ustr {
     ustr b(L"árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
     std::string o;
     assert( b.to_string(o) == true );
+#ifndef __MINGW32__
     assert( o == "árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP" );
+#endif /*__MINGW32__*/
     assert( b == o.c_str() );
   }
 
@@ -282,7 +288,7 @@ namespace test_ustr {
     ustr b("árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
     binry o;
     assert( b.to_binary(o) == true );
-    assert( b == (const char *)o.value().data() );
+    assert( b == reinterpret_cast<const char *>(o.value().data()) );
   }
 
   void to_binary_u()
@@ -293,7 +299,7 @@ namespace test_ustr {
     assert( b.to_binary(o,sz) == true );
     assert( sz == b.nbytes() );
     assert( sz > 10 );
-    assert( b == (const char *)o );
+    assert( b == reinterpret_cast<const char *>(o) );
   }
 
   void to_binary_v()
@@ -305,7 +311,7 @@ namespace test_ustr {
     assert( b.to_binary(vp,sz) == true );
     assert( sz == b.nbytes() );
     assert( sz > 10 );
-    assert( b == (const char *)o );
+    assert( b == reinterpret_cast<const char *>(o) );
   }
 
   void to_xdr()
@@ -384,14 +390,18 @@ namespace test_ustr {
   {
     ustr b;
     assert( b.from_string("árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP") == true );
+#ifndef __MINGW32__
     assert( b == "árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP" );
+#endif /*__MINGW32__*/
   }
 
   void from_string_sw()
   {
     ustr b;
     assert( b.from_string(L"árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP") == true );
+#ifndef __MINGW32__
     assert( b == "árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP" );
+#endif /*__MINGW32__*/
   }
 
   void from_binary_o()
@@ -400,7 +410,9 @@ namespace test_ustr {
     binry o;
     assert( o.from_string("árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP") == true );
     assert( b.from_binary(o) == true );
+#ifndef __MINGW32__
     assert( b == "árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP" );
+#endif /*__MINGW32__*/
   }
 
   void from_binary_u()
@@ -408,15 +420,19 @@ namespace test_ustr {
     ustr b;
     ustr o("árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
     assert( b.from_binary( o.buffer().data(), o.buffer().size() ) == true );
+#ifndef __MINGW32__
     assert( b == "árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP" );
+#endif /*__MINGW32__*/
   }
 
   void from_binary_v()
   {
     ustr b;
     ustr o("árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
-    assert( b.from_binary( (const void *)o.buffer().data(), o.buffer().size() ) == true );
+    assert( b.from_binary( reinterpret_cast<const void *>(o.buffer().data()), o.buffer().size() ) == true );
+#ifndef __MINGW32__
     assert( b == "árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP" );
+#endif /*__MINGW32__*/
   }
 
   void from_xdr()

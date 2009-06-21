@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -181,7 +181,7 @@ namespace csl
     {
       DWORD WINAPI thread_guard_( LPVOID lpParam )
       {
-        thread::impl * p = (thread::impl *)lpParam;
+        thread::impl * p = reinterpret_cast<thread::impl *>(lpParam);
         
         if( p )
         {
@@ -199,7 +199,7 @@ namespace csl
 
       DWORD WINAPI thread_entry_( LPVOID lpParam )
       {
-        thread::impl * p = (thread::impl *)lpParam;
+        thread::impl * p = reinterpret_cast<thread::impl *>(lpParam);
         if( p )
         {
           // flag start
