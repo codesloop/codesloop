@@ -61,7 +61,7 @@ namespace csl
     private:
       void reset();
       void save();
-      void print_error() const;
+      void print_error(const char * error_msg) const;
       iface iface_;
       token_info token_;
     }; 

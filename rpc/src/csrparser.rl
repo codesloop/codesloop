@@ -66,7 +66,7 @@ const char * csl::rpc::param_kind_name[] = {
   }
 
   action on_error {
-    print_error();
+    print_error("parse error");
   }
 
   action newline {
@@ -210,11 +210,14 @@ namespace csl
       token_.array_length  = 0;
     } 
 
-    void csrparser::print_error() const
+    void csrparser::print_error(const char * error_msg) const
     {
-      fprintf(stderr, "can not process file: parse error at line %d column %d\n",
+      fputs("can not process file: ", stderr);
+      fputs( error_msg, stderr);
+      fprintf(stderr, " at line %d column %d\n",
           token_.curline,
           (token_.p-token_.ls) );
+
       if ( token_.p-token_.ls < 70 ) {
         char * errloc = strdup( token_.ls+1);
         int col = 0;
@@ -241,6 +244,7 @@ namespace csl
         return;
       }
 
+      /* store tokens in iface */
       switch (token_.type) 
       {
         case TT_NAME:

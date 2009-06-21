@@ -57,8 +57,8 @@ int  main(  int  argc,  char  **argv  )
   
   
   ret = p.parse( 
-      (char*) buffer.c_str(),                 // file content
-      (char*) buffer.c_str() + buffer.size()  // end of file
+      const_cast<char*>(buffer.c_str()),                 // file content
+      const_cast<char*>(buffer.c_str()) + buffer.size()  // end of file
     );          
   
   if ( ret != 0 )

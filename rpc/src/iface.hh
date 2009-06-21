@@ -41,6 +41,25 @@ namespace csl
     class iface : public csl::common::obj
     {
       public:
+        /** @brief structure to hold information about a parameter */ 
+        struct param {
+          std::string type; ///< parameter's C++ type name
+          std::string name; ///< parameter name
+          param_kind kind;  ///< parameter's kind (eg. input, output, etc.)
+          bool is_array;    ///< true when parameter is an array 
+          size_t array_length;  ///< length of an array
+        };
+        
+        /** @brief contains a function and its parameters */
+        struct func {
+          std::string name;           ///< function name
+          bool disposable;            ///< true when invoker can omit return values
+          std::vector<param> params;  ///< parameters in original order
+        };
+
+        /*
+         * setters
+         */
         void set_name(const token_info &);    ///< sets interface name
         void set_version(const token_info &); ///< sets version string
         void set_namespc(const token_info &); ///< sets namespace 
@@ -53,8 +72,24 @@ namespace csl
         /** @brief adds an include statement from interface file */
         void add_include(const token_info &);   
 
+        /*
+         * getters 
+         */
+        /** @breif returns interface name */
+        const std::string get_name() const { return name_;}
+        /** @breif returns interface version */
+        const std::string get_version() const { return version_;}
+        /** @breif returns interface namespace */
+        const std::string get_namespc() const { return namespc_;}
+        /** @brief return list of defined functions */
+        const std::vector<func> * get_functions() const 
+        {
+          return &functions_;
+        }
+
+
         /** @brief dump iface content (for debug) */
-        std::string to_string() const;
+        std::string to_string() const;        
 
       private:
         std::string name_;
@@ -63,21 +98,6 @@ namespace csl
 
         std::string token_to_string(const token_info & ) const;
         std::string param_type_;
-    
-        struct param {
-          std::string type;
-          std::string name;
-          param_kind kind;
-          bool is_array;
-          bool array_length;
-        };
-
-        struct func {
-          std::string name;
-          bool disposable;
-          std::vector<param> params;
-        };
-
 
         std::vector<func> functions_;
         std::vector<std::string> includes_;

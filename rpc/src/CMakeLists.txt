@@ -27,7 +27,20 @@
 IF(WIN32)
   ADD_DEFINITIONS(-Wall)
 ELSE(WIN32)
-  ADD_DEFINITIONS(-Wall -g3)
+  ADD_DEFINITIONS(
+                   -Wall
+                   -Wwrite-strings
+                   -Wcast-qual
+                   -Wpointer-arith
+                   -Wold-style-cast
+                   -Wconversion
+                   -Wcomment
+                   -Wcast-align
+                   -Winline
+                   -Wshadow
+                   -Wredundant-decls
+                   -g3
+                 )
 ENDIF(WIN32)
 
 
