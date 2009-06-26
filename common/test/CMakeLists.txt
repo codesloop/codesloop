@@ -108,5 +108,6 @@ ADD_EXECUTABLE( t__ustr     t__ustr.cc )
 ADD_EXECUTABLE( t__int64    t__int64.cc )
 ADD_EXECUTABLE( t__dbl      t__dbl.cc )
 ADD_EXECUTABLE( t__binry    t__binry.cc )
+ADD_EXECUTABLE( t__obj      t__obj.cc )
 
 # -- EOF --

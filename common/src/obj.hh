@@ -18,7 +18,7 @@ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
 INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
 NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
 DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, objICT LIABILITY, OR TORT
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
@@ -46,6 +46,12 @@ namespace csl
         obj();
 
         virtual inline ~obj() {}
+  
+        /** @brief implemented by CSL_OBJECT_DECL macro */
+        virtual const char * get_class_name();
+
+        /** @brief returns true when the objects have the same type */
+        virtual bool is_kind_of( obj & o );
 
       protected:
         int logger_flags_; ///< enable or disable per instance logging
