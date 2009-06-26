@@ -53,14 +53,14 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if __GCC__ || __GNUC__
 #define STORE_FUNC_NAME()  \
-  csl::common::str __function_name = csl::common::str(__PRETTY_FUNCTION__);             \
-  csl::common::str __class_name;                                                   \
-  __function_name = __function_name.substr( 0, __function_name.find(L'('));    \
-  __function_name = __function_name.substr( (__function_name.rfind(L' ') ==    \
-          str::npos ) ?  0 : __function_name.rfind(L' ') + 1, -1 );    \
-  if ( __function_name.find( L"csl::" ) != str::npos)             \
-    __function_name = __function_name.substr(10,-1);                          \
-  if ( __function_name.find( ':' ) !=  str::npos)                     \
+  csl::common::str __function_name = csl::common::str(__PRETTY_FUNCTION__);   \
+  csl::common::str __class_name;                                              \
+  __function_name = __function_name.substr( 0, __function_name.find(L'('));   \
+  __function_name = __function_name.substr( (__function_name.rfind(L' ') ==   \
+          str::npos ) ?  0 : __function_name.rfind(L' ') + 1, str::npos );    \
+  if ( __function_name.find( L"csl::" ) != str::npos)                         \
+    __function_name = __function_name.substr(10,str::npos);                   \
+  if ( __function_name.find( ':' ) !=  str::npos)                             \
     __class_name = __function_name.substr( 0, __function_name.find( L"::" ) )
 #else 
 #define STORE_FUNC_NAME()                   \
