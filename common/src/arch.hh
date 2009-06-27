@@ -32,9 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "common.h"
-#include "var.hh"
-#include "pbuf.hh"
-#include "xdrbuf.hh"
+#include "obj.hh"
 #ifdef __cplusplus
 #include <utility>
 
@@ -42,6 +40,10 @@ namespace csl
 {
   namespace common
   {
+    class var;
+    class pbuf;
+    class xdrbuf;
+
     /**
     @brief arch de/serializes data to a pbuf in XDR format using xdrbuf
 
@@ -68,8 +70,7 @@ namespace csl
          @throw common::exc
         */
         arch( direction d );
-        virtual ~arch();
-
+        virtual ~arch(); 
 
         /**
           @brief serialize or deserialize val to xdrbuf
@@ -80,17 +81,20 @@ namespace csl
           or stores val from/to buffer
         */
         void serialize(var & val);
-        /**
-          @brief serialize or deserialize elementary typed val to xdrbuf
-          @param val is the value to be de/serialized
-          @throw common::exc               
-          
-          based on object's direction the function loads
-          or stores val from/to buffer. typename should be supported
-          by xmlbuf.
-        */
-        template <typename T> void serialize(T & val);
 
+        /**
+          @brief return the size of the serialized data
+        */
+        unsigned int size() const;
+        /**
+          @brief return serialized data buffer in pbuf
+        */
+        pbuf * get_pbuf() const;
+        /** 
+          @brief sets input buffer for deserialization
+        */
+        void set_pbuf( const pbuf & src );
+        
       private:
         pbuf * pbuf_;
         xdrbuf * xdrbuf_;

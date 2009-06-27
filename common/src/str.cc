@@ -28,6 +28,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "exc.hh"
 #include "common.h"
 #include "xdrbuf.hh"
+#include "logger.hh"
+
 
 /**
   @file csl_common/src/str.cc
@@ -409,7 +411,7 @@ namespace csl
       catch( exc e )
       {
         return false;
-      }
+      }      
     }
   };
 };

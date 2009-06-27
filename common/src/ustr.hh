@@ -627,6 +627,14 @@ namespace csl
          */
         bool from_var(const var & v) { return v.to_string(*this); }
 
+        /**
+        @brief serialize contents of objects
+        @param buf archiver class to/from serialize
+        @throw common::exc
+        */
+        virtual inline void serialize(arch & buf) { buf.serialize(*this); }
+
+
       private:
         tbuf<buf_size>   buf_;
     };

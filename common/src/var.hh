@@ -33,6 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "obj.hh"
 #include "common.h"
+#include "serializable.hh"
 #ifdef __cplusplus
 #include <string>
 
@@ -53,7 +54,7 @@ namespace csl
     this class defines the abstract functions to be implemented by descendant.
     these functions are mainly about conversion to and from various variable types.
     */
-    class var : public obj
+    class var : public obj, public serializable
     {
       private:
         bool use_exc_; ///<use exceptions?

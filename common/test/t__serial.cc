@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck, Tamas Foldi
+   Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -23,71 +23,56 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "arch.hh"
-#include "common.h"
-#include <memory>
-#include "exc.hh"
-#include "var.hh"
-#include "xdrbuf.hh"
 
 /**
-   @file arch.cc
-   @brief arch saves a complex network of objects in a permanent binary form 
-*/
+   @file t__obj.cc
+   @brief Tests to verify serialization/deserialization routines
+   @todo add more test case for each vars
+ */
 
-namespace csl
+#define DEBUG 
+
+#include "common.h"
+#include "str.hh"
+#include "exc.hh"
+#include "arch.hh"
+#include "logger.hh"
+#include "xdrbuf.hh"
+#include "pbuf.hh"
+#include <assert.h>
+#include <sys/stat.h>
+
+using namespace csl::common;
+
+int main()
 {
-  namespace common
-  {
-    arch::arch( direction d ) 
-      : direction_(d) 
-    {
-      pbuf_ = new pbuf;
-      xdrbuf_ = new xdrbuf(*pbuf_);
+  bool caught = false;
 
-      if ( !pbuf_ || !xdrbuf_ )
-        throw common::exc(exc::rs_out_of_memory,exc::cm_arch,L"",L""__FILE__,__LINE__);
-    }
+  try {
+    str src = L"This is a test";
+    str dst;
+    pbuf * buf;
 
-    arch::~arch() 
-    {
-      if ( pbuf_ )
-        delete pbuf_;
-      if ( xdrbuf_ )
-        delete xdrbuf_;
-    }
+    arch sar( arch::SERIALIZE );
+    src.serialize( sar );
 
-    unsigned int arch::size() const
-    {
-      return pbuf_->size();
-    }
+    buf = sar.get_pbuf();
 
-    pbuf * arch::get_pbuf() const
-    { 
-      return pbuf_;
-    }
-    
-    void arch::set_pbuf( const pbuf & src ) 
-    { 
-      *pbuf_ = src;
-      if ( xdrbuf_ )
-        delete xdrbuf_;
+    arch dar( arch::DESERIALIZE );
+    dar.set_pbuf( (*buf) );
+    dst.serialize( dar);
 
-      xdrbuf_ = new xdrbuf(*pbuf_);
+//    FPRINTF(stderr,L"src:%ls, dst:%ls\n", src.c_str(), dst.c_str() );
+//    FPRINTF(stderr,L"sar:%ld, dar:%ld\n", sar.size(), dar.size() );
 
-      if ( !xdrbuf_ )
-        throw common::exc(exc::rs_out_of_memory,exc::cm_arch,L"",L""__FILE__,__LINE__);
-    }
+    assert( src == dst );
 
-    void arch::serialize(var & val)
-    {
-      if ( direction_ == SERIALIZE ) 
-        val.to_xdr( *xdrbuf_ );
-      else
-        val.from_xdr( *xdrbuf_ );
-    }
-
+  } catch ( exc e ) {
+    FPRINTF(stderr,L"Exception caught: %ls\n",e.to_string().c_str());
+    caught = true;
   }
+  /* this should not throw an exception, will add as zero length string */
+  assert( caught == false );
 }
 
 /* EOF */
