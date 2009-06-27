@@ -32,7 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @todo document me
  */
 
-#include <xdrbuf.hh>
+#include "archiver.hh"
 #ifdef __cplusplus
 
 namespace csl
@@ -42,7 +42,7 @@ namespace csl
     /** @brief superclass of all codesloop serializableects */
     class serializable
     {
-      virtual void serialize(xdrbuf & buf) = 0;
+      virtual void serialize(archiver & buf) = 0;
     };
   }
 }

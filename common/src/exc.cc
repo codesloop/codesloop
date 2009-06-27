@@ -47,6 +47,7 @@ namespace csl
         case rs_xdr_invalid:     return L"Invalid XDR data";
         case rs_empty:           return L"Empty container.";
         case rs_conv_error:      return L"Cannot convert character.";
+        case rs_out_of_memory:   return L"Out of memory.";
         case rs_unknown:
           default:               return L"Unknown reason";
       };
@@ -63,6 +64,7 @@ namespace csl
         case cm_logger:    return L"common::logger";
         case cm_str:       return L"common::str";
         case cm_ustr:      return L"common::ustr";
+        case cm_arch:      return L"common::arch";
         case cm_unknown:
           default:         return L"unknown component";
       };

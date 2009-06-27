@@ -79,6 +79,8 @@ ADD_LIBRARY( csl_common STATIC
              circbuf.hh
              mpool.hh      tbuf.hh 
              logger.cc     logger.hh
+             arch.cc       arch.hh
+             serializable.hh
              obj.cc        obj.hh
              var.hh
              int64.cc      int64.hh

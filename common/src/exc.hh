@@ -55,6 +55,7 @@ namespace csl
           rs_xdr_invalid,    ///<Invald xdr data
           rs_empty,          ///<Empty container
           rs_conv_error,     ///<Cannot convert character
+          rs_out_of_memory,  ///<Can not allocate memory
         };
 
         enum {
@@ -65,7 +66,8 @@ namespace csl
           cm_circbuf, ///<circbuf component
           cm_logger,  ///<logger component
           cm_str,     ///<str component
-          cm_ustr     ///<ustr component
+          cm_ustr,    ///<ustr component
+          cm_arch,    ///<archiver component
         };
 
         /** @brief converts reason code to string */
