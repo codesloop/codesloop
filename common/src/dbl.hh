@@ -33,6 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "var.hh"
 #include "int64.hh"
+#include "arch.hh"
 #ifdef __cplusplus
 
 namespace csl

@@ -34,6 +34,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "var.hh"
 #include "dbl.hh"
 #include "tbuf.hh"
+#include "arch.hh"
 #ifdef __cplusplus
 
 namespace csl

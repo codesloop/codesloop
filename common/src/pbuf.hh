@@ -33,6 +33,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pvlist.hh"
 #include "mpool.hh"
+#include "obj.hh"
+#include "serializable.hh"
 #ifdef __cplusplus
 
 namespace csl
@@ -53,7 +55,7 @@ namespace csl
     an initial buffer is allocated on the stack, so if the memory needed is less than buf_size
     than it is a lot faster
     */
-    class pbuf
+    class pbuf : public obj, public serializable
     {
       public:
         enum { buf_size = 2048 };
@@ -196,6 +198,13 @@ namespace csl
 
         pbuf(const pbuf & other);              ///<copy constructor
         pbuf & operator=(const pbuf & other);  ///<copy operator
+
+        /**
+          @brief serialize contents of objects
+          @param buf archiver class to/from serialize
+          @throw common::exc
+         */
+        virtual void serialize(arch & ar);
 
       private:
         buf * allocate(unsigned int size);

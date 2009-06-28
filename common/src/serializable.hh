@@ -32,7 +32,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @todo document me
  */
 
-#include "arch.hh"
 #ifdef __cplusplus
 
 namespace csl
@@ -42,7 +41,7 @@ namespace csl
     /** @brief superclass of all codesloop serializableects */
     class serializable
     {
-      virtual void serialize(arch & buf) = 0;
+      virtual void serialize(class arch & buf) = 0;
     };
   }
 }

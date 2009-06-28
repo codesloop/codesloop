@@ -39,6 +39,7 @@ Credits: some techniques and code pieces are stolen from Christian
 #include "tbuf.hh"
 #include "var.hh"
 #include "binry.hh"
+#include "arch.hh"
 #ifdef __cplusplus
 #include <string>
 
