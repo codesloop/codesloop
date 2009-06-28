@@ -25,8 +25,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "xdrbuf.hh"
 #include "common.h"
+#include "pbuf.hh"
 #include "exc.hh"
 #include "str.hh"
+#include "var.hh"
+#include "ustr.hh"
 #include <memory>
 
 /**
@@ -136,6 +139,12 @@ namespace csl
           }
         }
       }
+      return *this;
+    }
+
+    xdrbuf & xdrbuf::operator<<(const common::var & val)
+    {
+      val.to_xdr( *this );
       return *this;
     }
 
@@ -275,6 +284,12 @@ namespace csl
         THR(exc::rs_cannot_get,exc::cm_xdrbuf,*this);
       }
 
+      return *this;
+    }
+
+    xdrbuf & xdrbuf::operator>>(common::var & val)
+    {
+      val.from_xdr( *this );
       return *this;
     }
 

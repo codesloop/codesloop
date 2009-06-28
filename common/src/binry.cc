@@ -29,6 +29,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ustr.hh"
 #include "binry.hh"
 #include "xdrbuf.hh"
+#include "exc.hh"
 
 /**
   @file csl_common/src/binry.cc

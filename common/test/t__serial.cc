@@ -53,6 +53,7 @@ int main()
     str dst;
     pbuf * buf;
 
+    // Class types - direct
     arch sar( arch::SERIALIZE );
     src.serialize( sar );
 
@@ -62,10 +63,22 @@ int main()
     dar.set_pbuf( (*buf) );
     dst.serialize( dar);
 
-//    FPRINTF(stderr,L"src:%ls, dst:%ls\n", src.c_str(), dst.c_str() );
-//    FPRINTF(stderr,L"sar:%ld, dar:%ld\n", sar.size(), dar.size() );
-
     assert( src == dst );
+
+    // Elementary types
+    unsigned int elementary = 0xDeadBabe;
+    arch sar2( arch::SERIALIZE );
+    sar2.serialize( elementary );
+    buf = sar2.get_pbuf();
+
+    elementary = 0;
+
+    arch dar2( arch::DESERIALIZE );
+    dar2.set_pbuf( (*buf) );
+    dar2.serialize( elementary );
+
+    assert( elementary == 0xDeadBabe );
+
 
   } catch ( exc e ) {
     FPRINTF(stderr,L"Exception caught: %ls\n",e.to_string().c_str());

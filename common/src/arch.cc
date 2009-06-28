@@ -78,15 +78,6 @@ namespace csl
       if ( !xdrbuf_ )
         throw common::exc(exc::rs_out_of_memory,exc::cm_arch,L"",L""__FILE__,__LINE__);
     }
-
-    void arch::serialize(var & val)
-    {
-      if ( direction_ == SERIALIZE ) 
-        val.to_xdr( *xdrbuf_ );
-      else
-        val.from_xdr( *xdrbuf_ );
-    }
-
   }
 }
 

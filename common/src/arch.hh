@@ -33,6 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "common.h"
 #include "obj.hh"
+#include "xdrbuf.hh"
 #ifdef __cplusplus
 #include <utility>
 
@@ -80,7 +81,13 @@ namespace csl
           based on object's direction the function loads
           or stores val from/to buffer
         */
-        void serialize(var & val);
+        template <typename T> void serialize(T & val)
+        {       
+          if ( direction_ == SERIALIZE )
+            (*xdrbuf_) << val;
+          else
+            (*xdrbuf_) >> val;
+        }
 
         /**
           @brief return the size of the serialized data
