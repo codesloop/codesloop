@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, Tamas Foldi
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Rediserializableibution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -38,7 +38,7 @@ namespace csl
 {
   namespace common
   {
-    /** @brief superclass of all codesloop serializableects */
+    /** @brief superclass of all codesloop serializables */
     class serializable
     {
       virtual void serialize(class arch & buf) = 0;

@@ -82,24 +82,22 @@ namespace csl
 #endif
       va_list args;
       va_start(args, pstrFormat);
-      char buffer[256];
-
-      vsnprintf( buffer, 256, pstrFormat, args );
-
-      log( type, str(buffer) );
-
+      log( type, pstrFormat, args );
       va_end(args);
     }
 
-    static void logger::log( logger_types type, const char * fmt, va_list args)
+    void logger::log( logger_types type, const char * fmt, va_list args)
     {
       char buffer[256];
-      vsnprintf( buffer, 256, pstrFormat, args );
+      vsnprintf( buffer, 256, fmt, args );
       log( type, str(buffer) );
     }
 
-    static void logger::log( logger_types type, const wchar_t * fmt, va_list args)
+    void logger::log( logger_types type, const wchar_t * fmt, va_list args)
     {
+      wchar_t buffer[256];
+      vswprintf( buffer, 256, fmt, args );
+      log( type, str(buffer) );
     }
 
 
@@ -111,12 +109,7 @@ namespace csl
 #endif
       va_list args;
       va_start(args, pstrFormat);
-      wchar_t buffer[256];
-
-      vswprintf( buffer, 256, pstrFormat, args );
-
-      log( type, str(buffer) );
-
+      log(type, pstrFormat, args );
       va_end(args);
     }
 

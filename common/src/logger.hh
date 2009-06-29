@@ -66,24 +66,24 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  #define ENTER_FUNCTION()  \
    STORE_FUNC_NAME();    \
    if ( csl::common::logger::enable_trace_ )                     \
-     csl::common::logger::debug(L">>> Entering function: %s (%s:%d)", __FUNCTION__,__file_name.c_str(),__LINE__)
+     csl::common::logger::debug(__file_name,L">>> Entering function: %s (%ls:%d)", __FUNCTION__,__file_name.c_str(),__LINE__)
  #define LEAVE_FUNCTION()                                        \
    {                                                             \
    if ( csl::common::logger::enable_trace_ )                     \
-     csl::common::logger::debug(L"<<< Leaving function: %s (%s:%d)", __FUNCTION__,__file_name.c_str(),__LINE__); \
+     csl::common::logger::debug(__file_name,L"<<< Leaving function: %s (%ls:%d)", __FUNCTION__,__file_name.c_str(),__LINE__); \
    return;                                                       \
    }
  #define RETURN_FUNCTION(ret)                                    \
    {                                                             \
    if ( csl::common::logger::enable_trace_ )                     \
-     csl::common::logger::debug(L"<<< Leaving function: %s (%s:%d)", __FUNCTION__,__file_name.c_str(),__LINE__);\
+     csl::common::logger::debug(__file_name,L"<<< Leaving function: %s (%ls:%d)", __FUNCTION__,__file_name.c_str(),__LINE__);\
    return(ret);                                                  \
    }
 
  #define THROW_EXCEPTION(e)                                      \
    {                                                             \
    if ( csl::common::logger::enable_trace_ )                     \
-     csl::common::logger::debug(L"<<< Leaving function: %s Exception: %s", __FUNCTION__,  \
+     csl::common::logger::debug(__file_name,L"<<< Leaving function: %s Exception: %ls", __FUNCTION__,  \
                    e.to_string().c_str());             \
    throw(e);                                                     \
    }
@@ -190,7 +190,7 @@ namespace csl {
           compiler optimizes out the debug related log macros
           @param str  message to log */
         static inline void      debug( const str & invoker,
-            const wchar_t * fmt )
+            const wchar_t * fmt, ... )
         {
 #ifdef DEBUG
           if ( class_to_trace_ == L"all" ||
