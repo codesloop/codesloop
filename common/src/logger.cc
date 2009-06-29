@@ -74,6 +74,51 @@ namespace csl
       logfile_ = logfile;
     }
 
+    void logger::log( logger_types type, const char * pstrFormat, ...)
+    {
+#ifndef DEBUG
+      if ( type == LOG_DEBUG )
+              return;
+#endif
+      va_list args;
+      va_start(args, pstrFormat);
+      char buffer[256];
+
+      vsnprintf( buffer, 256, pstrFormat, args );
+
+      log( type, str(buffer) );
+
+      va_end(args);
+    }
+
+    static void logger::log( logger_types type, const char * fmt, va_list args)
+    {
+      char buffer[256];
+      vsnprintf( buffer, 256, pstrFormat, args );
+      log( type, str(buffer) );
+    }
+
+    static void logger::log( logger_types type, const wchar_t * fmt, va_list args)
+    {
+    }
+
+
+    void logger::log( logger_types type, const wchar_t * pstrFormat, ...)
+    {
+#ifndef DEBUG
+      if ( type == LOG_DEBUG )
+              return;
+#endif
+      va_list args;
+      va_start(args, pstrFormat);
+      wchar_t buffer[256];
+
+      vswprintf( buffer, 256, pstrFormat, args );
+
+      log( type, str(buffer) );
+
+      va_end(args);
+    }
 
     // logs one message to the file
     void logger::log( logger_types type, const str & st )
