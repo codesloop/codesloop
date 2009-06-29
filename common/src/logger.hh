@@ -47,8 +47,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef DEBUG
 #define CSL_DEBUG(str)      csl::common::logger::debug( str, __file_name )
+#define CSL_DEBUGF(...)     csl::common::logger::debug( __file_name, __VA_ARGS__ )
 #else
 #define CSL_DEBUG(str)
+#define CSL_DEBUGF(...)     
 #endif
 
 

@@ -38,6 +38,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common.h"
 #include "str.hh"
 #include <assert.h>
+#include "test_timer.h"
 #include <sys/stat.h>
 
 #define LOG_TEST_MSG L"logger test"
@@ -54,7 +55,7 @@ namespace test_logger
     public:
 
       /**@test return value from RETURN_FUNCTION */
-      static int int_function(const wchar_t * sz)
+      int int_function(const wchar_t * sz)
       {
         ENTER_FUNCTION();
 
@@ -75,9 +76,17 @@ namespace test_logger
   /**@test simple LEAVE_FUNCTION test */
   void void_function()
   {
-//    ENTER_FUNCTION();
+    ENTER_FUNCTION();
 
-//    LEAVE_FUNCTION();
+    LEAVE_FUNCTION();
+  }
+
+  /**@test simple LEAVE_FUNCTION test */
+  void void_nolog_function()
+  {
+    ENTER_FUNCTION();
+
+    LEAVE_FUNCTION();
   }
 
 };
