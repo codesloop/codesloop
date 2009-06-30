@@ -162,9 +162,7 @@ namespace csl
         ustr substr(const size_t start, const size_t length) const;
 
         /**
-        @brief extracts a substring from a given position
-        @param start start from this position
-        @param length is the amount to be extracted
+        @brief trim spaces from string start and end positions
         */
         inline ustr trim() 
         {

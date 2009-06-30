@@ -148,8 +148,6 @@ namespace csl
 
         /**
         @brief extracts a substring from a given position
-        @param start start from this position
-        @param length is the amount to be extracted
         */
         inline str trim()
         {
