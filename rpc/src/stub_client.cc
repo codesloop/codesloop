@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, Beck David, Tamas Foldi
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -21,57 +21,21 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 */
 
-#include <stdio.h>
-#include <string.h>
-#include <string>
-#include <iostream>
-#include <fstream>
-
-#include "csrparser.hh"
-
-#include "stub_header.hh"
 #include "stub_client.hh"
-#include "stub_server.hh"
+#include "common.h"
 
-using namespace csl::rpc;
+/**
+  @file csl_rpc/src/stub_client.cc
+  @brief implementation of codesloop interface descriptor
+ */
 
-int  main(  int  argc,  char  **argv  )
+namespace csl
 {
-  std::string buffer;
-  csrparser p;
-  int ret = 0;
-
-  if ( argc == 1 ) 
+  namespace rpc
   {
-    fprintf(stderr, "usage: %s <filename>\n", argv[0] );
-    exit(1);
-  } else {
-    std::ifstream in( argv[1] );
-    if ( in.good() )
-    {
-      buffer = std::string(std::istreambuf_iterator<char>(in),std::istreambuf_iterator<char>());
-    } else {
-      fprintf(stderr, "%s: can not open file \"%s\"\n", argv[0], argv[1] );
-      exit(1);
-    }
-  }
-  
-  ret = p.parse( 
-      const_cast<char*>(buffer.c_str()),                 // file content
-      const_cast<char*>(buffer.c_str()) + buffer.size()  // end of file
-    );          
-  
+  };
+};
 
-  stub_header::generate( p.get_iface() );
-//  stub_client::generate( p.get_iface() );
-//  stub_server::generate( p.get_iface() );
-
-  if ( ret != 0 )
-    exit(0);
-
-  return 0;
-}
-
+/* EOF */

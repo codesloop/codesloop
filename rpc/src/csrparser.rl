@@ -30,6 +30,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "csrgen.hh"
 #include "csrparser.hh"
 #include "iface.hh"
+#include "logger.hh"
 
 const char * csl::rpc::token_type_name[] = {
   "unknown",
@@ -296,7 +297,7 @@ namespace csl
       if ( token_.cs == csrgen_error )
         return(1);
 
-      printf("%s", iface_.to_string().c_str() );
+      CSL_DEBUGF( L"Parsed token tree:\n%s", iface_.to_string().c_str() );
 
       return(0);
     } 

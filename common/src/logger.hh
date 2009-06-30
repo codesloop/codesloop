@@ -46,10 +46,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CSL_TRACE_SCOPE    "CSL_TRACE_SCOPE"
 
 #ifdef DEBUG
-#define CSL_DEBUG(str)      csl::common::logger::debug( str, __file_name )
-#define CSL_DEBUGF(...)     csl::common::logger::debug( __file_name, __VA_ARGS__ )
+#define CSL_DEBUG(msg)      csl::common::logger::debug( msg, csl::common::str(__FILE__) )
+#define CSL_DEBUGF(...)     csl::common::logger::debug( csl::common::str(__FILE__), __VA_ARGS__ )
 #else
-#define CSL_DEBUG(str)
+#define CSL_DEBUG(msg)
 #define CSL_DEBUGF(...)     
 #endif
 
@@ -175,7 +175,7 @@ namespace csl {
         compiler optimizes out the debug related log macros
         @param str  message to log */
         static inline void      debug( const str & st,
-                                       const str & invoker = L"" )
+                                       const str invoker = L"" )
         {
 #ifdef DEBUG
           if ( class_to_trace_ == L"all" ||
@@ -191,7 +191,7 @@ namespace csl {
           Debug messages are only available in DEBUG builds, otherwise
           compiler optimizes out the debug related log macros
           @param str  message to log */
-        static inline void      debug( const str & invoker,
+        static inline void      debug( const str invoker,
             const wchar_t * fmt, ... )
         {
 #ifdef DEBUG

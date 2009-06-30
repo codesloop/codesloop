@@ -87,10 +87,19 @@ namespace csl
           return &functions_;
         }
 
+        const std::vector<std::string> * get_includes() const
+        {
+          return &includes_;
+        }
 
         /** @brief dump iface content (for debug) */
         std::string to_string() const;        
 
+
+        /** @brief iterator to access includes */
+        typedef std::vector<std::string>::const_iterator include_iterator;
+        /** @brief iterator to access function */  
+        typedef std::vector<func>::const_iterator function_iterator;
       private:
         std::string name_;
         std::string version_;

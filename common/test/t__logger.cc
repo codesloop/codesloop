@@ -59,7 +59,7 @@ namespace test_logger
       {
         ENTER_FUNCTION();
 
-        CSL_DEBUG( str(L"parameter: ") + sz  );
+        CSL_DEBUGF( L"parameter: %ls", sz  );
 
         RETURN_FUNCTION( 0x12345678 );
       }

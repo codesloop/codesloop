@@ -88,15 +88,15 @@ namespace csl
 
     void logger::log( logger_types type, const char * fmt, va_list args)
     {
-      char buffer[256];
-      vsnprintf( buffer, 256, fmt, args );
+      char buffer[1024];
+      vsnprintf( buffer, 1024, fmt, args );
       log( type, str(buffer) );
     }
 
     void logger::log( logger_types type, const wchar_t * fmt, va_list args)
     {
-      wchar_t buffer[256];
-      vswprintf( buffer, 256, fmt, args );
+      wchar_t buffer[1024];
+      vswprintf( buffer, 1024, fmt, args );
       log( type, str(buffer) );
     }
 
