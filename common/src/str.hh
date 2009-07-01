@@ -331,6 +331,15 @@ namespace csl
          */
         size_t rfind(wchar_t w) const;
 
+        /* ------------------------------------------------------------------------ *
+        **    int64  operations
+        ** ------------------------------------------------------------------------ */
+        /** 
+        @brief generates crc64 hash value from string 
+        @returns signed 64 bit integer with CRC
+        */
+        int64 crc64() const;
+
         /* ------------------------------------------------------------------------ */
 
         /** @brief resets str buffer */
