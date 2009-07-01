@@ -26,6 +26,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "stub_header.hh"
 #include "common.h"
 #include "ustr.hh"
+#include "csrparser.hh"
 
 #include <iostream>
 #include <fstream>
@@ -86,9 +87,61 @@ namespace csl
       |  Generate function specs                                 |
       \---------------------------------------------------------*/
       iface::function_iterator func_it = ifc->get_functions()->begin();
+      iface::func::param_iterator param_it;
 
       while ( func_it != ifc->get_functions()->end() )
       {
+        param_it = (*func_it).params.begin();
+
+        output << ls << "void " << (*func_it).name << " (" << endl;
+
+        // fix parameter for
+        output << ls << "\t/* inout */\tcsl::rpc::conn &\t__rpc_con," << endl;
+
+        // parameters
+        while( param_it != (*func_it).params.end() ) 
+        {
+          if( (*param_it).kind==MD_EXCEPTION) 
+          {
+            output
+              << ls << "\t"
+              << "/* throws "
+              << (*param_it).type << " */" 
+              ;
+
+          } else { 
+            output 
+              << ls << "\t" 
+              << "/* " 
+              << param_kind_name[ (*param_it).kind ] << " */"
+              << "\t"
+              << (*param_it).type 
+            ;
+
+            if ( (*param_it).kind==MD_INPUT && (*param_it).is_array )
+              output << " "; // space needed only, when an arry ptr is coming
+            else if ( (*param_it).kind==MD_OUTPUT )
+              output << " *";
+            else if ( (*param_it).kind==MD_INOUT )
+              output << " &";
+
+            if ( (*param_it).is_array )
+              output << "*";
+
+            output
+              << "\t" << (*param_it).name  
+              ;
+          }
+
+          param_it++;
+          
+          // TODO: now it works only, if exceptions are defined last
+          if ( (*param_it).kind!=MD_EXCEPTION && param_it != (*func_it).params.end() )
+            output << ",";
+          output << endl;
+        }
+
+        output << ls << ");" << endl << endl;
         func_it++;
       }
       output << endl;
@@ -103,7 +156,7 @@ namespace csl
         << endl
         << "#ifndef /* __csl_interface_" << ifc->get_name().c_str() << "*/" 
         << endl
-        << "#endif /* __cplusplus /*" << endl
+        << "#endif /* __cplusplus */" << endl
         << "/* EOF */" << endl
       ;
 
