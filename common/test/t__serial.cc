@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck, Tamas Foldi
+   Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -23,44 +23,69 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+
 /**
-  @file ex_sql1.cc
-  @brief basic slt3 demonstration using exceptions
+   @file t__obj.cc
+   @brief Tests to verify serialization/deserialization routines
+   @todo add more test case for each vars
  */
 
-#include "str.hh"
-#include "csl_slt3.hh"
-#include "common.h"
+#define DEBUG 
 
-using namespace csl::slt3;
+#include "common.h"
+#include "str.hh"
+#include "exc.hh"
+#include "arch.hh"
+#include "logger.hh"
+#include "xdrbuf.hh"
+#include "pbuf.hh"
+#include <assert.h>
+#include <sys/stat.h>
+
 using namespace csl::common;
 
 int main()
 {
-  conn c;
+  bool caught = false;
 
-  try
-  {
-    c.open("testme.db");
+  try {
+    str src = L"This is a test";
+    str dst;
+    pbuf * buf;
 
-    /* start a transaction */
-    tran t(c);
+    // Class types - direct
+    arch sar( arch::SERIALIZE );
+    src.serialize( sar );
 
-    /* create a query object */
-    query q(t);
+    buf = sar.get_pbuf();
 
-    q.execute("create table test(i int);");
+    arch dar( arch::DESERIALIZE );
+    dar.set_pbuf( (*buf) );
+    dst.serialize( dar);
+
+    assert( src == dst );
+
+    // Elementary types
+    unsigned int elementary = 0xDeadBabe;
+    arch sar2( arch::SERIALIZE );
+    sar2.serialize( elementary );
+    buf = sar2.get_pbuf();
+
+    elementary = 0;
+
+    arch dar2( arch::DESERIALIZE );
+    dar2.set_pbuf( (*buf) );
+    dar2.serialize( elementary );
+
+    assert( elementary == 0xDeadBabe );
+
+
+  } catch ( exc e ) {
+    FPRINTF(stderr,L"Exception caught: %ls\n",e.to_string().c_str());
+    caught = true;
   }
-  catch( csl::slt3::exc e )
-  {
-    str s;
-    e.to_string(s);
-
-    FPRINTF(stderr,L"Exception caught: %ls\n",s.c_str());
-  }
-
-  return 0;
+  /* this should not throw an exception, will add as zero length string */
+  assert( caught == false );
 }
 
 /* EOF */
-

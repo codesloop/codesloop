@@ -27,9 +27,23 @@
 IF(WIN32)
   ADD_DEFINITIONS(-Wall)
 ELSE(WIN32)
-  ADD_DEFINITIONS(-Wall -g3)
+  ADD_DEFINITIONS(
+                   -Wall
+                   -Wwrite-strings
+                   -Wcast-qual
+                   -Wpointer-arith
+                   -Wold-style-cast
+                   -Wconversion
+                   -Wcomment
+                   -Wcast-align
+                   -Winline
+                   -Wshadow
+                   -Wredundant-decls
+                   -g3
+                 )
 ENDIF(WIN32)
 
+ADD_DEFINITIONS( -DDEBUG )
 
 INCLUDE_DIRECTORIES( ../../common/src) 
 LINK_DIRECTORIES( ../../common/src )
@@ -41,8 +55,11 @@ ADD_CUSTOM_COMMAND( OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/csrparser.cc
                   MAIN_DEPENDENCY csrparser.rl
                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} )
 
-ADD_EXECUTABLE( csrgen  csrparser.cc csrparser.hh
-                        iface.cc  iface.hh 
+ADD_EXECUTABLE( csrgen  csrparser.cc    csrparser.hh
+                        iface.cc        iface.hh 
+                        stub_header.cc  stub_header.hh
+                        stub_server.cc  stub_server.hh
+                        stub_client.cc  stub_client.hh
                         csrgen_main.cc 
                         csrgen.hh)
 # -- EOF 

@@ -100,8 +100,8 @@ namespace csl
       std::string ret;
       size_t i;
 
-      ret  = "Interface: " + name_ + "\n";
-      ret += "\tversion:\t" + version_ + "\n";
+      ret  = "Interface: \"" + name_ + "\"\n";
+      ret += "\tversion:\t\"" + version_ + "\"\n";
       ret += "\tnamespace:\t" + namespc_ + "\n";
 
       ret += "Includes:\n";
@@ -134,7 +134,12 @@ namespace csl
 
     std::string iface::token_to_string(const token_info & ti) const
     {
-      return std::string( ti.ts, ti.p-ti.ts );
+      char * pos = ti.p;
+
+      while( isspace(*pos)  && ti.ts <= pos )
+        pos--;
+
+      return std::string( ti.ts, pos-ti.ts+1 );
     }
   };
 };

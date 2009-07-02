@@ -161,6 +161,23 @@ namespace csl
          */
         ustr substr(const size_t start, const size_t length) const;
 
+        /**
+        @brief trim spaces from string start and end positions
+        */
+        inline ustr trim() 
+        {
+            size_t start = npos, length = 0;
+
+            for ( size_t pos = 0; pos < size() ; pos ++ ) 
+            {
+                if ( start == npos && !isspace( (*this)[pos] )  )
+                    start = pos;
+                else if ( start != npos && !isspace( (*this)[pos] ) )
+                    length = pos - start + 1;
+            }
+            return substr(start,length);
+        }
+
         /* ------------------------------------------------------------------------ *
         **    char * operations
         ** ------------------------------------------------------------------------ */
@@ -289,6 +306,15 @@ namespace csl
         /* ------------------------------------------------------------------------ *
         **    wchar_t operations
         ** ------------------------------------------------------------------------ */
+
+        /* ------------------------------------------------------------------------ *
+        **    int64  operations
+        ** ------------------------------------------------------------------------ */
+        /**
+        @brief generates crc64 hash value from string
+        @returns signed 64 bit integer with CRC
+        */
+        int64 crc64() const;
 
         /* ------------------------------------------------------------------------ */
 
@@ -626,6 +652,14 @@ namespace csl
         this function delegates the conversion to v
          */
         bool from_var(const var & v) { return v.to_string(*this); }
+
+        /**
+        @brief serialize contents of objects
+        @param buf archiver class to/from serialize
+        @throw common::exc
+        */
+        virtual inline void serialize(arch & buf) { buf.serialize(*this); }
+
 
       private:
         tbuf<buf_size>   buf_;

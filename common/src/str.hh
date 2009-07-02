@@ -39,6 +39,8 @@ Credits: some techniques and code pieces are stolen from Christian
 #include "tbuf.hh"
 #include "var.hh"
 #include "binry.hh"
+#include "arch.hh"
+#include <wctype.h>
 #ifdef __cplusplus
 #include <string>
 
@@ -143,6 +145,23 @@ namespace csl
         @param length is the amount to be extracted
          */
         str substr(const size_t start, const size_t length) const;
+
+        /**
+        @brief extracts a substring from a given position
+        */
+        inline str trim()
+        {
+            size_t start = npos, length = 0;
+
+            for ( size_t pos = 0; pos < size() ; pos ++ )
+            {
+                if ( start == npos && !iswspace( (*this)[pos] )  )
+                    start = pos;
+                else if ( start != npos && !iswspace( (*this)[pos] ) )
+                    length = pos - start + 1;
+            }
+            return substr(start,length);
+        }
 
         /* ------------------------------------------------------------------------ *
         **    ustr operations
@@ -311,6 +330,15 @@ namespace csl
         @returns npos if not found or the position
          */
         size_t rfind(wchar_t w) const;
+
+        /* ------------------------------------------------------------------------ *
+        **    int64  operations
+        ** ------------------------------------------------------------------------ */
+        /** 
+        @brief generates crc64 hash value from string 
+        @returns signed 64 bit integer with CRC
+        */
+        int64 crc64() const;
 
         /* ------------------------------------------------------------------------ */
 
@@ -650,7 +678,13 @@ namespace csl
         this function delegates the conversion to v
          */
         inline bool from_var(const var & v) { return v.to_string(*this); }
-
+        
+        /** 
+        @brief serialize contents of objects
+        @param buf archiver class to/from serialize
+        @throw common::exc
+        */
+        virtual inline void serialize(arch & buf) { buf.serialize(*this); }
       private:
         tbuf<buf_size>   buf_;
     };

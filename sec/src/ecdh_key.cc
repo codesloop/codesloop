@@ -31,7 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <openssl/bn.h>
 #include <openssl/objects.h>
 #include "ustr.hh"
-#include "common.h"
+#include "csl_common.hh"
 
 /**
   @file ecdh_key.cc

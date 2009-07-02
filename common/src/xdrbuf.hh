@@ -31,11 +31,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief XDR helper to reduce XDR dependecies
 */
 
-#include "pbuf.hh"
 #include "common.h"
-#include "exc.hh"
-#include "str.hh"
-#include "ustr.hh"
+#include "pbuf.hh"
 #ifdef __cplusplus
 #include <utility>
 
@@ -43,6 +40,11 @@ namespace csl
 {
   namespace common
   {
+    class str;
+    class ustr;
+    class var;
+    class exc;
+
     /**
     @brief xdrbuf de/serializes data to a pbuf in XDR format
 
@@ -113,6 +115,17 @@ namespace csl
         xdrbuf & operator<<(const char * val);
 
         /**
+        @brief serialize val to variable
+        @param val is the value to be serialized
+        @return reference to xdrbuf
+        @throw common::exc
+
+        calls the matching xdr function based on
+        variable's implementation
+        */
+        xdrbuf & operator<<(const common::var & val);
+
+        /**
         @brief serialize val to pbuf
         @param val is the value to be serialized
         @return reference to xdrbuf
@@ -179,6 +192,14 @@ namespace csl
         @li reads a 32 bit integer from stream to val
         */
         xdrbuf & operator>>(uint32_t & val);
+
+        /**
+        @brief deserialize val from variable
+        @param val is the value to be deserialized
+        @return reference to xdrbuf
+        @throw common::exc
+         */
+        xdrbuf & operator>>(common::var & val);
 
         /**
         @brief deserialize val from pbuf

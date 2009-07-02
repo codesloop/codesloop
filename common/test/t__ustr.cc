@@ -218,6 +218,14 @@ namespace test_ustr {
     assert( s2 == "llo " );
   }
 
+  void test_trim0()
+  {
+    str s(L" hello world ");
+    assert( s.trim()  == L"hello world" );
+    str s2(L"hello world");
+    assert( s2.trim()  == L"hello world" );
+  }
+
   void to_integer_o()
   {
     ustr b("-111000999");
@@ -552,6 +560,7 @@ int main()
   csl_common_print_results( "pluseq             ", csl_common_test_timer_v0(test_pluseq),"" );
   csl_common_print_results( "find0              ", csl_common_test_timer_v0(test_find0),"" );
   csl_common_print_results( "substr0            ", csl_common_test_timer_v0(test_substr0),"" );
+  csl_common_print_results( "trim0              ", csl_common_test_timer_v0(test_trim0),"" );
 
   /* performance */
   csl_common_print_results( "str_baseline       ", csl_common_test_timer_v0(str_baseline),"" );

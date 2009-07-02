@@ -34,6 +34,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "var.hh"
 #include "dbl.hh"
 #include "tbuf.hh"
+#include "arch.hh"
 #ifdef __cplusplus
 
 namespace csl
@@ -344,6 +345,13 @@ namespace csl
         this function delegates the conversion to v
          */
         bool from_var(const var & v);
+
+        /**
+        @brief serialize contents of objects
+        @param buf archiver class to/from serialize
+        @throw common::exc
+        */
+        virtual inline void serialize(arch & buf) { buf.serialize(*this); }
     };
   }
 }

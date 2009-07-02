@@ -309,6 +309,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <wchar.h>
 #endif /*CSL_WCHAR_H_INCLUDED*/
 
+#ifndef CSL_STDARG_H_INCLUDED
+#define CSL_STDARG_H_INCLUDED
+#include <stdarg.h>
+#endif /*CSL_STDARG_H_INCLUDED*/
+
 #ifdef WIN32
 # ifndef __MINGW32__
 #  define getpid()  0

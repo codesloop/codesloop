@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -49,6 +49,7 @@ namespace csl
         case rs_conv_error:      return L"Cannot convert character.";
         case rs_invalid_state:   return L"Component state invalid.";
         case rs_lookup_error:    return L"Lookup error.";
+        case rs_out_of_memory:   return L"Out of memory.";
         case rs_unknown:
           default:               return L"Unknown reason";
       };
@@ -66,6 +67,7 @@ namespace csl
         case cm_str:       return L"common::str";
         case cm_ustr:      return L"common::ustr";
         case cm_hash:      return L"common::hash";
+        case cm_arch:      return L"common::arch";
         case cm_unknown:
           default:         return L"unknown component";
       };

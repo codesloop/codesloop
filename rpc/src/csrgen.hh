@@ -36,27 +36,27 @@ namespace csl
   {
   
     enum token_type {
-      TT_UNKNOWN    = 0,
-      TT_VERSION    = 1,
-      TT_NAME       = 2,
-      TT_NAMESPACE  = 3,
-      TT_INCLUDE    = 4,
-      TT_FUNCTION   = 5,
-      TT_DISPOSABLE_FUNCTION  = 6,
-      TT_FUNCTION_END = 7,
-      TT_PARAM_MOD  = 8,
-      TT_PARAM_TYPE = 9,
-      TT_PARAM_NAME = 10,
-      TT_COMMENT    = 11,
-      TT_LAST       = 12
+      TT_UNKNOWN    = 0,  ///< unknown token
+      TT_VERSION    = 1,  ///< interface version in X.Y.Z(.A) format
+      TT_NAME       = 2,  ///< interface name
+      TT_NAMESPACE  = 3,  ///< desired namespace
+      TT_INCLUDE    = 4,  ///< c++ include statement 
+      TT_FUNCTION   = 5,  ///< regular function
+      TT_DISPOSABLE_FUNCTION  = 6,  ///< function with disposable prefix
+      TT_FUNCTION_END = 7,  ///< } character
+      TT_PARAM_MOD  = 8,  ///< parameter modifier (input, output, etc.)
+      TT_PARAM_TYPE = 9,  ///< parameter type
+      TT_PARAM_NAME = 10, ///< parameter name
+      TT_COMMENT    = 11, ///< comment
+      TT_LAST       = 12 
     };
     extern const char * token_type_name[];
 
     enum param_kind {
-      MD_INPUT      = 0,
-      MD_OUTPUT     = 1,
-      MD_INOUT      = 2,
-      MD_EXCEPTION  = 3
+      MD_INPUT      = 0, ///< input parameter
+      MD_OUTPUT     = 1, ///< output parameter
+      MD_INOUT      = 2, ///< bidirectional parameter
+      MD_EXCEPTION  = 3  ///< server side exception 
     };
     extern const char * param_kind_name[];
 

@@ -34,6 +34,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "obj.hh"
 #include "pvlist.hh"
 #include "tbuf.hh"
+#include "exc.hh"
 #include "common.h"
 #ifdef __cplusplus
 
@@ -108,10 +109,10 @@ namespace csl
         /* forwarders */
 
         /* call global hash_code function. if that is not suitable define one yourself */
-        bool get(Obj & obj)        { return get( hash_code(obj) ,obj ); }
-        bool set(const Obj & obj)  { return set( hash_code(obj) ,obj ); }
+        bool get(Obj & o)        { return get( hash_code(o) ,o ); }
+        bool set(const Obj & o)  { return set( hash_code(o) ,o ); }
 
-        bool get(unsigned long long id, Obj & obj)
+        bool get(unsigned long long id, Obj & o)
         {
           entry e;
           unsigned long long entry_id;
@@ -134,10 +135,10 @@ namespace csl
           if( e.next_item_ != 0 ) { THR(exc::rs_invalid_state,exc::cm_hash,false); }
 
           /* lookup and return item */
-          return page_handler_.get(e.page_id_,id,obj);
+          return page_handler_.get(e.page_id_,id,o);
         }
 
-        bool set(unsigned long long id, const Obj & obj)
+        bool set(unsigned long long id, const Obj & o)
         {
           entry e;
           unsigned long long entry_id;
@@ -165,7 +166,7 @@ namespace csl
              - page handler is expected to return true if succeed and
              - false if the page is full */
 
-          if( !page_handler_.insert(id,obj,e) )
+          if( !page_handler_.insert(id,o,e) )
           {
             /* the page is full so we need to split the entry.
                here we expect that e will be updated

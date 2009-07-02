@@ -23,6 +23,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <typeinfo>
 #include "obj.hh"
 
 /**
@@ -38,6 +39,17 @@ namespace csl
     obj::obj() : logger_flags_(0)
     {
     }
+
+    const char * obj::get_class_name()
+    {
+      return typeid( *this ).name();
+    }
+
+    bool obj::is_kind_of( obj & o )
+    {
+      return typeid( *this ) == typeid( o );
+    }
+
 
     /* public interface */
   };

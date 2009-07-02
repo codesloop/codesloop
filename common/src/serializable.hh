@@ -1,15 +1,15 @@
 /*
 Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
-Redistribution and use in source and binary forms, with or without
+Rediserializableibution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
 are met:
 
-1. Redistributions of source code must retain the above copyright
+1. Rediserializableibutions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-2. Redistributions in binary form must reproduce the above copyright
+2. Rediserializableibutions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
-   documentation and/or other materials provided with the distribution.
+   documentation and/or other materials provided with the diserializableibution.
 
 THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
 IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -18,49 +18,35 @@ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
 INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
 NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
 DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+THEORY OF LIABILITY, WHETHER IN CONTRACT, serializableICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef _csl_common_serializable_hh_included_
+#define _csl_common_serializable_hh_included_
+
 /**
-  @file ex_sql1.cc
-  @brief basic slt3 demonstration using exceptions
+   @file serializable.hh
+   @brief super class of all csl serializables
+   @todo document me
  */
 
-#include "str.hh"
-#include "csl_slt3.hh"
-#include "common.h"
+#ifdef __cplusplus
 
-using namespace csl::slt3;
-using namespace csl::common;
-
-int main()
+namespace csl
 {
-  conn c;
-
-  try
+  namespace common
   {
-    c.open("testme.db");
-
-    /* start a transaction */
-    tran t(c);
-
-    /* create a query object */
-    query q(t);
-
-    q.execute("create table test(i int);");
+    /** @brief superclass of all codesloop serializables */
+    class serializable
+    {
+    public:
+      virtual void serialize(class arch & buf) = 0;
+      virtual inline ~serializable() {}
+    };
   }
-  catch( csl::slt3::exc e )
-  {
-    str s;
-    e.to_string(s);
-
-    FPRINTF(stderr,L"Exception caught: %ls\n",s.c_str());
-  }
-
-  return 0;
 }
 
-/* EOF */
-
+#endif /* __cplusplus */
+#endif /* _csl_common_serializable_hh_included_ */

@@ -18,5 +18,6 @@ Modules
 *  *comm module* : _under construction_ (the first to complete: UDP based secured unicast and multicast communication)
 *  *slt3 module* : SQLite3 helpers including a simple Object Relational Mapper (ORM)
 *  *sched module* : _under construction_ (distributed schedule)
+*  *rpc module* : _under construction_ (secure and fast remote procedure call implementation for C++ applications)
 
 [Codesloop home](http://codesloop.blogspot.com/)

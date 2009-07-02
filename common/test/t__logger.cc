@@ -33,10 +33,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DEBUG 
 
 #include "logger.hh"
+#include "obj.hh"
 #include "exc.hh"
 #include "common.h"
 #include "str.hh"
 #include <assert.h>
+#include "test_timer.h"
 #include <sys/stat.h>
 
 #define LOG_TEST_MSG L"logger test"
@@ -48,7 +50,7 @@ using csl::common::str;
 namespace test_logger
 {
   /**@brief test class for logging */
-  class logtest
+  class logtest : public csl::common::obj
   {
     public:
 
@@ -57,7 +59,7 @@ namespace test_logger
       {
         ENTER_FUNCTION();
 
-        CSL_DEBUG( str(L"parameter: ") + sz  );
+        CSL_DEBUGF( L"parameter: %ls", sz  );
 
         RETURN_FUNCTION( 0x12345678 );
       }
@@ -73,6 +75,14 @@ namespace test_logger
 
   /**@test simple LEAVE_FUNCTION test */
   void void_function()
+  {
+    ENTER_FUNCTION();
+
+    LEAVE_FUNCTION();
+  }
+
+  /**@test simple LEAVE_FUNCTION test */
+  void void_nolog_function()
   {
     ENTER_FUNCTION();
 

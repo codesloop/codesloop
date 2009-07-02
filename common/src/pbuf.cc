@@ -24,6 +24,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "pbuf.hh"
+#include "arch.hh"
 
 /**
    @file pbuf.cc
@@ -159,6 +160,11 @@ namespace csl
       }
       if( thit != thend ) return false;
       return true;
+    }
+
+    void pbuf::serialize(arch & ar)
+    {
+      ar.serialize( *this );
     }
   }
 }

@@ -34,6 +34,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mpool.hh"
 #include "common.h"
 #include "test_timer.h"
+#include "str.hh"
+#include "ustr.hh"
+#include "exc.hh"
 #include <assert.h>
 
 using namespace csl::common;

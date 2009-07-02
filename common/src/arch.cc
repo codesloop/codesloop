@@ -23,68 +23,60 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "bignum.hh"
-#include "csl_common.hh"
+#include "arch.hh"
+#include "common.h"
+#include <memory>
+#include "exc.hh"
+#include "var.hh"
+#include "xdrbuf.hh"
 
 /**
-  @file bignum.cc
-  @brief big number helper w/ XDR features
- */
-
-using csl::common::xdrbuf;
+   @file arch.cc
+   @brief arch saves a complex network of objects in a permanent binary form 
+*/
 
 namespace csl
 {
-  namespace sec
+  namespace common
   {
-    bool bignum::to_xdr(xdrbuf & buf) const
+    arch::arch( direction d ) 
+      : direction_(d) 
     {
-      bool ret = true;
-      try
-      {
-        int32_t is_neg = (is_negative() == true ? 1 : 0);
-        buf << is_neg;
-        /* should be 0 or 1 */
-        if( is_neg != 0 && is_neg != 1 ) return false;
-        xdrbuf::bindata_t bin(data(),size());
-        buf << bin;
-      }
-      catch( csl::common::exc e )
-      {
-        ret = false;
-      }
-      return ret;
+      pbuf_ = new pbuf;
+      xdrbuf_ = new xdrbuf(*pbuf_);
+
+      if ( !pbuf_ || !xdrbuf_ )
+        throw common::exc(exc::rs_out_of_memory,exc::cm_arch,L"",L""__FILE__,__LINE__);
     }
 
-    bool bignum::from_xdr(xdrbuf & buf)
+    arch::~arch() 
     {
-      bool ret = true;
-      try
-      {
-        int32_t is_neg = 0;
-        buf >> is_neg;
-        unsigned int allocated=0;
-        ret = buf.get_data( buf_,allocated,2048 );
-        if( ret ) is_negative((is_neg == 0 ? false : true));
-        else      return false;
-      }
-      catch( csl::common::exc e )
-      {
-        ret = false;
-      }
-      return ret;
+      if ( pbuf_ )
+        delete pbuf_;
+      if ( xdrbuf_ )
+        delete xdrbuf_;
     }
 
-    void bignum::print() const
+    unsigned int arch::size() const
     {
-      const unsigned char * d = data();
-      unsigned int len = size();
-      PRINTF(L"BIGNUM[%d bytes]: neg[%d]: ",len,is_negative());
-      for( unsigned int i=0;i<len;++i )
-      {
-        PRINTF(L"%02x",d[i] );
-      }
-      PRINTF(L"\n");
+      return pbuf_->size();
+    }
+
+    pbuf * arch::get_pbuf() const
+    { 
+      return pbuf_;
+    }
+    
+    void arch::set_pbuf( const pbuf & src ) 
+    { 
+      *pbuf_ = src;
+      if ( xdrbuf_ )
+        delete xdrbuf_;
+
+      xdrbuf_ = new xdrbuf(*pbuf_);
+
+      if ( !xdrbuf_ )
+        throw common::exc(exc::rs_out_of_memory,exc::cm_arch,L"",L""__FILE__,__LINE__);
     }
   }
 }

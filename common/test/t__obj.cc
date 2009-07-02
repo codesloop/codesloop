@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, Beck David, Tamas Foldi
+   Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -21,57 +21,39 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 */
 
-#include <stdio.h>
-#include <string.h>
-#include <string>
-#include <iostream>
-#include <fstream>
 
-#include "csrparser.hh"
+/**
+   @file t__obj.cc
+   @brief Tests to verify logger
+ */
 
-#include "stub_header.hh"
-#include "stub_client.hh"
-#include "stub_server.hh"
+#define DEBUG 
 
-using namespace csl::rpc;
+#include "common.h"
+#include "obj.hh"
+#include "str.hh"
+#include "ustr.hh"
+#include <assert.h>
+#include <sys/stat.h>
 
-int  main(  int  argc,  char  **argv  )
+using namespace csl::common;
+
+int main()
 {
-  std::string buffer;
-  csrparser p;
-  int ret = 0;
+  str s;
+  ustr us;
+  str * s2 = new str();
+  ustr * us2 = new ustr();
 
-  if ( argc == 1 ) 
-  {
-    fprintf(stderr, "usage: %s <filename>\n", argv[0] );
-    exit(1);
-  } else {
-    std::ifstream in( argv[1] );
-    if ( in.good() )
-    {
-      buffer = std::string(std::istreambuf_iterator<char>(in),std::istreambuf_iterator<char>());
-    } else {
-      fprintf(stderr, "%s: can not open file \"%s\"\n", argv[0], argv[1] );
-      exit(1);
-    }
-  }
-  
-  ret = p.parse( 
-      const_cast<char*>(buffer.c_str()),                 // file content
-      const_cast<char*>(buffer.c_str()) + buffer.size()  // end of file
-    );          
-  
+  assert( s.is_kind_of( *s2 ) );
+  assert( us.is_kind_of( *us2 ) );
+  assert( !s.is_kind_of( us ) );
+  assert( !us.is_kind_of( *s2 ) );
 
-  stub_header::generate( p.get_iface() );
-//  stub_client::generate( p.get_iface() );
-//  stub_server::generate( p.get_iface() );
-
-  if ( ret != 0 )
-    exit(0);
-
-  return 0;
+  delete s2;
+  delete us2;
 }
 
+/* EOF */

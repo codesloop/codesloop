@@ -23,56 +23,33 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
  
-#ifndef _csl_rpc_csrparser_hh_included_
-#define _csl_rpc_csrparser_hh_included_
+#ifndef _csl_rpc_stub_client_hh_included_
+#define _csl_rpc_stub_client_hh_included_
 
 #include "common.h"
 #ifdef __cplusplus
 #include "obj.hh"
 #include "iface.hh"
+#include "csrgen.hh"
 
 namespace csl 
-{
-  /** @brief remote procedure call related classes
-   * 
-   * "rpc" namespace is responsible for codesloop
-   * remote procedure call implementation, like
-   * stub generation, serialization and transport 
-   * management, etc. 
-   */
+{ 
   namespace rpc 
   {
- 
-    /** @brief codesloop rpc interface parser */
-    class csrparser : public csl::common::obj
+    /** @brief stores parsed interface description */
+    class stub_client : public csl::common::obj
     {
-    public:
-      /** @brief default constructor */
-      csrparser();
-
-      /** @brief parse input 
-       *
-       * @param start pointer to char * data to parse
-       * @param end pointer of "eof"
-       * @return 0 on success, otherwise 1
-       */
-      int parse(char * start, char * end); 
-
-      /** @brief return parsed interface descriptor
-       *
-       * @return const pointer to interface descriptor
-       */
-      const iface * get_iface() const { return &iface_; }
-
     private:
-      void reset();
-      void save();
-      void print_error(const char * error_msg) const;
-      iface iface_;
-      token_info token_;
-    }; 
+      stub_client();
+
+    public:
+      static void generate(const iface *);
+
+    };
+
+
   }
 }
 
 #endif /* __cplusplus */
-#endif /* _csl_rpc_csrparser_hh_included_ */
+#endif /* _csl_rpc_stub_client_hh_included_ */

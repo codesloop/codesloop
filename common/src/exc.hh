@@ -57,6 +57,7 @@ namespace csl
           rs_conv_error,     ///<Cannot convert character
           rs_invalid_state,  ///<Component state invalid
           rs_lookup_error,   ///<Lookup error.
+          rs_out_of_memory,  ///<Can not allocate memory
         };
 
         enum {
@@ -69,6 +70,7 @@ namespace csl
           cm_str,     ///<str component
           cm_ustr,    ///<ustr component
           cm_hash,    ///<hash component
+          cm_arch,    ///<archiver component
         };
 
         /** @brief converts reason code to string */
