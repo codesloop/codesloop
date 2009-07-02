@@ -59,7 +59,7 @@ namespace csl
     active items. an other contains the free items to be reused. the third list contains the items that
     are about to be pushed (under preparation).
      */
-    template <typename T,int MaxSize> class circbuf
+    template <typename T,unsigned long long MaxSize> class circbuf
     {
       private:
         /**
@@ -70,6 +70,9 @@ namespace csl
           item * next_;
           item * prev_;
           T *    item_;
+
+          // this is done in circbuf::circbuf() :
+          // inline item() : next_(0), prev_(0), item_(0) {}
 
           inline ~item() { if(item_) delete item_; }
 
@@ -102,7 +105,7 @@ namespace csl
 
       public:
         /** @brief default constructor */
-        inline circbuf() : n_items_(0), size_(0)
+        inline circbuf() : n_items_(0), size_(0), max_(MaxSize)
         {
           head_.next_ = &head_;
           head_.prev_ = &head_;
@@ -113,6 +116,7 @@ namespace csl
           preplist_.next_ = &preplist_;
           preplist_.prev_ = &preplist_;
           preplist_.item_ = 0;
+          if( max_ == 0 ) max_ = 1023ULL*4095ULL*1023ULL*0xFFFFFFFF;
         }
 
         /**
@@ -146,7 +150,7 @@ namespace csl
           item * ret = freelist_.unlink_before();
           if( ret == 0 )
           {
-            if( n_items_ < MaxSize )
+            if( n_items_ < max_ )
             {
               ++size_;
               ret = new item();
@@ -180,9 +184,9 @@ namespace csl
               head_.link_after( it );
 
               ++n_items_;
-              if( n_items_ > MaxSize )
+              if( n_items_ > max_ )
               {
-                n_items_ = MaxSize;
+                n_items_ = max_;
                 on_full();
               }
               on_new_item();
@@ -228,9 +232,9 @@ namespace csl
           ++n_items_;
           item * ret = 0;
 
-          if( n_items_ > MaxSize )
+          if( n_items_ > max_ )
           {
-            n_items_ = MaxSize;
+            n_items_ = max_;
             ret = head_.unlink_before();
             head_.link_after( ret );
             on_full();
@@ -262,6 +266,8 @@ namespace csl
 
         on_empty() and on_del_item() may be signaled depending on the state of the
         active list.
+
+        @todo 2-step pop is also needed
          */
         inline T & pop()
         {
@@ -331,8 +337,8 @@ namespace csl
           return *(head_.prev_->item_);
         }
 
-        unsigned int n_items() { return n_items_; } ///<returns the number of active items
-        unsigned int size()    { return size_;    } ///<returns the number of all allocated items
+        unsigned long long n_items() { return n_items_; } ///<returns the number of active items
+        unsigned long long size()    { return size_;    } ///<returns the number of all allocated items
 
         /* event upcalls */
         inline virtual void on_new_item() {} ///<event upcall: called when new item is placed into the list
@@ -344,12 +350,13 @@ namespace csl
         inline bool use_exc() const     { return use_exc_; }  ///<checks the exception usage
 
       private:
-        unsigned int  n_items_;  ///<the number of active items
-        unsigned int  size_;     ///<the number of allocated items
-        item          head_;     ///<head of active list
-        item          freelist_; ///<head of free list
-        item          preplist_; ///<head of preapred (reserved) item list
-        bool          use_exc_;  ///<use exceptions?
+        unsigned long long  n_items_;  ///<the number of active items
+        unsigned long long  size_;     ///<the number of allocated items
+        unsigned long long  max_;      ///<the maximum number of items to be stored
+        item                head_;     ///<head of active list
+        item                freelist_; ///<head of free list
+        item                preplist_; ///<head of preapred (reserved) item list
+        bool                use_exc_;  ///<use exceptions?
     };
   }
 }

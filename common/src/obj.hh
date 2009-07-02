@@ -1,15 +1,15 @@
 /*
 Copyright (c) 2008,2009, Tamas Foldi, David Beck
 
-Rediobjibution and use in source and binary forms, with or without
+Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
 are met:
 
-1. Rediobjibutions of source code must retain the above copyright
+1. Redistributions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-2. Rediobjibutions in binary form must reproduce the above copyright
+2. Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
-   documentation and/or other materials provided with the diobjibution.
+   documentation and/or other materials provided with the distribution.
 
 THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
 IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -43,9 +43,14 @@ namespace csl
     class obj
     {
       public:
-        obj();
+        obj();                    ///<constructor
+        virtual inline ~obj() {}  ///<destructor
 
-        virtual inline ~obj() {}
+        inline bool use_exc() const     { return use_exc_;  } ///<checks exception usage
+        inline void use_exc(bool yesno) { use_exc_ = yesno; } ///<adjust exception usage
+
+      private:
+        bool use_exc_; ///<use exceptions?
 
       protected:
         int logger_flags_; ///< enable or disable per instance logging

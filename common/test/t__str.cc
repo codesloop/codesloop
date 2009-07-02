@@ -254,7 +254,9 @@ namespace test_str {
   void to_string_so()
   {
     str b("árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
+    b.use_exc(true);
     str o;
+    o.use_exc(true);
     assert( b.to_string(o) == true );
     assert( b == o );
     assert( o == L"árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP" );
@@ -263,7 +265,9 @@ namespace test_str {
   void to_string_su()
   {
     str b(L"árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
+    b.use_exc(true);
     ustr o;
+    o.use_exc(true);
     assert( b.to_string(o) == true );
     assert( o == "árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP" );
     assert( b == o );
@@ -272,6 +276,7 @@ namespace test_str {
   void to_string_ss()
   {
     str b(L"árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
+    b.use_exc(true);
     std::string o;
     assert( b.to_string(o) == true );
     assert( o == "árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP" );
@@ -281,6 +286,7 @@ namespace test_str {
   void to_binary_o()
   {
     str b("árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
+    b.use_exc(true);
     binry o;
     assert( b.to_binary(o) == true );
     assert( b == reinterpret_cast<const wchar_t *>(o.value().data()) );
@@ -289,6 +295,7 @@ namespace test_str {
   void to_binary_u()
   {
     str b("árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
+    b.use_exc(true);
     unsigned char o[300];
     size_t sz = 0;
     assert( b.to_binary(o,sz) == true );
@@ -300,6 +307,7 @@ namespace test_str {
   void to_binary_v()
   {
     str b("árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
+    b.use_exc(true);
     unsigned char o[300];
     void * vp = o;
     size_t sz = 0;
@@ -384,6 +392,7 @@ namespace test_str {
   void from_string_sc()
   {
     str b;
+    b.use_exc(true);
     assert( b.from_string("árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP") == true );
     assert( b == "árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP" );
   }
@@ -391,6 +400,7 @@ namespace test_str {
   void from_string_sw()
   {
     str b;
+    b.use_exc(true);
     assert( b.from_string(L"árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP") == true );
     assert( b == "árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP" );
   }
@@ -398,7 +408,9 @@ namespace test_str {
   void from_binary_o()
   {
     str b;
+    b.use_exc(true);
     binry o;
+    o.use_exc(true);
     assert( o.from_string(L"árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP") == true );
     assert( b.from_binary(o) == true );
     assert( b == "árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP" );
@@ -407,7 +419,9 @@ namespace test_str {
   void from_binary_u()
   {
     str b;
+    b.use_exc(true);
     str o(L"árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
+    o.use_exc(true);
     assert( b.from_binary( o.buffer().data(), o.buffer().size() ) == true );
     assert( b == "árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP" );
   }
@@ -415,7 +429,9 @@ namespace test_str {
   void from_binary_v()
   {
     str b;
+    b.use_exc(true);
     str o(L"árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
+    o.use_exc(true);
     assert( b.from_binary( reinterpret_cast<const void *>(o.buffer().data()), o.buffer().size() ) == true );
     assert( b == "árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP" );
   }
@@ -440,6 +456,17 @@ using namespace test_str;
 
 int main()
 {
+  const char * strs[] = { "LC_ALL", "LANG", "LC_CTYPE", "LC_MESSAGES", 0 };
+  const char ** strp = strs;
+
+  while( *strp )
+  {
+    if( getenv(*strp) == 0 )
+    {
+      fprintf(stderr,"Warning '%s' has not been set\n",*strp);
+    }
+    ++strp;
+  }
 
   if (!setlocale(LC_CTYPE, ""))
   {
@@ -448,6 +475,8 @@ int main()
   }
 
   str s( L"HELLO" );
+  s.use_exc(true);
+
   assert( s.nbytes() == 6*sizeof(wchar_t) );
   assert( s.empty() == false );
   assert( s.size() == 5 );
@@ -457,10 +486,14 @@ int main()
   assert( s[1] == L'E' );
 
   str s2 = s;
+  s2.use_exc(true);
+
   assert( s2.size() == 5 );
   assert( wcscmp(s2.c_str(), L"HELLO") == 0 );
 
   str s3(s);
+  s3.use_exc(true);
+
   assert( s3.size() == 5 );
   assert( wcscmp(s3.c_str(), L"HELLO") == 0 );
 
@@ -473,6 +506,8 @@ int main()
   assert( wcscmp(s2.c_str(), L"ELLWORLD") == 0 );
 
   str cs( "HELLO" );
+  cs.use_exc(true);
+
   assert( cs.size() == 5 );
   assert( wcscmp(cs.c_str(), L"HELLO") == 0 );
 

@@ -80,6 +80,7 @@ ADD_LIBRARY( csl_common STATIC
              mpool.hh      tbuf.hh 
              logger.cc     logger.hh
              obj.cc        obj.hh
+             hash.cc       hash.hh
              var.hh
              int64.cc      int64.hh
              dbl.cc        dbl.hh

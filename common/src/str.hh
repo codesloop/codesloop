@@ -379,7 +379,7 @@ namespace csl
 
         /** @brief returns a const pointer to internal data */
         inline const unsigned char * ucharp_data() const { return buf_.data(); }
-        
+
         /** @brief returns the size of the variable data */
         inline size_t var_size() const { return buf_.size(); }
 
