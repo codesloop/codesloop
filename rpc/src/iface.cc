@@ -136,7 +136,8 @@ namespace csl
     {
       char * pos = ti.p;
 
-      while( isspace(*pos)  && ti.ts <= pos )
+      // rtrim spaces, array decls and param separators
+      while( (isspace(*pos)||*pos==','||*pos=='[') && ti.ts <= pos )
         pos--;
 
       return std::string( ti.ts, pos-ti.ts+1 );

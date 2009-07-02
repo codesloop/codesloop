@@ -97,10 +97,15 @@ namespace csl
       \---------------------------------------------------------*/
       iface::function_iterator func_it = ifc->get_functions()->begin();
       iface::func::param_iterator param_it;
+      int func_seq = 0;
 
       while ( func_it != ifc->get_functions()->end() )
       {
         param_it = (*func_it).params.begin();
+
+        output 
+          << ls << "#define __func_"  << ifname.c_str()  << "_"
+          << (*func_it).name << "_id " << func_seq++ << endl;
 
         output << ls << "void " << (*func_it).name << " (" << endl;
 
