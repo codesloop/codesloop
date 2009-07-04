@@ -23,41 +23,22 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "exc.hh"
+#include "cexc.hh"
 #include "str.hh"
 #include "common.h"
 
 /**
-  @file csl_common/src/exc.cc
-  @brief implementation of common::exc
+  @file csl_common/src/cexc.cc
+  @brief implementation of common::cexc
  */
 
 namespace csl
 {
   namespace common
   {
-    const wchar_t * exc::reason_string(int rc)
+    void cexc::to_string(str & res)
     {
-      switch( rc )
-      {
-        case rs_invalid_param:   return L"Invalid parameter received";
-        case rs_cannot_append:   return L"Cannot append data to pbuf";
-        case rs_cannot_get:      return L"Cannot get data from pbuf";
-        case rs_xdr_eof:         return L"End of XDR data";
-        case rs_xdr_invalid:     return L"Invalid XDR data";
-        case rs_empty:           return L"Empty container.";
-        case rs_conv_error:      return L"Cannot convert character.";
-        case rs_invalid_state:   return L"Component state invalid.";
-        case rs_lookup_error:    return L"Lookup error.";
-        case rs_out_of_memory:   return L"Out of memory.";
-        case rs_unknown:
-          default:               return L"Unknown reason";
-      };
-    }
-
-    void exc::to_string(str & res)
-    {
-      str t(L"Exception");
+      str t(L"exception");
       if( file_.size() > 0 && line_ > 0 )
       {
         wchar_t tx[200];
@@ -73,15 +54,21 @@ namespace csl
       res = t;
     }
 
-    str exc::to_string() 
+    str cexc::to_string() 
     {
       str ret;
       to_string(ret);
       return ret;
     }
 
-    exc::exc() : reason_(rs_unknown), component_(L"unknown") {}
-    exc::~exc() {}
+    const wchar_t * cexc::reason_string(int rc)
+    {
+        return L"unknown";
+    }
+
+
+    cexc::cexc() : reason_(0), component_(L"unknown") {}
+    cexc::~cexc() {}
     /* public interface */
   };
 };

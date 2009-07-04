@@ -23,12 +23,12 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_common_exc_hh_included_
-#define _csl_common_exc_hh_included_
+#ifndef _csl_common_cexc_hh_included_
+#define _csl_common_cexc_hh_included_
 
 /**
-   @file csl_common/src/exc.hh
-   @brief common exception class for common
+   @file csl_common/src/cexc.hh
+   @brief common base exception class for codesloop classes
  */
 
 #include "str.hh"
@@ -40,51 +40,35 @@ namespace csl
   namespace common
   {
     /**
-    @brief common exception class used by common classes
+    @brief common base exception class for codesloop classes
 
-    this class is used by the common classes as an exception to be thrown
+    this class is used as base class when a module implements its 
+    own exception
      */
-    class exc
+    class cexc
     {
       public:
-        enum {
-          rs_unknown,        ///<Unknown error.
-          rs_invalid_param,  ///<Invalid parameter received
-          rs_cannot_append,  ///<Cannot append to pbuf
-          rs_cannot_get,     ///<Cannot get data
-          rs_xdr_eof,        ///<End of xdr data.
-          rs_xdr_invalid,    ///<Invald xdr data
-          rs_empty,          ///<Empty container
-          rs_conv_error,     ///<Cannot convert character
-          rs_invalid_state,  ///<Component state invalid
-          rs_lookup_error,   ///<Lookup error.
-          rs_out_of_memory,  ///<Can not allocate memory
-        };
-
         /** @brief converts reason code to string */
         static const wchar_t * reason_string(int rc);
 
-        /** @brief converts component code to string */
-        static const wchar_t * component_string(int cm);
-
         /** @brief converts exception to string 
         @param res string to store result */
-        void to_string(str & res);
+        virtual void to_string(str & res);
 
         /** @brief converts exception to string */
-        str to_string();
+        virtual str to_string();
 
         /** @brief constructor 
         *   @param component that caused the exception
         */
-        exc(const wchar_t * component)
-        : reason_(rs_unknown), component_(component), line_(0) {}
+        cexc(const wchar_t * component)
+        : reason_(0), component_(component), line_(0) {}
 
         /** @brief constructor
         *   @param reason is to tell why
         *   @param component that cause the exception
         */
-        exc(int reason, const wchar_t * component)
+        cexc(int reason, const wchar_t * component)
         : reason_(reason), component_(component), line_(0) {}
 
         /** @brief constructor
@@ -92,7 +76,7 @@ namespace csl
         *   @param component that cause the exception
         *   @param txt provides some explanation
         */
-        exc(int reason, const wchar_t * component, const wchar_t * txt)
+        cexc(int reason, const wchar_t * component, const wchar_t * txt)
         : reason_(reason), component_(component), text_(txt), line_(0) {}
 
         /** @brief constructor
@@ -102,10 +86,10 @@ namespace csl
         *   @param file tells which source file caused the error
         *   @param lin tells which line cause the error
         */
-        exc(int reason, const wchar_t * component, const wchar_t * txt, const wchar_t * file, unsigned int line)
+        cexc(int reason, const wchar_t * component, const wchar_t * txt, const wchar_t * file, unsigned int line)
         : reason_(reason), component_(component), text_(txt), file_(file), line_(line) {}
 
-        ~exc();
+        ~cexc();
 
         int reason_;        ///<reason code: one of rs_*
         str component_;     ///<component name
@@ -113,11 +97,11 @@ namespace csl
         str file_;          ///<error source file
         unsigned int line_; ///<error posintion in source file
 
-      private:
-        exc();
+      protected:
+        cexc();
     };
   }
 }
 
 #endif /* __cplusplus */
-#endif /* _csl_common_exc_hh_included_ */
+#endif /* _csl_common_cexc_hh_included_ */
