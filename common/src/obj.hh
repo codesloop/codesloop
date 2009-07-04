@@ -51,22 +51,15 @@ namespace csl
     {
       public:
         obj();                    ///<constructor
-        virtual inline ~obj() {}  ///<destructor
 
         inline bool use_exc() const     { return use_exc_;  } ///<checks exception usage
         inline void use_exc(bool yesno) { use_exc_ = yesno; } ///<adjust exception usage
 
-        /** XXX: @brief implemented by CSL_OBJ macro */
-        //static const char * get_class_name();
 
-        /** @brief returns true when the objects have the same type */
-        virtual bool is_kind_of( obj & o );
 
       protected:
         int logger_flags_; ///< enable or disable per instance logging
-
-      private:
-        bool use_exc_; ///<use exceptions?
+        bool use_exc_;     ///<use exceptions?
     };
   }
 }

@@ -40,12 +40,6 @@ namespace csl
     {
     }
 
-    bool obj::is_kind_of( obj & o )
-    {
-      return typeid( *this ) == typeid( o );
-    }
-
-
     /* public interface */
   };
 };
