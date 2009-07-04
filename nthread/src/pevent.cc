@@ -98,7 +98,7 @@ namespace csl
 
     // no-copy
     pevent::pevent(const pevent & other) 
-      : impl_( reinterpret_cast<impl *>(0) ) { throw nthread::exc(exc::rs_not_implemented,exc::cm_pevent); }
+      : impl_( reinterpret_cast<impl *>(0) ) { throw nthread::exc(exc::rs_not_implemented,L"csl::nthread::event"); }
 
     pevent & pevent::operator=(const pevent & other) { return *this; }
   }

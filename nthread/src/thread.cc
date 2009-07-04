@@ -105,7 +105,7 @@ namespace csl
 
     // no-copy
     thread::thread(const thread & other) 
-      : impl_( reinterpret_cast<impl *>(0) ) { throw nthread::exc(exc::rs_not_implemented,exc::cm_thread); }
+      : impl_( reinterpret_cast<impl *>(0) ) { throw nthread::exc(exc::rs_not_implemented,L"csl::nthread::thread"); }
 
     thread & thread::operator=(const thread & other) { return *this; }
   }

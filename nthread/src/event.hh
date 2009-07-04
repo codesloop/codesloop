@@ -63,7 +63,7 @@ namespace csl
        and also to notify all waiting threads. for the latter the user does not need
        to specify the number of events to be posted
      */
-    class event
+    class event 
     {
     public:
       /** @brief constructor */

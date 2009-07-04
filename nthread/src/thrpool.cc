@@ -87,7 +87,7 @@ namespace csl
                 {
                   if( pool_->start_one() == false )
                   {
-                    THRNORET(nthread::exc::rs_start_error, nthread::exc::cm_thrpool);
+                      //XXX: todo, handle exc - THRNORET(nthread::exc::rs_start_error);
                   }
                 }
 
@@ -190,10 +190,10 @@ namespace csl
                         unsigned int timeoutt, unsigned int attemptst,
                         event & ev, thread::callback & handler )
     {
-      if( maxt < mint )             { THR(nthread::exc::rs_invalid_param, nthread::exc::cm_thrpool,false); }
-      if( mint < 1 || maxt > 2000 ) { THR(nthread::exc::rs_invalid_param, nthread::exc::cm_thrpool,false); }
-      if( attemptst == 0 )          { THR(nthread::exc::rs_invalid_param, nthread::exc::cm_thrpool,false); }
-      if( timeoutt == 0 )           { THR(nthread::exc::rs_invalid_param, nthread::exc::cm_thrpool,false); }
+      if( maxt < mint )             { THR(nthread::exc::rs_invalid_param, false); }
+      if( mint < 1 || maxt > 2000 ) { THR(nthread::exc::rs_invalid_param, false); }
+      if( attemptst == 0 )          { THR(nthread::exc::rs_invalid_param, false); }
+      if( timeoutt == 0 )           { THR(nthread::exc::rs_invalid_param, false); }
 
       if( count() > 0 )
       {
@@ -201,7 +201,7 @@ namespace csl
         {
           if( unpolite_stop() == false )
           {
-            THR(nthread::exc::rs_stop_error, nthread::exc::cm_thrpool,false);
+            THR(nthread::exc::rs_stop_error, false);
           }
         }
       }
@@ -221,7 +221,7 @@ namespace csl
       {
         if( start_one() == false )
         {
-          THR(nthread::exc::rs_start_error, nthread::exc::cm_thrpool,false);
+          THR(nthread::exc::rs_start_error, false);
         }
       }
 

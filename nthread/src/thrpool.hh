@@ -42,8 +42,9 @@ namespace csl
   namespace nthread
   {
     /** @todo document me */
-    class thrpool
+    class thrpool: public csl::common::obj
     {
+      CSL_OBJ(csl::nthread,thrpool);
       public:
         thrpool();
         virtual ~thrpool();
