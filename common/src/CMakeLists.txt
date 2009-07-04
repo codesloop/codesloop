@@ -70,6 +70,7 @@ ENDIF(WIN32)
 ADD_DEFINITIONS( -DDEBUG) 
 
 ADD_LIBRARY( csl_common STATIC
+             cexc.cc       cexc.hh
              exc.cc        exc.hh
              zfile.cc      zfile.hh
              pbuf.cc       pbuf.hh
