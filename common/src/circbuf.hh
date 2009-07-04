@@ -59,8 +59,9 @@ namespace csl
     active items. an other contains the free items to be reused. the third list contains the items that
     are about to be pushed (under preparation).
      */
-    template <typename T,unsigned long long MaxSize> class circbuf
+    template <typename T,unsigned long long MaxSize> class circbuf : public obj
     {
+      CSL_OBJ(csl::common,circuf);
       private:
         /**
         @brief internal list-item type to store the user's items
@@ -278,7 +279,7 @@ namespace csl
             ++size_;
             item * x = new item();
             freelist_.link_after(x);
-            THR(common::exc::rs_empty,common::exc::cm_circbuf,*(x->item_));
+            THR(common::exc::rs_empty,*(x->item_));
           }
 
           if( n_items_ == 1 ) { on_empty(); }
@@ -294,7 +295,7 @@ namespace csl
             ++size_;
             item * x = new item();
             freelist_.link_after(x);
-            THR(common::exc::rs_empty,common::exc::cm_circbuf,*(x->item_));
+            THR(common::exc::rs_empty,*(x->item_));
           }
 
           on_del_item();
@@ -314,7 +315,7 @@ namespace csl
             ++size_;
             item * x = new item();
             freelist_.link_after(x);
-            THR(common::exc::rs_empty,common::exc::cm_circbuf,*(x->item_));
+            THR(common::exc::rs_empty,*(x->item_));
           }
           return *(head_.next_->item_);
         }
@@ -332,7 +333,7 @@ namespace csl
             ++size_;
             item * x = new item();
             freelist_.link_after(x);
-            THR(common::exc::rs_empty,common::exc::cm_circbuf,*(x->item_));
+            THR(common::exc::rs_empty,*(x->item_));
           }
           return *(head_.prev_->item_);
         }

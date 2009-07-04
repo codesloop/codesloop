@@ -88,7 +88,7 @@ namespace test_xdrbuf {
     {
       caught = true;
       assert( e.reason_    == csl::common::exc::rs_xdr_eof );
-      assert( e.component_ == csl::common::exc::cm_xdrbuf );
+      assert( e.component_ == L"csl::common::xdrbuf" );
     }
     assert( caught == true );
   }
@@ -128,7 +128,7 @@ namespace test_xdrbuf {
     {
       caught = true;
       assert( e.reason_    == csl::common::exc::rs_xdr_eof );
-      assert( e.component_ == csl::common::exc::cm_xdrbuf );
+      assert( e.component_ == L"csl::common::xdrbuf" );
     }
     assert( caught == true );
 
@@ -188,7 +188,7 @@ namespace test_xdrbuf {
     {
       caught = true;
       assert( e.reason_    == csl::common::exc::rs_xdr_eof );
-      assert( e.component_ == csl::common::exc::cm_xdrbuf );
+      assert( e.component_ == L"csl::common::xdrbuf" );
     }
     assert( caught == true );
 
