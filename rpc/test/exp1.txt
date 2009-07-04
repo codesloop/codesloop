@@ -7,7 +7,7 @@
 #include <world>
 
 #version      1.2.3.4   
-#name         interface
+#name         exp1
 #namespace    csl::rpc
 
 disposable function_name {

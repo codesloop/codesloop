@@ -7,8 +7,8 @@
 #include <world>
 
 #version      1.2.3.4   
-#name         interface
-#namespace    csl::rpc
+#name         test_exp2
+#namespace    test::exp
 
 disposable function_name {
  input:
@@ -30,6 +30,5 @@ func2 {
   double d_[1 ],
   double e_[ 2],
   double f_[ 3 ],
-  double f_[
-                ]
+  double f_ [ 1234 ]
 }
