@@ -58,6 +58,8 @@ namespace csl
              >
     class hash : public obj
     {
+      CSL_OBJ(csl::common,hash);
+
       public:
         typedef Obj            obj_t;
         typedef IndexHandler   index_handler_t;
@@ -125,14 +127,14 @@ namespace csl
           if( !index_handler_.get_entry(index_,id,e,entry_id) )
           {
             /* throw an exception telling the caller that this is a serious problem */
-            THR(exc::rs_lookup_error,exc::cm_hash,false);
+            THR(exc::rs_lookup_error,false);
           }
 
           /* no page found for the given id, means there is no page and thus no data */
           if( e.page_id_ == 0 ) { return false; }
 
           /* sanity check: the returned entry must be a leaf entry (should be zero) */
-          if( e.next_item_ != 0 ) { THR(exc::rs_invalid_state,exc::cm_hash,false); }
+          if( e.next_item_ != 0 ) { THR(exc::rs_invalid_state,false); }
 
           /* lookup and return item */
           return page_handler_.get(e.page_id_,id,o);
@@ -151,7 +153,7 @@ namespace csl
           if( !index_handler_.get_entry(index_,id,e,entry_id) )
           {
             /* this must be a serious problem, indicating an internal lookup error */
-            THR(exc::rs_lookup_error,exc::cm_hash,false);
+            THR(exc::rs_lookup_error,false);
           }
 
           /* if the page_id_ in the entry is nil than the page_handler_ is expected

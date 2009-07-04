@@ -35,6 +35,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common.h"
 #ifdef __cplusplus
 
+#define CSL_OBJ( namesp_, class_)                               \
+  public:                                                       \
+    static inline const wchar_t * get_namespace() { return L""#namesp_; }  \
+    static inline const wchar_t * get_class_name() { return L""#namesp_"::"#class_; }\
+    static inline const wchar_t * get_class_short() { return L""#class_; }
+
+
 namespace csl
 {
   namespace common
@@ -49,8 +56,8 @@ namespace csl
         inline bool use_exc() const     { return use_exc_;  } ///<checks exception usage
         inline void use_exc(bool yesno) { use_exc_ = yesno; } ///<adjust exception usage
 
-        /** @brief implemented by CSL_OBJECT_DECL macro */
-        virtual const char * get_class_name();
+        /** XXX: @brief implemented by CSL_OBJ macro */
+        //static const char * get_class_name();
 
         /** @brief returns true when the objects have the same type */
         virtual bool is_kind_of( obj & o );

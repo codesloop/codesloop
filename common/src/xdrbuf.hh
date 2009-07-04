@@ -54,8 +54,10 @@ namespace csl
     later this may further improve to a more complete XDR serialization implementation
     but now it is more a limited one
     */
-    class xdrbuf
+    class xdrbuf : public obj
     {
+      CSL_OBJ(csl::common,xdrbuf);
+
       public:
         /** @brief construct a pbuf dependent xdrbuf object */
         inline xdrbuf(pbuf & b)

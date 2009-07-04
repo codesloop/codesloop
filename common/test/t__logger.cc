@@ -52,6 +52,8 @@ namespace test_logger
   /**@brief test class for logging */
   class logtest : public csl::common::obj
   {
+      CSL_OBJ( test_logger, logtest );
+
     public:
 
       /**@test return value from RETURN_FUNCTION */
@@ -68,7 +70,7 @@ namespace test_logger
       void exception()
       {
         ENTER_FUNCTION();
-        THROW_EXCEPTION( exc(exc::rs_unknown,exc::cm_logger,LOG_TEST_MSG) );
+        //THROW_EXCEPTION( exc(exc::rs_unknown,exc::cm_logger,LOG_TEST_MSG) );
         LEAVE_FUNCTION();
       }
   };
@@ -76,17 +78,17 @@ namespace test_logger
   /**@test simple LEAVE_FUNCTION test */
   void void_function()
   {
-    ENTER_FUNCTION();
+    //ENTER_FUNCTION();
 
-    LEAVE_FUNCTION();
+    //LEAVE_FUNCTION();
   }
 
   /**@test simple LEAVE_FUNCTION test */
   void void_nolog_function()
   {
-    ENTER_FUNCTION();
+    //ENTER_FUNCTION();
 
-    LEAVE_FUNCTION();
+    //LEAVE_FUNCTION();
   }
 
 };

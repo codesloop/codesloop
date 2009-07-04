@@ -32,6 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "str.hh"
+#include "logger.hh"
 #ifdef __cplusplus
 
 namespace csl
@@ -60,19 +61,6 @@ namespace csl
           rs_out_of_memory,  ///<Can not allocate memory
         };
 
-        enum {
-          cm_unknown, ///<Unknown component
-          cm_pbuf,    ///<pbuf component
-          cm_zfile,   ///<zfile component
-          cm_xdrbuf,  ///<xdrbuf component
-          cm_circbuf, ///<circbuf component
-          cm_logger,  ///<logger component
-          cm_str,     ///<str component
-          cm_ustr,    ///<ustr component
-          cm_hash,    ///<hash component
-          cm_arch,    ///<archiver component
-        };
-
         /** @brief converts reason code to string */
         static const wchar_t * reason_string(int rc);
 
@@ -89,14 +77,14 @@ namespace csl
         /** @brief constructor 
         *   @param component that caused the exception
         */
-        exc(int component)
+        exc(const wchar_t * component)
         : reason_(rs_unknown), component_(component), line_(0) {}
 
         /** @brief constructor
         *   @param reason is to tell why
         *   @param component that cause the exception
         */
-        exc(int reason, int component)
+        exc(int reason, const wchar_t * component)
         : reason_(reason), component_(component), line_(0) {}
 
         /** @brief constructor
@@ -104,7 +92,7 @@ namespace csl
         *   @param component that cause the exception
         *   @param txt provides some explanation
         */
-        exc(int reason, int component, const wchar_t * txt)
+        exc(int reason, const wchar_t * component, const wchar_t * txt)
         : reason_(reason), component_(component), text_(txt), line_(0) {}
 
         /** @brief constructor
@@ -114,13 +102,13 @@ namespace csl
         *   @param file tells which source file caused the error
         *   @param lin tells which line cause the error
         */
-        exc(int reason, int component, const wchar_t * txt, const wchar_t * file, unsigned int line)
+        exc(int reason, const wchar_t * component, const wchar_t * txt, const wchar_t * file, unsigned int line)
         : reason_(reason), component_(component), text_(txt), file_(file), line_(line) {}
 
         ~exc();
 
         int reason_;        ///<reason code: one of rs_*
-        int component_;     ///<component code: one of cm_*
+        str component_;     ///<component name
         str text_;          ///<error explanation
         str file_;          ///<error source file
         unsigned int line_; ///<error posintion in source file

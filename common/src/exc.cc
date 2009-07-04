@@ -55,24 +55,6 @@ namespace csl
       };
     }
 
-    const wchar_t * exc::component_string(int cm)
-    {
-      switch( cm )
-      {
-        case cm_pbuf:      return L"common::pbuf";
-        case cm_zfile:     return L"common::zfile";
-        case cm_xdrbuf:    return L"common::xdrbuf";
-        case cm_circbuf:   return L"common::circbuf";
-        case cm_logger:    return L"common::logger";
-        case cm_str:       return L"common::str";
-        case cm_ustr:      return L"common::ustr";
-        case cm_hash:      return L"common::hash";
-        case cm_arch:      return L"common::arch";
-        case cm_unknown:
-          default:         return L"unknown component";
-      };
-    }
-
     void exc::to_string(str & res)
     {
       str t(L"Exception");
@@ -83,7 +65,7 @@ namespace csl
         t += tx;
       }
       t += L" [";
-      t += component_string(component_);
+      t += component_;    
       t += L"] [";
       t += reason_string(reason_);
       t += L"] ";
@@ -98,7 +80,7 @@ namespace csl
       return ret;
     }
 
-    exc::exc() : reason_(rs_unknown), component_(cm_unknown) {}
+    exc::exc() : reason_(rs_unknown), component_(L"unknown") {}
     exc::~exc() {}
     /* public interface */
   };

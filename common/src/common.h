@@ -78,9 +78,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #   define SWPRINTF swprintf
 #  endif /*__MINGW32__ && SWPRINTF && WIN32 */
 # endif /*SWPRINTF*/
-# ifndef FPRINTF
-#  define FPRINTF fwprintf
-# endif /*FPRINTF*/
+# ifndef CSL_DEBUGF
+#  define CSL_DEBUGF fwprintf
+# endif /*CSL_DEBUGF*/
 # ifndef PRINTF
 #  define PRINTF wprintf
 # endif /*PRINTF*/
@@ -137,46 +137,46 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef __cplusplus
 #ifndef THR
-#define THR(REASON,COMPONENT,RET) \
+#define THR(REASON,RET) \
     do { \
       if( this->use_exc() ) { \
-        throw exc(REASON,COMPONENT,L"",L""__FILE__,__LINE__); \
+        throw exc(REASON,this->get_class_name(),L"",L""__FILE__,__LINE__); \
         return RET; } \
       else { \
-        FPRINTF(stderr,L"Exception(%ls:%d): [%ls] [%ls]\n", \
+        CSL_DEBUGF(L"Exception(%ls:%d): [%ls] [%ls]\n", \
             L""__FILE__,__LINE__, \
-            exc::component_string(COMPONENT), \
+            this->get_class_name(), \
             exc::reason_string(REASON)); \
         return RET; } } while(false);
 #endif /*THR*/
 
 #ifndef THRR
-#define THRR(REASON,COMPONENT,MSG,RET) \
+#define THRR(REASON,MSG,RET) \
     do { \
       if( this->use_exc() ) { \
-        throw exc(REASON,COMPONENT,MSG,L""__FILE__,__LINE__); \
+        throw exc(REASON,this->get_class_name(),MSG,L""__FILE__,__LINE__); \
         return RET; } \
       else { \
-        FPRINTF(stderr,L"Exception(%ls:%d): [%ls] [%ls] [%ls]\n", \
+        CSL_DEBUGF(L"Exception(%ls:%d): [%ls] [%ls] [%ls]\n", \
             L""__FILE__,__LINE__, \
-            exc::component_string(COMPONENT), \
+            this->get_class_name(), \
             exc::reason_string(REASON), \
             MSG ); \
         return RET; } } while(false);
 #endif /*THRR*/
 
 #ifndef THRC
-#define THRC(REASON,COMPONENT,RET) \
+#define THRC(REASON,RET) \
     do { \
       if( this->use_exc() ) { \
         wchar_t errstr[256]; \
         mbstowcs( errstr,strerror(errno),255 ); \
-        throw exc(REASON,COMPONENT,errstr,L""__FILE__,__LINE__); \
+        throw exc(REASON,this->get_class_name(),errstr,L""__FILE__,__LINE__); \
         return RET; } \
       else { \
-        FPRINTF(stderr,L"Exception(%ls:%d): [%ls] [%ls]\n", \
+        CSL_DEBUGF(L"Exception(%ls:%d): [%ls] [%ls]\n", \
             L""__FILE__,__LINE__, \
-            exc::component_string(COMPONENT), \
+            this->get_class_name(), \
             exc::reason_string(REASON)); \
         return RET; } } while(false);
 #endif /*THRC*/
@@ -188,22 +188,22 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         throw E; \
         return RET; } \
       else { \
-        FPRINTF(stderr,L"Exception(%ls:%d): [%ls] [%ls]\n", \
+        CSL_DEBUGF(L"Exception(%ls:%d): [%ls] [%ls]\n", \
             E.file_.c_str(),E.line_, \
-            exc::component_string(E.component_), \
+            get_class_name(), \
             exc::reason_string(E.reason_)); \
             return RET; } } while(false);
 #endif /*THR*/
 
 #ifndef THRNORET
-#define THRNORET(REASON,COMPONENT) \
+#define THRNORET(REASON) \
     do { \
       if( this->use_exc() ) { \
-        throw exc(REASON,COMPONENT,L"",L""__FILE__,__LINE__); } \
+        throw exc(REASON,this->get_class_name(),L"",L""__FILE__,__LINE__); } \
       else { \
-        FPRINTF(stderr,L"Exception(%ls:%d): [%ls] [%ls]\n", \
+        CSL_DEBUGF(L"Exception(%ls:%d): [%ls] [%ls]\n", \
             L""__FILE__,__LINE__, \
-            exc::component_string(COMPONENT), \
+            this->get_class_name(), \
             exc::reason_string(REASON)); } } while(false);
 #endif /*THRNORET*/
 #endif /*__cplusplus*/

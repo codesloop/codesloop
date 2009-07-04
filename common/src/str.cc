@@ -149,7 +149,7 @@ namespace csl
 
       if ( start > sz )
       {
-        THRR(exc::rs_invalid_param,exc::cm_str,L"out of range",s);
+        THRR(exc::rs_invalid_param,L"out of range",s);
       }
 
       // shrink length to fit in
@@ -181,7 +181,7 @@ namespace csl
       {
         buf_.reset();
         ensure_trailing_zero();
-        THRNORET(exc::rs_conv_error,exc::cm_str);
+        THRNORET(exc::rs_conv_error);
       }
     }
 
@@ -204,7 +204,7 @@ namespace csl
       {
         buf_.reset();
         ensure_trailing_zero();
-        THRC(exc::rs_conv_error,exc::cm_str,*this);
+        THRC(exc::rs_conv_error,*this);
       }
       return *this;
     }
@@ -269,7 +269,7 @@ namespace csl
     {
       if ( n > ::wcslen( data() ) )
       {
-        THR(exc::rs_invalid_param,exc::cm_str,0);
+        THR(exc::rs_invalid_param,0);
       }
 
       return data()[n];

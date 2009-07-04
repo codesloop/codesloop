@@ -40,11 +40,6 @@ namespace csl
     {
     }
 
-    const char * obj::get_class_name()
-    {
-      return typeid( *this ).name();
-    }
-
     bool obj::is_kind_of( obj & o )
     {
       return typeid( *this ) == typeid( o );

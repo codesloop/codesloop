@@ -24,6 +24,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "xdrbuf.hh"
+#include "logger.hh"
 #include "common.h"
 #include "pbuf.hh"
 #include "exc.hh"
@@ -53,7 +54,7 @@ namespace csl
     {
       if( !b || !p || !sz )
       {
-        throw common::exc(exc::rs_cannot_append,exc::cm_xdrbuf,L"",L""__FILE__,__LINE__);
+        throw common::exc(exc::rs_cannot_append,L"",L"",L""__FILE__,__LINE__);        
         return;
       }
 
@@ -65,13 +66,13 @@ namespace csl
 
       if( !b->append( reinterpret_cast<unsigned char *>(&elen),sizeof(elen)) )
       {
-        throw common::exc(exc::rs_cannot_append,exc::cm_xdrbuf,L"",L""__FILE__,__LINE__);
+        throw common::exc(exc::rs_cannot_append,L"",L"",L""__FILE__,__LINE__);
         return;
       }
 
       if( !b->append( reinterpret_cast<const unsigned char *>(p),sz) )
       {
-        throw common::exc(exc::rs_cannot_append,exc::cm_xdrbuf,L"",L""__FILE__,__LINE__);
+        throw common::exc(exc::rs_cannot_append,L"",L"",L""__FILE__,__LINE__);
         return;
       }
 
@@ -79,7 +80,7 @@ namespace csl
       {
         if( !b->append(pad,pad_size) )
         {
-          throw common::exc(exc::rs_cannot_append,exc::cm_xdrbuf,L"",L""__FILE__,__LINE__);
+          throw common::exc(exc::rs_cannot_append,L"",L"",L""__FILE__,__LINE__);
           return;
         }
       }
@@ -94,7 +95,7 @@ namespace csl
 
       if( !b_->append( reinterpret_cast<unsigned char *>(&v),sizeof(int32_t)) )
       {
-        THR(exc::rs_cannot_append,exc::cm_xdrbuf,*this);
+        THR(exc::rs_cannot_append,*this);
       }
 
       return *this;
@@ -106,7 +107,7 @@ namespace csl
 
       if( !b_->append( reinterpret_cast<unsigned char *>(&v),sizeof(uint32_t)) )
       {
-        THR(exc::rs_cannot_append,exc::cm_xdrbuf,*this);
+        THR(exc::rs_cannot_append,*this);
       }
 
       return *this;
@@ -248,15 +249,15 @@ namespace csl
       }
       else if( szrd == 0 && it_==b_->end() )
       {
-        THR(exc::rs_xdr_eof,exc::cm_xdrbuf,*this);
+        THR(exc::rs_xdr_eof,*this);
       }
       else if( szrd != sizeof(tmp) )
       {
-        THR(exc::rs_xdr_invalid,exc::cm_xdrbuf,*this);
+        THR(exc::rs_xdr_invalid,*this);
       }
       else
       {
-        THR(exc::rs_cannot_get,exc::cm_xdrbuf,*this);
+        THR(exc::rs_cannot_get,*this);
       }
 
       return *this;
@@ -273,15 +274,15 @@ namespace csl
       }
       else if( szrd == 0 && it_==b_->end() )
       {
-        THR(exc::rs_xdr_eof,exc::cm_xdrbuf,*this);
+        THR(exc::rs_xdr_eof,*this);
       }
       else if( szrd != sizeof(tmp) )
       {
-        THR(exc::rs_xdr_invalid,exc::cm_xdrbuf,*this);
+        THR(exc::rs_xdr_invalid,*this);
       }
       else
       {
-        THR(exc::rs_cannot_get,exc::cm_xdrbuf,*this);
+        THR(exc::rs_cannot_get,*this);
       }
 
       return *this;
@@ -311,15 +312,15 @@ namespace csl
         }
         else if( szrd == 0 && it_==b_->end() )
         {
-          THR(exc::rs_xdr_eof,exc::cm_xdrbuf,*this);
+          THR(exc::rs_xdr_eof,*this);
         }
         else if( szrd != sz )
         {
-          THR(exc::rs_xdr_invalid,exc::cm_xdrbuf,*this);
+          THR(exc::rs_xdr_invalid,*this);
         }
         else
         {
-          THR(exc::rs_cannot_get,exc::cm_xdrbuf,*this);
+          THR(exc::rs_cannot_get,*this);
         }
       }
       return *this;
@@ -343,15 +344,15 @@ namespace csl
         }
         else if( szrd == 0 && it_==b_->end() )
         {
-          THR(exc::rs_xdr_eof,exc::cm_xdrbuf,*this);
+          THR(exc::rs_xdr_eof,*this);
         }
         else if( szrd != sz )
         {
-          THR(exc::rs_xdr_invalid,exc::cm_xdrbuf,*this);
+          THR(exc::rs_xdr_invalid,*this);
         }
         else
         {
-          THR(exc::rs_cannot_get,exc::cm_xdrbuf,*this);
+          THR(exc::rs_cannot_get,*this);
         }
       }
       return *this;
@@ -383,7 +384,7 @@ namespace csl
         {
           if( !val.append(bf->data_+pos_,size) )
           {
-            THRNORET(exc::rs_cannot_append,exc::cm_xdrbuf);
+            THRNORET(exc::rs_cannot_append);
             goto bail;
           }
 
@@ -400,7 +401,7 @@ namespace csl
         {
           if( !val.append(bf->data_+pos_,ts) )
           {
-            THRNORET(exc::rs_cannot_append,exc::cm_xdrbuf);
+            THRNORET(exc::rs_cannot_append);
             goto bail;
           }
           szrd  += ts;
@@ -416,7 +417,7 @@ namespace csl
       }
 
     bail:
-        if( saved_size != szrd ) { THRNORET(exc::rs_xdr_invalid,exc::cm_xdrbuf); }
+        if( saved_size != szrd ) { THRNORET(exc::rs_xdr_invalid); }
         return *this;
     }
 
@@ -441,7 +442,7 @@ namespace csl
       if( szrd == sz ) return true;
       else
       {
-        THR(exc::rs_xdr_invalid,exc::cm_xdrbuf,false);
+        THR(exc::rs_xdr_invalid,false);
         return false;
       }
     }

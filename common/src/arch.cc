@@ -46,7 +46,7 @@ namespace csl
       xdrbuf_ = new xdrbuf(*pbuf_);
 
       if ( !pbuf_ || !xdrbuf_ )
-        throw common::exc(exc::rs_out_of_memory,exc::cm_arch,L"",L""__FILE__,__LINE__);
+        THR(exc::rs_out_of_memory,);      
     }
 
     arch::~arch() 
@@ -76,7 +76,7 @@ namespace csl
       xdrbuf_ = new xdrbuf(*pbuf_);
 
       if ( !xdrbuf_ )
-        throw common::exc(exc::rs_out_of_memory,exc::cm_arch,L"",L""__FILE__,__LINE__);
+        THR(exc::rs_out_of_memory,);
     }
   }
 }

@@ -53,6 +53,7 @@ namespace csl
     */
     class arch : public obj
     {
+      CSL_OBJ(csl::common,arch);
       public:
         /** @brief specifies arch object's behaviour. 
          

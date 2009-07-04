@@ -137,7 +137,7 @@ namespace csl
       size_t sz = size();
 
       if ( start > sz )
-        throw exc(exc::rs_invalid_param,exc::cm_str,L"out of range");
+        throw exc(exc::rs_invalid_param,L"out of range");
 
       // shrink length to fit in
       if ( sz < length + start ) len = sz - start;
@@ -208,7 +208,7 @@ namespace csl
     char ustr::at(const size_t n) const
     {
       if ( n > nbytes() )
-        throw exc(exc::rs_invalid_param,exc::cm_str);
+        THR(exc::rs_invalid_param,NULL);
 
       return data()[n];
     }

@@ -46,55 +46,36 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CSL_TRACE_SCOPE    "CSL_TRACE_SCOPE"
 
 #ifdef DEBUG
-#define CSL_DEBUG(msg)      csl::common::logger::debug( msg, csl::common::str(__FILE__) )
-#define CSL_DEBUGF(...)     csl::common::logger::debug( csl::common::str(__FILE__), __VA_ARGS__ )
+#define CSL_DEBUG(msg)      csl::common::logger::debug( msg, get_class_name() )
+#define CSL_DEBUGF(...)     csl::common::logger::debug( get_class_name(), __VA_ARGS__ )
 #else
 #define CSL_DEBUG(msg)
 #define CSL_DEBUGF(...)     
 #endif
 
 
-#if __GCC__ || __GNUC__
-#define STORE_FUNC_NAME()  \
-  csl::common::str __file_name(L""__FILE__); \
-  __file_name = __file_name.substr( __file_name.rfind(L'/')+1, 20 ); 
-#else 
-#define STORE_FUNC_NAME()                          \
-  csl::common::str __file_name;                   
-#endif
-
 /* in debug mode these are optimized out by preprocessor */
 #ifdef DEBUG
  #define ENTER_FUNCTION()  \
-   STORE_FUNC_NAME();    \
    if ( csl::common::logger::enable_trace_ )                     \
-     csl::common::logger::debug(__file_name,L">>> Entering function: %s (%ls:%d)", __FUNCTION__,__file_name.c_str(),__LINE__)
+     csl::common::logger::debug(this->get_class_name(),L">>> Entering function:\t%ls::%s",this->get_class_name(),__FUNCTION__)
  #define LEAVE_FUNCTION()                                        \
    {                                                             \
    if ( csl::common::logger::enable_trace_ )                     \
-     csl::common::logger::debug(__file_name,L"<<< Leaving function: %s (%ls:%d)", __FUNCTION__,__file_name.c_str(),__LINE__); \
+     csl::common::logger::debug(this->get_class_name(),L">>> Leaving function:\t%ls::%s",this->get_class_name(),__FUNCTION__); \
    return;                                                       \
    }
  #define RETURN_FUNCTION(ret)                                    \
    {                                                             \
    if ( csl::common::logger::enable_trace_ )                     \
-     csl::common::logger::debug(__file_name,L"<<< Leaving function: %s (%ls:%d)", __FUNCTION__,__file_name.c_str(),__LINE__);\
+     csl::common::logger::debug(this->get_class_name(),L">>> Leaving function:\t%ls::%s",this->get_class_name(),__FUNCTION__); \
    return(ret);                                                  \
-   }
-
- #define THROW_EXCEPTION(e)                                      \
-   {                                                             \
-   if ( csl::common::logger::enable_trace_ )                     \
-     csl::common::logger::debug(__file_name,L"<<< Leaving function: %s Exception: %ls", __FUNCTION__,  \
-                   e.to_string().c_str());             \
-   throw(e);                                                     \
    }
 
 #else /* !DEBUG */
  #define ENTER_FUNCTION()
  #define LEAVE_FUNCTION()       return
  #define RETURN_FUNCTION(ret)   return(ret)
- #define THROW_EXCEPTION(e)     throw(e)
 #endif /* DEBUG */
 
 
@@ -125,8 +106,9 @@ namespace csl {
     this class is used by common classes for logging purpose. DEBUG
     messages are only available in DEBUG builds. 
      */
-    class logger 
+    class logger : public obj
     {
+      CSL_OBJ(csl::common,logger);
 
       public:
         /** @brief main logger function 
@@ -175,11 +157,11 @@ namespace csl {
         compiler optimizes out the debug related log macros
         @param str  message to log */
         static inline void      debug( const str & st,
-                                       const str invoker = L"" )
+                                       const wchar_t * invoker = NULL )
         {
 #ifdef DEBUG
           if ( class_to_trace_ == L"all" ||
-              class_to_trace_.find( invoker ) != str::npos )
+              class_to_trace_.find( str(invoker) ) != str::npos )
           {
             log( LOG_DEBUG, st );
           }
@@ -191,12 +173,12 @@ namespace csl {
           Debug messages are only available in DEBUG builds, otherwise
           compiler optimizes out the debug related log macros
           @param str  message to log */
-        static inline void      debug( const str invoker,
+        static inline void      debug( const wchar_t * invoker,
             const wchar_t * fmt, ... )
         {
 #ifdef DEBUG
           if ( class_to_trace_ == L"all" ||
-              class_to_trace_.find( invoker ) != str::npos )
+              class_to_trace_.find( str(invoker) ) != str::npos )
           {
 
             va_list args;

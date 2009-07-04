@@ -59,6 +59,7 @@ namespace csl
      */
     class ustr : public csl::common::var
     {
+      CSL_OBJ(csl::common,ustr);
       public:
         enum {
           buf_size = 128,            ///<amount of preallocated memory in bytes

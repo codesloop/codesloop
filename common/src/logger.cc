@@ -125,7 +125,7 @@ namespace csl
 #endif
 
       if ( static_cast<int>(type) >= static_cast<int>(LOG_LAST) || static_cast<int>(type) <= LOG_UNKNOWN )
-        throw exc(exc::rs_invalid_param,exc::cm_logger,L"Unknown log type");
+        throw exc(exc::rs_invalid_param,get_class_name(),L"Unknown log type");
 
       try {
         // set date and time
