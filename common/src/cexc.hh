@@ -89,7 +89,7 @@ namespace csl
         cexc(int reason, const wchar_t * component, const wchar_t * txt, const wchar_t * file, unsigned int line)
         : reason_(reason), component_(component), text_(txt), file_(file), line_(line) {}
 
-        ~cexc();
+        virtual ~cexc();
 
         int reason_;        ///<reason code: one of rs_*
         str component_;     ///<component name
