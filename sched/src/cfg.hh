@@ -90,6 +90,8 @@ namespace csl
         slt3::intvar    schedule_id_;
         slt3::strvar    name_;
         slt3::blobvar   value_;
+
+        CSL_OBJ(csl::sched,cfg);
     };
   }
 }

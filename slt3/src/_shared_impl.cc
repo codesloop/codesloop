@@ -43,11 +43,11 @@ using csl::common::binry;
   @brief private implementation of slt3 classes
  */
 
-#define THRE(FUN,RC,COMPONENT,MSG,RET) \
+#define THRE(FUN,RC,MSG,RET) \
     do { \
       if( this->use_exc_ ) \
       { \
-        exc e = FUN(RC,COMPONENT,MSG);\
+        exc e = FUN(RC,this->get_class_name(),MSG);\
         e.file_ = L""__FILE__; \
         e.line_ = __LINE__; \
         throw e; \
@@ -55,9 +55,8 @@ using csl::common::binry;
       } \
       else \
       { \
-        FPRINTF(stderr,L"Exception(%ls:%d): [%ls] [%ls] : %ls\n", \
+        FPRINTF(stderr,L"Exception(%ls:%d): [%ls] : %ls\n", \
             L""__FILE__,__LINE__, \
-            exc::component_string(COMPONENT), \
             exc::reason_string(RC), \
             MSG); \
         return RET; \
@@ -95,7 +94,7 @@ namespace csl
     long long conn::impl::last_insert_id()
     {
       long long ret = -1;
-      if( !db_ ) THR(exc::rs_notopened,exc::cm_conn,-1);
+      if( !db_ ) THR(exc::rs_notopened,-1);
       {
         ret = sqlite3_last_insert_rowid(db_);
         if( !ret ) ret = -1;
@@ -106,7 +105,7 @@ namespace csl
     long long conn::impl::change_count()
     {
       long long ret = -1;
-      if( !db_ ) THR(exc::rs_notopened,exc::cm_conn,-1);
+      if( !db_ ) THR(exc::rs_notopened,-1);
       {
         ret = sqlite3_changes(db_);
         if( !ret ) ret = -1;
@@ -128,7 +127,7 @@ namespace csl
       }
       else
       {
-        THRE(create_exc,rc,exc::cm_conn,L"Failed to open DB",false);
+        THRE(create_exc,rc,L"Failed to open DB",false);
       }
     }
 
@@ -151,7 +150,7 @@ namespace csl
       {
         db_ = 0;
         name_.clear();
-        THRE(create_exc,rc,exc::cm_conn,sqlite3_errmsg(db_),false);
+        THRE(create_exc,rc,sqlite3_errmsg(db_),false);
       }
       else
       {
@@ -161,19 +160,19 @@ namespace csl
       }
     }
 
-    exc conn::impl::create_exc(int rc,int component, const char * s)
+    exc conn::impl::create_exc(int rc, const wchar_t * component, const char * s)
     {
       return create_exc(rc,component,str(s));
     }
 
-    exc conn::impl::create_exc(int rc,int component, const wchar_t * s)
+    exc conn::impl::create_exc(int rc, const wchar_t * component, const wchar_t * s)
     {
       return create_exc(rc,component,str(s));
     }
 
-    exc conn::impl::create_exc(int rc,int component, const str & s)
+    exc conn::impl::create_exc(int rc, const wchar_t * component, const str & s)
     {
-      exc e(exc::cm_conn);
+      exc e(component);
       if( s.size() > 0 ) e.text_ = s;
       switch( rc )
       {
@@ -208,8 +207,8 @@ namespace csl
     bool conn::impl::exec_noret(const char * sql)
     {
       char * zErr = 0;
-      if( !db_ ) THR(exc::rs_notopened,exc::cm_conn,false);
-      if( !sql ) THR(exc::rs_nullparam,exc::cm_conn,false);
+      if( !db_ ) THR(exc::rs_notopened,false);
+      if( !sql ) THR(exc::rs_nullparam,false);
 
       int rc = sqlite3_exec( db_, sql, NULL, NULL, &zErr );
 
@@ -221,7 +220,7 @@ namespace csl
       {
         str s;
         if( zErr ) { s = zErr; sqlite3_free( zErr ); }
-        THRE(create_exc,rc,exc::cm_conn,s.c_str(),false);
+        THRE(create_exc,rc,s.c_str(),false);
       }
       return true;
     }
@@ -229,8 +228,8 @@ namespace csl
     bool conn::impl::exec(const char * sql,common::ustr & res)
     {
       char * zErr = 0;
-      if( !db_ ) THR(exc::rs_notopened,exc::cm_conn,false);
-      if( !sql ) THR(exc::rs_nullparam,exc::cm_conn,false);
+      if( !db_ ) THR(exc::rs_notopened,false);
+      if( !sql ) THR(exc::rs_nullparam,false);
 
       char    **   rset = NULL;
       int          nrow = 0;
@@ -257,7 +256,7 @@ namespace csl
         rset = 0;
         str s;
         if( zErr ) { s = zErr; sqlite3_free( zErr ); }
-        THRE(create_exc,rc,exc::cm_conn,s.c_str(),false);
+        THRE(create_exc,rc,s.c_str(),false);
       }
 
       if( rset ) sqlite3_free_table( rset );
@@ -331,7 +330,7 @@ namespace csl
     void tran::impl::commit()
     {
       if( !started_ ) { }
-      else if( cn_->valid_db_ptr() == false ) { THRNORET(exc::rs_notopened,exc::cm_tran); return; }
+      else if( cn_->valid_db_ptr() == false ) { THRNORET(exc::rs_notopened); return; }
       else if( tr_ )
       {
         char * sql = sqlite3_mprintf("RELEASE SAVEPOINT SP%lld;",tran_id_);
@@ -349,7 +348,7 @@ namespace csl
     void tran::impl::rollback()
     {
       if( !started_ ) { }
-      else if( cn_->valid_db_ptr() == false ) { THRNORET(exc::rs_notopened,exc::cm_tran); return; }
+      else if( cn_->valid_db_ptr() == false ) { THRNORET(exc::rs_notopened); return; }
       else if( tr_ )
       {
         char * sql = sqlite3_mprintf("ROLLBACK TRANSACTION TO SAVEPOINT SP%lld;",tran_id_);
@@ -417,10 +416,10 @@ namespace csl
     // stepwise query
     bool query::impl::prepare(const char * sql)
     {
-      if( !sql )               THR(exc::rs_nullparam,exc::cm_query,false);
-      if( !tran_ )             THR(exc::rs_nulltran,exc::cm_query,false);
-      if( !(tran_->cn_) )      THR(exc::rs_nullconn,exc::cm_query,false);
-      if( !(tran_->cn_->db_) ) THR(exc::rs_nulldb,exc::cm_query,false);
+      if( !sql )               THR(exc::rs_nullparam,false);
+      if( !tran_ )             THR(exc::rs_nulltran,false);
+      if( !(tran_->cn_) )      THR(exc::rs_nullconn,false);
+      if( !(tran_->cn_->db_) ) THR(exc::rs_nulldb,false);
 
       finalize();
       tran_->start();
@@ -440,7 +439,7 @@ namespace csl
       if(rc != SQLITE_OK)
       {
         str s(sqlite3_errmsg(tran_->cn_->db_));
-        THRE(conn::impl::create_exc,rc,exc::cm_query,s.c_str(),false);
+        THRE(conn::impl::create_exc,rc,s.c_str(),false);
       }
       //
       return true;
@@ -448,9 +447,9 @@ namespace csl
 
     bool query::impl::reset()
     {
-      if( !stmt_ )        THR(exc::rs_nullstmnt,exc::cm_query,false);
-      if( !tran_ )        THR(exc::rs_nulltran,exc::cm_query,false);
-      if( !(tran_->cn_) ) THR(exc::rs_nullconn,exc::cm_query,false);
+      if( !stmt_ )        THR(exc::rs_nullstmnt,false);
+      if( !tran_ )        THR(exc::rs_nulltran,false);
+      if( !(tran_->cn_) ) THR(exc::rs_nullconn,false);
 
       int rc = 0;
 
@@ -459,7 +458,7 @@ namespace csl
       if( rc != SQLITE_OK )
       {
         str s(sqlite3_errmsg(tran_->cn_->db_));
-        THRE(conn::impl::create_exc,rc,exc::cm_query,s.c_str(),false);
+        THRE(conn::impl::create_exc,rc,s.c_str(),false);
       }
 
       return true;
@@ -473,9 +472,9 @@ namespace csl
 
     bool query::impl::next(columns_t & cols, fields_t & fields)
     {
-      if( !stmt_ )        THR(exc::rs_nullstmnt,exc::cm_query,false);
-      if( !tran_ )        THR(exc::rs_nulltran,exc::cm_query,false);
-      if( !(tran_->cn_) ) THR(exc::rs_nullconn,exc::cm_query,false);
+      if( !stmt_ )        THR(exc::rs_nullstmnt,false);
+      if( !tran_ )        THR(exc::rs_nulltran,false);
+      if( !(tran_->cn_) ) THR(exc::rs_nullconn,false);
 
       parampool_t::iterator it(params_.begin());
       parampool_t::iterator end(params_.end());
@@ -583,7 +582,7 @@ namespace csl
       else
       {
         str s(sqlite3_errmsg(tran_->cn_->db_));
-        THRE(conn::impl::create_exc,rc,exc::cm_query,s.c_str(),false);
+        THRE(conn::impl::create_exc,rc,s.c_str(),false);
       }
 
       return true;
@@ -591,9 +590,9 @@ namespace csl
 
     bool query::impl::next()
     {
-      if( !stmt_ )         THR(exc::rs_nullstmnt,exc::cm_query,false);
-      if( !tran_ )         THR(exc::rs_nulltran,exc::cm_query,false);
-      if( !(tran_->cn_) )  THR(exc::rs_nullconn,exc::cm_query,false);
+      if( !stmt_ )         THR(exc::rs_nullstmnt,false);
+      if( !tran_ )         THR(exc::rs_nulltran,false);
+      if( !(tran_->cn_) )  THR(exc::rs_nullconn,false);
 
       parampool_t::iterator it(params_.begin());
       parampool_t::iterator end(params_.end());
@@ -667,7 +666,7 @@ namespace csl
       else
       {
         str s(sqlite3_errmsg(tran_->cn_->db_));
-        THRE(conn::impl::create_exc,rc,exc::cm_query,s.c_str(),false);
+        THRE(conn::impl::create_exc,rc,s.c_str(),false);
       }
 
       return true;
@@ -686,9 +685,9 @@ namespace csl
     // oneshot query
     bool query::impl::execute(const char * sql)
     {
-      if( !sql )          THR(exc::rs_nullparam,exc::cm_query,false);
-      if( !tran_ )        THR(exc::rs_nulltran,exc::cm_query,false);
-      if( !(tran_->cn_) ) THR(exc::rs_nullconn,exc::cm_query,false);
+      if( !sql )          THR(exc::rs_nullparam,false);
+      if( !tran_ )        THR(exc::rs_nulltran,false);
+      if( !(tran_->cn_) ) THR(exc::rs_nullconn,false);
 
       finalize();
       tran_->start();
@@ -712,9 +711,9 @@ namespace csl
 
     bool query::impl::execute(const char * sql, ustr & result)
     {
-      if( !sql )          THR(exc::rs_nullparam,exc::cm_query,false);
-      if( !tran_ )        THR(exc::rs_nulltran,exc::cm_query,false);
-      if( !(tran_->cn_) ) THR(exc::rs_nullconn,exc::cm_query,false);
+      if( !sql )          THR(exc::rs_nullparam,false);
+      if( !tran_ )        THR(exc::rs_nulltran,false);
+      if( !(tran_->cn_) ) THR(exc::rs_nullconn,false);
 
       finalize();
       tran_->start();

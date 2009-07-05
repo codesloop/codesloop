@@ -99,7 +99,7 @@ namespace csl
       bool udp::data_handler::get_salt( saltbuf_t & old_salt,
                                         const msg & m )
       {
-        if( m.size_ < (sizeof(int32_t)) )  { THR(comm::exc::rs_null_param,comm::exc::cm_udp_data_handler,false); }
+        if( m.size_ < (sizeof(int32_t)) )  { THR(comm::exc::rs_null_param,false); }
 
         pbuf    outer;
         outer.append(m.data_,(sizeof(int32_t)));
@@ -108,7 +108,7 @@ namespace csl
         int32_t packet_type = 0;
         xbo >> packet_type;
 
-        if( packet_type != msg::data_p ) { THR(comm::exc::rs_invalid_packet_type,comm::exc::cm_udp_data_handler,false); }
+        if( packet_type != msg::data_p ) { THR(comm::exc::rs_invalid_packet_type,false); }
 
         const unsigned char  * ptrp = m.data_ + xbo.position();
 
@@ -124,8 +124,8 @@ namespace csl
       {
         try
         {
-          if( m.size_ < (sizeof(int32_t)) ) { THR(comm::exc::rs_null_param,comm::exc::cm_udp_data_handler,false); }
-          if( sesskey.size() == 0 )         { THR(comm::exc::rs_sesskey_empty,comm::exc::cm_udp_data_handler,false); }
+          if( m.size_ < (sizeof(int32_t)) ) { THR(comm::exc::rs_null_param,false); }
+          if( sesskey.size() == 0 )         { THR(comm::exc::rs_sesskey_empty,false); }
 
           /* unencrypted part */
           pbuf    outer;
@@ -135,7 +135,7 @@ namespace csl
           int32_t packet_type = 0;
           xbo >> packet_type;
 
-          if( packet_type != msg::data_p ) { THR(comm::exc::rs_invalid_packet_type,comm::exc::cm_udp_data_handler,false); }
+          if( packet_type != msg::data_p ) { THR(comm::exc::rs_invalid_packet_type,false); }
 
           const unsigned char  * ptrp = m.data_ + xbo.position();
           unsigned int           lenp = m.size_ - xbo.position();
@@ -166,7 +166,7 @@ namespace csl
 
           if( pk.decrypt( key,head,data,foot ) == false )
           {
-            THR(comm::exc::rs_crypt_pkt_error,comm::exc::cm_udp_data_handler,false);
+            THR(comm::exc::rs_crypt_pkt_error,false);
           }
 
           /* xdr deserialize */
@@ -178,17 +178,17 @@ namespace csl
 
           if( xbi.get_data( new_salt,sz,salt_size_v) == false )
           {
-            THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_data_handler,false);
+            THR(comm::exc::rs_xdr_error,false);
           }
 
           if( sz != 8 )
           {
-            THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_data_handler,false);
+            THR(comm::exc::rs_xdr_error,false);
           }
 
           if( xbi.get_data( recvdta,sz,m.max_len() ) == false )
           {
-            THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_data_handler,false);
+            THR(comm::exc::rs_xdr_error,false);
           }
 
           if( debug() )
@@ -205,7 +205,7 @@ namespace csl
           str s;
           e.to_string(s);
           FPRINTF(stderr,L"Exception caught: %ls\n",s.c_str());
-          THR(comm::exc::rs_common_error,comm::exc::cm_udp_data_handler,false);
+          THR(comm::exc::rs_common_error,false);
         }
         return false;
       }
@@ -219,10 +219,10 @@ namespace csl
       {
         try
         {
-          if( senddta.size() == 0 ) { THR(comm::exc::rs_null_param,comm::exc::cm_udp_data_handler,false); }
-          if( old_salt.size() != salt_size_v ) { THR(comm::exc::rs_salt_size,comm::exc::cm_udp_data_handler,false); }
-          if( new_salt.size() != salt_size_v ) { THR(comm::exc::rs_salt_size,comm::exc::cm_udp_data_handler,false); }
-          if( sesskey.size() == 0 ) { THR(comm::exc::rs_sesskey_empty,comm::exc::cm_udp_data_handler,false); }
+          if( senddta.size() == 0 )            { THR(comm::exc::rs_null_param,false); }
+          if( old_salt.size() != salt_size_v ) { THR(comm::exc::rs_salt_size,false); }
+          if( new_salt.size() != salt_size_v ) { THR(comm::exc::rs_salt_size,false); }
+          if( sesskey.size() == 0 )            { THR(comm::exc::rs_sesskey_empty,false); }
 
           /* unencrypted part */
           pbuf    outer;
@@ -230,7 +230,7 @@ namespace csl
 
           xbo << static_cast<int32_t>(msg::data_p);
 
-          if( outer.size() > m.max_len() ) { THR(comm::exc::rs_too_big,comm::exc::cm_udp_data_handler,false); }
+          if( outer.size() > m.max_len() ) { THR(comm::exc::rs_too_big,false); }
 
           outer.copy_to(m.data_,m.max_len());
 
@@ -264,14 +264,14 @@ namespace csl
 
           if( !pk.encrypt( salt,key,head,data,foot ) )
           {
-            THR(comm::exc::rs_crypt_pkt_error,comm::exc::cm_udp_data_handler,false);
+            THR(comm::exc::rs_crypt_pkt_error,false);
           }
 
           /* output packet */
           unsigned char * outputp = m.data_+outer.size();
           unsigned int     retlen = outer.size()+head.size()+data.size()+foot.size();
 
-          if( retlen > m.max_len() ) { THR(comm::exc::rs_too_big,comm::exc::cm_udp_data_handler,false); }
+          if( retlen > m.max_len() ) { THR(comm::exc::rs_too_big,false); }
 
           memcpy( outputp, head.data(), head.size() ); outputp += head.size();
           memcpy( outputp, data.data(), data.size() ); outputp += data.size();
@@ -294,7 +294,7 @@ namespace csl
           str s;
           e.to_string(s);
           FPRINTF(stderr,L"Exception caught: %ls\n",s.c_str());
-          THR(comm::exc::rs_common_error,comm::exc::cm_udp_data_handler,false);
+          THR(comm::exc::rs_common_error,false);
         }
         return false;
       }
@@ -392,7 +392,7 @@ namespace csl
         /* init receivers */
         if( receiver_.start(min_threads_,max_threads_,timeout_ms_,retries_,handler_) == false )
         {
-          THR(exc::rs_thread_start,exc::cm_udp_data_srv,false);
+          THR(exc::rs_thread_start,false);
         }
 
         /* set thread entries */
@@ -400,7 +400,7 @@ namespace csl
         handler_.socket( receiver_.socket() );
 
         /* launch receiver threads */
-        if( thread_.start() == false ) { THR(exc::rs_thread_start,exc::cm_udp_data_srv,false); }
+        if( thread_.start() == false ) { THR(exc::rs_thread_start,false); }
 
         return true;
       }
@@ -424,7 +424,7 @@ namespace csl
       }
 
       data_srv::data_srv()
-        : use_exc_(true), debug_(false), min_threads_(1), max_threads_(20), timeout_ms_(1000), retries_(10)
+        : debug_(false), min_threads_(1), max_threads_(20), timeout_ms_(1000), retries_(10)
       {
       }
 
@@ -441,7 +441,7 @@ namespace csl
 
       bool data_cli::recv(b1024_t & data,unsigned int timeout_ms)
       {
-        if( init() == false ) { THR(exc::rs_init_failed,exc::cm_udp_data_cli,false); }
+        if( init() == false ) { THR(exc::rs_init_failed,false); }
 
         /* wait for data arrival */
         fd_set rfds;
@@ -474,7 +474,7 @@ namespace csl
 
             if( helper.init_data( new_salt, session_key_, m, data  ) == false )
             {
-              THR(exc::rs_pkt_error,exc::cm_udp_data_cli,false);
+              THR(exc::rs_pkt_error,false);
             }
 
             server_salt_ = new_salt;
@@ -482,27 +482,27 @@ namespace csl
           }
           else
           {
-            THRC(exc::rs_recv_failed,exc::cm_udp_data_cli,false);
+            THRC(exc::rs_recv_failed,false);
           }
         }
         else if( err == 0 )
         {
           /* timed out */
-          THR(exc::rs_timeout,exc::cm_udp_data_cli,false);
+          THR(exc::rs_timeout,false);
         }
         else
         {
           /* error */
-          THRC(exc::rs_select_failed,exc::cm_udp_data_cli,false);
+          THRC(exc::rs_select_failed,false);
         }
       }
 
       bool data_cli::send(const b1024_t & data)
       {
-        if( init() == false ) { THR(exc::rs_init_failed,exc::cm_udp_data_cli,false); }
+        if( init() == false ) { THR(exc::rs_init_failed,false); }
         if( my_salt_.size() != saltbuf_t::preallocated_size )
         {
-          { THR(exc::rs_salt_size,exc::cm_udp_data_cli,false); }
+          { THR(exc::rs_salt_size,false); }
         }
 
         /* prepare data packet */
@@ -514,19 +514,19 @@ namespace csl
 
         if( helper.prepare_data(my_salt_,new_salt,session_key_,data,m) == false )
         {
-          THR(exc::rs_pkt_error,exc::cm_udp_data_cli,false);
+          THR(exc::rs_pkt_error,false);
         }
 
         if( (::send( sock_, reinterpret_cast<const char *>(m.data_), m.size_ , 0 )) != static_cast<int>(m.size_) )
         {
-          THRC(exc::rs_send_failed,exc::cm_udp_data_cli,false);
+          THRC(exc::rs_send_failed,false);
         }
 
         my_salt_ = new_salt;
         return true;
       }
 
-      data_cli::data_cli() : use_exc_(true), debug_(false), sock_(-1)
+      data_cli::data_cli() : debug_(false), sock_(-1)
       {
         memset( &addr_,0,sizeof(addr_) );
         addr_.sin_family        = AF_INET;
@@ -562,11 +562,11 @@ namespace csl
         if( sock_ > 0 ) return true;
 
         /* session key has been set ? */
-        if( session_key_.size() == 0 ) { THR(exc::rs_sesskey_empty,exc::cm_udp_data_cli,false); }
+        if( session_key_.size() == 0 ) { THR(exc::rs_sesskey_empty,false); }
 
         sock_ = init_sock( addr_ );
 
-        if( sock_ <= 0 ) { THRC(exc::rs_socket_failed,exc::cm_udp_data_cli,false); }
+        if( sock_ <= 0 ) { THRC(exc::rs_socket_failed,false); }
 
         return true;
       }

@@ -81,10 +81,10 @@ namespace csl
 
           if( packet_type != msg::unicast_auth_p )
           {
-            THR(comm::exc::rs_invalid_packet_type,comm::exc::cm_udp_auth_handler,false);
+            THR(comm::exc::rs_invalid_packet_type,false);
           }
 
-          if( peer_public_key.from_xdr(xbo) == false ) { THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_auth_handler,false); }
+          if( peer_public_key.from_xdr(xbo) == false ) { THR(comm::exc::rs_xdr_error,false); }
 
           const unsigned char * ptrp = m.data_ + xbo.position();
           unsigned int          lenp = m.size_ - xbo.position();
@@ -96,7 +96,7 @@ namespace csl
 
           if( !peer_public_key.gen_sha1hex_shared_key(private_key(),session_key) )
           {
-            THR(comm::exc::rs_sec_error,comm::exc::cm_udp_auth_handler,false);
+            THR(comm::exc::rs_sec_error,false);
           }
 
           if( debug() )
@@ -125,7 +125,7 @@ namespace csl
 
           if( pk.decrypt( key,head,data,foot ) == false )
           {
-            THR(comm::exc::rs_crypt_pkt_error,comm::exc::cm_udp_auth_handler,false);
+            THR(comm::exc::rs_crypt_pkt_error,false);
           }
 
           /* xdr deserialize */
@@ -137,12 +137,12 @@ namespace csl
 
           if( xbi.get_data( slt,sz,salt_size_v ) == false )
           {
-            THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_auth_handler,false);
+            THR(comm::exc::rs_xdr_error,false);
           }
 
           if( sz != salt_size_v )
           {
-            THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_auth_handler,false);
+            THR(comm::exc::rs_xdr_error,false);
           }
 
           xbi >> login;
@@ -164,7 +164,7 @@ namespace csl
           str s;
           e.to_string(s);
           FPRINTF(stderr,L"Exception caught: %ls\n",s.c_str());
-          THR(comm::exc::rs_common_error,comm::exc::cm_udp_auth_handler,false);
+          THR(comm::exc::rs_common_error,false);
         }
       }
 
@@ -176,9 +176,9 @@ namespace csl
       {
         try
         {
-          if( pkt_salt.size() != salt_size_v )  { THR(comm::exc::rs_salt_size,comm::exc::cm_udp_auth_handler,false); }
-          if( comm_salt.size() != salt_size_v ) { THR(comm::exc::rs_salt_size,comm::exc::cm_udp_auth_handler,false); }
-          if( sesskey.size() == 0 ) { THR(comm::exc::rs_sesskey_empty,comm::exc::cm_udp_auth_handler,false); }
+          if( pkt_salt.size() != salt_size_v )  { THR(comm::exc::rs_salt_size,false); }
+          if( comm_salt.size() != salt_size_v ) { THR(comm::exc::rs_salt_size,false); }
+          if( sesskey.size() == 0 )             { THR(comm::exc::rs_sesskey_empty,false); }
 
           /* unencrypted part */
           pbuf    outer;
@@ -186,7 +186,7 @@ namespace csl
 
           xbo << static_cast<int32_t>(msg::unicast_htua_p);
 
-          if( outer.size() > m.max_len() ) { THR(comm::exc::rs_too_big,comm::exc::cm_udp_auth_handler,false); }
+          if( outer.size() > m.max_len() ) { THR(comm::exc::rs_too_big,false); }
 
           outer.copy_to(m.data_,m.max_len());
 
@@ -219,14 +219,14 @@ namespace csl
 
           if( !pk.encrypt( salt,key,head,data,foot ) )
           {
-            THR(comm::exc::rs_crypt_pkt_error,comm::exc::cm_udp_auth_handler,false);
+            THR(comm::exc::rs_crypt_pkt_error,false);
           }
 
           /* output packet */
           unsigned char * outputp = m.data_+outer.size();
           unsigned int    retlen  = outer.size()+head.size()+data.size()+foot.size();
 
-          if( retlen > m.max_len() ) { THR(comm::exc::rs_too_big,comm::exc::cm_udp_auth_handler,false); }
+          if( retlen > m.max_len() ) { THR(comm::exc::rs_too_big,false); }
 
           memcpy( outputp, head.data(), head.size() ); outputp += head.size();
           memcpy( outputp, data.data(), data.size() ); outputp += data.size();
@@ -250,7 +250,7 @@ namespace csl
           str s;
           e.to_string(s);
           FPRINTF(stderr,L"Exception caught: %ls\n",s.c_str());
-          THR(comm::exc::rs_common_error,comm::exc::cm_udp_auth_handler,false);
+          THR(comm::exc::rs_common_error,false);
         }
         return false;
       }
@@ -374,7 +374,7 @@ namespace csl
         /* init receivers */
         if( receiver_.start(min_threads_,max_threads_,timeout_ms_,retries_,handler_) == false ) 
         {
-          THR(exc::rs_thread_start,exc::cm_udp_auth_srv,false);
+          THR(exc::rs_thread_start,false);
         }
 
         /* set thread entries */
@@ -382,7 +382,7 @@ namespace csl
         handler_.socket( receiver_.socket() );
 
         /* launch receiver threads */
-        if( thread_.start() == false ) { THR(exc::rs_thread_start,exc::cm_udp_auth_srv,false); }
+        if( thread_.start() == false ) { THR(exc::rs_thread_start,false); }
 
         return true;
       }
@@ -406,7 +406,7 @@ namespace csl
       }
 
       auth_srv::auth_srv()
-        : use_exc_(true), debug_(false), min_threads_(1), max_threads_(4), timeout_ms_(1000), retries_(10)
+        : debug_(false), min_threads_(1), max_threads_(4), timeout_ms_(1000), retries_(10)
       {
       }
 
@@ -421,7 +421,7 @@ namespace csl
       **
       **********************************************************************/
 
-      auth_cli::auth_cli() : use_exc_(true), debug_(false), sock_(-1)
+      auth_cli::auth_cli() : debug_(false), sock_(-1)
       {
         memset( &addr_,0,sizeof(addr_) );
         addr_.sin_family        = AF_INET;
@@ -444,7 +444,7 @@ namespace csl
 
           xbo << static_cast<int32_t>(msg::unicast_auth_p);
 
-          if( public_key_.to_xdr(xbo) == false ) { THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_auth_cli,false); }
+          if( public_key_.to_xdr(xbo) == false ) { THR(comm::exc::rs_xdr_error,false); }
 
           if( debug() )
           {
@@ -452,7 +452,7 @@ namespace csl
             PRINTF(L" ++ [%ld] : ",xbo.position()); public_key_.print();
           }
 
-          if( outer.size() > m.max_len() ) { THR(comm::exc::rs_too_big,comm::exc::cm_udp_auth_cli,false); }
+          if( outer.size() > m.max_len() ) { THR(comm::exc::rs_too_big,false); }
 
           outer.copy_to(m.data_,m.max_len());
 
@@ -479,12 +479,12 @@ namespace csl
           {
             if( server_public_key_.gen_sha1hex_shared_key(private_key_,session_key_v) == false )
             {
-              THR(comm::exc::rs_sec_error,comm::exc::cm_udp_auth_cli,false);
+              THR(comm::exc::rs_sec_error,false);
             }
           }
           else
           {
-            THR(comm::exc::rs_pubkey_empty,comm::exc::cm_udp_auth_cli,false);
+            THR(comm::exc::rs_pubkey_empty,false);
           }
 
           if( debug() ) { PRINTF(L"  ++ Session Key: '%s'\n",session_key_v.c_str()); }
@@ -505,14 +505,14 @@ namespace csl
 
           if( !pk.encrypt( salt,key,head,data,foot ) )
           {
-            THR(comm::exc::rs_crypt_pkt_error,comm::exc::cm_udp_auth_cli,false);
+            THR(comm::exc::rs_crypt_pkt_error,false);
           }
 
           /* output packet */
           unsigned char * outputp = m.data_+outer.size();
           unsigned int retlen = outer.size()+head.size()+data.size()+foot.size();
 
-          if( retlen > m.max_len() ) { THR(comm::exc::rs_too_big,comm::exc::cm_udp_auth_cli,false); }
+          if( retlen > m.max_len() ) { THR(comm::exc::rs_too_big,false); }
 
           memcpy( outputp, head.data(), head.size() ); outputp += head.size();
           memcpy( outputp, data.data(), data.size() ); outputp += data.size();
@@ -536,7 +536,7 @@ namespace csl
           str s;
           e.to_string(s);
           FPRINTF(stderr,L"Exception caught: %ls\n",s.c_str());
-          THR(comm::exc::rs_common_error,comm::exc::cm_udp_auth_cli,false);
+          THR(comm::exc::rs_common_error,false);
         }
         return false;
       }
@@ -557,7 +557,7 @@ namespace csl
 
           if( packet_type != msg::unicast_htua_p )
           {
-            THR(comm::exc::rs_invalid_packet_type,comm::exc::cm_udp_auth_cli,false);
+            THR(comm::exc::rs_invalid_packet_type,false);
           }
 
           const unsigned char * ptrp = m.data_ + xbo.position();
@@ -594,7 +594,7 @@ namespace csl
 
           if( pk.decrypt( key,head,data,foot ) == false )
           {
-            THR(comm::exc::rs_crypt_pkt_error,comm::exc::cm_udp_auth_cli,false);
+            THR(comm::exc::rs_crypt_pkt_error,false);
           }
 
           /* xdr deserialize */
@@ -606,12 +606,12 @@ namespace csl
 
           if( xbi.get_data( server_salt_,sz,saltbuf_t::preallocated_size ) == false )
           {
-            THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_auth_cli,false);
+            THR(comm::exc::rs_xdr_error,false);
           }
 
           if( sz != saltbuf_t::preallocated_size )
           {
-            THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_auth_cli,false);
+            THR(comm::exc::rs_xdr_error,false);
           }
 
           if( debug() ) { print_hex(L"  -- RAND ",server_salt_.data(),server_salt_.size()); }
@@ -623,7 +623,7 @@ namespace csl
           str s;
           e.to_string(s);
           FPRINTF(stderr,L"Exception caught: %ls\n",s.c_str());
-          THR(comm::exc::rs_common_error,comm::exc::cm_udp_auth_cli,false);
+          THR(comm::exc::rs_common_error,false);
         }
         return false;
       }
@@ -651,11 +651,11 @@ namespace csl
         if( sock_ > 0 ) return true;
 
         /* public_key has been set ? */
-        if( public_key().is_empty() ) { THR(exc::rs_pubkey_empty,exc::cm_udp_auth_cli,false); }
+        if( public_key().is_empty() ) { THR(exc::rs_pubkey_empty,false); }
 
         sock_ = init_sock( addr_ );
 
-        if( sock_ <= 0 ) { THRC(exc::rs_socket_failed,exc::cm_udp_auth_cli,false); }
+        if( sock_ <= 0 ) { THRC(exc::rs_socket_failed,false); }
 
         return true;
       }
@@ -679,7 +679,7 @@ namespace csl
 
         if( !init() ) return false;
 
-        if( public_key().is_empty() ) { THR(exc::rs_pubkey_empty,exc::cm_udp_auth_cli,false); }
+        if( public_key().is_empty() ) { THR(exc::rs_pubkey_empty,false); }
 
         /* generate salt and session key */
         csl_sec_gen_rand( my_salt_.allocate(saltbuf_t::preallocated_size), saltbuf_t::preallocated_size );
@@ -688,11 +688,11 @@ namespace csl
         /* prepare auth packet */
         msg m;
 
-        if( !prepare_auth( m ) ) { THR(exc::rs_pkt_error,exc::cm_udp_auth_cli,false); }
+        if( !prepare_auth( m ) ) { THR(exc::rs_pkt_error,false); }
 
         if( (err=::send( sock_, reinterpret_cast<const char *>(m.data_), m.size_ , 0 )) != static_cast<int>(m.size_) )
         {
-          THRC(exc::rs_send_failed,exc::cm_udp_auth_cli,false);
+          THRC(exc::rs_send_failed,false);
         }
 
         fd_set rfds;
@@ -720,25 +720,25 @@ namespace csl
             m.size_ = err;
             if( init_htua( m ) == false )
             {
-              THR(exc::rs_pkt_error,exc::cm_udp_auth_cli,false);
+              THR(exc::rs_pkt_error,false);
             }
 
             return true;
           }
           else
           {
-            THRC(exc::rs_recv_failed,exc::cm_udp_auth_cli,false);
+            THRC(exc::rs_recv_failed,false);
           }
         }
         else if( err == 0 )
         {
           /* timed out */
-          THR(exc::rs_timeout,exc::cm_udp_auth_cli,false);
+          THR(exc::rs_timeout,false);
         }
         else
         {
           /* error */
-          THRC(exc::rs_select_failed,exc::cm_udp_auth_cli,false);
+          THRC(exc::rs_select_failed,false);
         }
       }
     } /* end of udp namespace */

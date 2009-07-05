@@ -94,6 +94,8 @@ namespace csl
         slt3::intvar  item_id_;
         slt3::strvar  name_;
         slt3::strvar  value_;
+
+        CSL_OBJ(csl::sched,head);
     };
   }
 }

@@ -22,11 +22,11 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
- 
+
 #ifndef _csl_rpc_csrparser_hh_included_
 #define _csl_rpc_csrparser_hh_included_
 
-#include "common.h"
+#include "csl_common.hh"
 #ifdef __cplusplus
 #include "obj.hh"
 #include "iface.hh"
@@ -40,7 +40,7 @@ namespace csl
    * stub generation, serialization and transport 
    * management, etc. 
    */
-  namespace rpc 
+  namespace rpc
   {
  
     /** @brief codesloop rpc interface parser */
@@ -70,7 +70,9 @@ namespace csl
       void print_error(const char * error_msg) const;
       iface iface_;
       token_info token_;
-    }; 
+
+      CSL_OBJ(csl::rpc,csrparser);
+    };
   }
 }
 

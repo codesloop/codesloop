@@ -58,7 +58,7 @@ namespace csl
     data::data(const data & x)
       : id_(0,*this), item_id_(0,*this), is_inline_(0,*this), value_(0,*this)
       {
-        throw exc(exc::rs_private_fun,exc::cm_data);
+        throw exc(exc::rs_private_fun,get_class_name());
       }
 
   } /*sched*/

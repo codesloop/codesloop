@@ -87,6 +87,8 @@ namespace csl
         /* db fields */
         slt3::intvar   id_;
         slt3::intvar   schedule_id_;
+
+        CSL_OBJ(csl::sched,item);
     };
   }
 }

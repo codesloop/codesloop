@@ -31,7 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief common exception class for csl::sec
  */
 
-#include "str.hh"
+#include "csl_common.hh"
 #ifdef __cplusplus
 
 namespace csl
@@ -43,7 +43,7 @@ namespace csl
 
     this class is used by the csl::sec classes as an exception to be thrown
      */
-    class exc
+    class exc : public csl::common::cexc
     {
       public:
         enum {
@@ -58,61 +58,39 @@ namespace csl
           rs_cksum,          ///<Checksum mismatch.
         };
 
-        enum {
-          cm_unknown,    ///<Unknown component
-          cm_crypt_pkt,  ///<pbuf component
-        };
-
         /** @brief converts reason code to string */
         static const wchar_t * reason_string(int rc);
 
-        /** @brief converts component code to string */
-        static const wchar_t * component_string(int cm);
-
-        /** @brief converts exception to string */
-        void to_string(common::str & res);
-
         /** @brief constructor 
-        *   @param component that caused the exception
-        */
-        exc(int component)
-        : reason_(rs_unknown), component_(component), line_(0) {}
+         *   @param component that caused the exception
+         */
+        exc(const wchar_t * component)
+        : csl::common::cexc(component) {}
 
         /** @brief constructor
-        *   @param reason is to tell why
-        *   @param component that cause the exception
-        */
-        exc(int reason, int component)
-        : reason_(reason), component_(component), line_(0) {}
+         *   @param reason is to tell why
+         *   @param component that cause the exception
+         */
+        exc(int reason, const wchar_t * component)
+        : csl::common::cexc(reason,component) {}
 
         /** @brief constructor
-        *   @param reason is to tell why
-        *   @param component that cause the exception
-        *   @param txt provides some explanation
-        */
-        exc(int reason, int component, const wchar_t * txt)
-        : reason_(reason), component_(component), text_(txt), line_(0) {}
+         *   @param reason is to tell why
+         *   @param component that cause the exception
+         *   @param txt provides some explanation
+         */
+        exc(int reason, const wchar_t * component, const wchar_t * txt)
+        : csl::common::cexc(reason,component,txt) {}
 
         /** @brief constructor
-        *   @param reason is to tell why
-        *   @param component that cause the exception
-        *   @param txt provides some explanation
-        *   @param file tells which source file caused the error
-        *   @param lin tells which line cause the error
-        */
-        exc(int reason, int component, const wchar_t * txt, const wchar_t * file, unsigned int line)
-        : reason_(reason), component_(component), text_(txt), file_(file), line_(line) {}
-
-        ~exc();
-
-        int reason_;        ///<reason code: one of rs_*
-        int component_;     ///<component code: one of cm_*
-        common::str text_;  ///<error explanation
-        common::str file_;  ///<error source file
-        unsigned int line_; ///<error posintion in source file
-
-      private:
-        exc();
+         *   @param reason is to tell why
+         *   @param component that cause the exception
+         *   @param txt provides some explanation
+         *   @param file tells which source file caused the error
+         *   @param lin tells which line cause the error
+         */
+        exc(int reason, const wchar_t * component, const wchar_t * txt, const wchar_t * file, unsigned int line)
+        : csl::common::cexc(reason,component,txt,file,line) {}
     };
   }
 }

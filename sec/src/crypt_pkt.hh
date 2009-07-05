@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck
+Copyright (c) 2008,2009, David Beck, Tamas Foldi
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -32,8 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    Encryption is based on AES and UMAC
  */
 
-#include "common.h"
-#include "tbuf.hh"
+#include "csl_common.hh"
 #ifdef __cplusplus
 #include <memory>
 
@@ -42,7 +41,7 @@ namespace csl
   namespace sec
   {
     /** @todo document me */
-    class crypt_pkt
+    class crypt_pkt : public csl::common::obj
     {
       public:
         typedef common::tbuf<8>       buf8_t;
@@ -75,17 +74,14 @@ namespace csl
                       databuf_t & data,
                       const footbuf_t & footer );
 
-        inline crypt_pkt() : use_exc_(false) {}
+        inline crypt_pkt() {}
         inline virtual ~crypt_pkt() {}
-
-        inline void use_exc(bool yesno) { use_exc_ = yesno; }
-        inline bool use_exc() const     { return use_exc_; }
 
       private:
         crypt_pkt(const crypt_pkt & other) {}
         crypt_pkt & operator=(const crypt_pkt & other) { return *this; }
 
-        bool use_exc_;
+        CSL_OBJ(csl::sec,crypt_pkt);
     };
   }
 }

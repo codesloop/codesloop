@@ -40,8 +40,14 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "xdrbuf.hh"
 #include "zfile.hh"
 #include "test_timer.h"
+#include "obj.hh"
+#include "var.hh"
+#include "int64.hh"
+#include "dbl.hh"
+#include "binry.hh"
 #include "str.hh"
 #include "ustr.hh"
+#include "circbuf.hh"
 #include "logger.hh"
 
 #endif /* _csl_common_csl_common_hh_included_ */

@@ -57,7 +57,7 @@ namespace csl
           pbuf pb;
           pb.append(public_key_.get().data(),public_key_.get().size());
           xdrbuf xb(pb);
-          if( !tmp_public_.from_xdr(xb) ) THRNORET(exc::rs_xdr,exc::cm_peer);
+          if( !tmp_public_.from_xdr(xb) ) THRNORET(exc::rs_xdr);
         }
       }
 
@@ -68,7 +68,7 @@ namespace csl
           pbuf pb;
           pb.append(private_key_.get().data(),private_key_.get().size());
           xdrbuf xb(pb);
-          if( !tmp_private_.from_xdr(xb) ) THRNORET(exc::rs_xdr,exc::cm_peer);
+          if( !tmp_private_.from_xdr(xb) ) THRNORET(exc::rs_xdr);
         }
       }
     }
@@ -90,9 +90,9 @@ namespace csl
       tmp_public_ = pubk;
       pbuf pb;
       xdrbuf xb(pb);
-      if( tmp_public_.to_xdr(xb) == false ) THRNORET(exc::rs_xdr,exc::cm_peer);
+      if( tmp_public_.to_xdr(xb) == false ) THRNORET(exc::rs_xdr);
       common::binry::buf_t v;
-      if( pb.t_copy_to(v) == false ) THRNORET(exc::rs_internal,exc::cm_peer);
+      if( pb.t_copy_to(v) == false ) THRNORET(exc::rs_internal);
       public_key_ = v;
     }
 
@@ -107,9 +107,9 @@ namespace csl
       tmp_private_ = privk;
       pbuf pb;
       xdrbuf xb(pb);
-      if( !tmp_private_.to_xdr(xb) ) THRNORET(exc::rs_xdr,exc::cm_peer);
+      if( !tmp_private_.to_xdr(xb) ) THRNORET(exc::rs_xdr);
       common::binry::buf_t v;
-      if( pb.t_copy_to(v) == false ) THRNORET(exc::rs_internal,exc::cm_peer);
+      if( pb.t_copy_to(v) == false ) THRNORET(exc::rs_internal);
       private_key_ = v;
     }
 
@@ -124,10 +124,10 @@ namespace csl
       return *this;
     }
 
-    peer::peer(const peer & x) 
+    peer::peer(const peer & x)
       : id_(0,*this), common_name_(0,*this), public_key_(0,*this), private_key_(0,*this)
     {
-      throw exc(exc::rs_private_fun,exc::cm_peer);
+      throw exc(exc::rs_private_fun,get_class_name());
     }
   }
 }

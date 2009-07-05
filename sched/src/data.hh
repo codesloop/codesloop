@@ -92,6 +92,8 @@ namespace csl
         slt3::intvar    item_id_;
         slt3::intvar    is_inline_;
         slt3::blobvar   value_;
+
+        CSL_OBJ(csl::sched,cfg);
     };
   }
 }

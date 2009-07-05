@@ -58,7 +58,7 @@ namespace csl
     remote_peer::remote_peer(const remote_peer & x)
       : id_(0,*this), schedule_id_(0,*this), peer_id_(0,*this), peer_state_(0,*this)
       {
-        throw exc(exc::rs_private_fun,exc::cm_remote_peer);
+        throw exc(exc::rs_private_fun,get_class_name());
       }
 
   } /*sched*/

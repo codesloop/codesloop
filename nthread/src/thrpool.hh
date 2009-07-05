@@ -34,6 +34,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "event.hh"
 #include "mutex.hh"
 #include "thread.hh"
+#include "csl_common.hh"
 #ifdef __cplusplus
 #include <list>
 
@@ -42,7 +43,7 @@ namespace csl
   namespace nthread
   {
     /** @todo document me */
-    class thrpool: public csl::common::obj
+    class thrpool : public csl::common::obj
     {
       CSL_OBJ(csl::nthread,thrpool);
       public:

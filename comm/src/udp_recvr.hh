@@ -27,10 +27,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _csl_comm_udp_recvr_hh_included_
 
 #include "csl_nthread.hh"
-#include "circbuf.hh"
-#include "bignum.hh"
+#include "csl_common.hh"
 #include "ecdh_key.hh"
-#include "common.h"
 #ifdef __cplusplus
 
 namespace csl
@@ -88,7 +86,7 @@ namespace csl
         }
       };
 
-      class recvr : public thread::callback
+      class recvr : public thread::callback, public csl::common::obj
       {
         public:
           class msgs : public common::circbuf<msg,30>
@@ -101,13 +99,13 @@ namespace csl
               event   ev_;
           };
 
-          class msg_handler : public thread::callback
+          class msg_handler : public thread::callback, public csl::common::obj
           {
             public:
               /* this must lock/unlock msgs_.mtx_ */
               virtual void operator()(void) = 0;
 
-              inline msg_handler() : msgs_(0), debug_(false), use_exc_(false), socket_(-1) {}
+              inline msg_handler() : msgs_(0), debug_(false), socket_(-1) {}
 
               /* NOTE: all the setter functions are supposed to be called once during
                  initialization. for this reason they are not protected by the mutex. if
@@ -126,10 +124,6 @@ namespace csl
               inline bool debug() const      { return debug_;  }
               inline void debug(bool yesno)  { debug_ = yesno; }
 
-              /* use exceptions ? */
-              inline bool use_exc() const      { return use_exc_; }
-              inline void use_exc(bool yesno)  { use_exc_ = yesno; }
-
               /* private key */
               inline const bignum & private_key() const { return private_key_; }
               inline void private_key(const bignum & v) { private_key_ = v; }
@@ -142,10 +136,11 @@ namespace csl
               mutex     mtx_;
               msgs *    msgs_;
               bool      debug_;
-              bool      use_exc_;
               int       socket_;
               bignum    private_key_;
               ecdh_key  public_key_;
+
+              CSL_OBJ(csl::comm::udp,recvr::msg_handler);
           };
 
         private:
@@ -154,7 +149,6 @@ namespace csl
           SAI           addr_;
           int           socket_;
           bool          stop_me_;
-          bool          use_exc_;
           bool          debug_;
           mutex         mtx_;
 
@@ -173,9 +167,6 @@ namespace csl
           SAI addr();
           void addr(const SAI & a);
 
-          bool use_exc();
-          void use_exc(bool yesno);
-
           bool stop_me();
           void stop_me(bool yesno);
 
@@ -186,6 +177,8 @@ namespace csl
           /* debug ? */
           inline void debug(bool yesno) { debug_ = yesno; }
           inline bool debug() const     { return debug_;  }
+
+          CSL_OBJ(csl::comm::udp,recvr);
       };
 
     } /* end of udp namespace */

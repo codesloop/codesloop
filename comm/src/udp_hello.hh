@@ -27,9 +27,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _csl_comm_udp_hello_hh_included_
 
 #include "udp_recvr.hh"
-#include "bignum.hh"
-#include "ecdh_key.hh"
-#include "common.h"
+#include "csl_sec.hh"
+#include "csl_common.hh"
 #ifdef __cplusplus
 
 namespace csl
@@ -98,9 +97,11 @@ namespace csl
                                 const bignum & my_private_key,
                                 const ecdh_key & peer_public_key,
                                 msg & m );
+
+            CSL_OBJ(csl::comm::udp,hello_handler);
         };
 
-        class hello_srv
+        class hello_srv : public csl::common::obj
         {
           public:
             bool start();
@@ -126,10 +127,6 @@ namespace csl
 
             /* hello callback */
             void hello_cb(hello_callback & cb) { handler_.hello_cb_ = &cb; }
-
-            /* use exceptions ? */
-            inline void use_exc(bool yesno) { use_exc_ = yesno; }
-            inline bool use_exc() const     { return use_exc_;  }
 
             /* debug ? */
             inline void debug(bool yesno) { debug_ = yesno; }
@@ -159,7 +156,6 @@ namespace csl
             hello_handler   handler_;
 
             /* internal */
-            bool use_exc_;
             bool debug_;
 
             /* thread pool */
@@ -167,9 +163,11 @@ namespace csl
             unsigned int max_threads_;
             unsigned int timeout_ms_;
             unsigned int retries_;
+
+            CSL_OBJ(csl::comm::udp,hello_srv);
         };
 
-        class hello_cli
+        class hello_cli : public csl::common::obj
         {
           public:
             bool hello( unsigned int timeout_ms=0 );
@@ -179,7 +177,6 @@ namespace csl
 
           private:
             /* internal */
-            bool      use_exc_;
             bool      debug_;
 
             SAI        addr_;
@@ -223,9 +220,7 @@ namespace csl
             inline void debug(bool yesno) { debug_ = yesno; }
             inline bool debug() const     { return debug_; }
 
-            /* use exceptions ? */
-            inline void use_exc(bool yesno) { use_exc_ = yesno; }
-            inline bool use_exc() const { return use_exc_; }
+            CSL_OBJ(csl::comm::udp,hello_cli);
         };
     } /* end of udp namespace */
   } /* end of comm namespace */

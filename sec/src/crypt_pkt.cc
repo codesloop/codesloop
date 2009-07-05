@@ -48,9 +48,9 @@ namespace csl
                              databuf_t & data,
                              footbuf_t & footer )
     {
-      if( salt.size() != 8 )    { THR(sec::exc::rs_salt_size,sec::exc::cm_crypt_pkt,false); }
-      if( key.size() == 0 )     { THR(sec::exc::rs_null_key,sec::exc::cm_crypt_pkt,false); }
-      if( data.size() > 65200 ) { THR(sec::exc::rs_too_big,sec::exc::cm_crypt_pkt,false); }
+      if( salt.size() != 8 )    { THR(sec::exc::rs_salt_size,false); }
+      if( key.size() == 0 )     { THR(sec::exc::rs_null_key,false); }
+      if( data.size() > 65200 ) { THR(sec::exc::rs_too_big,false); }
 
       umac_ae_ctx_t * ctx = reinterpret_cast<umac_ae_ctx_t *>(::malloc(sizeof(umac_ae_ctx_t)));
 
@@ -93,7 +93,7 @@ namespace csl
         /* fallback */
         if( RAND_pseudo_bytes( reinterpret_cast<unsigned char *>(data2),4) != 1 )
         {
-          THR(sec::exc::rs_rand_failed,sec::exc::cm_crypt_pkt,false);
+          THR(sec::exc::rs_rand_failed,false);
         }
       }
       memcpy( data2+4,data.data(),data.size() );
@@ -127,11 +127,11 @@ namespace csl
                              databuf_t & data,
                              const footbuf_t & footer )
     {
-      if( header.size() != 8 )  { THR(sec::exc::rs_header_size,sec::exc::cm_crypt_pkt,false); }
-      if( footer.size() != 8 )  { THR(sec::exc::rs_footer_size,sec::exc::cm_crypt_pkt,false); }
-      if( key.size() == 0 )     { THR(sec::exc::rs_null_key,sec::exc::cm_crypt_pkt,false); }
-      if( data.size() > 65200 ) { THR(sec::exc::rs_too_big,sec::exc::cm_crypt_pkt,false); }
-      if( data.size() < 4 )     { THR(sec::exc::rs_null_data,sec::exc::cm_crypt_pkt,false); }
+      if( header.size() != 8 )  { THR(sec::exc::rs_header_size,false); }
+      if( footer.size() != 8 )  { THR(sec::exc::rs_footer_size,false); }
+      if( key.size() == 0 )     { THR(sec::exc::rs_null_key,false); }
+      if( data.size() > 65200 ) { THR(sec::exc::rs_too_big,false); }
+      if( data.size() < 4 )     { THR(sec::exc::rs_null_data,false); }
 
       umac_ae_ctx_t * ctx = reinterpret_cast<umac_ae_ctx_t *>(::malloc(sizeof(umac_ae_ctx_t)));
 
@@ -198,7 +198,7 @@ namespace csl
       else
       {
         free( ctx );
-        THR(sec::exc::rs_cksum,sec::exc::cm_crypt_pkt,false);
+        THR(sec::exc::rs_cksum,false);
       }
       return ret;
     }

@@ -33,12 +33,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "udp_hello.hh"
 #include "udp_recvr.hh"
-#include "bignum.hh"
-#include "ecdh_key.hh"
-#include "tbuf.hh"
-#include "common.h"
-#include "str.hh"
-#include "ustr.hh"
+#include "csl_sec.hh"
+#include "csl_common.hh"
 #ifdef __cplusplus
 
 namespace csl
@@ -113,10 +109,12 @@ namespace csl
                              const saltbuf_t & my_salt,
                              const ustr & session_key,
                              msg & m );
+
+          CSL_OBJ(csl::comm::udp,auth_handler);
       };
 
       /** @brief the server class to be started */
-      class auth_srv
+      class auth_srv : public csl::common::obj
       {
         public:
           bool start();
@@ -146,10 +144,6 @@ namespace csl
           /* register authenticated clients */
           void register_auth_cb(register_auth_callback & cb) { handler_.register_auth_cb_ = &cb; }
 
-          /* use exceptions ? */
-          inline void use_exc(bool yesno) { use_exc_ = yesno; }
-          inline bool use_exc() const     { return use_exc_;  }
-
           /* debug ? */
           inline void debug(bool yesno) { debug_ = yesno; }
           inline bool debug() const     { return debug_;  }
@@ -178,7 +172,6 @@ namespace csl
           auth_handler    handler_;
 
           /* internal */
-          bool use_exc_;
           bool debug_;
 
           /* thread pool */
@@ -186,10 +179,12 @@ namespace csl
           unsigned int max_threads_;
           unsigned int timeout_ms_;
           unsigned int retries_;
+
+          CSL_OBJ(csl::comm::udp,auth_srv);
       };
 
       /** @brief the client class */
-      class auth_cli
+      class auth_cli : public csl::common::obj
       {
         public:
           bool auth( unsigned int timeout_ms=0 );
@@ -199,7 +194,6 @@ namespace csl
 
         private:
           /* internal */
-          bool         use_exc_;
           bool         debug_;
 
           SAI          addr_;
@@ -261,9 +255,7 @@ namespace csl
           inline void debug(bool yesno) { debug_ = yesno; }
           inline bool debug() const     { return debug_; }
 
-          /* use exceptions ? */
-          inline void use_exc(bool yesno) { use_exc_ = yesno; }
-          inline bool use_exc() const { return use_exc_; }
+          CSL_OBJ(csl::comm::udp,auth_cli);
       };
     } /* end of udp namespace */
   } /* end of comm namespace */

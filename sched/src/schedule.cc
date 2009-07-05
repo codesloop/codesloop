@@ -57,7 +57,7 @@ namespace csl
     schedule::schedule(const schedule & x)
       : id_(0,*this), common_name_(0,*this), owner_peer_id_(0,*this)
     {
-      throw exc(exc::rs_private_fun,exc::cm_schedule);
+      throw exc(exc::rs_private_fun,get_class_name());
     }
 
   } /*sched*/

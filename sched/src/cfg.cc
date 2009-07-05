@@ -58,7 +58,7 @@ namespace csl
     cfg::cfg(const cfg & x)
       : id_(0,*this), schedule_id_(0,*this), name_(0,*this), value_(0,*this)
       {
-        throw exc(exc::rs_private_fun,exc::cm_cfg);
+        throw exc(exc::rs_private_fun,get_class_name());
       }
 
   } /*sched*/

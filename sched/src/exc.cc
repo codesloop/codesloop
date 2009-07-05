@@ -49,47 +49,6 @@ namespace csl
           default:               return L"Unknown reason";
       };
     }
-
-    const wchar_t * exc::component_string(int cm)
-    {
-      switch( cm )
-      {
-        case cm_cfg:           return L"sched::cfg";
-        case cm_data:          return L"sched::data";
-        case cm_head:          return L"sched::head";
-        case cm_item:          return L"sched::item";
-        case cm_peer:          return L"sched::peer";
-        case cm_schedule:      return L"sched::schedule";
-        case cm_item_state:    return L"sched::item_state";
-        case cm_remote_peer:   return L"sched::remote_peer";
-        case cm_route:         return L"sched::route";
-
-        case cm_unknown:
-          default:             return L"unknown component";
-      };
-    }
-
-    void exc::to_string(common::str & res)
-    {
-      common::str t("Exception");
-      if( file_.size() > 0 && line_ > 0 )
-      {
-        wchar_t tx[200];
-        SWPRINTF(tx,199,L"(%s:%d): ",file_.c_str(),line_);
-        t += tx;
-      }
-      t += L" [";
-      t += component_string(component_);
-      t += L"] [";
-      t += reason_string(reason_);
-      t += L"] ";
-      if( text_.size() > 0 ) t+= text_;
-      res = t;
-    }
-
-    exc::exc() : reason_(rs_unknown), component_(cm_unknown) {}
-    exc::~exc() {}
-    /* public interface */
   };
 };
 

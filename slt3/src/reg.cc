@@ -77,7 +77,7 @@ namespace csl
         {
           str nm(name_);
 
-          THRR( slt3::exc::rs_cannot_reg, slt3::exc::cm_reg, nm.c_str(), NULL );
+          THRR( slt3::exc::rs_cannot_reg, nm.c_str(), NULL );
         }
         return default_path_;
       }
@@ -102,7 +102,7 @@ namespace csl
           {
             str nm(name_);
 
-            THRR( slt3::exc::rs_cannot_reg, slt3::exc::cm_reg, nm.c_str(), conn_ );
+            THRR( slt3::exc::rs_cannot_reg, nm.c_str(), conn_ );
           }
         }
       }

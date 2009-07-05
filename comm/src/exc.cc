@@ -72,48 +72,6 @@ namespace csl
           default:                    return L"Unknown reason";
       };
     }
-
-    const wchar_t * exc::component_string(int cm)
-    {
-      switch( cm )
-      {
-        case cm_wsa:                return L"comm::wsa";
-        case cm_udp_recvr:          return L"comm::udp::recvr";
-        case cm_udp_hello_handler:  return L"comm::udp::hello_handler";
-        case cm_udp_hello_cli:      return L"comm::udp::hello_cli";
-        case cm_udp_hello_srv:      return L"comm::udp::hello_srv";
-        case cm_udp_auth_handler:   return L"comm::udp::auth_handler";
-        case cm_udp_auth_cli:       return L"comm::udp::auth_cli";
-        case cm_udp_auth_srv:       return L"comm::udp::auth_srv";
-        case cm_udp_data_handler:   return L"comm::udp::data_handler";
-        case cm_udp_data_cli:       return L"comm::udp::data_cli";
-        case cm_udp_data_srv:       return L"comm::udp::data_srv";
-        case cm_unknown:
-          default:                  return L"unknown component";
-      };
-    }
-
-    void exc::to_string(common::str & res)
-    {
-      common::str t(L"Exception");
-      if( file_.size() > 0 && line_ > 0 )
-      {
-        wchar_t tx[200];
-        SWPRINTF(tx,199,L"(%ls:%d): ",file_.c_str(),line_);
-        t += tx;
-      }
-      t += L" [";
-      t += component_string(component_);
-      t += L"] [";
-      t += reason_string(reason_);
-      t += L"] ";
-      if( text_.size() > 0 ) t+= text_;
-      res = t;
-    }
-
-    exc::exc() : reason_(rs_unknown), component_(cm_unknown) {}
-    exc::~exc() {}
-    /* public interface */
   };
 };
 

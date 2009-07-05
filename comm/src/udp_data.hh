@@ -27,8 +27,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _csl_comm_udp_data_hh_included_
 
 #include "udp_auth.hh"
-#include "tbuf.hh"
-#include "common.h"
+#include "csl_common.hh"
 #ifdef __cplusplus
 
 namespace csl
@@ -123,9 +122,11 @@ namespace csl
                              const ustr & sesskey,
                              const b1024_t & senddta,
                              msg & m );
+
+          CSL_OBJ(csl::comm::udp,data_handler);
       };
 
-      class data_srv
+      class data_srv : public csl::common::obj
       {
         public:
           bool start();
@@ -146,10 +147,6 @@ namespace csl
 
           /* update session with the new salts to be used */
           void update_session_cb(update_session_callback & cb)  { handler_.update_session_cb_ = &cb; }
-
-          /* use exceptions ? */
-          inline void use_exc(bool yesno) { use_exc_ = yesno; }
-          inline bool use_exc() const     { return use_exc_;  }
 
           /* debug ? */
           inline void debug(bool yesno) { debug_ = yesno; }
@@ -179,7 +176,6 @@ namespace csl
           data_handler    handler_;
 
           /* internal */
-          bool use_exc_;
           bool debug_;
 
           /* thread pool */
@@ -187,9 +183,11 @@ namespace csl
           unsigned int max_threads_;
           unsigned int timeout_ms_;
           unsigned int retries_;
+
+          CSL_OBJ(csl::comm::udp,data_srv);
       };
 
-      class data_cli
+      class data_cli : public csl::common::obj
       {
         public:
           bool send(const b1024_t & data);
@@ -200,7 +198,6 @@ namespace csl
 
         private:
           /* internal */
-          bool         use_exc_;
           bool         debug_;
 
           SAI          addr_;
@@ -233,9 +230,7 @@ namespace csl
           inline void debug(bool yesno) { debug_ = yesno; }
           inline bool debug() const     { return debug_; }
 
-          /* use exceptions ? */
-          inline void use_exc(bool yesno) { use_exc_ = yesno; }
-          inline bool use_exc() const { return use_exc_; }
+          CSL_OBJ(csl::comm::udp,data_cli);
       };
     } /* end of udp namespace */
   } /* end of comm namespace */

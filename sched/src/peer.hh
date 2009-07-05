@@ -107,6 +107,8 @@ namespace csl
         slt3::strvar      common_name_;
         slt3::blobvar     public_key_;
         slt3::blobvar     private_key_;
+
+        CSL_OBJ(csl::sched,peer_state);
     };
   }
 }

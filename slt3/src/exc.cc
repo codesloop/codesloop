@@ -76,42 +76,6 @@ namespace csl
       };
       return L"unkonwn reason";
     }
-
-    const wchar_t * exc::component_string(int cm)
-    {
-      switch( cm )
-      {
-        case cm_conn:      return L"slt3::conn";
-        case cm_tran:      return L"slt3::tran";
-        case cm_query:     return L"slt3::query";
-        case cm_reg:       return L"slt3::reg";
-        case cm_unknown:
-        default:           return L"unknown";
-      };
-      return L"unknown component";
-    }
-
-    void exc::to_string(common::str & res)
-    {
-      common::str t(L"Exception");
-      if( file_.size() > 0 && line_ > 0 )
-      {
-        wchar_t tx[200];
-        SWPRINTF(tx,199,L"(%ls:%d): ",file_.c_str(),line_);
-        t += tx;
-      }
-      t += L" [";
-      t += component_string(component_);
-      t += L"] [";
-      t += reason_string(reason_);
-      t += L"] ";
-      if( text_.size() > 0 ) t+= text_;
-      res = t;
-    }
-
-    exc::exc() : reason_(rs_unknown), component_(cm_unknown) {}
-    exc::~exc() {}
-    /* public interface */
   };
 };
 

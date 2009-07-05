@@ -56,7 +56,7 @@ namespace csl
     item::item(const item & x)
       : id_(0,*this), schedule_id_(0,*this)
       {
-        throw exc(exc::rs_private_fun,exc::cm_item);
+        throw exc(exc::rs_private_fun,get_class_name());
       }
 
   } /*sched*/

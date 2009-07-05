@@ -91,6 +91,8 @@ namespace csl
         slt3::intvar      schedule_id_;
         slt3::intvar      peer_id_;
         slt3::blobvar     peer_state_;
+
+        CSL_OBJ(csl::sched,remote_peer);
     };
   }
 }

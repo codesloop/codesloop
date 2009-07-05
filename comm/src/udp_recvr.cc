@@ -68,7 +68,7 @@ namespace csl
           if( ::getsockname(sock,reinterpret_cast<struct sockaddr *>(&addrv),&len) )
           {
             ShutdownCloseSocket( sock );
-            THRC(exc::rs_getsockname_failed,exc::cm_udp_recvr,false);
+            THRC(exc::rs_getsockname_failed,false);
           }
 
           /* copy the address */
@@ -83,20 +83,20 @@ namespace csl
           if( socket_ != -1 ) { ShutdownCloseSocket(socket_); }
 
           int sock = ::socket( AF_INET, SOCK_DGRAM, 0 );
-          if( sock <= 0 ) { THRC(exc::rs_socket_failed,exc::cm_udp_recvr,false); }
+          if( sock <= 0 ) { THRC(exc::rs_socket_failed,false); }
 
           /* bind socket */
           if( ::bind(sock,reinterpret_cast<struct sockaddr *>(&addrv), sizeof(addrv)) )
           {
             ShutdownCloseSocket( sock );
-            THRC(exc::rs_bind_failed,exc::cm_udp_recvr,false);
+            THRC(exc::rs_bind_failed,false);
           }
 
           /* check internal address */
           if( ::getsockname(sock,reinterpret_cast<struct sockaddr *>(&addrv),&len) )
           {
             ShutdownCloseSocket( sock );
-            THRC(exc::rs_getsockname_failed,exc::cm_udp_recvr,false);
+            THRC(exc::rs_getsockname_failed,false);
           }
 
           /* copy the address back, in case of OS chosen port/address */
@@ -126,7 +126,7 @@ namespace csl
           int err = ::select( socket_+1,&fds,NULL,NULL,&tv );
           int recvd = 0;
 
-          if( err < 0 )       { THRNORET(exc::rs_select_failed,exc::cm_udp_recvr); break; }
+          if( err < 0 )       { THRNORET(exc::rs_select_failed); break; }
           else if( err == 0 ) { continue; }
 
           /* temporary lock messages for getting an entry from it */
@@ -143,7 +143,7 @@ namespace csl
           recvd = ::recvfrom( socket_, reinterpret_cast<char *>(m.data_), m.max_len(), 0,
             reinterpret_cast<struct sockaddr *>(&(m.sender_)), &len );
 
-          if( recvd < 0 ) { THRNORET(exc::rs_recv_failed,exc::cm_udp_recvr); break; }
+          if( recvd < 0 ) { THRNORET(exc::rs_recv_failed); break; }
           else if( recvd == 0 )
           {
             m.size_ = 0;
@@ -194,24 +194,8 @@ namespace csl
         socket_ = -1;
       }
 
-      recvr::recvr() : socket_(-1), stop_me_(false), use_exc_(false), debug_(false)
+      recvr::recvr() : socket_(-1), stop_me_(false), debug_(false)
       {
-      }
-
-      bool recvr::use_exc()
-      {
-        bool ret = false;
-        {
-          scoped_mutex m(mtx_);
-          ret = use_exc_;
-        }
-        return ret;
-      }
-
-      void recvr::use_exc(bool yesno)
-      {
-        scoped_mutex m(mtx_);
-        use_exc_ = yesno;
       }
 
       bool recvr::stop_me()

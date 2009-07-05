@@ -58,7 +58,7 @@ namespace csl
     head::head(const head & x)
       : id_(0,*this), item_id_(0,*this), name_(0,*this), value_(0,*this)
       {
-        throw exc(exc::rs_private_fun,exc::cm_head);
+        throw exc(exc::rs_private_fun,get_class_name());
       }
 
   } /*sched*/

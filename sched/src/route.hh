@@ -95,6 +95,8 @@ namespace csl
         slt3::intvar      port_;
         slt3::strvar      type_;
         slt3::strvar      host_;
+
+        CSL_OBJ(csl::sched,route);
     };
   }
 }

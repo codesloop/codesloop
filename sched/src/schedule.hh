@@ -91,6 +91,8 @@ namespace csl
         slt3::intvar    id_;
         slt3::strvar    common_name_;
         slt3::intvar    owner_peer_id_;
+
+        CSL_OBJ(csl::sched,schedule);
     };
   }
 }

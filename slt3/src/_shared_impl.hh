@@ -34,6 +34,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "str.hh"
 #include "ustr.hh"
 #include "common.h"
+#include "csl_common.hh"
 
 /**
   @file _shared_impl.hh
@@ -58,9 +59,9 @@ namespace csl
 
       /* internal */
       unsigned long long new_tran_id();
-      static exc create_exc(int rc,int component, const char * str);
-      static exc create_exc(int rc,int component, const wchar_t * str);
-      static exc create_exc(int rc,int component, const common::str & str);
+      static exc create_exc(int rc, const wchar_t * component, const char * str);
+      static exc create_exc(int rc, const wchar_t * component, const wchar_t * str);
+      static exc create_exc(int rc, const wchar_t * component, const common::str & str);
       bool exec_noret(const char * sql);
       bool exec(const char * sql,common::ustr & res);
       bool valid_db_ptr();
@@ -75,6 +76,8 @@ namespace csl
       inline void use_exc(bool yesno)          { use_exc_ = yesno; }
       inline bool use_exc() const              { return use_exc_;  }
       inline const common::ustr & name() const { return name_; }
+
+      CSL_OBJ(csl::slt3,conn::impl);
     };
 
     struct tran::impl
@@ -105,6 +108,8 @@ namespace csl
       /* inline functions */
       inline void use_exc(bool yesno) { use_exc_ = yesno; }
       inline bool use_exc() const     { return use_exc_;  }
+
+      CSL_OBJ(csl::slt3,tran::impl);
     };
 
     struct query::impl
@@ -135,20 +140,24 @@ namespace csl
       /* internal */
       bool fill_columns();
       void finalize();
-      
+
       template <typename T>
       T & get_at(unsigned int pos)
       {
-        if( pos > 2000 ) { THR(exc::rs_toobig,exc::cm_query,*( reinterpret_cast<T *>(params_.push_back(new T())))); }
+        if( pos > 2000 )
+        {
+          THR(exc::rs_toobig,
+              *( reinterpret_cast<T *>(params_.push_back(new T()))));
+        }
         unsigned int sz = params_.n_items();
 
         /* ensure we have enough space */
         if( sz <= pos )
           for( unsigned int i=sz;i<=pos;++i )
             params_.push_back(0);
-        
+
         common::var * q = 0;
-        
+
         if( (q=params_.get_at(pos))!=NULL )
         {
           if( q->var_type() == T::var_type_v )
@@ -157,10 +166,10 @@ namespace csl
           }
           else
           {
-            delete q;            
+            delete q;
           }
         }
-        
+
         T * t = new T();
         params_.set_at( pos, t );
         return *t;
@@ -171,7 +180,7 @@ namespace csl
       common::dbl   & dbl_param(unsigned int pos)   { return get_at<common::dbl>(pos); }
       common::ustr  & ustr_param(unsigned int pos)  { return get_at<common::ustr>(pos); }
       common::binry & binry_param(unsigned int pos) { return get_at<common::binry>(pos); }
-      
+
       common::var & set_param(unsigned int pos,const common::var & p)
       {
         switch( p.var_type() )
@@ -182,7 +191,7 @@ namespace csl
             ret.from_var(p);
             return ret;
           }
-            
+
           case query::colhead::t_string:
           {
             common::ustr & ret(ustr_param(pos));
@@ -237,6 +246,8 @@ namespace csl
 
       inline void autoreset_data(bool yesno) { autoreset_data_ = yesno; }
       inline bool autoreset_data() const     { return autoreset_data_; }
+
+      CSL_OBJ(csl::slt3,query::impl);
     };
   }
 }

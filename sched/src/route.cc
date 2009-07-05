@@ -60,7 +60,7 @@ namespace csl
     route::route(const route & x)
       : id_(0,*this), peer_id_(0,*this), protocol_(0,*this), port_(0,*this), type_(0,*this), host_(0,*this)
       {
-        throw exc(exc::rs_private_fun,exc::cm_route);
+        throw exc(exc::rs_private_fun,get_class_name());
       }
 
   } /*sched*/

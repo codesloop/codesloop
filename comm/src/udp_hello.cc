@@ -73,8 +73,8 @@ namespace csl
           int32_t packet_type;
           xb >> packet_type;
 
-          if( packet_type != msg::hello_p ) { THR(comm::exc::rs_invalid_packet_type,comm::exc::cm_udp_hello_handler,false); }
-          if( peer_public_key.from_xdr(xb) == false ) { THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_hello_handler,false); }
+          if( packet_type != msg::hello_p ) { THR(comm::exc::rs_invalid_packet_type,false); }
+          if( peer_public_key.from_xdr(xb) == false ) { THR(comm::exc::rs_xdr_error,false); }
 
           if( debug() )
           {
@@ -87,7 +87,7 @@ namespace csl
           str s;
           e.to_string(s);
           FPRINTF(stderr,L"Exception caught: %ls\n",s.c_str());
-          THR(comm::exc::rs_common_error,comm::exc::cm_udp_hello_handler,false);
+          THR(comm::exc::rs_common_error,false);
         }
         return true;
       }
@@ -113,8 +113,8 @@ namespace csl
             thus the public key based on the received public key
           */
 
-          if( my_public_key.to_xdr(xbo) == false ) { THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_hello_handler,false); }
-          if( outer.size() > m.max_len() ) { THR(comm::exc::rs_too_big,comm::exc::cm_udp_hello_handler,false); }
+          if( my_public_key.to_xdr(xbo) == false ) { THR(comm::exc::rs_xdr_error,false); }
+          if( outer.size() > m.max_len() )         { THR(comm::exc::rs_too_big,false); }
 
           outer.copy_to(m.data_,m.max_len());
 
@@ -140,7 +140,7 @@ namespace csl
         */
           if( !peer_public_key.gen_sha1hex_shared_key(my_private_key,session_key) )
           {
-            THR(comm::exc::rs_sec_error,comm::exc::cm_udp_hello_handler,false);
+            THR(comm::exc::rs_sec_error,false);
           }
 
           /* compile packet */
@@ -159,14 +159,14 @@ namespace csl
 
           if( !pk.encrypt( salt,key,head,data,foot ) )
           {
-            THR(comm::exc::rs_crypt_pkt_error,comm::exc::cm_udp_hello_handler,false);
+            THR(comm::exc::rs_crypt_pkt_error,false);
           }
 
           /* output packet */
           unsigned char * outputp = m.data_+outer.size();
           unsigned int retlen = outer.size()+head.size()+data.size()+foot.size();
 
-          if( retlen > m.max_len() ) { THR(comm::exc::rs_too_big,comm::exc::cm_udp_hello_handler,false); }
+          if( retlen > m.max_len() ) { THR(comm::exc::rs_too_big,false); }
 
           memcpy( outputp, head.data(), head.size() ); outputp += head.size();
           memcpy( outputp, data.data(), data.size() ); outputp += data.size();
@@ -190,7 +190,7 @@ namespace csl
           str s;
           e.to_string(s);
           FPRINTF(stderr,L"Exception caught: %ls\n",s.c_str());
-          THR(comm::exc::rs_common_error,comm::exc::cm_udp_hello_handler,false);
+          THR(comm::exc::rs_common_error,false);
         }
 
         return false;
@@ -297,7 +297,7 @@ namespace csl
         /* init receivers */
         if( receiver_.start(min_threads_,max_threads_,timeout_ms_,retries_,handler_) == false )
         {
-          THR(exc::rs_thread_start,exc::cm_udp_hello_srv,false);
+          THR(exc::rs_thread_start,false);
         }
 
         /* set thread entries */
@@ -305,7 +305,7 @@ namespace csl
         handler_.socket( receiver_.socket() );
 
         /* launch receiver threads */
-        if( thread_.start() == false ) { THR(exc::rs_thread_start,exc::cm_udp_hello_srv,false); }
+        if( thread_.start() == false ) { THR(exc::rs_thread_start,false); }
 
         return true;
       }
@@ -329,7 +329,7 @@ namespace csl
       }
 
       hello_srv::hello_srv() 
-        : use_exc_(true), debug_(false), min_threads_(1), max_threads_(4), timeout_ms_(1000), retries_(10)
+        : debug_(false), min_threads_(1), max_threads_(4), timeout_ms_(1000), retries_(10)
       {
       }
 
@@ -344,7 +344,7 @@ namespace csl
       **
       **********************************************************************/
 
-      hello_cli::hello_cli() : use_exc_(true), debug_(false), sock_(-1)
+      hello_cli::hello_cli() : debug_(false), sock_(-1)
       {
         memset( &addr_,0,sizeof(addr_) );
         addr_.sin_family        = AF_INET;
@@ -368,7 +368,7 @@ namespace csl
 
           if( debug() ) { PRINTF(L" ++ [%ld] : packet_type : %d\n",xb.position(),msg::hello_p ); }
 
-          if( public_key_.to_xdr(xb) == false ) { THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_hello_cli,false); }
+          if( public_key_.to_xdr(xb) == false ) { THR(comm::exc::rs_xdr_error,false); }
 
           if( debug() ) { PRINTF(L" ++ [%ld] : ",xb.position()); public_key_.print(); }
 
@@ -380,7 +380,7 @@ namespace csl
           str s;
           e.to_string(s);
           FPRINTF(stderr,L"Exception caught: %ls\n",s.c_str());
-          THR(comm::exc::rs_common_error,comm::exc::cm_udp_hello_cli,false);
+          THR(comm::exc::rs_common_error,false);
         }
         return true;
       }
@@ -399,9 +399,9 @@ namespace csl
 
           if( debug() ) { PRINTF(L" -- [%ld] : packet_type : %d\n",xbo.position(),packet_type ); }
 
-          if( packet_type != msg::olleh_p ) { THR(comm::exc::rs_invalid_packet_type,comm::exc::cm_udp_hello_cli,false); }
+          if( packet_type != msg::olleh_p ) { THR(comm::exc::rs_invalid_packet_type,false); }
 
-          if( server_public_key_.from_xdr(xbo) == false ) { THR(comm::exc::rs_xdr_error,comm::exc::cm_udp_hello_cli,false); }
+          if( server_public_key_.from_xdr(xbo) == false ) { THR(comm::exc::rs_xdr_error,false); }
 
           if( debug() ) { PRINTF(L" -- [%ld] : ",xbo.position()); server_public_key_.print(); }
 
@@ -415,7 +415,7 @@ namespace csl
 
           if( !server_public_key_.gen_sha1hex_shared_key(private_key_,session_key) )
           {
-            THR(comm::exc::rs_sec_error,comm::exc::cm_udp_hello_cli,false);
+            THR(comm::exc::rs_sec_error,false);
           }
 
           if( debug() ) { PRINTF(L"  -- Session Key: '%s'\n",session_key.c_str()); }
@@ -439,7 +439,7 @@ namespace csl
 
           if( pk.decrypt( key,head,data,foot ) == false )
           {
-            THR(comm::exc::rs_crypt_pkt_error,comm::exc::cm_udp_hello_cli,false);
+            THR(comm::exc::rs_crypt_pkt_error,false);
           }
 
           /* xdr deserialize */
@@ -467,7 +467,7 @@ namespace csl
           str s;
           e.to_string(s);
           FPRINTF(stderr,L"Exception caught: %ls\n",s.c_str());
-          THR(comm::exc::rs_common_error,comm::exc::cm_udp_hello_cli,false);
+          THR(comm::exc::rs_common_error,false);
         }
         return false;
       }
@@ -495,11 +495,11 @@ namespace csl
         if( sock_ > 0 ) return true;
 
         /* public_key has been set ? */
-        if( public_key().is_empty() ) { THR(exc::rs_pubkey_empty,exc::cm_udp_hello_cli,false); }
+        if( public_key().is_empty() ) { THR(exc::rs_pubkey_empty,false); }
 
         sock_ = init_sock( addr_ );
 
-        if( sock_ <= 0 ) { THRC(exc::rs_socket_failed,exc::cm_udp_hello_cli,false); }
+        if( sock_ <= 0 ) { THRC(exc::rs_socket_failed,false); }
 
         return true;
       }
@@ -515,12 +515,12 @@ namespace csl
         /* prepare hello packet */
         if( prepare_hello( ms) == false )
         {
-          THR(exc::rs_pkt_error,exc::cm_udp_hello_cli,false);
+          THR(exc::rs_pkt_error,false);
         }
 
         if( (err=::send( sock_, reinterpret_cast<const char *>(ms.data_), ms.size_, 0 )) != static_cast<int>(ms.size_) )
         {
-          THRC(exc::rs_send_failed,exc::cm_udp_hello_cli,false);
+          THRC(exc::rs_send_failed,false);
         }
 
         fd_set rfds;
@@ -549,24 +549,24 @@ namespace csl
 
             if( init_olleh( ms ) == false )
             {
-              THR(exc::rs_pkt_error,exc::cm_udp_hello_cli,false);
+              THR(exc::rs_pkt_error,false);
             }
             return true;
           }
           else
           {
-            THRC(exc::rs_recv_failed,exc::cm_udp_hello_cli,false);
+            THRC(exc::rs_recv_failed,false);
           }
         }
         else if( err == 0 )
         {
           /* timed out */
-          THR(exc::rs_timeout,exc::cm_udp_hello_cli,false);
+          THR(exc::rs_timeout,false);
         }
         else
         {
           /* error */
-          THRC(exc::rs_select_failed,exc::cm_udp_hello_cli,false);
+          THRC(exc::rs_select_failed,false);
         }
       }
 

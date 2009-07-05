@@ -58,7 +58,7 @@ namespace csl
     item_state::item_state(const item_state & x)
       : id_(0,*this), item_id_(0,*this), peer_id_(0,*this), peer_state_(0,*this)
       {
-        throw exc(exc::rs_private_fun,exc::cm_item_state);
+        throw exc(exc::rs_private_fun,get_class_name());
       }
 
   } /*sched*/
