@@ -208,7 +208,7 @@ namespace csl
     char ustr::at(const size_t n) const
     {
       if ( n > nbytes() )
-        THR(exc::rs_invalid_param,NULL);
+        THR(exc::rs_invalid_param,0);
 
       return data()[n];
     }
