@@ -70,26 +70,16 @@ namespace test_logger
       void exception()
       {
         ENTER_FUNCTION();
-        //THROW_EXCEPTION( exc(exc::rs_unknown,exc::cm_logger,LOG_TEST_MSG) );
+        THRR( exc::rs_unknown, LOG_TEST_MSG, );
+        LEAVE_FUNCTION();
+      }
+
+      static void static_void() 
+      {
+        ENTER_FUNCTION();
         LEAVE_FUNCTION();
       }
   };
-
-  /**@test simple LEAVE_FUNCTION test */
-  void void_function()
-  {
-    //ENTER_FUNCTION();
-
-    //LEAVE_FUNCTION();
-  }
-
-  /**@test simple LEAVE_FUNCTION test */
-  void void_nolog_function()
-  {
-    //ENTER_FUNCTION();
-
-    //LEAVE_FUNCTION();
-  }
 
 };
 
@@ -98,23 +88,31 @@ int main()
   struct stat st;
   unlink( CSL_LOGFILE );
 
-  // test mostly the compilation issues
-  test_logger::void_function();
 
   // check return code from RETURN_FUNCTION 
   test_logger::logtest l;
-  assert( l.int_function(L"param1") == 0x12345678 );
+  l.use_exc(true);
+  assert( l.int_function(L"param1") == 0x12345678 );  
 
   // check created logfile
   assert( stat(CSL_LOGFILE,&st) == 0 );
 
+  // test static file
+  unlink( CSL_LOGFILE );
+  test_logger::logtest::static_void();
+  assert( stat(CSL_LOGFILE,&st) == 0 );
+
+
   // check THROW_EXCEPTION
+  unlink( CSL_LOGFILE );
   try {
     l.exception();
     assert( "Exception not thrown" == NULL );
   } catch ( exc e ) {
     assert( e.text_ == LOG_TEST_MSG );
   }
+  assert( stat(CSL_LOGFILE,&st) == 0 );
+
 
   return 0;
 }

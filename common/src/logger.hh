@@ -58,17 +58,17 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef DEBUG
  #define ENTER_FUNCTION()  \
    if ( csl::common::logger::enable_trace_ )                     \
-     csl::common::logger::debug(this->get_class_name(),L">>> Entering function:\t%ls::%s",this->get_class_name(),__FUNCTION__)
+     csl::common::logger::debug(get_class_name(),L">>> Entering function:\t%ls::%s",get_class_name(),__FUNCTION__)
  #define LEAVE_FUNCTION()                                        \
    {                                                             \
    if ( csl::common::logger::enable_trace_ )                     \
-     csl::common::logger::debug(this->get_class_name(),L">>> Leaving function:\t%ls::%s",this->get_class_name(),__FUNCTION__); \
+     csl::common::logger::debug(get_class_name(),L">>> Leaving function:\t%ls::%s",get_class_name(),__FUNCTION__); \
    return;                                                       \
    }
  #define RETURN_FUNCTION(ret)                                    \
    {                                                             \
    if ( csl::common::logger::enable_trace_ )                     \
-     csl::common::logger::debug(this->get_class_name(),L">>> Leaving function:\t%ls::%s",this->get_class_name(),__FUNCTION__); \
+     csl::common::logger::debug(get_class_name(),L">>> Leaving function:\t%ls::%s",get_class_name(),__FUNCTION__); \
    return(ret);                                                  \
    }
 
