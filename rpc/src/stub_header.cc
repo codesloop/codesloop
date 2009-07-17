@@ -129,18 +129,22 @@ namespace csl
               << "/* " 
               << param_kind_name[ (*param_it).kind ] << " */"
               << "\t"
-              << (*param_it).type 
-            ;
+              << ((*param_it).kind==MD_INPUT ? "const " : "")
+              ;
 
-            if ( (*param_it).kind==MD_INPUT && (*param_it).is_array )
-              output << " "; // space needed only, when an arry ptr is coming
+
+            if (  (*param_it).is_array ) {
+              output << "vec<" << (*param_it).type << ">";
+            } else {
+              output << (*param_it).type;
+            }
+
+            if ( (*param_it).kind==MD_INPUT )
+              output << " &"; 
             else if ( (*param_it).kind==MD_OUTPUT )
               output << " *";
             else if ( (*param_it).kind==MD_INOUT )
               output << " &";
-
-            if ( (*param_it).is_array )
-              output << "*";
 
             output
               << "\t" << (*param_it).name  
