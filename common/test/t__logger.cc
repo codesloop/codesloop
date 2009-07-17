@@ -88,6 +88,8 @@ int main()
   struct stat st;
   unlink( CSL_LOGFILE );
 
+  // assert def values
+  assert( csl::common::logger::enable_trace_ == true );
 
   // check return code from RETURN_FUNCTION 
   test_logger::logtest l;

@@ -188,7 +188,9 @@ namespace csl {
           }
 #endif
         }
-
+      
+        /** @brief executed at program startup */
+        static int           init(); 
 
       private:
         static std::string   logfile_;
