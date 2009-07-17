@@ -40,6 +40,32 @@ namespace csl
 {
   namespace common
   {
+    namespace 
+    {
+      static unsigned long long CRCTable[256];
+  
+      static int initalize_CRCTable() 
+      {
+        int i, j;
+        unsigned long long part;
+
+        for (i = 0; i < 256; i++)
+        {
+          part = i;
+          for (j = 0; j < 8; j++)
+          {
+            if (part & 1)
+              part = (part >> 1) ^ 0xd800000000000000ULL;
+            else
+              part >>= 1;
+          }
+          CRCTable[i] = part;
+        }
+
+        return 0;
+      }
+    } 
+
     str::str(const ustr & other) : csl::common::var(), buf_( L'\0' )
     {
       size_t sz = other.size();
@@ -417,28 +443,8 @@ namespace csl
     int64 str::crc64() const
     {
       int64 ret;
-      int i, j;
-      unsigned long long crc = 0x0000000000000000ULL, part;
-      static int init = 0;
-      static unsigned long long CRCTable[256];
+      unsigned long long crc = 0x0000000000000000ULL;
       const unsigned char * seq = ucharp_data();
-
-      if (!init)
-      {
-          init = 1;
-          for (i = 0; i < 256; i++)
-          {
-              part = i;
-              for (j = 0; j < 8; j++)
-              {
-                  if (part & 1)
-                      part = (part >> 1) ^ 0xd800000000000000ULL;
-                  else
-                      part >>= 1;
-              }
-              CRCTable[i] = part;
-          }
-      }
 
       while (*seq)
           crc = CRCTable[(crc ^ *seq++) & 0xff] ^ (crc >> 8);
@@ -448,5 +454,7 @@ namespace csl
 
   };
 };
+
+AUTOEXEC( csl::common, initalize_crc_table, initalize_CRCTable );
 
 /* EOF */
