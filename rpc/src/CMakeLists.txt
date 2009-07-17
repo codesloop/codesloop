@@ -60,6 +60,7 @@ ADD_EXECUTABLE( csrgen  csrparser.cc    csrparser.hh
                         stub_header.cc  stub_header.hh
                         stub_server.cc  stub_server.hh
                         stub_client.cc  stub_client.hh
+                        exc.cc          exc.hh
                         csrgen_main.cc 
                         csrgen.hh)
 # -- EOF 
