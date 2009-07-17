@@ -344,4 +344,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CSL_TYPE_BIN 5
 #endif /*CSL_TYPE_BIN*/
 
+#define AUTOEXEC( NAMESPACE, TASK, FUNCTION ) \
+     static int NAMESPACE::TASK = NAMESPACE::FUNCTION(); 
+
 #endif /* _csl_common_common_h_included_ */
