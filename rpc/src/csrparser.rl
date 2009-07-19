@@ -131,6 +131,7 @@ const char * csl::rpc::param_kind_name[] = {
   identifier  = ( [a-zA-Z_] [a-zA-Z0-9_]* )             >s;
 
   type_ident  = ( [a-zA-Z_:] ([a-zA-Z 0-9_:<>]*[a-zA-Z0-9_>])?) >s;
+  namespc_def = ( [a-zA-Z_]  ([a-zA-Z0-9_:]*[a-zA-Z0-9_])?)     >s;
   version_num = ( [0-9] ( '.'? [0-9] )* )      >s;
 
   array_decl  = ws* (
@@ -180,7 +181,7 @@ const char * csl::rpc::param_kind_name[] = {
                 ;
 
   if_namespc  = '#' ws_no_nl* namespc ws_no_nl+ 
-                type_ident
+                namespc_def
                 ws_no_nl* newline
                 ;
 

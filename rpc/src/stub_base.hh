@@ -23,30 +23,45 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
  
-#ifndef _csl_rpc_stub_header_hh_included_
-#define _csl_rpc_stub_header_hh_included_
+#ifndef _csl_rpc_stub_base_hh_included_
+#define _csl_rpc_stub_base_hh_included_
 
 #include "common.h"
 #ifdef __cplusplus
+#include <fstream>
+#include <string>
+
 #include "obj.hh"
 #include "iface.hh"
 #include "csrgen.hh"
-#include "stub_base.hh"
+#include "ustr.hh"
+#include "str.hh"
+
+
 
 namespace csl 
 { 
   namespace rpc 
   {
     /** @brief stores parsed interface description */
-    class stub_header : public stub_base
+    class stub_base : public csl::common::obj
     {
-      CSL_OBJ(csl::rpc,stub_header);
+      CSL_OBJ(csl::rpc,stub_base);
 
     public:
-      stub_header(const iface * i) : stub_base(i) {}
+      stub_base(const iface * i);
+      ~stub_base();
 
-    public:
-      virtual void generate();
+      virtual void generate() = 0;
+
+      virtual void generate_func_params(std::string function);
+
+    protected:
+      const iface * ifc_;
+
+      csl::common::ustr ifname_;
+      std::fstream output_;
+      std::string ls_;
 
     };
 
@@ -55,4 +70,4 @@ namespace csl
 }
 
 #endif /* __cplusplus */
-#endif /* _csl_rpc_stub_header_hh_included_ */
+#endif /* _csl_rpc_stub_base_hh_included_ */

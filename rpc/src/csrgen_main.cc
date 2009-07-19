@@ -65,7 +65,8 @@ int  main(  int  argc,  char  **argv  )
     );          
   
 
-  stub_header::generate( p.get_iface() );
+  stub_header h(p.get_iface());
+  h.generate();
 //  stub_client::generate( p.get_iface() );
 //  stub_server::generate( p.get_iface() );
 

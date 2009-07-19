@@ -57,6 +57,7 @@ ADD_CUSTOM_COMMAND( OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/csrparser.cc
 
 ADD_EXECUTABLE( csrgen  csrparser.cc    csrparser.hh
                         iface.cc        iface.hh 
+                        stub_base.cc    stub_base.hh
                         stub_header.cc  stub_header.hh
                         stub_server.cc  stub_server.hh
                         stub_client.cc  stub_client.hh
