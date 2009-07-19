@@ -84,7 +84,8 @@ namespace csl
       |  Generate namespace info                                 |
       \---------------------------------------------------------*/
       
-      // TODO
+      this->generate_ns_open();
+      output_ << endl;
 
       /*---------------------------------------------------------\
       |  Generate function specs                                 |
@@ -95,7 +96,7 @@ namespace csl
       while ( func_it != ifc_->get_functions()->end() )
       {
         output_ 
-          << ls_ << "#define __func_"  << ifname_.c_str()  << "_"
+          << "#define __func_"  << ifname_.c_str()  << "_"
           << (*func_it).name << "_id " << func_seq++ << endl;
 
         output_ << ls_ << "void " << (*func_it).name << " (" << endl;
@@ -107,12 +108,11 @@ namespace csl
         func_it++;
       }
 
-
-      // TODO
-
       /*---------------------------------------------------------\
       |  Cleanup                                                 |
       \---------------------------------------------------------*/
+      generate_ns_close();
+
       output_
         << endl
         << "#ifndef /* __csl_interface_" << ifc_->get_name().c_str() << "*/" 

@@ -71,8 +71,50 @@ namespace csl
       LEAVE_FUNCTION();
     }
 
+
+    void stub_base::generate_ns_open()
+    {
+      ENTER_FUNCTION();
+
+      char * pch = strtok(const_cast<char*>(ifc_->get_namespc().c_str()) ,":");
+
+      while (pch != NULL)
+      {
+        output_ 
+          << ls_ << "namespace " << pch << endl
+          << ls_ << "{" 
+          << endl
+        ;
+
+        ls_ += "  ";
+
+        pch = strtok (NULL, ":");
+      }
+
+      LEAVE_FUNCTION();
+    }
+
+    void stub_base::generate_ns_close()
+    {
+      ENTER_FUNCTION();
+
+      for ( size_t i = ls_.size() ; i > 0 ; i -= 2 )
+      {
+        output_ 
+          << ls_.substr(0,i-2) 
+          << "}"
+          << endl
+        ;
+      }
+
+      ls_ = "";
+      LEAVE_FUNCTION();
+    }
+
+
     void stub_base::generate_func_params(std::string function)
     {   
+      ENTER_FUNCTION();
 
       /*---------------------------------------------------------\
       |  Generate function specs                                 |
@@ -138,6 +180,8 @@ namespace csl
         }
 
         output_ << ls_ << ")";
+
+        LEAVE_FUNCTION();
       }
     }
   };

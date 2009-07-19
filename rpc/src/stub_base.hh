@@ -55,6 +55,8 @@ namespace csl
       virtual void generate() = 0;
 
       virtual void generate_func_params(std::string function);
+      virtual void generate_ns_open();
+      virtual void generate_ns_close();
 
     protected:
       const iface * ifc_;
