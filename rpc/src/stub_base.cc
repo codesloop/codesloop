@@ -112,7 +112,7 @@ namespace csl
     }
 
 
-    void stub_base::generate_func_params(std::string function)
+    void stub_base::generate_func_params(std::string function, bool is_async)
     {   
       ENTER_FUNCTION();
 
@@ -130,7 +130,10 @@ namespace csl
         param_it = (*func_it).params.begin();
 
         // fix parameter for
-        output_ << ls_ << "\t/* inout */\tcsl::rpc::conn &\t__rpc_con," << endl;
+        output_ << ls_ << "\t/* inout */\tcsl::rpc::conn &\t__rpc_conn," << endl;
+
+        if ( is_async == true )
+          output_ << ls_ << "\t/* inout */\tcsl::rpc::handle &\t__handle," << endl;
 
         // parameters
         while( param_it != (*func_it).params.end() ) 

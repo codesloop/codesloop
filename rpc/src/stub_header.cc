@@ -99,9 +99,14 @@ namespace csl
           << "#define __func_"  << ifname_.c_str()  << "_"
           << (*func_it).name << "_id " << func_seq++ << endl;
 
+        /* synchronous call */
         output_ << ls_ << "void " << (*func_it).name << " (" << endl;
+        this->generate_func_params( (*func_it).name, false );
+        output_ << ";" << endl;
 
-        this->generate_func_params( (*func_it).name );
+        /* synchronous call */
+        output_ << ls_ << "void " << (*func_it).name << " (" << endl;
+        this->generate_func_params( (*func_it).name, true);
 
         output_ << ";" << endl << endl << endl;
 
