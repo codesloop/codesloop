@@ -47,6 +47,11 @@ namespace csl
     class stub_base : public csl::common::obj
     {
       CSL_OBJ(csl::rpc,stub_base);
+      
+      enum stub_kind { 
+        STUB_CLIENT,
+        STUB_SERVER
+      };
 
     public:
       stub_base(const iface * i);
@@ -54,9 +59,12 @@ namespace csl
 
       virtual void generate() = 0;
 
-      virtual void generate_func_params(std::string function, bool is_async = false);
+      virtual void generate_func_params(std::string function, stub_kind kind, 
+          bool is_async = false);
       virtual void generate_ns_open();
       virtual void generate_ns_close();
+
+      virtual void open_file(const char * filename);
 
     protected:
       const iface * ifc_;

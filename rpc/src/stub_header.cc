@@ -44,6 +44,15 @@ namespace csl
   namespace rpc
   {
     void stub_header::generate()
+    {
+      open_file((ifname_+"_cli.hh").c_str());
+      write_file(STUB_CLIENT);
+
+      open_file((ifname_+"_srv.hh").c_str());
+      write_file(STUB_SERVER);
+    }
+
+    void stub_header::write_file(stub_kind kind)
     {   
 
       output_
@@ -79,6 +88,25 @@ namespace csl
         << ustr( ifc_->to_string().c_str() ).crc64().value()
         << "LL"
         << endl << endl;
+
+      if ( kind == STUB_SERVER ) 
+      {
+        output_ 
+         << "#ifdef __if_" << ifname_.c_str() << "_client" << endl
+         << "#error \"both client and server headers are included\"" << endl
+         << "#endif" << endl
+         << "#define  __if_" << ifname_.c_str()  << "_server"
+         << endl << endl
+        ;
+      } else {
+        output_ 
+         << "#ifdef __if_" << ifname_.c_str() << "_server" << endl
+         << "#error both client and server headers are included" << endl
+         << "#endif" << endl
+         << "#define  __if_" << ifname_.c_str()  << "_client"
+         << endl << endl;
+      }
+
             
       /*---------------------------------------------------------\
       |  Generate namespace info                                 |
@@ -101,14 +129,17 @@ namespace csl
 
         /* synchronous call */
         output_ << ls_ << "void " << (*func_it).name << " (" << endl;
-        this->generate_func_params( (*func_it).name, false );
+        this->generate_func_params( (*func_it).name, kind, false);
         output_ << ";" << endl;
 
-        /* synchronous call */
-        output_ << ls_ << "void " << (*func_it).name << " (" << endl;
-        this->generate_func_params( (*func_it).name, true);
+        /* asynchronous call */
+        if ( kind == STUB_CLIENT ) {
+          output_ << ls_ << "void " << (*func_it).name << " (" << endl;
+          this->generate_func_params( (*func_it).name, kind, true);
+          output_ << ";" << endl;
+        }
 
-        output_ << ";" << endl << endl << endl;
+        output_ << endl << endl;
 
         func_it++;
       }

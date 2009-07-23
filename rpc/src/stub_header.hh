@@ -48,6 +48,9 @@ namespace csl
     public:
       virtual void generate();
 
+    private:
+      virtual void write_file(stub_kind kind);
+
     };
 
 
