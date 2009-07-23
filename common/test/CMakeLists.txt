@@ -1,5 +1,5 @@
 # Copyright (c) 2008,2009, David Beck, Tamas Foldi
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
@@ -38,7 +38,7 @@ IF(WIN32)
                      -Wcast-align
                      -Wshadow
                      -Wredundant-decls
-                     -g3
+                     -pg
                    )
 
   ELSE(MSYS)
@@ -95,21 +95,25 @@ ELSE(WIN32)
 
 ENDIF(WIN32)
 
-ADD_EXECUTABLE( t__zfile    t__zfile.cc )
-ADD_EXECUTABLE( t__circbuf  t__circbuf.cc )
-ADD_EXECUTABLE( t__pvlist   t__pvlist.cc )
-ADD_EXECUTABLE( t__mpool    t__mpool.cc )
-ADD_EXECUTABLE( t__pbuf     t__pbuf.cc )
-ADD_EXECUTABLE( t__hash     t__hash.cc )
-ADD_EXECUTABLE( t__tbuf     t__tbuf.cc )
-ADD_EXECUTABLE( t__xdrbuf   t__xdrbuf.cc )
-ADD_EXECUTABLE( t__logger   t__logger.cc )
-ADD_EXECUTABLE( t__str      t__str.cc )
-ADD_EXECUTABLE( t__ustr     t__ustr.cc )
-ADD_EXECUTABLE( t__int64    t__int64.cc )
-ADD_EXECUTABLE( t__dbl      t__dbl.cc )
-ADD_EXECUTABLE( t__binry    t__binry.cc )
-ADD_EXECUTABLE( t__serial   t__serial.cc )
-ADD_EXECUTABLE( t__obj      t__obj.cc )
+ADD_EXECUTABLE( t__zfile         t__zfile.cc )
+ADD_EXECUTABLE( t__circbuf       t__circbuf.cc )
+ADD_EXECUTABLE( t__pvlist        t__pvlist.cc )
+ADD_EXECUTABLE( t__mpool         t__mpool.cc )
+ADD_EXECUTABLE( t__pbuf          t__pbuf.cc )
+ADD_EXECUTABLE( t__tbuf          t__tbuf.cc )
+ADD_EXECUTABLE( t__xdrbuf        t__xdrbuf.cc )
+ADD_EXECUTABLE( t__logger        t__logger.cc )
+ADD_EXECUTABLE( t__str           t__str.cc )
+ADD_EXECUTABLE( t__ustr          t__ustr.cc )
+ADD_EXECUTABLE( t__int64         t__int64.cc )
+ADD_EXECUTABLE( t__dbl           t__dbl.cc )
+ADD_EXECUTABLE( t__binry         t__binry.cc )
+ADD_EXECUTABLE( t__serial        t__serial.cc )
+ADD_EXECUTABLE( t__obj           t__obj.cc )
+ADD_EXECUTABLE( t__inpvec        t__inpvec.cc )
+ADD_EXECUTABLE( t__hash          t__hash.cc )
+
+#ADD_EXECUTABLE( t__hash_macros   t__hash_macros.cc )
+#SET_TARGET_PROPERTIES( t__inpvec PROPERTIES LINK_FLAGS -pg )
 
 # -- EOF --

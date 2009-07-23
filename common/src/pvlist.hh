@@ -268,6 +268,17 @@ namespace csl
           if( i_ ) { return i_->ptrs_[pos_]; }
           else     { return 0;               }
         }
+
+        /** @brief free item at the given iterator position */
+        void free()
+        {
+          D d;
+          if( i_ && i_->ptrs_[pos_] )
+          {
+            d.destruct( i_->ptrs_[pos_] );
+            i_->ptrs_[pos_] = 0;
+          }
+        }
       };
 
 
@@ -421,19 +432,19 @@ namespace csl
       inline pvlist() : tail_(&head_), n_items_(0) { }
 
       /** @brief destructor */
-      inline ~pvlist() 
+      inline ~pvlist()
       {
         free_all();
       }
 
       /** 
-       @brief number of items stored 
+       @brief number of items stored
        @return the number of items
        */
       inline size_t n_items() const { return n_items_; }
 
       /** 
-      @brief number of items stored 
+      @brief number of items stored
       @return the number of items
 
       same as n_items()
@@ -517,7 +528,7 @@ namespace csl
         return freed;
       }
 
-      /** 
+      /**
        @brief free()-s p first occurence and returns
        @param p the pointer to be destructed
        @return true if pointer found and freed
@@ -547,13 +558,13 @@ namespace csl
               i->ptrs_[ii] = 0;
               return true;
             }
-          }    
+          }
           i = i->next_;
         }
         return false;
       }
 
-      /** 
+      /**
        @brief adds an item to the end of the list
        @param p the pointer to be appended
 
@@ -577,30 +588,30 @@ namespace csl
       inline T * get_at(size_t which) const
       {
         if( which >= n_items_ ) return 0;
-        
+
         size_t pn = which/block_size;
-        
+
         /* first page go fast */
-        if( !pn  ) 
+        if( !pn  )
           return (which < head_.used_ ? head_.ptrs_[which] : 0);
-        
+
         /* iterate through pages */
         const item * pt = &head_;
         while( pt->next_ && pn > 0 )
         {
-          --pn; 
-          pt = pt->next_; 
+          --pn;
+          pt = pt->next_;
         }
-        
+
         /* not enough pages */
-        if( pn ) 
+        if( pn )
           return 0;
-        
+
         size_t rm = which%block_size;
-        
+
         return (rm < pt->used_ ? pt->ptrs_[rm] : 0);
       }
-      
+
       /**
        @brief sets the item at the specified position
        @param which is the desired position
@@ -610,9 +621,9 @@ namespace csl
       inline bool set_at(size_t which, T * ptr)
       {
         if( which >= n_items_ ) return false;
-        
+
         size_t pn = which/block_size;
-        
+
         /* first page go fast */
         if( !pn  ) 
         {
@@ -620,21 +631,21 @@ namespace csl
           head_.ptrs_[which] = ptr;
           return true;
         }
-        
+
         /* iterate through pages */
         item * pt = &head_;
         while( pt->next_ && pn > 0 )
         {
-          --pn; 
-          pt = pt->next_; 
+          --pn;
+          pt = pt->next_;
         }
-        
+
         /* not enough pages */
-        if( pn ) 
+        if( pn )
           return false;
-        
+
         size_t rm = which%block_size;
-        
+
         if( rm < pt->used_ )
         {
           pt->ptrs_[rm] = ptr;
@@ -645,7 +656,7 @@ namespace csl
           return false;
         }
       }
-      
+
       /** @brief prints some debug information to STDOUT */
       inline void debug()
       {

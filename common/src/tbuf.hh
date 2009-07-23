@@ -84,13 +84,13 @@ namespace csl
         }
 
         /** @brief copy constructor */
-        inline tbuf(const tbuf & other) : data_(preallocated_), size_(0) // TODO test copy constructor!!!
+        inline tbuf(const tbuf & other) : data_(preallocated_), size_(0)
         {
           *this = other;
         }
 
         /** @brief copy constructor */
-        inline explicit tbuf(const char * other) : data_(preallocated_), size_(0) // TODO test copy constructor!!!
+        inline explicit tbuf(const char * other) : data_(preallocated_), size_(0)
         {
           *this = other;
         }
@@ -128,7 +128,7 @@ namespace csl
         }
 
         /** @brief copy operator */
-        inline tbuf & operator=(const tbuf & other) // TODO test copy operator!!!
+        inline tbuf & operator=(const tbuf & other)
         {
           /* return immediately if they are the same */
           if( &other == this || other.data_ == data_ )
