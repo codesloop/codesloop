@@ -40,6 +40,8 @@ namespace csl
     /** @brief stores parsed interface description */
     class iface : public csl::common::obj
     {
+      CSL_OBJ(csl::rpc,iface);
+
       public:
         /** @brief structure to hold information about a parameter */ 
         struct param {

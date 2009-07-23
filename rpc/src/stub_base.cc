@@ -88,8 +88,8 @@ namespace csl
     void stub_base::generate_ns_open()
     {
       ENTER_FUNCTION();
-
-      char * pch = strtok(const_cast<char*>(ifc_->get_namespc().c_str()) ,":");
+      char * nspc = strdup( ifc_->get_namespc().c_str());
+      char * pch = strtok(nspc ,":");
 
       while (pch != NULL)
       {
@@ -103,6 +103,11 @@ namespace csl
 
         pch = strtok (NULL, ":");
       }
+
+      output_ << endl;
+
+      if (nspc != NULL)
+        free(nspc);
 
       LEAVE_FUNCTION();
     }
@@ -144,9 +149,6 @@ namespace csl
           continue;
 
         param_it = (*func_it).params.begin();
-
-        // fix parameter for
-        output_ << ls_ << "\t/* inout */\tcsl::rpc::conn &\t__rpc_conn," << endl;
 
         if ( is_async == true )
           output_ << ls_ << "\t/* inout */\tcsl::rpc::handle &\t__handle," << endl;
