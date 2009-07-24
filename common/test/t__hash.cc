@@ -29,117 +29,20 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "hash.hh"
+#include "hash_macros.hh"
+#include "tbuf.hh"
 #include "test_timer.h"
+#include "ustr.hh"
 #include "common.h"
+#include "mpool.hh"
+#include "pvlist.hh"
 #include <assert.h>
+#include <vector>
 
 using namespace csl::common;
 
 /** @brief contains tests related to hash */
 namespace test_hash {
-
-  /** @test baseline for performance comparison */
-  void baseline() { }
-
-  /** @test mod 7 baseline for performance comparison */
-  void mod7()
-  {
-    unsigned long long i = 12345678ULL;
-    assert( (i%7) < 7 );
-  }
-
-  /** @test mod 7,11 baseline for performance comparison */
-  void mod7_11()
-  {
-    unsigned long long i = 12345678ULL;
-    assert( (i%7) < 7 );
-    assert( (i%11) < 11 );
-  }
-
-  void hash_fun_1()
-  {
-    unsigned long long i = 12345678ULL;
-    default_hash_function(i,1);
-  }
-
-  void hash_fun_2()
-  {
-    unsigned long long i = 12345678ULL;
-    default_hash_function(i,2);
-  }
-
-  void hash_fun_6()
-  {
-    unsigned long long i = 12345678ULL;
-    default_hash_function(i,6);
-  }
-
-  void hash_fun_64()
-  {
-    unsigned long long i = 12345678ULL;
-    default_hash_function(i,64);
-  }
-
-  void hash_fun_ck()
-  {
-    // 1 bit hash
-    assert( default_hash_function(0,1) == 0 );
-    assert( default_hash_function(1,1) == 1 );
-    assert( default_hash_function(2,1) == 0 );
-    assert( default_hash_function(3,1) == 1 );
-
-    // 2 bits
-    assert( default_hash_function(0,2) == 0 );
-    assert( default_hash_function(1,2) == 1 );
-    assert( default_hash_function(2,2) == 2 );
-    assert( default_hash_function(3,2) == 3 );
-    assert( default_hash_function(4,2) == 0 );
-    assert( default_hash_function(5,2) == 1 );
-    assert( default_hash_function(6,2) == 2 );
-    assert( default_hash_function(7,2) == 0 );
-
-    // 3 bits
-    assert( default_hash_function(0,3)  == 0 );
-    assert( default_hash_function(1,3)  == 1 );
-    assert( default_hash_function(2,3)  == 2 );
-    assert( default_hash_function(3,3)  == 3 );
-    assert( default_hash_function(4,3)  == 4 );
-    assert( default_hash_function(5,3)  == 5 );
-    assert( default_hash_function(6,3)  == 6 );
-    assert( default_hash_function(7,3)  == 0 );
-    assert( default_hash_function(8,3)  == 1 );
-    assert( default_hash_function(9,3)  == 2 );
-
-    // 4 bits
-    assert( default_hash_function(0,4)  == 0000 );
-    assert( default_hash_function(1,4)  == 0011 );
-    assert( default_hash_function(2,4)  == 0002 );
-    assert( default_hash_function(3,4)  == 0013 );
-    assert( default_hash_function(4,4)  == 0004 );
-    assert( default_hash_function(5,4)  == 0015 );
-    assert( default_hash_function(6,4)  == 0006 );
-    assert( default_hash_function(7,4)  == 0010 );
-    assert( default_hash_function(8,4)  == 0001 );
-    assert( default_hash_function(9,4)  == 0012 );
-    assert( default_hash_function(10,4) == 0003 );
-
-    // 5 bits
-    assert( default_hash_function(0,5)  == 0000 );
-    assert( default_hash_function(1,5)  == 0011 );
-    assert( default_hash_function(2,5)  == 0022 );
-    assert( default_hash_function(3,5)  == 0033 );
-    assert( default_hash_function(4,5)  == 0004 );
-    assert( default_hash_function(5,5)  == 0015 );
-    assert( default_hash_function(6,5)  == 0026 );
-    assert( default_hash_function(7,5)  == 0030 );
-    assert( default_hash_function(8,5)  == 0001 );
-    assert( default_hash_function(9,5)  == 0012 );
-    assert( default_hash_function(10,5) == 0023 );
-    assert( default_hash_function(11,5) == 0004 );
-    assert( default_hash_function(12,5) == 0015 );
-    assert( default_hash_function(13,5) == 0026 );
-  }
-
 
 } // end of test_hash
 
@@ -147,15 +50,6 @@ using namespace test_hash;
 
 int main()
 {
-  csl_common_print_results( "hash_fun_ck         ", csl_common_test_timer_v0(hash_fun_ck),"" );
-  csl_common_print_results( "hash_fun_64         ", csl_common_test_timer_v0(hash_fun_64),"" );
-  csl_common_print_results( "baseline            ", csl_common_test_timer_v0(baseline),"" );
-  csl_common_print_results( "mod7                ", csl_common_test_timer_v0(mod7),"" );
-  csl_common_print_results( "mod7_11             ", csl_common_test_timer_v0(mod7_11),"" );
-  csl_common_print_results( "hash_fun_1          ", csl_common_test_timer_v0(hash_fun_1),"" );
-  csl_common_print_results( "hash_fun_2          ", csl_common_test_timer_v0(hash_fun_2),"" );
-  csl_common_print_results( "hash_fun_6          ", csl_common_test_timer_v0(hash_fun_6),"" );
-
   return 0;
 }
 

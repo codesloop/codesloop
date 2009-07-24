@@ -42,6 +42,7 @@ namespace csl
 {
   namespace common
   {
+#if 0
     unsigned long long default_hash_function(unsigned long long id, unsigned char nbits);
 
     unsigned long long hash_code(unsigned long long item);
@@ -105,12 +106,12 @@ namespace csl
         index            index_;
 
       public:
-        /* consructor */
+        // consructor
         hash() : index_(index_handler_), obj() { use_exc(true); }
 
-        /* forwarders */
+        // forwarders
 
-        /* call global hash_code function. if that is not suitable define one yourself */
+        // call global hash_code function. if that is not suitable define one yourself
         bool get(Obj & o)        { return get( hash_code(o) ,o ); }
         bool set(const Obj & o)  { return set( hash_code(o) ,o ); }
 
@@ -126,17 +127,17 @@ namespace csl
 
           if( !index_handler_.get_entry(index_,id,e,entry_id) )
           {
-            /* throw an exception telling the caller that this is a serious problem */
+            // throw an exception telling the caller that this is a serious problem
             THR(exc::rs_lookup_error,false);
           }
 
-          /* no page found for the given id, means there is no page and thus no data */
+          // no page found for the given id, means there is no page and thus no data
           if( e.page_id_ == 0 ) { return false; }
 
-          /* sanity check: the returned entry must be a leaf entry (should be zero) */
+          // sanity check: the returned entry must be a leaf entry (should be zero)
           if( e.next_item_ != 0 ) { THR(exc::rs_invalid_state,false); }
 
-          /* lookup and return item */
+          // lookup and return item
           return page_handler_.get(e.page_id_,id,o);
         }
 
@@ -152,7 +153,7 @@ namespace csl
 
           if( !index_handler_.get_entry(index_,id,e,entry_id) )
           {
-            /* this must be a serious problem, indicating an internal lookup error */
+            // this must be a serious problem, indicating an internal lookup error
             THR(exc::rs_lookup_error,false);
           }
 
@@ -181,12 +182,14 @@ namespace csl
           }
           else
           {
-            /* page_handler_ could insert the object */
+            // page_handler_ could insert the object
           }
         }
     };
-  }
-}
+#endif
+
+  } /* end of ns:common */
+} /* end of ns:csl */
 
 #endif /* __cplusplus */
 #endif /* _csl_common_hash_hh_included_ */

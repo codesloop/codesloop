@@ -110,13 +110,13 @@ namespace test_pvlist {
   void test_get_at()
   {
     pvlist< 32,char,nop_destructor<char> > pv;
-    
+
     for( int i=0;i<100;++i )
     {
       pv.push_back( reinterpret_cast<char *>(i) );
       assert( pv.n_items() == static_cast<size_t>(i+1) );
     }
-    
+
     for( int i=0;i<100;++i )
     {
       assert( pv.get_at(i) == reinterpret_cast<char *>(i) );
@@ -127,7 +127,7 @@ namespace test_pvlist {
   void test_set_get_at()
   {
     pvlist< 32,char,nop_destructor<char> > pv;
-    
+
     for( int i=0;i<100;++i )
     {
       pv.push_back( reinterpret_cast<char *>(i) );
@@ -146,13 +146,13 @@ namespace test_pvlist {
       assert( pv.n_items() == static_cast<size_t>(i+1) );
     }
   }
-  
+
   /** @test free() -- nop_destructor */
   void test_free_nop()
   {
     char t[2];
     pvlist< 32,char,nop_destructor<char> > pv;
-    
+
     for( int i=0;i<50;++i )
     {
       pv.push_back( t );
@@ -163,13 +163,13 @@ namespace test_pvlist {
     {
       assert( pv.get_at(i) != 0 );
     }
-    
+
     assert( pv.n_items() == 100 );
     pv.free( t );
     pv.free( t+1 );
     pv.free( t+2 );
     assert( pv.n_items() == 100 );
-    
+
     for( int i=0;i<100;++i )
     {
       assert( pv.get_at(i) == 0 );
@@ -181,10 +181,10 @@ namespace test_pvlist {
   {
     char * t[2];
     pvlist< 32,char,free_destructor<char> > pv;
-    
+
     t[0] = reinterpret_cast<char *>(malloc(1));
     t[1] = reinterpret_cast<char *>(malloc(1));
-    
+
     for( int i=0;i<50;++i )
     {
       pv.push_back( t[0] );
@@ -195,13 +195,13 @@ namespace test_pvlist {
     {
       assert( pv.get_at(i) != 0 );
     }
-    
+
     assert( pv.n_items() == 100 );
     pv.free( t[0] );
     pv.free( t[1] );
     pv.free( reinterpret_cast<char *>(8) );
     assert( pv.n_items() == 100 );
-    
+
     for( int i=0;i<100;++i )
     {
       assert( pv.get_at(i) == 0 );
@@ -213,10 +213,10 @@ namespace test_pvlist {
   {
     char * t[2];
     pvlist< 32,char,delete_destructor<char> > pv;
-    
+
     t[0] = new char;
     t[1] = new char;
-    
+
     for( int i=0;i<50;++i )
     {
       pv.push_back( t[0] );
@@ -227,13 +227,13 @@ namespace test_pvlist {
     {
       assert( pv.get_at(i) != 0 );
     }
-    
+
     assert( pv.n_items() == 100 );
     pv.free( t[0] );
     pv.free( t[1] );
     pv.free( reinterpret_cast<char *>(8) );
     assert( pv.n_items() == 100 );
-    
+
     for( int i=0;i<100;++i )
     {
       assert( pv.get_at(i) == 0 );
@@ -245,7 +245,7 @@ namespace test_pvlist {
   {
     char t[2];
     pvlist< 32,char,nop_destructor<char> > pv;
-    
+
     for( int i=0;i<50;++i )
     {
       pv.push_back( t );
@@ -256,16 +256,16 @@ namespace test_pvlist {
     {
       assert( pv.get_at(i) != 0 );
     }
-    
+
     assert( pv.n_items() == 100 );
     pv.free_one( t );
     pv.free_one( t+1 );
     pv.free_one( t+2 );
     assert( pv.n_items() == 100 );
-    
+
     assert( pv.get_at(0) == 0 );
     assert( pv.get_at(1) == 0 );
-    
+
     for( int i=2;i<100;++i )
     {
       assert( pv.get_at(i) != 0 );
@@ -278,10 +278,10 @@ namespace test_pvlist {
   {
     char * t[2];
     pvlist< 32,char,free_destructor<char> > pv;
-    
+
     t[0] = reinterpret_cast<char *>(malloc(1));
     t[1] = reinterpret_cast<char *>(malloc(1));
-    
+
     for( int i=0;i<50;++i )
     {
       pv.push_back( t[0] );
@@ -292,13 +292,13 @@ namespace test_pvlist {
     {
       assert( pv.get_at(i) != 0 );
     }
-    
+
     assert( pv.n_items() == 100 );
     pv.free_one( t[0] );
     pv.free_one( t[1] );
     pv.free_one( reinterpret_cast<char *>(8) );
     assert( pv.n_items() == 100 );
-    
+
     assert( pv.get_at(0) == 0 );
     assert( pv.get_at(1) == 0 );
 
@@ -314,10 +314,10 @@ namespace test_pvlist {
   {
     char * t[2];
     pvlist< 32,char,delete_destructor<char> > pv;
-    
+
     t[0] = new char;
     t[1] = new char;
-    
+
     for( int i=0;i<50;++i )
     {
       pv.push_back( t[0] );
@@ -328,7 +328,7 @@ namespace test_pvlist {
     {
       assert( pv.get_at(i) != 0 );
     }
-    
+
     assert( pv.n_items() == 100 );
     pv.free_one( t[0] );
     pv.free_one( t[1] );
@@ -337,7 +337,7 @@ namespace test_pvlist {
 
     assert( pv.get_at(0) == 0 );
     assert( pv.get_at(1) == 0 );
-    
+
     for( int i=2;i<100;++i )
     {
       assert( pv.get_at(i) != 0 );
@@ -350,15 +350,15 @@ namespace test_pvlist {
   {
     char t[2];
     pvlist< 32,char,nop_destructor<char> > pv;
-    
+
     for( int j=0;j<10;++j )
-    {    
+    {
       for( int i=0;i<50;++i )
       {
         pv.push_back( t );
         pv.push_back( t+1 );
       }
-      
+
       assert( pv.n_items() == 100 );
       pv.free_all();
       assert( pv.n_items() == 0 );
@@ -376,7 +376,7 @@ namespace test_pvlist {
       {
         pv.push_back( reinterpret_cast<char *>(malloc(1)) );
       }
-      
+
       assert( pv.n_items() == 100 );
       pv.free_all();
       assert( pv.n_items() == 0 );
@@ -387,7 +387,7 @@ namespace test_pvlist {
   void test_free_all_delete()
   {
     pvlist< 32,char,delete_destructor<char> > pv;
-   
+
     for( int j=0;j<10;++j )
     {
       for( int i=0;i<100;++i )
@@ -428,7 +428,7 @@ namespace test_pvlist {
     assert( lk == lk2 );
     assert( lk2 > 80 );
   }
-  
+
   /** @test iterator */
   void test_iter2()
   {

@@ -58,7 +58,7 @@ namespace csl
     {
       public:
         /** @brief default constructor */
-        inline var() : obj() { use_exc(false); }
+        inline var() : obj() { }
 
         virtual inline ~var() {} ///<destructor
 

@@ -34,6 +34,7 @@ namespace csl
 {
   namespace common
   {
+#if 0
     namespace
     {
       struct HF_data
@@ -138,6 +139,7 @@ namespace csl
       }
       return result;
     }
+#endif
   };
 };
 
