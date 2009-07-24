@@ -120,7 +120,7 @@ namespace csl
       {
         output_ 
           << ls_.substr(0,i-2) 
-          << "}"
+          << "} /* namespace */"
           << endl
         ;
       }

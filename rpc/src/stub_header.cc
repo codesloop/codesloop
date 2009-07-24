@@ -196,7 +196,9 @@ namespace csl
       /*---------------------------------------------------------\
       |  Cleanup                                                 |
       \---------------------------------------------------------*/
-      //ls_ = ls_.substr( 0, ls_.size() - 2 );
+      ls_ = ls_.substr( 0, ls_.size() - 2 );
+      output_ << ls_ << "}; /* class */" << endl << endl;
+
       generate_ns_close();
 
       output_

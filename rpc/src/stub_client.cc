@@ -39,6 +39,8 @@ namespace csl
   {
     void stub_client::generate()
     {
+      const char * class_name = (ifname_ + "_srv").c_str();
+
       open_file((ifname_+"_cli.cc").c_str());
 
       output_
@@ -62,11 +64,16 @@ namespace csl
       while ( func_it != ifc_->get_functions()->end() )
       {
         /* synchronous call */
-        output_ << ls_ << "void " << (*func_it).name << " (" << endl;
+        output_ 
+          << ls_ << "void " << class_name << "::" 
+          << (*func_it).name << " (" << endl
+        ;
         this->generate_func_params( (*func_it).name, STUB_CLIENT, false);
         output_ 
           << endl 
-          << ls_ << "{" 
+          << ls_ << "{" << endl
+          << ls_ << "  csl::rpc::handle __handle;" << endl
+          << ls_ << "  this->create_handle(__handle);" << endl
           << endl
         ;
 
@@ -75,7 +82,7 @@ namespace csl
       \---------------------------------------------------------*/        
         output_ 
           << ls_ << "  " << (*func_it).name << "("  << endl
-          << ls_ << "    " << "NULL," << endl
+          << ls_ << "    " << "__handle," << endl
         ;
 
         param_it = (*func_it).params.begin();
@@ -98,14 +105,20 @@ namespace csl
         }
         output_
           << ls_ << "  );" 
+          << endl << endl 
+          << ls_ << "  this->wait( __handle);" << endl
           << endl
           << ls_ << "}" << endl
+          << endl
         ;
 
       /*---------------------------------------------------------\
       |  Function implementation on client side stub             |
       \---------------------------------------------------------*/        
-        output_ << ls_ << "void " << (*func_it).name << " (" << endl;
+        output_ 
+          << ls_ << "void " << class_name << "::" 
+          << (*func_it).name << " (" << endl
+        ;
         this->generate_func_params( (*func_it).name, STUB_CLIENT, true);
         output_
           << endl
