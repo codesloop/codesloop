@@ -31,19 +31,25 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "obj.hh"
 #include "iface.hh"
 #include "csrgen.hh"
+#include "stub_base.hh"
 
 namespace csl 
 { 
   namespace rpc 
   {
     /** @brief stores parsed interface description */
-    class stub_header : public csl::common::obj
+    class stub_header : public stub_base
     {
-    private:
-      stub_header();
+      CSL_OBJ(csl::rpc,stub_header);
 
     public:
-      static void generate(const iface *);
+      stub_header(const iface * i) : stub_base(i) {}
+
+    public:
+      virtual void generate();
+
+    private:
+      virtual void write_file(stub_kind kind);
 
     };
 

@@ -139,46 +139,41 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef THR
 #define THR(REASON,RET) \
     do { \
-      if( this->use_exc() ) { \
-        throw exc(REASON,this->get_class_name(),L"",L""__FILE__,__LINE__); \
-        return RET; } \
-      else { \
-        CSL_DEBUGF(L"Exception(%ls:%d): [%ls] [%ls]\n", \
-            L""__FILE__,__LINE__, \
-            this->get_class_name(), \
-            exc::reason_string(REASON)); \
-        return RET; } } while(false);
+      CSL_DEBUGF(L"Exception(%ls:%d): [%ls] [%ls]\n", \
+          L""__FILE__,__LINE__, \
+          get_class_name(), \
+          exc::reason_string(REASON)); \
+      if( this->use_exc() ) \
+        throw exc(REASON,get_class_name(),L"",L""__FILE__,__LINE__); \
+      return RET; } while(false);
 #endif /*THR*/
 
 #ifndef THRR
 #define THRR(REASON,MSG,RET) \
     do { \
-      if( this->use_exc() ) { \
-        throw exc(REASON,this->get_class_name(),MSG,L""__FILE__,__LINE__); \
-        return RET; } \
-      else { \
-        CSL_DEBUGF(L"Exception(%ls:%d): [%ls] [%ls] [%ls]\n", \
-            L""__FILE__,__LINE__, \
-            this->get_class_name(), \
-            exc::reason_string(REASON), \
-            MSG ); \
-        return RET; } } while(false);
+      CSL_DEBUGF(L"Exception(%ls:%d): [%ls] [%ls] [%ls]\n", \
+          L""__FILE__,__LINE__, \
+          get_class_name(), \
+          exc::reason_string(REASON), \
+          MSG ); \
+      if( this->use_exc() ) \
+        throw exc(REASON,get_class_name(),MSG,L""__FILE__,__LINE__); \
+      return RET; } while(false);
 #endif /*THRR*/
 
 #ifndef THRC
 #define THRC(REASON,RET) \
     do { \
+      CSL_DEBUGF(L"Exception(%ls:%d): [%ls] [%ls]\n", \
+        L""__FILE__,__LINE__, \
+        get_class_name(), \
+        exc::reason_string(REASON)); \
       if( this->use_exc() ) { \
         wchar_t errstr[256]; \
         mbstowcs( errstr,strerror(errno),255 ); \
-        throw exc(REASON,this->get_class_name(),errstr,L""__FILE__,__LINE__); \
-        return RET; } \
-      else { \
-        CSL_DEBUGF(L"Exception(%ls:%d): [%ls] [%ls]\n", \
-            L""__FILE__,__LINE__, \
-            this->get_class_name(), \
-            exc::reason_string(REASON)); \
-        return RET; } } while(false);
+        throw exc(REASON,get_class_name(),errstr,L""__FILE__,__LINE__); \
+      } \
+      return RET; } while(false);
 #endif /*THRC*/
 
 #ifndef THREX
@@ -192,19 +187,19 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             E.file_.c_str(),E.line_, \
             get_class_name(), \
             exc::reason_string(E.reason_)); \
-            return RET; } } while(false);
+        return RET; } } while(false);
 #endif /*THR*/
 
 #ifndef THRNORET
 #define THRNORET(REASON) \
     do { \
-      if( this->use_exc() ) { \
-        throw exc(REASON,this->get_class_name(),L"",L""__FILE__,__LINE__); } \
-      else { \
-        CSL_DEBUGF(L"Exception(%ls:%d): [%ls] [%ls]\n", \
-            L""__FILE__,__LINE__, \
-            this->get_class_name(), \
-            exc::reason_string(REASON)); } } while(false);
+      CSL_DEBUGF(L"Exception(%ls:%d): [%ls] [%ls]\n", \
+          L""__FILE__,__LINE__, \
+          get_class_name(), \
+          exc::reason_string(REASON)); \
+      if( this->use_exc() )  \
+        throw exc(REASON,get_class_name(),L"",L""__FILE__,__LINE__); \
+      } while(false);
 #endif /*THRNORET*/
 #endif /*__cplusplus*/
 
@@ -348,5 +343,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CSL_TYPE_BIN
 #define CSL_TYPE_BIN 5
 #endif /*CSL_TYPE_BIN*/
+
+#define AUTOEXEC( NAMESPACE, TASK, FUNCTION ) \
+     static int NAMESPACE::TASK = NAMESPACE::FUNCTION(); 
 
 #endif /* _csl_common_common_h_included_ */
