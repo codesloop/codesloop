@@ -38,7 +38,7 @@ IF(WIN32)
                      -Wcast-align
                      -Wshadow
                      -Wredundant-decls
-                     -pg
+                     -g3
                    )
 
   ELSE(MSYS)

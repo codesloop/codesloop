@@ -28,14 +28,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify hash table
  */
 
-#include "hash.hh"
-#include "hash_macros.hh"
-#include "tbuf.hh"
-#include "test_timer.h"
-#include "ustr.hh"
-#include "common.h"
-#include "mpool.hh"
+#include "inpvec.hh"
 #include "pvlist.hh"
+#include "hash.hh"
+#include "test_timer.h"
+#include "common.h"
 #include <assert.h>
 #include <vector>
 
@@ -44,12 +41,422 @@ using namespace csl::common;
 /** @brief contains tests related to hash */
 namespace test_hash {
 
+  template <typename K>
+  struct default_hash_fun
+  {
+    inline uint64_t operator()(const K & k)
+    {
+      return k.hash_key();
+    }
+  };
+
+  template <typename K, typename V, typename F=default_hash_fun<K> > class hash
+  {
+    public:
+      typedef K key_t;
+      typedef V value_t;
+      typedef uint64_t hashed_t;
+
+      struct page;
+      typedef inpvec<page> page_vec_t;
+
+      struct index;
+      typedef inpvec<index> index_vec_t;
+
+      static const uint16_t index_bits_ = page_vec_t::width_in_bits_;
+      static const uint16_t index_size_ = page_vec_t::width_;
+
+      struct contained
+      {
+        hashed_t  hash_key_;
+        key_t     key_;
+        value_t   value_;
+
+        contained( hashed_t h, const key_t & k, const value_t & v ) : hash_key_(h), key_(k), value_(v) {}
+      };
+
+      typedef inpvec<contained>                     contained_vec_t;
+      typedef typename contained_vec_t::iterator    contained_iterator_t;
+      typedef inpvec<uint32_t>                      pageid_vec_t;
+      typedef typename inpvec<uint32_t>::iterator   pageid_iterator_t;
+
+      struct page
+      {
+        static const uint16_t max_size_hint_ = page_vec_t::width_;
+
+        //typedef inpvec<contained> contained_vec_t;
+        //typedef inpvec<uint32_t>  pageid_vec_t;
+
+        contained_vec_t data_;
+
+        void split(uint32_t shift, page_vec_t & pages, pageid_vec_t & idxs)
+        {
+        }
+
+        static const uint8_t over_limit           = 1;
+        static const uint8_t overwrite_duplicate  = 2;
+        static const uint8_t samekey_append       = 3;
+        static const uint8_t samehash_append      = 4;
+        static const uint8_t succeed              = 5;
+        static const uint8_t failed               = 6;
+
+        uint8_t add(hashed_t hash_key, const key_t & key, const value_t & value)
+        {
+          contained_iterator_t it  = data_.begin();
+          contained_iterator_t en  = data_.end();
+          contained_iterator_t fr(en);
+
+          bool hash_key_exists     = false;
+          bool object_key_exists   = false;
+          size_t used_items        = 0;
+          size_t n_items           = data_.n_items();
+          uint8_t retval           = succeed;
+
+          // TODO: speedup this:
+          // goes through each element
+
+          for( ;it!=en;++it )
+          {
+            if( it.is_empty() && fr == en )
+            {
+              // memorize the first free element found
+              fr = it;
+            }
+            else
+            {
+              ++used_items;
+              if( (*it)->hash_key_ == hash_key )
+              {
+              // have that hash key already, this page cannot refuse
+              // the item even if it has lots of items
+                hash_key_exists = true;
+
+                retval = samehash_append;
+
+                if( (*it)->key_ == key )
+                {
+                // not just the hash key, but the object key field is
+                // equal as well
+                  object_key_exists = true;
+
+                  if( (*it)->value_ == value )
+                  {
+                  // if value is equal then we overwrite and return
+                    (*it)->value_ = value;
+                    return ( overwrite_duplicate );
+                  }
+                  else
+                  {
+                  // if value is not equal then flag that
+                    object_key_exists = true;
+                    retval = samekey_append;
+                  }
+                }
+              }
+
+              // break the long loop to speedup the search
+              if( used_items >= n_items ) break;
+            }
+          }
+
+          if( hash_key_exists == true || object_key_exists == true ||  used_items < max_size_hint_ )
+          {
+            if( fr != en )   fr.set( hash_key, key, value );
+            else             data_.push_back( hash_key, key, value );
+
+            return retval;
+          }
+          else
+          {
+            return over_limit;
+          }
+        }
+      };
+
+      struct index
+      {
+        static const uint8_t is_page = 1;
+        static const uint8_t is_next = 1;
+
+        uint8_t   page_or_next_;
+        uint32_t  ptr_;
+      };
+
+      bool has_key(const key_t & key) { return false; }
+      bool get(const key_t & key, value_t & value) { return false; }
+      bool set(const key_t & key, const value_t & value) { return false; }
+      bool del(const key_t & key) { return false; }
+
+    private:
+      page_vec_t    pages_;
+      index_vec_t   indices_;
+
+#if 0
+      typedef unsigned long long key_t;
+
+    private:
+      struct hdata
+      {
+        key_t   key_;
+        T       dta_;
+
+        hdata() { }
+        hdata( key_t key, const T & dta ) : key_( key ), dta_( dta ) { }
+
+        void set( key_t key, const T & dta )
+        {
+          key_   = key;
+          dta_   = dta;
+        }
+      };
+
+      typedef inpvec<hdata> hdata_vec_t;
+
+      struct page
+      {
+        hdata_vec_t datas_;
+
+        typedef typename hdata_vec_t::iterator hdata_vec_iterator_t;
+
+        bool add( key_t key, const T & dta )
+        {
+          if( datas_.size() >= 16 )
+          {
+            hdata_vec_iterator_t it(datas_.begin());
+            hdata_vec_iterator_t en(datas_.end());
+
+            // slow here ...
+            for( ;it!=en;++it )
+            {
+              hdata * h = *it;
+              if( h && h->key_ == key )
+              {
+                h->set( key, dta );
+                return true;
+              }
+            }
+            return false;
+          }
+
+          datas_.push_back( hdata( key, dta ) );
+          return true;
+        }
+
+        page() {}
+
+        page(key_t key, const T & dta)
+        {
+          datas_.push_back( new hdata( key, dta ) );
+        }
+      };
+
+      struct idx;
+      typedef inpvec<idx> idx_vec_t;
+
+      struct idx
+      {
+        static const unsigned char empty   = 0;
+        static const unsigned char is_page = 1;
+        static const unsigned char is_idxv = 2;
+
+        unsigned char type_;
+
+        union {
+          idx_vec_t  * next_;
+          page       * page_;
+        };
+
+        ~idx()
+        {
+          switch( type_ )
+          {
+            case is_page:
+              if( page_ ) delete page_;
+              break;
+
+            case is_idxv:
+              if( next_ ) delete next_;
+              break;
+
+            case empty:
+            default:
+              break;
+          }
+        }
+
+        idx(page * pg) { set_page(pg); }
+
+        void set_page(page * p)
+        {
+          type_ = is_page;
+          page_ = p;
+        }
+
+        typedef typename hdata_vec_t::iterator hdata_vec_iterator_t;
+
+        idx_vec_t * split(unsigned int shift)
+        {
+          if( type_ == is_page && page_ != 0 )
+          {
+            page * p = page_;
+            next_    = new idx_vec_t();
+
+            for( unsigned char i=0;i<16;++i ) next_->push_back(0);
+
+            hdata_vec_iterator_t it(p->datas_.begin());
+            hdata_vec_iterator_t en(p->datas_.end());
+
+            for( ;it!=en;++it )
+            {
+              hdata * h = *it;
+              key_t   k = ((h->key_)>>shift) & 15ULL;
+              idx *  ix = next_->get_at(k);
+              if( ix == 0 )
+              {
+                ix       = new idx( new page() );
+                next_->set_at( k,ix );
+              }
+              ix->page_->add( h->key_, h->dta_ );
+            }
+
+            delete p;
+          }
+          else
+          {
+            return next_;
+          }
+          return 0;
+        }
+      };
+
+      idx_vec_t  indices_;
+
+    public:
+      hash() { }
+
+      void set(key_t key, const T & dta)
+      {
+        key_t          k = 0;
+        idx_vec_t * idxs = &indices_;
+
+        for( unsigned char i=0;i<16;++i )
+        {
+          k          = (key>>(i*4)) & 15ULL;
+          idx * ix   = idxs->get_at(k);
+
+          if( ix == 0 )
+          {
+            page * pg = new page( key, dta );
+            ix        = new idx(pg);
+            if( idxs->set_at(k,ix) == false )
+            {
+              for( unsigned char j=0;j<16;++j ) idxs->push_back(0);
+              idxs->set_at(k,ix);
+              return;
+            }
+            return;
+          }
+          else if( ix->page_ == 0 )
+          {
+            ix->set_page(new page( key, dta ));
+            return;
+          }
+          else if( ix->type_ == idx::is_idxv  )
+          {
+            idxs = ix->next_;
+          }
+          else if( ix->type_ == idx::is_page )
+          {
+            page * pg = ix->page_;
+            if( pg->add( key,dta ) == false )
+            {
+              idxs = ix->split((i+1)*4);
+            }
+            else
+            {
+              return;
+            }
+          }
+        }
+      }
+
+      bool get(key_t key, T & dta)
+      {
+        return false;
+      }
+
+      bool del(key_t key)
+      {
+        return false;
+      }
+#endif
+  };
+
+  // -- pvlist --
+  // baseline               1909.710 ms, 33554430 calls,   0.000057 ms/call,   17570432.159857 calls/sec
+  // -- inpvec --
+  // baseline               2818.410 ms, 67108862 calls,   0.000042 ms/call,   23810894.085672 calls/sec
+
+  void baseline()
+  {
+    hash<uint64_t,uint64_t> o;
+  }
+
+  void page0()
+  {
+    typedef hash<uint64_t,uint64_t> hash_t;
+    hash_t::page p;
+  }
+
+  void page1()
+  {
+    typedef hash<uint64_t,uint64_t> hash_t;
+    hash_t::page p;
+
+    for( uint64_t i=0;i<hash_t::page::max_size_hint_;++i )
+    {
+      assert( p.add( i,i,i ) == hash_t::page::succeed );
+    }
+
+    // add an existing item
+    assert( p.add( 0,0,0 ) == hash_t::page::overwrite_duplicate );
+
+    // add an item with an existing key, but different value
+    assert( p.add( 0,0,1 ) == hash_t::page::samekey_append );
+
+    // add an item with an existing hash key, but different key and value
+    assert( p.add( 0,1,1 ) == hash_t::page::samehash_append );
+
+    // add an item that should cause overflow
+    assert( p.add( hash_t::page::max_size_hint_+1,1,1 ) == hash_t::page::over_limit );
+  }
+
+  void page_split()
+  {
+    typedef hash<uint64_t,uint64_t> hash_t;
+    hash_t::page p;
+
+    for( uint64_t i=0;i<hash_t::page::max_size_hint_;++i )
+    {
+      assert( p.add( i,i,i ) == hash_t::page::succeed );
+    }
+
+    hash_t::page_vec_t    res;
+    hash_t::pageid_vec_t  ids;
+    uint32_t              shift=0;
+
+  }
+
 } // end of test_hash
 
 using namespace test_hash;
 
 int main()
 {
+  csl_common_print_results( "baseline            ", csl_common_test_timer_v0(baseline),"" );
+  csl_common_print_results( "page0               ", csl_common_test_timer_v0(page0),"" );
+  csl_common_print_results( "page1               ", csl_common_test_timer_v0(page1),"" );
+  csl_common_print_results( "page_split          ", csl_common_test_timer_v0(page_split),"" );
   return 0;
 }
 

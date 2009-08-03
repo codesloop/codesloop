@@ -34,6 +34,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common.h"
 #include <assert.h>
 #include <vector>
+#include <string>
 
 using namespace csl::common;
 
@@ -64,11 +65,11 @@ namespace test_inpvec {
 
     for( unsigned int i=0;i<static_cast<unsigned int>(p);++i )
     {
-      vec.set( vec.n_items(),s );
+      vec.push_back( s );
       assert( vec.get(i) == "Hello world" );
-      assert( vec.n_items() == i+1 );
-      vec.set(i,s);
-      vec.set(i/2,s);
+      //assert( vec.n_items() == i+1 );
+      //vec.set(i,s);
+      //vec.set(i/2,s);
     }
   }
 
@@ -81,9 +82,24 @@ namespace test_inpvec {
     {
       vec.push_back(s);
       assert( vec[i] == "Hello world" );
-      assert( vec.size() == i+1 );
-      vec[i] = s;
-      vec[i/2] = s;
+      //assert( vec.size() == i+1 );
+      //vec[i] = s;
+      //vec[i/2] = s;
+    }
+  }
+
+  void stds_stdvec(int p)
+  {
+    std::vector<std::string> vec;
+    std::string s("Hello world");
+
+    for( unsigned int i=0;i<static_cast<unsigned int>(p);++i )
+    {
+      vec.push_back(s);
+      assert( vec[i] == "Hello world" );
+      //assert( vec.size() == i+1 );
+      //vec[i] = s;
+      //vec[i/2] = s;
     }
   }
 
@@ -114,33 +130,140 @@ namespace test_inpvec {
       vec[i/2] = i;
     }
   }
+
+  void iter_test(int p)
+  {
+    inpvec<uint64_t> vec;
+
+    uint64_t i=0;
+
+    for( i=0;i<static_cast<uint64_t>(p);++i )
+    {
+      vec.push_back(i);
+    }
+
+    // vec.debug();
+
+    i=0;
+    inpvec<uint64_t>::iterator it=vec.begin();
+    inpvec<uint64_t>::iterator en=vec.end();
+
+    for( ;it!=en;++it )
+    {
+      assert( *(*it) == i );
+      ++i;
+    }
+  }
+
+  void iter_std(int p)
+  {
+    std::vector<uint64_t> vec;
+
+    uint64_t i=0;
+
+    for( i=0;i<static_cast<uint64_t>(p);++i )
+    {
+      vec.push_back(i);
+    }
+
+    // vec.debug();
+
+    i=0;
+    std::vector<uint64_t>::iterator it=vec.begin();
+    std::vector<uint64_t>::iterator en=vec.end();
+
+    for( ;it!=en;++it )
+    {
+      assert( (*it) == i );
+      ++i;
+    }
+  }
+
+  void get_iter(int p)
+  {
+    inpvec<uint64_t> vec;
+
+    uint64_t i=0;
+
+    for( i=0;i<static_cast<uint64_t>(p);++i )
+    {
+      vec.push_back(i);
+    }
+
+    for( i=0;i<static_cast<uint64_t>(p);++i )
+    {
+      inpvec<uint64_t>::iterator it=vec.iterator_at(i);
+      assert( (*it)[0] == i );
+    }
+
+    assert( vec.n_items() == static_cast<uint64_t>(p) );
+  }
+
+  // TODO : test inpvec functionality:
+  // - push_back() w/ non default constructor arguments
+  // - n_get()
+  // - get()
+  // - iterator_at()
+  // - set()
+  // - last_free()
+  // - size()
+  // - n_items()
+  // - begin(), end()
+  // - iterator : set() w/ non default constructor arguments
+  // - iterator : free() and double free()
+  // - iterator : is_empty()
+  // - iterator : operator() *
+  // - iterator : operator++
+  // - iterator : constructors
+
 } // end of test_inpvec
 
 using namespace test_inpvec;
 
 int main()
 {
-
-  csl_common_print_results( "ustr_inpvec 5       ", csl_common_test_timer_i1(ustr_inpvec,5),"" );
-  csl_common_print_results( "ustr_stdvec 5       ", csl_common_test_timer_i1(ustr_stdvec,5),"" );
-
-  csl_common_print_results( "ustr_inpvec 50      ", csl_common_test_timer_i1(ustr_inpvec,50),"" );
-  csl_common_print_results( "ustr_stdvec 50      ", csl_common_test_timer_i1(ustr_stdvec,50),"" );
-
-  csl_common_print_results( "ustr_inpvec 3000    ", csl_common_test_timer_i1(ustr_inpvec,3000),"" );
-  csl_common_print_results( "ustr_stdvec 3000    ", csl_common_test_timer_i1(ustr_stdvec,3000),"" );
-
-  csl_common_print_results( "ulli_inpvec 5       ", csl_common_test_timer_i1(ulli_inpvec,5),"" );
-  csl_common_print_results( "ulli_stdvec 5       ", csl_common_test_timer_i1(ulli_stdvec,5),"" );
-
-  csl_common_print_results( "ulli_inpvec 50      ", csl_common_test_timer_i1(ustr_inpvec,50),"" );
-  csl_common_print_results( "ulli_stdvec 50      ", csl_common_test_timer_i1(ustr_stdvec,50),"" );
-
-  csl_common_print_results( "ulli_inpvec 3000    ", csl_common_test_timer_i1(ulli_inpvec,3000),"" );
-  csl_common_print_results( "ulli_stdvec 3000    ", csl_common_test_timer_i1(ulli_stdvec,3000),"" );
-
   csl_common_print_results( "itm                 ", csl_common_test_timer_v0(itm),"" );
   csl_common_print_results( "baseline            ", csl_common_test_timer_v0(baseline),"" );
+
+  csl_common_print_results( "get_iter 5          ", csl_common_test_timer_i1(get_iter,5),"" );
+  csl_common_print_results( "get_iter 31         ", csl_common_test_timer_i1(get_iter,31),"" );
+  csl_common_print_results( "get_iter 50         ", csl_common_test_timer_i1(get_iter,50),"" );
+  csl_common_print_results( "get_iter 3000       ", csl_common_test_timer_i1(get_iter,3000),"" );
+
+  csl_common_print_results( "iter_test 5         ", csl_common_test_timer_i1(iter_test,5),"" );
+  csl_common_print_results( "iter_test 31        ", csl_common_test_timer_i1(iter_test,31),"" );
+  csl_common_print_results( "iter_test 50        ", csl_common_test_timer_i1(iter_test,50),"" );
+  csl_common_print_results( "iter_test 3000      ", csl_common_test_timer_i1(iter_test,3000),"" );
+
+  csl_common_print_results( "iter_std 5          ", csl_common_test_timer_i1(iter_std,5),"" );
+  csl_common_print_results( "iter_std 31         ", csl_common_test_timer_i1(iter_std,31),"" );
+  csl_common_print_results( "iter_std 50         ", csl_common_test_timer_i1(iter_std,50),"" );
+  csl_common_print_results( "iter_std 3000       ", csl_common_test_timer_i1(iter_std,3000),"" );
+
+  csl_common_print_results( "ustr_inpvec 5       ", csl_common_test_timer_i1(ustr_inpvec,5),"" );
+  csl_common_print_results( "ustr_inpvec 31      ", csl_common_test_timer_i1(ustr_inpvec,31),"" );
+  csl_common_print_results( "ustr_inpvec 50      ", csl_common_test_timer_i1(ustr_inpvec,50),"" );
+  csl_common_print_results( "ustr_inpvec 3000    ", csl_common_test_timer_i1(ustr_inpvec,3000),"" );
+
+  csl_common_print_results( "ustr_stdvec 5       ", csl_common_test_timer_i1(ustr_stdvec,5),"" );
+  csl_common_print_results( "ustr_stdvec 31      ", csl_common_test_timer_i1(ustr_stdvec,31),"" );
+  csl_common_print_results( "ustr_stdvec 50      ", csl_common_test_timer_i1(ustr_stdvec,50),"" );
+  csl_common_print_results( "ustr_stdvec 3000    ", csl_common_test_timer_i1(ustr_stdvec,3000),"" );
+
+  csl_common_print_results( "stds_stdvec 5       ", csl_common_test_timer_i1(stds_stdvec,5),"" );
+  csl_common_print_results( "stds_stdvec 31      ", csl_common_test_timer_i1(stds_stdvec,31),"" );
+  csl_common_print_results( "stds_stdvec 50      ", csl_common_test_timer_i1(stds_stdvec,50),"" );
+  csl_common_print_results( "stds_stdvec 3000    ", csl_common_test_timer_i1(stds_stdvec,3000),"" );
+
+  csl_common_print_results( "ulli_inpvec 5       ", csl_common_test_timer_i1(ulli_inpvec,5),"" );
+  csl_common_print_results( "ulli_inpvec 31      ", csl_common_test_timer_i1(ustr_inpvec,31),"" );
+  csl_common_print_results( "ulli_inpvec 50      ", csl_common_test_timer_i1(ustr_inpvec,50),"" );
+  csl_common_print_results( "ulli_inpvec 3000    ", csl_common_test_timer_i1(ulli_inpvec,3000),"" );
+
+  csl_common_print_results( "ulli_stdvec 5       ", csl_common_test_timer_i1(ulli_stdvec,5),"" );
+  csl_common_print_results( "ulli_stdvec 31      ", csl_common_test_timer_i1(ustr_stdvec,31),"" );
+  csl_common_print_results( "ulli_stdvec 50      ", csl_common_test_timer_i1(ustr_stdvec,50),"" );
+  csl_common_print_results( "ulli_stdvec 3000    ", csl_common_test_timer_i1(ulli_stdvec,3000),"" );
 
   return 0;
 }
