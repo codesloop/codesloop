@@ -57,10 +57,10 @@ namespace csl
       const char * class_name, * parent_class;
       if ( kind == STUB_SERVER ) {
         class_name = (ifname_ + "_srv").c_str();
-        parent_class = "rpc_server";
+        parent_class = (std::string("srv_trans_") + ifc_->get_transport() ).c_str();
       } else {
         class_name = (ifname_ + "_cli").c_str();
-        parent_class = "rpc_client";
+        parent_class = (std::string("cli_trans_") + ifc_->get_transport() ).c_str();
       }
 
       output_

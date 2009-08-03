@@ -48,7 +48,8 @@ namespace csl
       TT_PARAM_TYPE = 9,  ///< parameter type
       TT_PARAM_NAME = 10, ///< parameter name
       TT_COMMENT    = 11, ///< comment
-      TT_LAST       = 12 
+      TT_TRANSPORT  = 12, ///< transport method
+      TT_LAST       = 13 
     };
     extern const char * token_type_name[];
 

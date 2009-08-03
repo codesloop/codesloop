@@ -39,7 +39,7 @@ namespace csl
   {
     void stub_client::generate()
     {
-      const char * class_name = (ifname_ + "_srv").c_str();
+      const char * class_name = (ifname_ + "_cli").c_str();
 
       open_file((ifname_+"_cli.cc").c_str());
 

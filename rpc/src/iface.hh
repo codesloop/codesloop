@@ -67,6 +67,7 @@ namespace csl
         void set_name(const token_info &);    ///< sets interface name
         void set_version(const token_info &); ///< sets version string
         void set_namespc(const token_info &); ///< sets namespace 
+        void set_transport(const token_info &); ///< sets namespace 
 
         void add_function(const token_info &);   ///< adds one function 
         void set_param_type(const token_info &); ///< adds a parameter type 
@@ -85,6 +86,11 @@ namespace csl
         const std::string get_version() const { return version_;}
         /** @breif returns interface namespace */
         const std::string get_namespc() const { return namespc_;}
+        /** @breif returns interface namespace */
+        const std::string get_transport() const 
+        { 
+          return transport_ == "" ? "udp" : transport_;
+        }
         /** @brief return list of defined functions */
         const std::vector<func> * get_functions() const 
         {
@@ -108,6 +114,7 @@ namespace csl
         std::string name_;
         std::string version_;
         std::string namespc_;
+        std::string transport_;
 
         std::string token_to_string(const token_info & ) const;
         std::string param_type_;

@@ -123,6 +123,7 @@ const char * csl::rpc::param_kind_name[] = {
   name      = 'name'           %{token_.type     = TT_NAME;};
   version   = 'version'        %{token_.type     = TT_VERSION;};
   namespc   = 'namespace'      %{token_.type     = TT_NAMESPACE;};
+  transport = 'transport'      %{token_.type     = TT_TRANSPORT;};
   
 
   # literals, identifiers
@@ -185,6 +186,12 @@ const char * csl::rpc::param_kind_name[] = {
                 ws_no_nl* newline
                 ;
 
+  if_transprt = '#' ws_no_nl* transport ws_no_nl+
+                ('tcp'|'udp'|'mq') >s
+                ws_no_nl* newline
+                ;
+
+
   main  :=  ( ws            # whitespace
             | comment       # comments
             | includes      # include statements
@@ -192,6 +199,7 @@ const char * csl::rpc::param_kind_name[] = {
             | if_version    # version information
             | if_name       # interface name
             | if_namespc    # namespace
+            | if_transprt   # transport layer
             )* 
             @save           # save identified token to iface
             $!on_error
@@ -257,6 +265,9 @@ namespace csl
           break;
         case TT_VERSION:
           iface_.set_version(token_);
+          break;
+        case TT_TRANSPORT:
+          iface_.set_transport(token_);
           break;
         case TT_INCLUDE:
           iface_.add_include(token_);

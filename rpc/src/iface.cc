@@ -68,6 +68,11 @@ namespace csl
       functions_.push_back(f);
     }
 
+    void iface::set_transport(const token_info & ti)
+    {
+      transport_ = token_to_string(ti);
+    }
+
     void iface::set_param_type(const token_info & ti)
     {
       param_type_ = token_to_string(ti);
