@@ -1,4 +1,4 @@
-# Copyright (c) 2008, David Beck
+# Copyright (c) 2008,2009, CodeSLoop Team
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -21,20 +21,55 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-PROJECT(codesloop)
+IF(WIN32)
 
-# SET(CMAKE_VERBOSE_MAKEFILE ON)
+  IF(MSYS)
 
-SUBDIRS( common
-	 comm
-         sec
-         nthread
-	 db
-         slt3
-	 pq
-         sched
-         rpc
-         example )
+    ADD_DEFINITIONS( -Wall
+                     -Wwrite-strings
+                     -Wcast-qual
+                     -Wpointer-arith
+                     -Wold-style-cast
+                     -Wconversion
+                     -Wcomment
+                     -Wcast-align
+                     -Wshadow
+                     -Wredundant-decls
+                     -g3
+                   )
+
+  ENDIF(MSYS)
+
+  LINK_DIRECTORIES(
+      $ENV{ZLIB_DEV_ENV}/lib
+      ../../../3rdparty/zlib/GnuWin32/lib )
+
+  INCLUDE_DIRECTORIES(
+      $ENV{ZLIB_DEV_ENV}/include
+      ../../../3rdparty/zlib/GnuWin32/include )
+
+ELSE(WIN32)
+
+  ADD_DEFINITIONS(
+                   -Wall
+                   -Wwrite-strings
+                   -Wcast-qual
+                   -Wpointer-arith
+                   -Wold-style-cast
+                   -Wconversion
+                   -Wcomment
+                   -Wcast-align
+                   -Winline
+                   -Wshadow
+                   -Wredundant-decls
+                   -g3
+                 )
+
+ENDIF(WIN32)
+
+ADD_DEFINITIONS( -DDEBUG) 
+
+ADD_LIBRARY( csl_db STATIC
+             exc.cc  exc.hh )
 
 # -- EOF --
