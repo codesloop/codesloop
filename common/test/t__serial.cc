@@ -30,7 +30,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @todo add more test case for each vars
  */
 
-#define DEBUG 
+#ifndef DEBUG
+#define DEBUG
+#endif /* DEBUG */
 
 #include "common.h"
 #include "str.hh"

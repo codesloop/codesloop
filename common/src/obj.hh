@@ -41,6 +41,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     static inline const wchar_t * get_class_name() { return L""#namesp_"::"#class_; }\
     static inline const wchar_t * get_class_short() { return L""#class_; }
 
+#define USE_EXC() \
+  public: \
+    inline bool use_exc() const     { return use_exc_; } \
+    inline void use_exc(bool yesno) { use_exc_ = yesno; } \
+  protected: \
+    bool use_exc_;
 
 namespace csl
 {
@@ -52,14 +58,10 @@ namespace csl
       public:
         obj();                    ///<constructor
 
-        inline bool use_exc() const     { return use_exc_;  } ///<checks exception usage
-        inline void use_exc(bool yesno) { use_exc_ = yesno; } ///<adjust exception usage
-
-
-
       protected:
         int logger_flags_; ///< enable or disable per instance logging
-        bool use_exc_;     ///<use exceptions?
+
+        USE_EXC();
     };
   }
 }

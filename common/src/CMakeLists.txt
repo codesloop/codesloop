@@ -67,7 +67,7 @@ ELSE(WIN32)
 
 ENDIF(WIN32)
 
-ADD_DEFINITIONS( -DDEBUG) 
+ADD_DEFINITIONS( -DDEBUG)
 
 ADD_LIBRARY( csl_common STATIC
              cexc.cc       cexc.hh

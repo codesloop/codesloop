@@ -28,6 +28,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify xdr utilities
  */
 
+#ifndef DEBUG
+#define DEBUG
+#endif /* DEBUG */
+
 #include "xdrbuf.hh"
 #include "pbuf.hh"
 #include "zfile.hh"

@@ -28,6 +28,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify in-place vector
  */
 
+#ifndef DEBUG
+#define DEBUG
+#endif /* DEBUG */
+
 #include "inpvec.hh"
 #include "test_timer.h"
 #include "ustr.hh"
@@ -43,7 +47,7 @@ namespace test_inpvec {
 
   void baseline()
   {
-    inpvec<ustr> ipv;
+    inpvec<uint64_t> ipv;
   }
 
   void itm()
@@ -199,15 +203,64 @@ namespace test_inpvec {
     assert( vec.n_items() == static_cast<uint64_t>(p) );
   }
 
+  /////////////////////////
+  // testing functionality
+  /////////////////////////
+
+  void fun_push_back()
+  {
+    inpvec<uint64_t> vec;
+    assert( vec.size() > 0 );
+    assert( vec.n_items() == 0 );
+
+    inpvec<uint64_t>::iterator i = vec.last_free();
+    assert( i != vec.end() );
+    assert( i != vec.begin() );
+    assert( vec.begin() == vec.end() );
+
+    // check iterators of an empty vector
+    assert( vec.iterator_pos( i ) == 0 );
+    assert( vec.iterator_pos( vec.begin() ) == 1 );
+    assert( vec.iterator_pos( vec.end() ) == 1 );
+
+    // default construct an item
+    assert( i.construct() == true );
+
+    // check vector's size
+    assert( vec.n_items() == 1 );
+
+    // check item after replacing its data
+    assert( i.set(123ULL) == false );
+    assert( vec.n_items() == 1 );
+
+    // begin should return a non-end iterator
+    assert( vec.begin() != vec.end() );
+    i = vec.iterator_at( 0 );
+    assert( (*i)[0] == 123ULL );
+    assert( vec.get(0) == 123ULL );
+
+    // move iterator to the end of vector
+    ++i;
+    assert( i == vec.end() );
+
+    // check invalid free_at
+    assert( vec.free_at(100) == false );
+    assert( vec.n_items() == 1 );
+
+    // check valid free_at
+    assert( vec.free_at(0) == true );
+    assert( vec.n_items() == 0 );
+  }
+
   // TODO : test inpvec functionality:
   // - push_back() w/ non default constructor arguments
-  // - n_get()
   // - get()
   // - iterator_at()
   // - set()
   // - last_free()
   // - size()
   // - n_items()
+  // - iterator_pos()
   // - begin(), end()
   // - iterator : set() w/ non default constructor arguments
   // - iterator : free() and double free()
@@ -222,6 +275,8 @@ using namespace test_inpvec;
 
 int main()
 {
+  csl_common_print_results( "push_back           ", csl_common_test_timer_v0(fun_push_back),"" );
+
   csl_common_print_results( "itm                 ", csl_common_test_timer_v0(itm),"" );
   csl_common_print_results( "baseline            ", csl_common_test_timer_v0(baseline),"" );
 

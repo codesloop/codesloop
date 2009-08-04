@@ -28,7 +28,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify wide character string
  */
 
+#ifndef DEBUG
 #define DEBUG
+#endif /* DEBUG */
 
 #include "logger.hh"
 #include "exc.hh"

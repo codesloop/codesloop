@@ -252,6 +252,24 @@ namespace csl
             d->~DESTR();
           }
 
+          bool construct(size_t at)
+          {
+            size_t off = at/width_;
+            size_t pos = at%width_;
+
+            if( (bmap_[off]>>pos)&static_cast<bitmap_t>(1UL) )
+            { // already have an item
+              return false;
+            }
+            else
+            { // "allocate" = default construct an item
+              new (items_+at) T();
+              bmap_[off] = (bmap_[off]) | (static_cast<bitmap_t>(1UL)<<pos);
+              if( parent_ ) ++(parent_->n_items_);
+              return true;
+            }
+          }
+
           bool set(size_t at, const T & t)
           {
             size_t off = at/width_;
@@ -467,6 +485,9 @@ namespace csl
 
         class iterator
         {
+          public:
+            friend class inpvec;
+
           private:
             item * i_;
             size_t pos_;
@@ -562,6 +583,14 @@ namespace csl
               if( i_ ) { i_->destroy( pos_ ); }
             }
 
+            /// @brief default construct the item at the iterator position
+            ///
+            bool construct()
+            {
+              if( !i_ ) return false;
+              return i_->construct( pos_ );
+            }
+
             /// @brief sets the item at the iterator position
             ///
             bool set(const T & t)
@@ -605,6 +634,8 @@ namespace csl
               if( !i_ ) return false;
               return i_->set( pos_,t1,t2,t3,t4 );
             }
+
+            CSL_OBJ(csl::common,inpvec::iterator);
         };
 
         /** @brief returns iterator pointed at the beginning of the container */
@@ -740,6 +771,17 @@ namespace csl
           return iterator(0,0);
         }
 
+        bool free_at(size_t pos)
+        {
+          iterator it = iterator_at(pos);
+          if( it != end() && it.is_empty() == false )
+          {
+            it.free();
+            return true;
+          }
+          return false;
+        }
+
         T & get(size_t at)
         {
           item * p = &head_;
@@ -759,33 +801,23 @@ namespace csl
             }
           }
 
-          /* TODO XXX : handle invalid index position */
-          throw csl::common::exc(L"inpvec");
-          return tail_->get(0);
+          /* handle invalid index position */
+          THR( exc::rs_invalid_param, (tail_->get(0)) );
         }
 
-        T & n_get(size_t at)
+        size_t iterator_pos(iterator it)
         {
+          if( it == end() ) return (n_items_+1);
           item * p = &head_;
-          size_t max_pos = 0;
+          size_t ret = it.pos_;
 
-          while( p != 0 )
+          while( p!=it.i_ && p!=0 )
           {
-            max_pos += (p->n_items());
-            if( at >= max_pos )
-            {
-              p = p->next_;
-            }
-            else
-            {
-              size_t pos = (max_pos-n_items());
-              return p->get(at-pos);
-            }
+            ret += (p->size());
+            p = p->next_;
           }
 
-          /* TODO XXX : handle invalid index position */
-          throw csl::common::exc(L"inpvec");
-          return tail_->get(0);
+          return ret;
         }
 
         void push_back(const T & t)
@@ -816,6 +848,9 @@ namespace csl
         {
           last_free().set(t1,t2,t3,t4);
         }
+
+        CSL_OBJ(csl::common,inpvec);
+        USE_EXC();
     };
   } /* end of ns:common */
 } /* end of ns:csl */

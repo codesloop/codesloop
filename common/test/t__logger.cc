@@ -30,7 +30,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify logger
  */
 
-#define DEBUG 
+#ifndef DEBUG
+#define DEBUG
+#endif /* DEBUG */
 
 #include "logger.hh"
 #include "obj.hh"

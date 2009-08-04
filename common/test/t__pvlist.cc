@@ -28,6 +28,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify pvlist
 */
 
+#ifndef DEBUG
+#define DEBUG
+#endif /* DEBUG */
+
 #include "pvlist.hh"
 #include "test_timer.h"
 #include "common.h"

@@ -28,10 +28,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify hash table
  */
 
+#ifndef DEBUG
+#define DEBUG
+#endif /* DEBUG */
+
 #include "inpvec.hh"
 #include "pvlist.hh"
 #include "hash.hh"
 #include "test_timer.h"
+#include "logger.hh"
 #include "common.h"
 #include <assert.h>
 #include <vector>
@@ -52,16 +57,20 @@ namespace test_hash {
 
   template <typename K, typename V, typename F=default_hash_fun<K> > class hash
   {
+    CSL_OBJ(csl::common,hash);
+
     public:
       typedef K key_t;
       typedef V value_t;
       typedef uint64_t hashed_t;
 
       struct page;
-      typedef inpvec<page> page_vec_t;
+      typedef inpvec<page>                       page_vec_t;
+      typedef typename inpvec<page>::iterator    page_iterator_t;
 
       struct index;
-      typedef inpvec<index> index_vec_t;
+      typedef inpvec<index>                      index_vec_t;
+      typedef typename inpvec<index>::iterator   index_iterator_t;
 
       static const uint16_t index_bits_ = page_vec_t::width_in_bits_;
       static const uint16_t index_size_ = page_vec_t::width_;
@@ -73,6 +82,8 @@ namespace test_hash {
         value_t   value_;
 
         contained( hashed_t h, const key_t & k, const value_t & v ) : hash_key_(h), key_(k), value_(v) {}
+
+        CSL_OBJ(csl::common,hash::contained);
       };
 
       typedef inpvec<contained>                     contained_vec_t;
@@ -84,13 +95,54 @@ namespace test_hash {
       {
         static const uint16_t max_size_hint_ = page_vec_t::width_;
 
-        //typedef inpvec<contained> contained_vec_t;
-        //typedef inpvec<uint32_t>  pageid_vec_t;
-
         contained_vec_t data_;
 
         void split(uint32_t shift, page_vec_t & pages, pageid_vec_t & idxs)
         {
+          contained_iterator_t it  = data_.begin();
+          contained_iterator_t en  = data_.end();
+
+          for( ;it!=en;++it )
+          {
+            if( it.is_empty() == false )
+            {
+              /* calculate which page will have the given item */
+              uint8_t pos = (((*it)->hash_key_ >> shift) & 0x1ff);
+
+              if( pos == 0 )
+              {
+                /* if the page id is 0 then it will stay where it is */
+              }
+              else
+              {
+                /* check if a page has already been allocated for the given position */
+                pageid_iterator_t pit = idxs.iterator_at( pos );
+                page * p = 0;
+
+                if( pit.is_empty() )
+                {
+                  /* default construct a page */
+                  page_iterator_t pgit = pages.last_free();
+                  pgit.construct();
+
+                  /* set the index of the new page */
+                  pit.set( pages.iterator_pos( pgit ) );
+
+                  /* save a pointer to the given page */
+                  p = *pgit;
+                }
+                else
+                {
+                  page_iterator_t pgit = pages.iterator_at( (*pit)[0] );
+                  p = *pgit;
+                }
+
+                contained * c = *it;
+                p->add( c->hash_key_,c->key_,c->value_ );
+                it.free();
+              }
+            }
+          }
         }
 
         static const uint8_t over_limit           = 1;
@@ -171,6 +223,8 @@ namespace test_hash {
             return over_limit;
           }
         }
+
+        CSL_OBJ(csl::common,hash::page);
       };
 
       struct index
@@ -180,6 +234,8 @@ namespace test_hash {
 
         uint8_t   page_or_next_;
         uint32_t  ptr_;
+
+        CSL_OBJ(csl::common,hash::index);
       };
 
       bool has_key(const key_t & key) { return false; }
@@ -431,6 +487,10 @@ namespace test_hash {
     assert( p.add( hash_t::page::max_size_hint_+1,1,1 ) == hash_t::page::over_limit );
   }
 
+  static inline const wchar_t * get_namespace()   { return L"test_hash"; }
+  static inline const wchar_t * get_class_name()  { return L"test_hash::noclass"; }
+  static inline const wchar_t * get_class_short() { return L"noclass"; }
+
   void page_split()
   {
     typedef hash<uint64_t,uint64_t> hash_t;
@@ -438,13 +498,59 @@ namespace test_hash {
 
     for( uint64_t i=0;i<hash_t::page::max_size_hint_;++i )
     {
-      assert( p.add( i,i,i ) == hash_t::page::succeed );
+      int r = p.add( i%32,i,i );
+      assert(  r == hash_t::page::succeed || r == hash_t::page::samehash_append );
+      // CSL_DEBUGF( L"add: %ld",i );
     }
 
     hash_t::page_vec_t    res;
     hash_t::pageid_vec_t  ids;
     uint32_t              shift=0;
 
+    assert( p.data_.size() == hash_t::page::max_size_hint_ );
+
+    p.split(shift,res,ids);
+
+    // CSL_DEBUGF( L"Page size: %ld [res=%ld ids=%ld]", p.data_.n_items(),res.n_items(),ids.n_items() );
+    // CSL_DEBUGF( L"hash_t::page::max_size_hint_ =  %d", hash_t::page::max_size_hint_ );
+
+    // the split creates n-1 pages evenly spreading the keys into them
+    assert( res.n_items() == (hash_t::page::max_size_hint_ - 1) );
+
+    // each page is created in the res vector, and its page ids (indexes) are stored
+    // into the ids vector
+    assert( ids.n_items() == (hash_t::page::max_size_hint_ - 1) );
+
+    hash_t::page_vec_t::iterator it = res.begin();
+    hash_t::page_vec_t::iterator en = res.begin();
+
+    for( ;it!=en;++it )
+    {
+      assert( (*it)->data_.size() == 1 );
+    }
+  }
+
+  void page_addfew()
+  {
+    typedef hash<uint64_t,uint64_t> hash_t;
+    hash_t::page p;
+
+    //       page_addfew            2860.883 ms, 67108862 calls,   0.000043 ms/call,   23457394.797341 calls/sec
+    assert( p.add(0,0,0) == hash_t::page::succeed );
+    // 288 : page_addfew            2780.423 ms,  8388606 calls,   0.000331 ms/call,   3017025.107331 calls/sec
+    assert( p.add(1,0,0) == hash_t::page::succeed );
+    // 275 : page_addfew            2541.468 ms,  4194302 calls,   0.000606 ms/call,   1650346.177878 calls/sec
+    assert( p.add(2,0,0) == hash_t::page::succeed );
+    // 657 : page_addfew            2649.575 ms,  2097150 calls,   0.001263 ms/call,   791504.297859 calls/sec
+    assert( p.add(3,0,0) == hash_t::page::succeed );
+    // 434 : page_addfew            1779.790 ms,  1048574 calls,   0.001697 ms/call,   589156.024025 calls/sec
+    assert( p.add(4,0,0) == hash_t::page::succeed );
+    // 507 : page_addfew            2310.587 ms,  1048574 calls,   0.002204 ms/call,   453812.818994 calls/sec
+    assert( p.add(5,0,0) == hash_t::page::succeed );
+    // 569 : page_addfew            2907.684 ms,  1048574 calls,   0.002773 ms/call,   360621.718178 calls/sec
+    assert( p.add(6,0,0) == hash_t::page::succeed );
+    // 510 : page_addfew            1720.933 ms,   524286 calls,   0.003282 ms/call,   304652.185762 calls/sec
+    assert( p.add(7,0,0) == hash_t::page::succeed );
   }
 
 } // end of test_hash
@@ -453,10 +559,13 @@ using namespace test_hash;
 
 int main()
 {
+  csl_common_print_results( "page_addfew         ", csl_common_test_timer_v0(page_addfew),"" );
+  csl_common_print_results( "page_split          ", csl_common_test_timer_v0(page_split),"" );
+
   csl_common_print_results( "baseline            ", csl_common_test_timer_v0(baseline),"" );
   csl_common_print_results( "page0               ", csl_common_test_timer_v0(page0),"" );
   csl_common_print_results( "page1               ", csl_common_test_timer_v0(page1),"" );
-  csl_common_print_results( "page_split          ", csl_common_test_timer_v0(page_split),"" );
+
   return 0;
 }
 

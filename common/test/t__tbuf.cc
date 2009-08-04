@@ -28,6 +28,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify tbuf
  */
 
+#ifndef DEBUG
+#define DEBUG
+#endif /* DEBUG */
+
 #include "pbuf.hh"
 #include "tbuf.hh"
 #include "str.hh"

@@ -60,8 +60,8 @@ namespace csl
 
       public:
         typedef long long value_t;
-        enum { var_type_v =  CSL_TYPE_INT64 }; 
-      
+        enum { var_type_v =  CSL_TYPE_INT64 };
+
         inline int64() : var(), value_(0) { }             ///<default constructor
         inline int64(long long v) : var(), value_(v) { }  ///<copy constructor
         virtual inline ~int64() {}                        ///<destructor
@@ -78,7 +78,7 @@ namespace csl
 
         /** @brief returns a const pointer to internal data */
         inline const unsigned char * ucharp_data() const { return reinterpret_cast<const unsigned char *>(&value_); }
-        
+
         /** @brief returns the size of the variable data */
         inline size_t var_size() const { return sizeof(value_); }
 
