@@ -42,6 +42,8 @@ Credits: some techniques and code pieces are stolen from Christian
 #ifdef __cplusplus
 #include <string>
 
+extern unsigned long long csl::common::CRCTable[256];
+
 namespace csl
 {
   namespace common

@@ -36,8 +36,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   @brief implementation of csl::common::logger
  */
 
-using std::string; /* TODO move to common::str */
-
 namespace csl
 {
   namespace common
@@ -52,21 +50,31 @@ namespace csl
       }
     }
 
-    // initalize to default logfile
-    std::string logger::logfile_ = CSL_LOGFILE;
-#if DEBUG
-    str logger::class_to_trace_= ( getenv(CSL_TRACE_SCOPE) == NULL ?
-                                        L"all" : wgetenv(CSL_TRACE_SCOPE) );
-    bool   logger::enable_trace_  = ( getenv(CSL_TRACE_ENABLE) == NULL ?
-                                        false : true );
-    bool   logger::enable_stderr_ = ( getenv(CSL_TRACE_STDERR) == NULL ?
-                                        false : true ) ;
+    std::string logger::logfile_;
+#ifdef DEBUG
+    str logger::class_to_trace_;
+                               
+    bool   logger::enable_trace_;
+    bool   logger::enable_stderr_;
 #endif
 
     // type name to string helper 
     static const wchar_t * LOGTYPE_NAMES [] = { 
       L"UNKNOWN", L"DEBUG", L"INFO", L"AUTH", L"WARNING", L"ERROR", L"CRITICAL"
     };
+
+    int logger::init() {
+      logfile_ = CSL_LOGFILE;
+#ifdef DEBUG      
+      class_to_trace_= ( getenv(CSL_TRACE_SCOPE) == NULL  ?  L"all" : wgetenv(CSL_TRACE_SCOPE) );
+      enable_trace_  = ( getenv(CSL_TRACE_ENABLE) == NULL ?  false : true );
+      enable_stderr_ = ( getenv(CSL_TRACE_STDERR) == NULL ?  false : true ) ;
+#endif
+
+      // TODO: use config file parser class (maybe a ragel based one)
+
+      return 0;
+    }
 
     // sets output filename
     void logger::set_log_file( const char * logfile )
@@ -164,4 +172,7 @@ namespace csl
     } /* public interface */
   };
 };
+
+AUTOEXEC( csl::common, load_configfile, logger::init );
+
 /* EOF */
