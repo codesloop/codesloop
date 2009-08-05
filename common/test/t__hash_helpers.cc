@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck, Tamas Foldi
+Copyright (c) 2008,2009, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -83,9 +83,6 @@ namespace test_hash_helpers {
     assert( p.n_items() == page_t::sz_ );
 
     p.split(shift,res,ids);
-
-    // CSL_DEBUGF( L"Page size: %ld [res=%ld ids=%ld]", p.data_.n_items(),res.n_items(),ids.n_items() );
-    // CSL_DEBUGF( L"hash_t::page::max_size_hint_ =  %d", hash_t::page::max_size_hint_ );
 
     // the split creates n-1 pages evenly spreading the keys into them
     assert( res.n_items() == (page_t::sz_ - 1) );

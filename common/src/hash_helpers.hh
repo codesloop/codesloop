@@ -45,8 +45,8 @@ namespace csl
       class contained
       {
         public:
-          typedef K key_t;
-          typedef V value_t;
+          typedef K    key_t;
+          typedef V    value_t;
 
         private:
           key_t        key_;
@@ -140,6 +140,7 @@ namespace csl
 
           void remove(size_t pos, const key_t & k)
           {
+            /* TODO */
           }
 
           void split(size_t shift, page_vec_t & pagev, pos_vec_t & posv)
@@ -199,6 +200,12 @@ namespace csl
 
           CSL_OBJ(csl::common::hash_helpers,page);
           USE_EXC();
+      };
+
+      class index
+      {
+        public:
+          typedef uint64_t page_index_t;
       };
     }
   }
