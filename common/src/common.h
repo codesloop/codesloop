@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck, Tamas Foldi
+Copyright (c) 2008,2009, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -344,7 +344,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CSL_TYPE_BIN 5
 #endif /*CSL_TYPE_BIN*/
 
-#define AUTOEXEC( NAMESPACE, TASK, FUNCTION ) \
-     static int NAMESPACE::TASK = NAMESPACE::FUNCTION(); 
+#define AUTOEXEC( NAMESPACE1, NAMESPACE2, TASK, FUNCTION ) \
+  namespace NAMESPACE1 { \
+     namespace NAMESPACE2 { \
+       namespace { \
+         static int TASK = FUNCTION(); \
+       } /* end of anonymous namespace */ \
+     } /* end of NAMESPACE2 */ \
+   } /* end od NAMESPACE1 */
 
 #endif /* _csl_common_common_h_included_ */

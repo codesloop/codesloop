@@ -1,6 +1,5 @@
-
 /*
-Copyright (c) 2008,2009, David Beck, Tamas Foldi
+Copyright (c) 2008,2009, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -116,9 +115,9 @@ namespace csl {
         @param str  message to log */
         static void log( logger_types type, const str & str );
         static void log( logger_types type, const char * fmt, va_list args);
-        static void log( logger_types type, const wchar_t * fmt, va_list args);               
+        static void log( logger_types type, const wchar_t * fmt, va_list args);
         static void log( logger_types type, const char * fmt, ...);
-        static void log( logger_types type, const wchar_t * fmt, ...);               
+        static void log( logger_types type, const wchar_t * fmt, ...);
 
         /** @brief override default log file name and location 
         @param logfile full path of demanded file name */
@@ -145,7 +144,7 @@ namespace csl {
         static inline void      auth( const str & str ) {
           log( LOG_AUTH, str );
         }
-        /** @brief shortcut function for normal errors  
+        /** @brief shortcut function for normal errors
         @param str  message to log */
         static inline void      error( const str & str ) {
           log( LOG_ERROR, str );

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, Tamas Foldi, David Beck
+Copyright (c) 2008,2009, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -42,12 +42,12 @@ Credits: some techniques and code pieces are stolen from Christian
 #ifdef __cplusplus
 #include <string>
 
-extern unsigned long long csl::common::CRCTable[256];
-
 namespace csl
 {
   namespace common
   {
+    //extern unsigned long long CRCTable[256];
+
     /**
     @brief UTF-8 ready C-String class
 

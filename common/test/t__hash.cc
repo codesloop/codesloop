@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck, Tamas Foldi
+Copyright (c) 2008,2009, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -499,7 +499,7 @@ namespace test_hash {
     for( uint64_t i=0;i<hash_t::page::max_size_hint_;++i )
     {
       int r = p.add( i%32,i,i );
-      assert(  r == hash_t::page::succeed || r == hash_t::page::samehash_append );
+      assert(  r == hash_t::page::succeed );
       // CSL_DEBUGF( L"add: %ld",i );
     }
 
@@ -507,7 +507,7 @@ namespace test_hash {
     hash_t::pageid_vec_t  ids;
     uint32_t              shift=0;
 
-    assert( p.data_.size() == hash_t::page::max_size_hint_ );
+    assert( p.data_.n_items() == hash_t::page::max_size_hint_ );
 
     p.split(shift,res,ids);
 
@@ -526,31 +526,19 @@ namespace test_hash {
 
     for( ;it!=en;++it )
     {
-      assert( (*it)->data_.size() == 1 );
+      assert( (*it)->data_.n_items() == 1 );
     }
   }
 
-  void page_addfew()
+  void page_add(int n)
   {
-    typedef hash<uint64_t,uint64_t> hash_t;
+    typedef hash<int,int> hash_t;
     hash_t::page p;
 
-    //       page_addfew            2860.883 ms, 67108862 calls,   0.000043 ms/call,   23457394.797341 calls/sec
-    assert( p.add(0,0,0) == hash_t::page::succeed );
-    // 288 : page_addfew            2780.423 ms,  8388606 calls,   0.000331 ms/call,   3017025.107331 calls/sec
-    assert( p.add(1,0,0) == hash_t::page::succeed );
-    // 275 : page_addfew            2541.468 ms,  4194302 calls,   0.000606 ms/call,   1650346.177878 calls/sec
-    assert( p.add(2,0,0) == hash_t::page::succeed );
-    // 657 : page_addfew            2649.575 ms,  2097150 calls,   0.001263 ms/call,   791504.297859 calls/sec
-    assert( p.add(3,0,0) == hash_t::page::succeed );
-    // 434 : page_addfew            1779.790 ms,  1048574 calls,   0.001697 ms/call,   589156.024025 calls/sec
-    assert( p.add(4,0,0) == hash_t::page::succeed );
-    // 507 : page_addfew            2310.587 ms,  1048574 calls,   0.002204 ms/call,   453812.818994 calls/sec
-    assert( p.add(5,0,0) == hash_t::page::succeed );
-    // 569 : page_addfew            2907.684 ms,  1048574 calls,   0.002773 ms/call,   360621.718178 calls/sec
-    assert( p.add(6,0,0) == hash_t::page::succeed );
-    // 510 : page_addfew            1720.933 ms,   524286 calls,   0.003282 ms/call,   304652.185762 calls/sec
-    assert( p.add(7,0,0) == hash_t::page::succeed );
+    for( int i=0;i<n;++i )
+    {
+      assert( p.add(i,i,i) == hash_t::page::succeed );
+    }
   }
 
 } // end of test_hash
@@ -559,8 +547,13 @@ using namespace test_hash;
 
 int main()
 {
-  csl_common_print_results( "page_addfew         ", csl_common_test_timer_v0(page_addfew),"" );
   csl_common_print_results( "page_split          ", csl_common_test_timer_v0(page_split),"" );
+
+  csl_common_print_results( "page_add (1)        ", csl_common_test_timer_i1(page_add,1),"" );
+  csl_common_print_results( "page_add (2)        ", csl_common_test_timer_i1(page_add,2),"" );
+  csl_common_print_results( "page_add (3)        ", csl_common_test_timer_i1(page_add,3),"" );
+  csl_common_print_results( "page_add (4)        ", csl_common_test_timer_i1(page_add,4),"" );
+  csl_common_print_results( "page_add (5)        ", csl_common_test_timer_i1(page_add,5),"" );
 
   csl_common_print_results( "baseline            ", csl_common_test_timer_v0(baseline),"" );
   csl_common_print_results( "page0               ", csl_common_test_timer_v0(page0),"" );

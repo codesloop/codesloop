@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck, Tamas Foldi
+Copyright (c) 2008,2009, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -40,11 +40,11 @@ namespace csl
 {
   namespace common
   {
-    namespace 
+    namespace
     {
       static unsigned long long CRCTable[256];
-  
-      static int initalize_CRCTable() 
+
+      static int initalize_CRCTable()
       {
         int i, j;
         unsigned long long part;
@@ -437,7 +437,7 @@ namespace csl
       catch( exc e )
       {
         return false;
-      }      
+      }
     }
 
     int64 str::crc64() const
@@ -455,6 +455,6 @@ namespace csl
   };
 };
 
-AUTOEXEC( csl::common, initalize_crc_table, initalize_CRCTable );
+AUTOEXEC( csl, common, initalize_crc_table, initalize_CRCTable );
 
 /* EOF */
