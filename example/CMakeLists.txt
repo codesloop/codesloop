@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009, David Beck, Tamas Foldi
+# Copyright (c) 2008,2009, CodeSLoop Team
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -113,7 +113,7 @@ ELSE(WIN32)
                    -g3
                    -pthread
                  )
-  
+
   LINK_LIBRARIES(
                   csl_slt3
                   csl_nthread
@@ -130,6 +130,7 @@ ADD_EXECUTABLE(ex_zfile2 ex_zfile2.cc)
 ADD_EXECUTABLE(ex_sql1 ex_sql1.cc)
 ADD_EXECUTABLE(ex_sql2 ex_sql2.cc)
 ADD_EXECUTABLE(ex_thread1 ex_thread1.cc)
+ADD_EXECUTABLE(ex_thrpool ex_thrpool.cc)
 
 # -- EOF --
 
