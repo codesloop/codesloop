@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck, Tamas Foldi
+Copyright (c) 2008,2009, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -27,7 +27,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "obj.hh"
 
 /**
-  @file csl_common/src/obj.cc
+  @file common/src/obj.cc
   @brief implementation of simple string class
  */
 

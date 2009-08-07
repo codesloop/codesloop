@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck, Tamas Foldi
+Copyright (c) 2008,2009, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -31,7 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "xdrbuf.hh"
 
 /**
-  @file csl_common/src/dbl.cc
+  @file common/src/dbl.cc
   @brief implementation of double precision floating point type
  */
 

@@ -32,7 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 
 /**
-  @file csl_common/src/logger.cc
+  @file common/src/logger.cc
   @brief implementation of csl::common::logger
  */
 

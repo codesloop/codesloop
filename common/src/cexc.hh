@@ -27,7 +27,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _csl_common_cexc_hh_included_
 
 /**
-   @file csl_common/src/cexc.hh
+   @file common/src/cexc.hh
    @brief common base exception class for codesloop classes
  */
 

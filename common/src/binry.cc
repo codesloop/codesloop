@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck, Tamas Foldi
+Copyright (c) 2008,2009, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -32,7 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "exc.hh"
 
 /**
-  @file csl_common/src/binry.cc
+  @file common/src/binry.cc
   @brief implementation of binary object type
  */
 

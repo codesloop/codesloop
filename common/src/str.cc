@@ -32,7 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /**
-  @file csl_common/src/str.cc
+  @file common/src/str.cc
   @brief implementation of simple string class
  */
 

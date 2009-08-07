@@ -27,7 +27,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _csl_common_logger_hh_included_
 
 /**
-   @file csl_common/src/logger.hh
+   @file common/src/logger.hh
    @brief common logger class
  */
 

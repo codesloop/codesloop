@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck, Tamas Foldi
+Copyright (c) 2008,2009, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -35,7 +35,7 @@ using csl::common::ustr;
 using std::endl;
 
 /**
-  @file csl_rpc/src/stub_header.cc
+  @file rpc/src/stub_header.cc
   @brief implementation of codesloop interface descriptor
  */
 
