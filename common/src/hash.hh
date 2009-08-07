@@ -91,7 +91,10 @@ namespace csl
             CSL_DEBUGF( L"page: %lld created for: %lld", pageid, hk );
 
             index_.internal_set( pgpos, pageid, true );
-            int result = pg->add( (hk>>5)&0x1ff, key, value, hk );
+#ifdef DEBUG
+            int result =
+#endif /* DEBUG */
+            pg->add( (hk>>5)&0x1ff, key, value, hk );
 
             /* this should return ok_ indicating that it wen smoothly */
             CSL_DEBUG_ASSERT( result == page_t::ok_ );
@@ -110,7 +113,10 @@ namespace csl
             /* noone at the given position, the item should always be added, no split can happen */
             CSL_DEBUGF( L"Add the first element to: %lld:%lld pg:%lld",hk,(hk>>(5+shift))&0x1ff,pageid );
 
-            int result = pg->add( (hk>>(5+shift))&0x1ff, key, value, hk );
+#ifdef DEBUG
+            int result =
+#endif /*DEBUG*/
+            pg->add( (hk>>(5+shift))&0x1ff, key, value, hk );
 
             /* this should return ok_ indicating that it wen smoothly */
             CSL_DEBUG_ASSERT( result == page_t::ok_ );
@@ -132,12 +138,25 @@ namespace csl
             ** to check for the need to split the page */
             CSL_DEBUGF( L"k,v appended at page:%lld pos:%lld (hk:%lld)",pageid,(hk>>(5+shift))&0x1ff,hk );
 
-            if( (pg->n_items() > 32 && pg->n_free() < 24) || pg->n_free() == 0 )
+            if( (pg->n_items() > 32 && pg->n_free() < 31) || pg->n_free() == 0 )
             {
               /* do split */
-              page_vec_t pv;
               pos_vec_t  iv;
+
+              pg->split( shift+10, pages_, iv );
+
+              pos_vec_t::iterator ivit  = iv.begin();
+              pos_vec_t::iterator ivend = iv.end();
+
+#ifdef DEBUG
+              bool res =
+#endif /*DEBUG*/
+              index_.split( hk, shift, iv );
+
+              CSL_DEBUG_ASSERT( res == true );
             }
+
+            RETURN_FUNCTION( true );
           }
           else
           {

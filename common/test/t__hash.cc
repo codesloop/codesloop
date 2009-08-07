@@ -71,8 +71,11 @@ using namespace test_hash;
 
 int main()
 {
+#ifdef DEBUG
   funct0();
-  //csl_common_print_results( "funct0                   ", csl_common_test_timer_v0(funct0),"" );
+#else
+  csl_common_print_results( "funct0                   ", csl_common_test_timer_v0(funct0),"" );
+#endif /*DEBUG*/
 
   csl_common_print_results( "hash_baseline            ", csl_common_test_timer_v0(hash_baseline),"" );
   csl_common_print_results( "tbuf_baseline            ", csl_common_test_timer_v0(tbuf_baseline),"" );

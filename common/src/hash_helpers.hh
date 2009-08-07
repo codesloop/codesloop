@@ -83,7 +83,7 @@ namespace csl
           size_t pos() const { return pos_; }
       };
 
-      typedef inpvec< size_t > pos_vec_t;
+      typedef inpvec< uint64_t > pos_vec_t;
 
       template <typename K, typename V>
       class page
@@ -228,16 +228,27 @@ namespace csl
       class index
       {
         public:
-          typedef inpvec< uint64_t >  item_vec_t;
+          typedef inpvec< uint64_t >    item_vec_t;
+          typedef item_vec_t::iterator  item_iter_t;
+          typedef pos_vec_t::iterator   pos_iter_t;
 
           bool internal_get( size_t at, uint64_t & pos, bool & is_page )
           {
+            ENTER_FUNCTION();
             item_vec_t::iterator i = items_.iterator_at( at );
-            if( i.is_empty() ) return false;
+
+            if( i.is_empty() )
+            {
+              /* the given position at 'at' is empty */
+              RETURN_FUNCTION( false );
+            }
+            /* extract 'page id' or 'index position' */
             uint64_t x = (*i)[0];
             pos = (x>>1ULL);
+
+            /* decide wether it is a page id? */
             is_page = ((x&1ULL) == 1ULL);
-            return true;
+            RETURN_FUNCTION( true );
           }
 
           void internal_set( size_t at, uint64_t pos, bool is_page )
@@ -246,44 +257,91 @@ namespace csl
             items_.set( at, p );
           }
 
-          bool get( hash_key_t hk, uint64_t & pgpos, uint64_t & shift )
+          static const uint64_t not_found_ = 0xffffffffffffffffULL;
+
+          uint64_t lookup_pos( hash_key_t hk, uint64_t & shift )
           {
-            uint64_t off,tpos,pg;
+            ENTER_FUNCTION();
+            uint64_t tpos,pg,off=0ULL;
             bool is_page;
 
-            off  = 0;
-
+            /* iterator through the index records only checking the relevant ones
+            ** of which the corresponding part of the hash key matches. the iterator i
+            ** tells which part of the hash key to be checked
+            */
             for( uint64_t i=0;i<64;i+=5 )
             {
               tpos = (hk>>i)&0x1ff;
 
-              if( internal_get( off+tpos, pg, is_page ) == false ) return false;
+              if( internal_get( off+tpos, pg, is_page ) == false )
+              {
+                RETURN_FUNCTION( not_found_ );
+              }
 
               if( is_page == true )
               {
-                pgpos = pg;
                 shift = i;
-                return true;
+                RETURN_FUNCTION( off+tpos );
               }
               off = pg*32;
             }
-            return false;
+            RETURN_FUNCTION( not_found_ );
+          }
+
+          bool split( hash_key_t hk, uint64_t shift, pos_vec_t & posv )
+          {
+            ENTER_FUNCTION();
+
+            pos_iter_t   it      = posv.begin();
+            pos_iter_t   en      = posv.end();
+            uint64_t     pos     = lookup_pos( hk, shift );
+            item_iter_t  ii      = items_.last_free();
+            uint64_t     endp    = (items_.iterator_pos(ii)+31)/32;
+
+            /* set this to be a link */
+            internal_set( pos, endp, false );
+
+            for( size_t i=(endp*32);i<(endp+1)*32;++i )
+            {
+              if( it.is_empty() == false )
+              {
+                CSL_DEBUGF(L"Setting pos:%lld to [%lld]",i,((*it)[0]));
+                items_.set( i,(*it)[0] );
+              }
+              ++it;
+            }
+
+            RETURN_FUNCTION( false );
+          }
+
+          bool get( hash_key_t hk, uint64_t & pgpos, uint64_t & shift )
+          {
+            ENTER_FUNCTION();
+            uint64_t pg,pos = lookup_pos( hk, shift );
+            bool is_page;
+
+            if( internal_get( pos, pg, is_page ) == false )
+            {
+              RETURN_FUNCTION( false );
+            }
+
+            if( is_page == true )
+            {
+              pgpos = pg;
+              RETURN_FUNCTION( true );
+            }
+
+            RETURN_FUNCTION( false );
           }
 
           size_t n_items() { return items_.n_items(); }
-
-          /*
-          void set( hash_key_t hk, uint64_t pos )
-          {
-          }
-          */
 
           void debug()
           {
           }
 
         private:
-          item_vec_t   items_;
+          item_vec_t items_;
 
           CSL_OBJ(csl::common::hash_helpers,index);
           USE_EXC();
