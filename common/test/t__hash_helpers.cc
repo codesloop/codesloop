@@ -77,7 +77,7 @@ namespace test_hash_helpers {
     }
 
     page_t::page_vec_t    res;
-    page_t::pos_vec_t     ids;
+    pos_vec_t             ids;
     uint32_t              shift=0;
 
     assert( p.n_items() == page_t::sz_ );
@@ -100,12 +100,43 @@ namespace test_hash_helpers {
     }
   }
 
+  void index_getset()
+  {
+    hash_helpers::index idx;
+
+    uint64_t i;
+    uint64_t tpos;
+    bool page,tpage;
+
+    for( i=0;i<64;++i )
+    {
+      /* check that a get to empty value returns false */
+      assert( idx.internal_get( i,tpos,page ) == false );
+
+      /* flip-flop */
+      if( (i&1ULL) == 0 ) page = true;
+      else                page = false;
+
+      /* set a new value */
+      idx.internal_set( i,i,page );
+
+      /* retrieve the value */
+      assert( idx.internal_get( i,tpos,tpage ) == true );
+
+      /* check data */
+      assert( page == tpage );
+      assert( tpos == i );
+    }
+  }
+
 } // end of test_hash_helpers
 
 using namespace test_hash_helpers;
 
 int main()
 {
+  csl_common_print_results( "index getset (internal)      ", csl_common_test_timer_v0(index_getset),"" );
+
   csl_common_print_results( "page_split                   ", csl_common_test_timer_v0(page_split),"" );
 
   csl_common_print_results( "page_add (1)                 ", csl_common_test_timer_i1(page_add,1),"" );

@@ -135,6 +135,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # endif /*STRDUP*/
 #endif
 
+#ifndef CSL_DEBUG_ASSERT
+# ifdef DEBUG
+#  include <assert.h>
+#  define CSL_DEBUG_ASSERT(EXPR) assert( (EXPR) );
+# else
+#  define CSL_DEBUG_ASSERT(EXPR)
+# endif /*DEBUG*/
+#endif /*CSL_DEBUG_ASSERT*/
+
 #ifdef __cplusplus
 #ifndef THR
 #define THR(REASON,RET) \

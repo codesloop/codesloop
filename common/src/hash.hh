@@ -32,9 +32,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "obj.hh"
-#include "pvlist.hh"
-#include "tbuf.hh"
+#include "hash_helpers.hh"
 #include "exc.hh"
+#include "logger.hh"
 #include "common.h"
 #ifdef __cplusplus
 
@@ -42,151 +42,127 @@ namespace csl
 {
   namespace common
   {
-#if 0
-    unsigned long long default_hash_function(unsigned long long id, unsigned char nbits);
-
-    unsigned long long hash_code(unsigned long long item);
-
-    template <typename Obj>
-    unsigned long long hash_code(const Obj & o)
+    template <typename K> struct default_hash_fun
     {
-      return o.hash_code();
-    }
+      hash_helpers::hash_key_t operator()(const K & k) { return k.hash_key(); }
+    };
 
-    template < typename Obj,
-               typename IndexHandler,
-               typename PageHandler
-             >
-    class hash : public obj
+    template <> struct default_hash_fun<hash_helpers::hash_key_t>
     {
-      CSL_OBJ(csl::common,hash);
+      hash_helpers::hash_key_t operator()(hash_helpers::hash_key_t k) { return k; }
+    };
 
+    template <typename K, typename V, typename F=default_hash_fun<K> > class hash
+    {
       public:
-        typedef Obj            obj_t;
-        typedef IndexHandler   index_handler_t;
-        typedef PageHandler    page_handler_t;
+        typedef K                         key_t;
+        typedef V                         value_t;
+        typedef hash_helpers::hash_key_t  hash_key_t;
 
-        struct entry
+        typedef hash_helpers::page<key_t,value_t>   page_t;
+        typedef typename page_t::page_vec_t         page_vec_t;
+        typedef typename page_vec_t::iterator       page_iter_t;
+        typedef hash_helpers::index                 index_t;
+        typedef hash_helpers::pos_vec_t             pos_vec_t;
+
+        bool has_key(const key_t & key) { return false; }
+        bool get(const key_t & key, value_t & value) { return false; }
+        bool del(const key_t & key) { return false; }
+
+        bool set( const key_t & key, const value_t & value )
         {
-          unsigned long long next_item_;
-          unsigned long long page_id_;
+          ENTER_FUNCTION();
 
-          inline void reset()
+          F          hash_fun;
+          uint64_t   pgpos      = 0;
+          uint64_t   pageid     = 0;
+          hash_key_t hk         = hash_fun( key );
+          uint64_t   shift      = 0;
+
+          if( index_.get( hk, pageid, shift ) == false )
           {
-            next_item_    = 0;
-            page_id_      = 0;
-          }
-        };
+            /* no page for hash key yet */
+            CSL_DEBUGF( L"no page for hash_key: %lld", hk );
 
-        struct index
-        {
-          unsigned char        max_bits_;
-          unsigned char        item_width_;
-          unsigned long long   n_items_;
-          unsigned long long   allocated_;
-          unsigned char *      buffer_;
-          index_handler_t &    index_handler_;
+            pgpos        = (hk&0x1ff);
+            page_t * pg  = create_page( pageid );
 
-          index(index_handler_t & h)
-            : max_bits_(1), item_width_(2), n_items_(0),
-              allocated_(0), buffer_(0), index_handler_(h)
-          {
-            index_handler_.consruct(*this);
-          }
+            CSL_DEBUG_ASSERT( pg != 0 );
+            CSL_DEBUGF( L"page: %lld created for: %lld", pageid, hk );
 
-          ~index()
-          {
-            index_handler_.destruct(*this);
-          }
-        };
+            index_.internal_set( pgpos, pageid, true );
+            int result = pg->add( (hk>>5)&0x1ff, key, value, hk );
 
-      private:
-        index_handler_t  index_handler_;
-        page_handler_t   page_handler_;
-        index            index_;
-
-      public:
-        // consructor
-        hash() : index_(index_handler_), obj() { use_exc(true); }
-
-        // forwarders
-
-        // call global hash_code function. if that is not suitable define one yourself
-        bool get(Obj & o)        { return get( hash_code(o) ,o ); }
-        bool set(const Obj & o)  { return set( hash_code(o) ,o ); }
-
-        bool get(unsigned long long id, Obj & o)
-        {
-          entry e;
-          unsigned long long entry_id;
-
-          /* index handler is reponsible for looking up the entry associated
-             with the given id. if that failed then no entry found for the given
-             id. this indicates a serious error. every lookup must succeed, but
-             e.page_id_ may be nil if no entry is there. */
-
-          if( !index_handler_.get_entry(index_,id,e,entry_id) )
-          {
-            // throw an exception telling the caller that this is a serious problem
-            THR(exc::rs_lookup_error,false);
+            /* this should return ok_ indicating that it wen smoothly */
+            CSL_DEBUG_ASSERT( result == page_t::ok_ );
+            RETURN_FUNCTION( true );
           }
 
-          // no page found for the given id, means there is no page and thus no data
-          if( e.page_id_ == 0 ) { return false; }
+          /* now we have a page id at 'pageid' so try to add the data to it */
+          page_iter_t pit = pages_.iterator_at( pageid );
+          CSL_DEBUG_ASSERT( pit.at_end() == false );
 
-          // sanity check: the returned entry must be a leaf entry (should be zero)
-          if( e.next_item_ != 0 ) { THR(exc::rs_invalid_state,false); }
+          page_t * pg = *pit;
 
-          // lookup and return item
-          return page_handler_.get(e.page_id_,id,o);
-        }
-
-        bool set(unsigned long long id, const Obj & o)
-        {
-          entry e;
-          unsigned long long entry_id;
-
-          /* if set_entry returns false than it indicates a lookup error which
-             should not happen. every lookup must succeed. this function is expected
-             to return the given entry and an identifier that is used by the index_handler_
-             to identify the given entry */
-
-          if( !index_handler_.get_entry(index_,id,e,entry_id) )
+          /* check if there is an item at the desired position */
+          if( pg->has_item( (hk>>(5+shift))&0x1ff ) == false )
           {
-            // this must be a serious problem, indicating an internal lookup error
-            THR(exc::rs_lookup_error,false);
+            /* noone at the given position, the item should always be added, no split can happen */
+            CSL_DEBUGF( L"Add the first element to: %lld:%lld pg:%lld",hk,(hk>>(5+shift))&0x1ff,pageid );
+
+            int result = pg->add( (hk>>(5+shift))&0x1ff, key, value, hk );
+
+            /* this should return ok_ indicating that it wen smoothly */
+            CSL_DEBUG_ASSERT( result == page_t::ok_ );
+            RETURN_FUNCTION( true );
           }
 
-          /* if the page_id_ in the entry is nil than the page_handler_ is expected
-             to allocate a page and return the id in e.page_id_. if that is the
-             case, we must tell the index handler later to update the index entry */
+          int result = pg->add( (hk>>(5+shift))&0x1ff, key, value, hk );
 
-          bool need_index_update = false;
-
-          if( e.page_id_ == 0 ) { need_index_update = true; }
-
-          /* check if page handler can insert obj:
-             - page handler is expected to return true if succeed and
-             - false if the page is full */
-
-          if( !page_handler_.insert(id,o,e) )
+          if( result == page_t::has_already_ )
           {
-            /* the page is full so we need to split the entry.
-               here we expect that e will be updated
-            */
+            /* this means that this key <=> value pair already there, so
+            ** page didn't replace that */
+            CSL_DEBUGF( L"not replacing existing value. (hk:%lld)",hk);
+            RETURN_FUNCTION( false );
+          }
+          else if( result == page_t::append_ok_ )
+          {
+            /* k,v has been appended to the given position. this tells us
+            ** to check for the need to split the page */
+            CSL_DEBUGF( L"k,v appended at page:%lld pos:%lld (hk:%lld)",pageid,(hk>>(5+shift))&0x1ff,hk );
 
-            if( !index_handler_.split(index_,entry_id,id,e) )
+            if( (pg->n_items() > 32 && pg->n_free() < 24) || pg->n_free() == 0 )
             {
-              /// TODO fix this design issue
+              /* do split */
+              page_vec_t pv;
+              pos_vec_t  iv;
             }
           }
           else
           {
-            // page_handler_ could insert the object
+            /* the page returned an unexpected value, telling us
+            ** something is wrong with its state */
+            THR(exc::rs_invalid_state,false);
           }
+          RETURN_FUNCTION( false );
         }
+
+      private:
+        page_t * create_page( uint64_t & pgid )
+        {
+          page_iter_t it = pages_.last_free();
+          it.construct();
+          pgid = pages_.iterator_pos( it );
+          return *it;
+        }
+
+        page_vec_t    pages_;
+        index_t       index_;
+
+        CSL_OBJ(csl::common,hash);
+        USE_EXC();
     };
-#endif
 
   } /* end of ns:common */
 } /* end of ns:csl */

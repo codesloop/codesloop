@@ -83,7 +83,9 @@ namespace csl
           size_t pos() const { return pos_; }
       };
 
-      template <typename K, typename V, size_t SZ=32, size_t BITS=5>
+      typedef inpvec< size_t > pos_vec_t;
+
+      template <typename K, typename V>
       class page
       {
         public:
@@ -93,26 +95,38 @@ namespace csl
           typedef inpvec<contained_t>                             contained_vec_t;
           typedef typename inpvec<contained_t>::iterator          contained_iter_t;
           typedef inpvec< page >                                  page_vec_t;
-          typedef inpvec< size_t >                                pos_vec_t;
 
-          static const size_t sz_         = SZ;
-          static const size_t bits_       = BITS;
+          static const size_t sz_         = 32;
+          static const size_t bits_       = 5;
           static const hash_key_t mask_   = 0x1ff;
 
           static const int  ok_            = 1;
           static const int  bad_pos_       = 2;
           static const int  has_already_   = 3;
+          static const int  append_ok_     = 4;
 
           int add(size_t pos, const key_t & k, const value_t & v, hash_key_t hk)
           {
             ENTER_FUNCTION();
+            int ret = ok_;
+
             if( pos > sz_ ) { THR(exc::rs_invalid_param,bad_pos_); }
 
             contained_iter_t it = data_.iterator_at(pos);
 
-            if( it.is_empty() ) { it.set( k,v,hk,pos ); }
+            if( it.is_empty() )
+            {
+              /* the given position is empty */
+              it.set( k,v,hk,pos );
+              ret = ok_;
+            }
             else
             {
+              /* there is an item at the given position
+              ** now check if this is a duplicate or not
+              ** if duplicate then skip, otherwise append
+              ** to the end of the list
+              **/
               contained_t * p = (*it);
 
               while( p )
@@ -129,13 +143,14 @@ namespace csl
                   if( it.is_empty() == false ) it = data_.last_free();
                   it.set( k,v,hk,data_.iterator_pos(it) );
                   p->next(*it);
+                  ret = append_ok_;
                   break;
                 }
                 p = p->next();
               }
             }
 
-            RETURN_FUNCTION(ok_);
+            RETURN_FUNCTION(ret);
           }
 
           void remove(size_t pos, const key_t & k)
@@ -188,6 +203,14 @@ namespace csl
 
           size_t n_items() { return data_.n_items(); }
 
+          size_t n_free()
+          {
+            contained_iter_t it = data_.begin();
+
+            if( it != data_.end() ) return it.n_free();
+            else                    return 32;
+          }
+
           bool has_item(size_t pos)
           {
             ENTER_FUNCTION();
@@ -205,7 +228,65 @@ namespace csl
       class index
       {
         public:
-          typedef uint64_t page_index_t;
+          typedef inpvec< uint64_t >  item_vec_t;
+
+          bool internal_get( size_t at, uint64_t & pos, bool & is_page )
+          {
+            item_vec_t::iterator i = items_.iterator_at( at );
+            if( i.is_empty() ) return false;
+            uint64_t x = (*i)[0];
+            pos = (x>>1ULL);
+            is_page = ((x&1ULL) == 1ULL);
+            return true;
+          }
+
+          void internal_set( size_t at, uint64_t pos, bool is_page )
+          {
+            size_t p = (pos<<1ULL) | (is_page&1ULL);
+            items_.set( at, p );
+          }
+
+          bool get( hash_key_t hk, uint64_t & pgpos, uint64_t & shift )
+          {
+            uint64_t off,tpos,pg;
+            bool is_page;
+
+            off  = 0;
+
+            for( uint64_t i=0;i<64;i+=5 )
+            {
+              tpos = (hk>>i)&0x1ff;
+
+              if( internal_get( off+tpos, pg, is_page ) == false ) return false;
+
+              if( is_page == true )
+              {
+                pgpos = pg;
+                shift = i;
+                return true;
+              }
+              off = pg*32;
+            }
+            return false;
+          }
+
+          size_t n_items() { return items_.n_items(); }
+
+          /*
+          void set( hash_key_t hk, uint64_t pos )
+          {
+          }
+          */
+
+          void debug()
+          {
+          }
+
+        private:
+          item_vec_t   items_;
+
+          CSL_OBJ(csl::common::hash_helpers,index);
+          USE_EXC();
       };
     }
   }

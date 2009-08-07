@@ -83,6 +83,7 @@ ADD_LIBRARY( csl_common STATIC
              arch.cc       arch.hh
              serializable.hh
              obj.cc        obj.hh
+             hlprs.cc      hlprs.hh
              hash.cc       hash.hh
              hash_helpers.hh
              var.hh
