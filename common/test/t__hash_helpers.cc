@@ -28,6 +28,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify hash related macros
  */
 
+#if 0
+#ifndef DEBUG
+#define DEBUG
+#endif /* DEBUG */
+#endif
+
 #include "hash.hh"
 #include "hash_helpers.hh"
 #include "inpvec.hh"
@@ -129,12 +135,38 @@ namespace test_hash_helpers {
     }
   }
 
+  void index_split()
+  {
+    hash_helpers::index      idx;
+    hash_helpers::pos_vec_t  pv,pv2;
+    uint64_t                 shift=0;
+
+    idx.internal_set( 2,1,true );
+
+    pv.set( 2,2 );
+    pv.set( 5,5 );
+
+    idx.split( 2,shift,pv );
+
+    pv2.set( 7,7 );
+    pv2.set( 21,21 );
+
+    idx.split( (2<<5)+2,shift,pv2 );
+  }
+
 } // end of test_hash_helpers
 
 using namespace test_hash_helpers;
 
 int main()
 {
+
+#ifdef DEBUG
+  index_split();
+  index_getset();
+#else
+
+  csl_common_print_results( "index split                  ", csl_common_test_timer_v0(index_split),"" );
   csl_common_print_results( "index getset (internal)      ", csl_common_test_timer_v0(index_getset),"" );
 
   csl_common_print_results( "page_split                   ", csl_common_test_timer_v0(page_split),"" );
@@ -147,7 +179,7 @@ int main()
 
   csl_common_print_results( "baseline (contained)         ", csl_common_test_timer_v0(baseline_contained),"" );
   csl_common_print_results( "baseline (page)              ", csl_common_test_timer_v0(baseline_page),"" );
-
+#endif
   return 0;
 }
 

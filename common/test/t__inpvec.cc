@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, David Beck, Tamas Foldi
+Copyright (c) 2008,2009, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -28,9 +28,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify in-place vector
  */
 
+#if 0
 #ifndef DEBUG
 #define DEBUG
 #endif /* DEBUG */
+#endif
 
 #include "inpvec.hh"
 #include "test_timer.h"
@@ -113,7 +115,7 @@ namespace test_inpvec {
 
     for( unsigned long long i=0;i<static_cast<unsigned long long>(p);++i )
     {
-      vec.set( vec.n_items(),i );
+      vec.push_back( i );
       assert( vec.get(i) == i );
       assert( vec.n_items() == i+1 );
       vec.set(i,i);
@@ -150,7 +152,7 @@ namespace test_inpvec {
 
     i=0;
     inpvec<uint64_t>::iterator it=vec.begin();
-    inpvec<uint64_t>::iterator en=vec.end();
+    const inpvec<uint64_t>::iterator & en(vec.end());
 
     for( ;it!=en;++it )
     {
@@ -174,7 +176,7 @@ namespace test_inpvec {
 
     i=0;
     std::vector<uint64_t>::iterator it=vec.begin();
-    std::vector<uint64_t>::iterator en=vec.end();
+    const std::vector<uint64_t>::iterator & en(vec.end());
 
     for( ;it!=en;++it )
     {
@@ -220,17 +222,17 @@ namespace test_inpvec {
 
     // check iterators of an empty vector
     assert( vec.iterator_pos( i ) == 0 );
-    assert( vec.iterator_pos( vec.begin() ) == 1 );
-    assert( vec.iterator_pos( vec.end() ) == 1 );
+    assert( vec.iterator_pos( vec.begin() ) == 0 );
+    assert( vec.iterator_pos( vec.end() ) == 0 );
 
     // default construct an item
-    assert( i.construct() == true );
+    assert( i.construct() != 0 );
 
     // check vector's size
     assert( vec.n_items() == 1 );
 
     // check item after replacing its data
-    assert( i.set(123ULL) == false );
+    assert( i.set(123ULL) != 0 );
     assert( vec.n_items() == 1 );
 
     // begin should return a non-end iterator
@@ -275,6 +277,11 @@ using namespace test_inpvec;
 
 int main()
 {
+#if 0
+  csl_common_print_results( "get_iter 3000       ", csl_common_test_timer_i1(get_iter,3000),"" );
+  csl_common_print_results( "iter_test 3000      ", csl_common_test_timer_i1(iter_test,3000),"" );
+  csl_common_print_results( "ulli_inpvec 3000    ", csl_common_test_timer_i1(ulli_inpvec,3000),"" );
+#else
   csl_common_print_results( "push_back           ", csl_common_test_timer_v0(fun_push_back),"" );
 
   csl_common_print_results( "itm                 ", csl_common_test_timer_v0(itm),"" );
@@ -319,7 +326,7 @@ int main()
   csl_common_print_results( "ulli_stdvec 31      ", csl_common_test_timer_i1(ustr_stdvec,31),"" );
   csl_common_print_results( "ulli_stdvec 50      ", csl_common_test_timer_i1(ustr_stdvec,50),"" );
   csl_common_print_results( "ulli_stdvec 3000    ", csl_common_test_timer_i1(ulli_stdvec,3000),"" );
-
+#endif
   return 0;
 }
 

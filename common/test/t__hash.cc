@@ -28,9 +28,28 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify hash table
  */
 
+#if 0
 #ifndef DEBUG
 #define DEBUG
 #endif /* DEBUG */
+#endif
+
+#define COMPARE_STD
+#ifdef COMPARE_STD
+#include <ext/hash_map>
+
+namespace __gnu_cxx
+{
+  template<> struct hash< uint64_t >
+  {
+    size_t operator()( const uint64_t & x ) const
+    {
+      uint64_t z = x;
+      return static_cast<size_t>(z);
+    }
+  };
+};
+#endif
 
 #include "hash.hh"
 #include "tbuf.hh"
@@ -65,6 +84,41 @@ namespace test_hash {
     h.set( 0ULL,0ULL );
   }
 
+  void funct1(int n)
+  {
+    hash<uint64_t,uint64_t> h;
+
+    for( uint64_t i=0ULL;i<static_cast<uint64_t>(n);++i )
+    {
+      h.set( i+0,i );
+      h.set( i+1,i );
+      h.set( i+2,i );
+    }
+  }
+
+  void stdhash(int n)
+  {
+#ifdef COMPARE_STD
+    typedef __gnu_cxx::hash_map<uint64_t, uint64_t, __gnu_cxx::hash<uint64_t> > ghash;
+    ghash h;
+
+    for( uint64_t i=0ULL;i<static_cast<uint64_t>(n);++i )
+    {
+      h.insert( ghash::value_type(i+0,i) );
+      h.insert( ghash::value_type(i+1,i) );
+      h.insert( ghash::value_type(i+2,i) );
+    }
+#endif
+  }
+
+  void ghash_baseline()
+  {
+#ifdef COMPARE_STD
+    typedef __gnu_cxx::hash_map<uint64_t, uint64_t, __gnu_cxx::hash<uint64_t> > ghash;
+    ghash h;
+#endif
+  }
+
 } // end of test_hash
 
 using namespace test_hash;
@@ -72,14 +126,37 @@ using namespace test_hash;
 int main()
 {
 #ifdef DEBUG
+  funct1(5);
   funct0();
 #else
-  csl_common_print_results( "funct0                   ", csl_common_test_timer_v0(funct0),"" );
-#endif /*DEBUG*/
 
+#if !0
   csl_common_print_results( "hash_baseline            ", csl_common_test_timer_v0(hash_baseline),"" );
   csl_common_print_results( "tbuf_baseline            ", csl_common_test_timer_v0(tbuf_baseline),"" );
   csl_common_print_results( "pbuf_baseline            ", csl_common_test_timer_v0(pbuf_baseline),"" );
+
+#ifdef COMPARE_STD
+  csl_common_print_results( "ghash_baseline           ", csl_common_test_timer_v0(ghash_baseline),"" );
+#endif /*COMPARE_STD*/
+
+  csl_common_print_results( "funct1(5)                ", csl_common_test_timer_i1(funct1,5),"" );
+  csl_common_print_results( "funct1(31)               ", csl_common_test_timer_i1(funct1,31),"" );
+  csl_common_print_results( "funct1(50)               ", csl_common_test_timer_i1(funct1,50),"" );
+  csl_common_print_results( "funct1(100)              ", csl_common_test_timer_i1(funct1,100),"" );
+  csl_common_print_results( "funct1(3000)             ", csl_common_test_timer_i1(funct1,3000),"" );
+
+#ifdef COMPARE_STD
+  csl_common_print_results( "stdhash(5)               ", csl_common_test_timer_i1(stdhash,5),"" );
+  csl_common_print_results( "stdhash(31)              ", csl_common_test_timer_i1(stdhash,31),"" );
+  csl_common_print_results( "stdhash(100)             ", csl_common_test_timer_i1(stdhash,100),"" );
+  csl_common_print_results( "stdhash(3000)            ", csl_common_test_timer_i1(stdhash,3000),"" );
+#endif /*COMPARE_STD*/
+
+#else
+  csl_common_print_results( "funct1(300000)           ", csl_common_test_timer_i1(funct1,300000),"" );
+#endif
+
+#endif /*DEBUG*/
 
   return 0;
 }

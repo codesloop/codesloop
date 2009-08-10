@@ -82,19 +82,19 @@ namespace csl
           if( index_.get( hk, pageid, shift ) == false )
           {
             /* no page for hash key yet */
-            CSL_DEBUGF( L"no page for hash_key: %lld", hk );
+            CSL_DEBUGF( L"no page for hash_key: [hk:%lld]", hk );
 
-            pgpos        = (hk&0x1ff);
+            pgpos        = (hk&(page_t::mask_));
             page_t * pg  = create_page( pageid );
 
             CSL_DEBUG_ASSERT( pg != 0 );
-            CSL_DEBUGF( L"page: %lld created for: %lld", pageid, hk );
+            CSL_DEBUGF( L"page: %lld created for: [hk:%lld]", pageid, hk );
 
             index_.internal_set( pgpos, pageid, true );
 #ifdef DEBUG
             int result =
 #endif /* DEBUG */
-            pg->add( (hk>>5)&0x1ff, key, value, hk );
+            pg->add( (hk>>5)&(page_t::mask_), key, value, hk );
 
             /* this should return ok_ indicating that it wen smoothly */
             CSL_DEBUG_ASSERT( result == page_t::ok_ );
@@ -102,51 +102,49 @@ namespace csl
           }
 
           /* now we have a page id at 'pageid' so try to add the data to it */
-          page_iter_t pit = pages_.iterator_at( pageid );
-          CSL_DEBUG_ASSERT( pit.at_end() == false );
-
-          page_t * pg = *pit;
+          page_t * pg = pages_.get_ptr( pageid );
+          CSL_DEBUG_ASSERT( pg != 0 );
 
           /* check if there is an item at the desired position */
-          if( pg->has_item( (hk>>(5+shift))&0x1ff ) == false )
+          if( pg->has_item( (hk>>(5+shift))&(page_t::mask_) ) == false )
           {
             /* noone at the given position, the item should always be added, no split can happen */
-            CSL_DEBUGF( L"Add the first element to: %lld:%lld pg:%lld",hk,(hk>>(5+shift))&0x1ff,pageid );
+            CSL_DEBUGF( L"Add the first element to: [hk:%lld:%lld] pg:%lld",hk,(hk>>(5+shift))&(page_t::mask_),pageid );
 
 #ifdef DEBUG
             int result =
 #endif /*DEBUG*/
-            pg->add( (hk>>(5+shift))&0x1ff, key, value, hk );
+            pg->add( (hk>>(5+shift))&(page_t::mask_), key, value, hk );
 
             /* this should return ok_ indicating that it wen smoothly */
             CSL_DEBUG_ASSERT( result == page_t::ok_ );
             RETURN_FUNCTION( true );
           }
 
-          int result = pg->add( (hk>>(5+shift))&0x1ff, key, value, hk );
+          int result = pg->add( (hk>>(5+shift))&(page_t::mask_), key, value, hk );
 
           if( result == page_t::has_already_ )
           {
             /* this means that this key <=> value pair already there, so
             ** page didn't replace that */
-            CSL_DEBUGF( L"not replacing existing value. (hk:%lld)",hk);
+            CSL_DEBUGF( L"not replacing existing value. [hk:%lld]",hk);
             RETURN_FUNCTION( false );
           }
           else if( result == page_t::append_ok_ )
           {
             /* k,v has been appended to the given position. this tells us
             ** to check for the need to split the page */
-            CSL_DEBUGF( L"k,v appended at page:%lld pos:%lld (hk:%lld)",pageid,(hk>>(5+shift))&0x1ff,hk );
+            CSL_DEBUGF( L"k,v appended at page:%lld pos:%lld ** [hk:%lld]",pageid,(hk>>(5+shift))&(page_t::mask_),hk );
 
-            if( (pg->n_items() > 32 && pg->n_free() < 31) || pg->n_free() == 0 )
+            uint64_t nf = pg->n_free();
+
+            if( (pg->n_items() > 1000 && nf < 31) || nf == 0 )
             {
               /* do split */
               pos_vec_t  iv;
 
+              /* TODO : SPEEDUP HERE XXX */
               pg->split( shift+10, pages_, iv );
-
-              pos_vec_t::iterator ivit  = iv.begin();
-              pos_vec_t::iterator ivend = iv.end();
 
 #ifdef DEBUG
               bool res =
@@ -167,10 +165,29 @@ namespace csl
           RETURN_FUNCTION( false );
         }
 
+        void debug()
+        {
+#ifdef DEBUG
+          ENTER_FUNCTION();
+          CSL_DEBUGF(L"DEBUG: %s","INDEX");
+          index_.debug();
+          CSL_DEBUGF(L"DEBUG: %s","PAGES");
+          pages_.debug();
+          CSL_DEBUGF(L"DEBUG: %s","PAGEDATA");
+          page_iter_t it = pages_.begin();
+          page_iter_t en = pages_.end();
+          for( ;it!=en;++it )
+          {
+            (*it)->debug();
+          }
+          LEAVE_FUNCTION();
+#endif /*DEBUG*/
+        }
+
       private:
         page_t * create_page( uint64_t & pgid )
         {
-          page_iter_t it = pages_.last_free();
+          page_iter_t it(pages_.last_free());
           it.construct();
           pgid = pages_.iterator_pos( it );
           return *it;
