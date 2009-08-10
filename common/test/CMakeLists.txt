@@ -116,5 +116,6 @@ ADD_EXECUTABLE( t__hash_helpers  t__hash_helpers.cc )
 
 #ADD_EXECUTABLE( t__hash_macros   t__hash_macros.cc )
 #SET_TARGET_PROPERTIES( t__hash PROPERTIES LINK_FLAGS -pg )
+#SET_TARGET_PROPERTIES( t__inpvec PROPERTIES LINK_FLAGS -pg )
 
 # -- EOF --
