@@ -46,31 +46,69 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef DEBUG
 #define CSL_DEBUG(msg)      csl::common::logger::debug( msg, get_class_name() )
+#ifdef DEBUG_ENABLE_INDENT
+#define CSL_DEBUGF(...) \
+  csl::common::logger::debug( \
+    get_class_name(), csl::common::logger::get_indent(0), __VA_ARGS__ )
+#else /* !DEBUG_ENABLE_INDENT */
 #define CSL_DEBUGF(...)     csl::common::logger::debug( get_class_name(), __VA_ARGS__ )
+#endif /* DEBUG_ENABLE_INDENT */
 #else
 #define CSL_DEBUG(msg)
-#define CSL_DEBUGF(...)     
+#define CSL_DEBUGF(...)
 #endif
-
 
 /* in debug mode these are optimized out by preprocessor */
 #ifdef DEBUG
+#ifdef DEBUG_ENABLE_INDENT
+#define ENTER_FUNCTION()  \
+   if ( csl::common::logger::enable_trace_ ) {                   \
+     csl::common::logger::debug(get_class_name(),                \
+        L" %*s\\ Entering function: ++++ %ls::%s",               \
+        csl::common::logger::get_indent(1)," ",                  \
+        get_class_name(),__FUNCTION__);                          \
+    }
+#define LEAVE_FUNCTION()                                         \
+{                                                                \
+   if ( csl::common::logger::enable_trace_ )                     \
+     csl::common::logger::debug(get_class_name(),                \
+        L" %*s/ Leaving function: ----- %ls::%s",                \
+        csl::common::logger::get_indent(-1)," ",                 \
+        get_class_name(),__FUNCTION__);                          \
+   return;                                                       \
+}
+#define RETURN_FUNCTION(ret)                                     \
+{                                                                \
+   if ( csl::common::logger::enable_trace_ )                     \
+     csl::common::logger::debug(get_class_name(),                \
+        L" %*s/ Leaving function: ----- %ls::%s",                \
+        csl::common::logger::get_indent(-1)," ",                 \
+        get_class_name(),__FUNCTION__);                          \
+   return(ret);                                                  \
+}
+#else /* !DEBUG_ENABLE_INDENT */
  #define ENTER_FUNCTION()  \
    if ( csl::common::logger::enable_trace_ )                     \
-     csl::common::logger::debug(get_class_name(),L">>> Entering function:\t%ls::%s",get_class_name(),__FUNCTION__)
+     csl::common::logger::debug(get_class_name(),                \
+        L">>> Entering function:\t%ls::%s",                      \
+        get_class_name(),__FUNCTION__)
  #define LEAVE_FUNCTION()                                        \
    {                                                             \
    if ( csl::common::logger::enable_trace_ )                     \
-     csl::common::logger::debug(get_class_name(),L">>> Leaving function:\t%ls::%s",get_class_name(),__FUNCTION__); \
+     csl::common::logger::debug(get_class_name(),                \
+        L"<<< Leaving function:\t%ls::%s",                       \
+        get_class_name(),__FUNCTION__);                          \
    return;                                                       \
    }
  #define RETURN_FUNCTION(ret)                                    \
    {                                                             \
    if ( csl::common::logger::enable_trace_ )                     \
-     csl::common::logger::debug(get_class_name(),L">>> Leaving function:\t%ls::%s",get_class_name(),__FUNCTION__); \
+     csl::common::logger::debug(get_class_name(),                \
+        L"<<< Leaving function:\t%ls::%s",                       \
+        get_class_name(),__FUNCTION__);                          \
    return(ret);                                                  \
    }
-
+#endif /* DEBUG_ENABLE_INDENT */
 #else /* !DEBUG */
  #define ENTER_FUNCTION()
  #define LEAVE_FUNCTION()       return
@@ -95,7 +133,7 @@ namespace csl {
       LOG_WARNING     = 4,
       LOG_ERROR       = 5,
       LOG_CRITICAL    = 6,
-      LOG_LAST     
+      LOG_LAST
     } logger_types;
 
 
@@ -150,6 +188,20 @@ namespace csl {
           log( LOG_ERROR, str );
         }
 
+#ifdef DEBUG_ENABLE_INDENT
+        /** @brief helper function for more digestable debug logs
+        *** @note that this function is not thread safe so this should not be used in production builds
+        *** @param change tells how much we change the indentation
+        *** @return the indent value
+        ***/
+        static inline int get_indent(int change) {
+          static int indent_value_ = 0;
+          int ret = indent_value_;
+          indent_value_ += change;
+          if( change > 0 ) return (indent_value_);
+          else             return (ret);
+        }
+#endif
         /** @brief shortcut function for debug messages
 
         Debug messages are only available in DEBUG builds, otherwise
@@ -187,7 +239,48 @@ namespace csl {
           }
 #endif
         }
-      
+
+        /** @brief shortcut function for debug messages
+
+        Debug messages are only available in DEBUG builds, otherwise
+        compiler optimizes out the debug related log macros
+        @param str  message to log */
+#ifdef DEBUG_ENABLE_INDENT
+        static inline void      debug( const wchar_t * invoker,
+                                       int indent,
+                                       const wchar_t * fmt1,
+                                       ... )
+        {
+#ifdef DEBUG
+          if ( class_to_trace_ == L"all" ||
+               class_to_trace_.find( str(invoker) ) != str::npos )
+          {
+            /* create indent string */
+            if( indent <= 0 ) indent = 0;
+            tbuf<128> tb;
+
+            wchar_t * p = reinterpret_cast<wchar_t *>(tb.allocate( (indent+6)*sizeof(wchar_t) ));
+            if( indent > 0 )
+            {
+              swprintf( p,indent+5,L"  %*s| ",indent," ");
+            }
+            else
+            {
+              swprintf( p,4,L"  ");
+            }
+
+            /* create format string */
+            str fmt(p); fmt += fmt1;
+
+            va_list args;
+            va_start(args, fmt1);
+            log( LOG_DEBUG, fmt.c_str(), args );
+            va_end(args);
+          }
+#endif
+        }
+#endif /*DEBUG_ENABLE_INDENT*/
+
         /** @brief executed at program startup */
         static int           init(); 
 
