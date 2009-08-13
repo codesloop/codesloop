@@ -96,9 +96,20 @@ namespace csl
           typedef typename inpvec<contained_t>::iterator          contained_iter_t;
           typedef inpvec< page >                                  page_vec_t;
 
+          /*
+          static const uint64_t sz_       = 4096ULL;
+          static const uint64_t bits_     = 12ULL;
+          static const hash_key_t mask_   = 0xfff;
+          */
+          /*
           static const uint64_t sz_       = 32ULL;
           static const uint64_t bits_     = 5ULL;
           static const hash_key_t mask_   = 0x1f;
+          */
+
+          static const uint64_t sz_       = 256ULL;
+          static const uint64_t bits_     = 8ULL;
+          static const hash_key_t mask_   = 0xff;
 
           static const int  ok_            = 1;
           static const int  bad_pos_       = 2;
@@ -172,16 +183,20 @@ namespace csl
             /* TODO */
           }
 
+          //XXX create xtract op, rather than split ...
           void split(uint64_t shift, page_vec_t & pagev, pos_vec_t & posv)
           {
+            ENTER_FUNCTION();
             typedef typename page_vec_t::iterator it_t;
+
+            CSL_DEBUGF(L"split(%lld,pagev,posv)",shift);
 
             contained_iter_t it = data_.begin();
             const contained_iter_t & en(data_.end());
 
             uint64_t pos = 0;
 
-            for( ;(it!=en) && (pos<32);++it )
+            for( ;(it!=en) && (pos<sz_);++it )
             {
               if( it.is_empty() == false && pos != 0 )
               {
@@ -208,6 +223,7 @@ namespace csl
               }
               ++pos;
             }
+            LEAVE_FUNCTION();
           }
 
           contained_t * get(uint64_t pos)
@@ -227,6 +243,7 @@ namespace csl
           bool has_item(uint64_t pos)
           {
             ENTER_FUNCTION();
+            CSL_DEBUGF(L"has_item(%lld)",pos);
             bool ret = false;
             if( pos > sz_ ) { THR(exc::rs_invalid_param,false); }
             else ret = (data_.is_free_at(pos) == false);
@@ -257,22 +274,28 @@ namespace csl
           typedef item_vec_t::iterator  item_iter_t;
           typedef pos_vec_t::iterator   pos_iter_t;
 
+          static const uint64_t sz_       = 256ULL;
+          static const uint64_t bits_     = 8ULL;
+          static const hash_key_t mask_   = 0xff;
+
           bool internal_get( uint64_t at, uint64_t & pos, bool & is_page )
           {
             ENTER_FUNCTION();
-            item_vec_t::iterator i = items_.iterator_at( at );
+            CSL_DEBUGF(L"internal_get(%lld)",at);
+            uint64_t * i = items_.get_ptr( at );
 
-            if( i.is_empty() )
+            if( i == 0 )
             {
               /* the given position at 'at' is empty */
               RETURN_FUNCTION( false );
             }
             /* extract 'page id' or 'index position' */
-            uint64_t x = (*i)[0];
-            pos = (x>>1ULL);
+            pos = ((*i)>>1ULL);
 
             /* decide wether it is a page id? */
-            is_page = ((x&1ULL) == 1ULL);
+            is_page = (((*i)&1ULL) == 1ULL);
+
+            CSL_DEBUGF(L"internal_get(%lld, =>%lld, =>'%s')",at,pos,(is_page==true?"true":"false"));
             RETURN_FUNCTION( true );
           }
 
@@ -280,57 +303,75 @@ namespace csl
           {
             ENTER_FUNCTION();
             uint64_t p = (pos<<1ULL) | (is_page&1ULL);
-            CSL_DEBUGF(L"set #%lld to [%s:%lld] => %lld",at,(is_page==true?"page":"link"),pos,p);
+            CSL_DEBUGF(L"internal_set(%lld, %lld, %s) => %lld",at,pos,(is_page==true?"page":"link"),p);
             items_.set( at, p );
             LEAVE_FUNCTION();
           }
 
           static const uint64_t not_found_ = 0xffffffffffffffffULL;
 
-          uint64_t lookup_pos( hash_key_t hk, uint64_t & shift )
+          /* OK, tested in t__hash_helpers.cc / index_lookup_pp() */
+          uint64_t lookup_pagepos_for_hashkey( hash_key_t hk, uint64_t & shift )
           {
             ENTER_FUNCTION();
             uint64_t tpos,pg=0ULL,off=0ULL;
             bool is_page;
+            uint64_t ret = not_found_;
 
             /* iterator through the index records only checking the relevant ones
             ** of which the corresponding part of the hash key matches. the iterator i
             ** tells which part of the hash key to be checked
             */
-            for( uint64_t i=0;i<64;i+=5 )
+            for( uint64_t i=0;i<64;i+=bits_ )
             {
-              tpos = ((hk>>i)&0x1f);
+              tpos = ((hk>>i)&(mask_));
+
+              CSL_DEBUGF(L"Checking position (%lld)=(%lld*%lld)+(%lld>>%lld&%lld) (%lld+%lld)",
+                         off+tpos,
+                         pg,sz_,      // = off
+                         hk,i,mask_,  // = tpos
+                         off,
+                         tpos );
 
               if( internal_get( off+tpos, pg, is_page ) == false )
               {
-                CSL_DEBUGF(L"empty position at: %lld [%lld:%lld]",(off+tpos),off,tpos);
-                RETURN_FUNCTION( not_found_ );
+                CSL_DEBUGF(L"lookup_pagepos_for_hashkey(%lld) "
+                    "[off:%lld + tpos:%lld = %lld] => %lld shift:%lld",
+                    hk,off,tpos,(off+tpos),ret,shift);
+
+                RETURN_FUNCTION( ret );
               }
 
               if( is_page == true )
               {
-                CSL_DEBUGF(L"page #%lld found at: %lld",pg,off+tpos);
                 shift = i;
+                ret = off+tpos;
+                CSL_DEBUGF(L"lookup_pagepos_for_hashkey(%lld) "
+                    "[off:%lld + tpos:%lld = %lld] => %lld shift:%lld [PAGE]",
+                    hk,off,tpos,(off+tpos),ret,shift);
                 RETURN_FUNCTION( off+tpos );
               }
               else
               {
-                CSL_DEBUGF(L"link to %lld/%lld found at: %lld",pg,pg*32,off+tpos);
+                CSL_DEBUGF(L"lookup_pagepos_for_hashkey(%lld) // link to %lld/%lld found at: %lld [LINK]",
+                           hk,pg,pg*sz_,off+tpos);
               }
-              off = pg*32;
+              off = pg*sz_;
             }
-            RETURN_FUNCTION( not_found_ );
+            CSL_DEBUGF(L"lookup_pagepos_for_hashkey(%lld) => %lld shift:%lld [???]",hk,ret,shift);
+            RETURN_FUNCTION( ret );
           }
 
           bool split( hash_key_t hk, uint64_t & shift, pos_vec_t & posv )
           {
             ENTER_FUNCTION();
+            CSL_DEBUGF(L"split(%lld,shift,posv)",hk);
 
-            pos_iter_t   it      = posv.begin();
-            pos_iter_t   en      = posv.end();
-            uint64_t     pos     = lookup_pos( hk, shift );
-            uint64_t     ii      = items_.last_free_pos();
-            uint64_t     endp    = (ii+31)/32;
+            uint64_t     pos        = lookup_pagepos_for_hashkey( hk, shift );
+            uint64_t     ii         = items_.last_free_pos();
+            uint64_t     endp       = (ii+sz_-1)/sz_;
+
+            CSL_DEBUGF(L"split(%lld,shift,posv) [pos:%lld ii:%lld endp:%lld]",hk,pos,ii,endp);
 
             if( pos == not_found_ )
             {
@@ -339,18 +380,24 @@ namespace csl
             }
 
             /* set this to be a link */
-            CSL_DEBUGF(L"Linking pos:%lld to [%lld / %lld]",pos,endp,endp*32);
+            CSL_DEBUGF(L"Linking pos:%lld to [%lld / %lld]",pos,endp,endp*sz_);
             internal_set( pos, endp, false );
 
-            for( uint64_t i=(endp*32);i<(endp+1)*32;++i )
+            pos_iter_t it = posv.begin();
+            uint64_t * x = *it;
+
+            /* check first */
+            if( x )
             {
-              if( it.is_empty() == false )
-              {
-                CSL_DEBUGF(L"Setting pos:%lld to [%lld]",i,((*it)[0]));
-                //items_.set( i,(*it)[0] );
-                internal_set( i,(*it)[0],true );
-              }
-              ++it;
+              CSL_DEBUGF(L"Setting pos:%lld to [%lld]",(endp*sz_),*x);
+              internal_set( (endp*sz_),*x,true );
+            }
+
+            /* check others */
+            while( (x=it.next_used()) != 0 )
+            {
+              CSL_DEBUGF(L"Setting pos:%lld to [%lld]",(endp*sz_)+it.get_pos(),*x);
+              internal_set( (endp*sz_)+it.get_pos(),*x,true );
             }
 
             RETURN_FUNCTION( false );
@@ -359,20 +406,24 @@ namespace csl
           bool get( hash_key_t hk, uint64_t & pgpos, uint64_t & shift )
           {
             ENTER_FUNCTION();
-            uint64_t pg,pos = lookup_pos( hk, shift );
+            CSL_DEBUGF(L"get(%lld,pgpos,shift)",hk);
+            uint64_t pg,pos = lookup_pagepos_for_hashkey( hk, shift );
             bool is_page;
 
             if( internal_get( pos, pg, is_page ) == false )
             {
+              CSL_DEBUGF(L"get(%lld,pgpos,shift) => FALSE",hk);
               RETURN_FUNCTION( false );
             }
 
             if( is_page == true )
             {
               pgpos = pg;
+              CSL_DEBUGF(L"get(%lld,pgpos:%lld,shift:%lld) => TRUE",hk,pgpos,shift);
               RETURN_FUNCTION( true );
             }
 
+            CSL_DEBUGF(L"get(%lld,pgpos,shift) => FALSE",hk);
             RETURN_FUNCTION( false );
           }
 
@@ -382,6 +433,7 @@ namespace csl
           {
 #ifdef DEBUG
             ENTER_FUNCTION();
+            CSL_DEBUGF(L"DEBUG: INDEX ITEMS");
             items_.debug();
             LEAVE_FUNCTION();
 #endif /*DEBUG*/

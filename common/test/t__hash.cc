@@ -31,6 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #if 0
 #ifndef DEBUG
 #define DEBUG
+#define DEBUG_ENABLE_INDENT
 #endif /* DEBUG */
 #endif
 
@@ -90,9 +91,26 @@ namespace test_hash {
 
     for( uint64_t i=0ULL;i<static_cast<uint64_t>(n);++i )
     {
+      CSL_DEBUGF(L"set(%lld,%lld)\n",i+0,i);
       h.set( i+0,i );
+
+#ifdef DEBUG
+      h.debug();
+#endif /*DEBUG*/
+
+      CSL_DEBUGF(L"set(%lld,%lld)\n",i+1,i);
       h.set( i+1,i );
+
+#ifdef DEBUG
+      h.debug();
+#endif /*DEBUG*/
+
+      CSL_DEBUGF(L"set(%lld,%lld)\n",i+2,i);
       h.set( i+2,i );
+
+#ifdef DEBUG
+      h.debug();
+#endif /*DEBUG*/
     }
   }
 
@@ -127,7 +145,7 @@ int main()
 {
 #ifdef DEBUG
   funct1(5);
-  funct0();
+  //funct0();
 #else
 
 #if !0
