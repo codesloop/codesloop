@@ -37,6 +37,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "inpvec.hh"
 #include "test_timer.h"
 #include "ustr.hh"
+#include "logger.hh"
 #include "common.h"
 #include <assert.h>
 #include <vector>
@@ -46,6 +47,10 @@ using namespace csl::common;
 
 /** @brief contains tests related to in-place vector */
 namespace test_inpvec {
+
+  static inline const wchar_t * get_namespace()   { return L"test_inpvec"; }
+  static inline const wchar_t * get_class_name()  { return L"test_inpvec::noclass"; }
+  static inline const wchar_t * get_class_short() { return L"noclass"; }
 
   void baseline()
   {
@@ -256,20 +261,94 @@ namespace test_inpvec {
 
   // TODO : test inpvec functionality:
   // - push_back() w/ non default constructor arguments
-  // - get()
-  // - iterator_at()
-  // - set()
   // - last_free()
-  // - size()
-  // - n_items()
-  // - iterator_pos()
-  // - begin(), end()
   // - iterator : set() w/ non default constructor arguments
   // - iterator : free() and double free()
   // - iterator : is_empty()
   // - iterator : operator() *
   // - iterator : operator++
   // - iterator : constructors
+  // force_iterator_at(a), force_iterator_at(a,b)
+
+  void fun_get_set()
+  {
+    inpvec<uint64_t> vec;
+
+    for( uint64_t i=0;i<1000;++i )
+    {
+      assert( vec.last_free_pos() == i );
+      assert( vec.is_free_at( i ) == true );
+      assert( vec.iterator_at( i ) == vec.end() || vec.iterator_at( i ).is_empty() == true  );
+      vec.set( i,i );
+      assert( vec.get_ptr( i ) != 0 );
+      assert( vec.get_ptr( i )[0] == i );
+      assert( vec.is_free_at( i ) == false );
+      assert( vec.iterator_at( i ).is_empty() == false );
+      assert( vec.iterator_at( i+1 ).is_empty() == true );
+      assert( vec.n_items() == (i+1) );
+      assert( vec.iterator_pos(vec.iterator_at(i)) == i );
+      assert( vec.last_free_pos() == i+1 );
+    }
+
+    for( uint64_t i=2000;i<4000;i+=3 )
+    {
+      assert( vec.is_free_at( i ) == true );
+      assert( vec.iterator_at( i ) == vec.end() || vec.iterator_at( i ).is_empty() == true );
+      vec.set( i,i );
+      assert( vec.get_ptr( i )[0] == i );
+      assert( vec.is_free_at( i ) == false );
+      assert( vec.iterator_at( i ).is_empty() == false );
+      assert( vec.iterator_at( i+1 ).is_empty() == true );
+    }
+  }
+
+  void test_next_used()
+  {
+    inpvec<uint64_t> vec;
+
+    CSL_DEBUGF(L"\n\nsetting: 2,99\n\n");
+    vec.set( 2,99 );
+
+#ifdef DEBUG
+    vec.debug();
+#endif /*DEBUG*/
+
+    CSL_DEBUGF(L"\n\nsetting: 100,9999\n\n");
+    vec.set( 100,9999 );
+
+#ifdef DEBUG
+    vec.debug();
+#endif /*DEBUG*/
+
+    CSL_DEBUGF(L"\n\nsetting: 1000,888888\n\n");
+    vec.set( 1000,888888 );
+
+#ifdef DEBUG
+    vec.debug();
+#endif /*DEBUG*/
+
+    inpvec<uint64_t>::iterator it = vec.begin();
+    uint64_t * x = 0;
+
+    CSL_DEBUGF(L"\n\nnext_used\n\n");
+    while( (x=it.next_used()) != 0 )
+    {
+      CSL_DEBUGF(L"next_used returned: %p",x);
+      CSL_DEBUGF(L"\n\nnext_used\n\n");
+    }
+
+    CSL_DEBUGF(L"\n\nsetting: 0,777777777\n\n");
+    vec.set( 0,777777777 );
+
+    it = vec.begin();
+
+    CSL_DEBUGF(L"\n\nnext_used B\n\n");
+    while( (x=it.next_used()) != 0 )
+    {
+      CSL_DEBUGF(L"next_used returned: %p:%lld B  [pos=%lld]",x,*x,it.get_pos());
+      CSL_DEBUGF(L"\n\nnext_used B\n\n");
+    }
+  }
 
 } // end of test_inpvec
 
@@ -277,11 +356,12 @@ using namespace test_inpvec;
 
 int main()
 {
-#if 0
-  csl_common_print_results( "get_iter 3000       ", csl_common_test_timer_i1(get_iter,3000),"" );
-  csl_common_print_results( "iter_test 3000      ", csl_common_test_timer_i1(iter_test,3000),"" );
-  csl_common_print_results( "ulli_inpvec 3000    ", csl_common_test_timer_i1(ulli_inpvec,3000),"" );
+#ifdef DEBUG
+  test_next_used();
+  fun_get_set();
 #else
+  fun_get_set();
+  csl_common_print_results( "fun_get_set         ", csl_common_test_timer_v0(fun_get_set),"" );
   csl_common_print_results( "push_back           ", csl_common_test_timer_v0(fun_push_back),"" );
 
   csl_common_print_results( "itm                 ", csl_common_test_timer_v0(itm),"" );
@@ -289,42 +369,42 @@ int main()
 
   csl_common_print_results( "get_iter 5          ", csl_common_test_timer_i1(get_iter,5),"" );
   csl_common_print_results( "get_iter 31         ", csl_common_test_timer_i1(get_iter,31),"" );
-  csl_common_print_results( "get_iter 50         ", csl_common_test_timer_i1(get_iter,50),"" );
+  csl_common_print_results( "get_iter 150        ", csl_common_test_timer_i1(get_iter,150),"" );
   csl_common_print_results( "get_iter 3000       ", csl_common_test_timer_i1(get_iter,3000),"" );
 
   csl_common_print_results( "iter_test 5         ", csl_common_test_timer_i1(iter_test,5),"" );
   csl_common_print_results( "iter_test 31        ", csl_common_test_timer_i1(iter_test,31),"" );
-  csl_common_print_results( "iter_test 50        ", csl_common_test_timer_i1(iter_test,50),"" );
+  csl_common_print_results( "iter_test 150       ", csl_common_test_timer_i1(iter_test,150),"" );
   csl_common_print_results( "iter_test 3000      ", csl_common_test_timer_i1(iter_test,3000),"" );
 
   csl_common_print_results( "iter_std 5          ", csl_common_test_timer_i1(iter_std,5),"" );
   csl_common_print_results( "iter_std 31         ", csl_common_test_timer_i1(iter_std,31),"" );
-  csl_common_print_results( "iter_std 50         ", csl_common_test_timer_i1(iter_std,50),"" );
+  csl_common_print_results( "iter_std 150        ", csl_common_test_timer_i1(iter_std,150),"" );
   csl_common_print_results( "iter_std 3000       ", csl_common_test_timer_i1(iter_std,3000),"" );
 
   csl_common_print_results( "ustr_inpvec 5       ", csl_common_test_timer_i1(ustr_inpvec,5),"" );
   csl_common_print_results( "ustr_inpvec 31      ", csl_common_test_timer_i1(ustr_inpvec,31),"" );
-  csl_common_print_results( "ustr_inpvec 50      ", csl_common_test_timer_i1(ustr_inpvec,50),"" );
+  csl_common_print_results( "ustr_inpvec 150     ", csl_common_test_timer_i1(ustr_inpvec,150),"" );
   csl_common_print_results( "ustr_inpvec 3000    ", csl_common_test_timer_i1(ustr_inpvec,3000),"" );
 
   csl_common_print_results( "ustr_stdvec 5       ", csl_common_test_timer_i1(ustr_stdvec,5),"" );
   csl_common_print_results( "ustr_stdvec 31      ", csl_common_test_timer_i1(ustr_stdvec,31),"" );
-  csl_common_print_results( "ustr_stdvec 50      ", csl_common_test_timer_i1(ustr_stdvec,50),"" );
+  csl_common_print_results( "ustr_stdvec 150     ", csl_common_test_timer_i1(ustr_stdvec,150),"" );
   csl_common_print_results( "ustr_stdvec 3000    ", csl_common_test_timer_i1(ustr_stdvec,3000),"" );
 
   csl_common_print_results( "stds_stdvec 5       ", csl_common_test_timer_i1(stds_stdvec,5),"" );
   csl_common_print_results( "stds_stdvec 31      ", csl_common_test_timer_i1(stds_stdvec,31),"" );
-  csl_common_print_results( "stds_stdvec 50      ", csl_common_test_timer_i1(stds_stdvec,50),"" );
+  csl_common_print_results( "stds_stdvec 150     ", csl_common_test_timer_i1(stds_stdvec,150),"" );
   csl_common_print_results( "stds_stdvec 3000    ", csl_common_test_timer_i1(stds_stdvec,3000),"" );
 
   csl_common_print_results( "ulli_inpvec 5       ", csl_common_test_timer_i1(ulli_inpvec,5),"" );
   csl_common_print_results( "ulli_inpvec 31      ", csl_common_test_timer_i1(ustr_inpvec,31),"" );
-  csl_common_print_results( "ulli_inpvec 50      ", csl_common_test_timer_i1(ustr_inpvec,50),"" );
+  csl_common_print_results( "ulli_inpvec 150     ", csl_common_test_timer_i1(ustr_inpvec,150),"" );
   csl_common_print_results( "ulli_inpvec 3000    ", csl_common_test_timer_i1(ulli_inpvec,3000),"" );
 
   csl_common_print_results( "ulli_stdvec 5       ", csl_common_test_timer_i1(ulli_stdvec,5),"" );
   csl_common_print_results( "ulli_stdvec 31      ", csl_common_test_timer_i1(ustr_stdvec,31),"" );
-  csl_common_print_results( "ulli_stdvec 50      ", csl_common_test_timer_i1(ustr_stdvec,50),"" );
+  csl_common_print_results( "ulli_stdvec 150     ", csl_common_test_timer_i1(ustr_stdvec,150),"" );
   csl_common_print_results( "ulli_stdvec 3000    ", csl_common_test_timer_i1(ulli_stdvec,3000),"" );
 #endif
   return 0;
