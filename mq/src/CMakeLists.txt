@@ -67,8 +67,9 @@ ELSE(NOT WIN32)
 ENDIF(NOT WIN32)
 
 ADD_LIBRARY( csl_mq STATIC
-             sess.hh
+             sess.hh                  msg.hh
              qpid_sess.cc             qpid_sess.hh
+             qpid_msg.cc              qpid_msg.hh
            )
 
 # -- EOF --

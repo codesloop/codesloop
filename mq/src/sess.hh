@@ -48,7 +48,7 @@ namespace csl
     {
       CSL_OBJ(csl::mq,sess);      
 
-    public: 
+    protected:
       /** standard constructor */
       sess() {};
       /** constructor with connection to broker */
@@ -56,6 +56,7 @@ namespace csl
 
       virtual ~sess() {};
 
+    public:
       /** connects to the specified url to the broker server */
       virtual void connect(const char * url)    = 0;
       /** disconnet from the broker server */

@@ -1,5 +1,5 @@
 /*
-   Copyright (c) 2008,2009, CodeSLoop Team
+Copyright (c) 2008,2009, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -18,59 +18,58 @@ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
 INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
 NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
 DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+THEORY OF LIABILITY, WHETHER IN CONTRACT, objICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-
 /**
-   @file t__qpid_sess.cc
-   @brief Tests to verify qpid session management
+   @file qpid_msg.cc
+   @brief impl_ interface for qpid based queueing
  */
 
-#define DEBUG 
-
-#include "common.h"
-#include "obj.hh"
-#include "qpid_sess.hh"
+#include "sess.hh"
 #include "qpid_msg.hh"
-#include <assert.h>
-#include <sys/stat.h>
+#include "qpid_sess.hh"
+#include "logger.hh"
 
-using namespace csl::common;
-using namespace csl::mq;
+#include <qpid/client/Connection.h>
+#include <qpid/client/Session.h>
 
-int main()
+
+using namespace qpid::client;
+using namespace qpid::framing;
+
+namespace csl 
 {
-  qpid_sess s;
-  s.connect("qpid://localhost:5672");
+  namespace mq 
+  {
 
-  s.add_q("qpid_sess.q1");
-  s.add_q("qpid_sess.q2");
-  s.add_xchg("qpid_sess.xchg");
+    void qpid_msg::send(const char * xchg)
+    {
+      ENTER_FUNCTION();
 
-  // xchg based route
-  s.add_route("qpid_sess.xchg", "qpid_sess.q1", "route1");
-  s.add_route("qpid_sess.xchg", "qpid_sess.q2", "route2");
+      msg_.getDeliveryProperties().setRoutingKey( get_routing_key() );
+      msg_.setData(std::string( reinterpret_cast<const char*>(buf_->data()), buf_->size() ) );
 
-  // use direct transport 
-  s.add_route("amq.direct", "qpid_sess.q1", "route1");
-  s.add_route("amq.direct", "qpid_sess.q2", "route2");
+      dynamic_cast<qpid_sess * >(sess_)->get_native_sess().
+        messageTransfer(arg::content=msg_, arg::destination=xchg);
 
-  qpid_msg msg;
 
-  tbuf<512> buf("test message");
-  msg.set_tbuf( &buf );
-  msg.set_session( s );
+      LEAVE_FUNCTION();
+    }
 
-  msg.send("amq.direct", "routing_key");
+    void qpid_msg::send(const char * xchg,const char * routing_key) 
+    {
+      ENTER_FUNCTION();
+      
+      set_routing_key(routing_key);
+      send(xchg);
 
-  s.del_q("qpid_sess.q1");
-  s.del_q("qpid_sess.q2");
-  s.del_xchg("qpid_sess.xchg");
+      LEAVE_FUNCTION();
+    }
 
-  s.disconnect();
+
+  }
 }
 
-/* EOF */
