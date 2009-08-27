@@ -38,25 +38,44 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // default logfile
 #define CSL_LOGFILE        "csl.log"
 
-
 // env variables
 #define CSL_TRACE_ENABLE   "CSL_TRACE_ENABLE"
 #define CSL_TRACE_STDERR   "CSL_TRACE_STDERR"
 #define CSL_TRACE_SCOPE    "CSL_TRACE_SCOPE"
 
+/*
+DEBUG               - this tells to compile in the debugging code
+DEBUG_VERBOSE       - this tells to produce extensive debug output
+DEBUG_ENABLE_INDENT - this tells wether to indent the debug output or not
+*/
+
 #ifdef DEBUG
-#define CSL_DEBUG(msg)      csl::common::logger::debug( msg, get_class_name() )
-#ifdef DEBUG_ENABLE_INDENT
-#define CSL_DEBUGF(...) \
-  csl::common::logger::debug( \
-    get_class_name(), csl::common::logger::get_indent(0), __VA_ARGS__ )
-#else /* !DEBUG_ENABLE_INDENT */
-#define CSL_DEBUGF(...)     csl::common::logger::debug( get_class_name(), __VA_ARGS__ )
-#endif /* DEBUG_ENABLE_INDENT */
-#else
-#define CSL_DEBUG(msg)
-#define CSL_DEBUGF(...)
-#endif
+# define CSL_DEBUG(msg)      csl::common::logger::debug( msg, get_class_name() )
+# ifdef DEBUG_VERBOSE
+#  ifdef DEBUG_ENABLE_INDENT
+#   define CSL_DEBUGF_X(...) \
+      csl::common::logger::debug( \
+      get_class_name(), csl::common::logger::get_indent(0), __VA_ARGS__ )
+#  else /* !DEBUG_ENABLE_INDENT */
+#   define CSL_DEBUGF_X(...)     csl::common::logger::debug( get_class_name(), __VA_ARGS__ )
+#  endif /* DEBUG_ENABLE_INDENT */
+# else /*DEBUG_VERBOSE*/
+#  define CSL_DEBUG_X(msg)
+#  define CSL_DEBUGF_X(...)
+# endif /*DEBUG_VERBOSE*/
+# ifdef DEBUG_ENABLE_INDENT
+#  define CSL_DEBUGF(...) \
+     csl::common::logger::debug( \
+      get_class_name(), csl::common::logger::get_indent(0), __VA_ARGS__ )
+# else /* !DEBUG_ENABLE_INDENT */
+#  define CSL_DEBUGF(...)     csl::common::logger::debug( get_class_name(), __VA_ARGS__ )
+# endif /* DEBUG_ENABLE_INDENT */
+#else /*DEBUG*/
+# define CSL_DEBUG(msg)
+# define CSL_DEBUG_X(msg)
+# define CSL_DEBUGF(...)
+# define CSL_DEBUGF_X(...)
+#endif /*DEBUG*/
 
 /* in debug mode these are optimized out by preprocessor */
 #ifdef DEBUG
@@ -109,12 +128,22 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    return(ret);                                                  \
    }
 #endif /* DEBUG_ENABLE_INDENT */
+
 #else /* !DEBUG */
  #define ENTER_FUNCTION()
  #define LEAVE_FUNCTION()       return
  #define RETURN_FUNCTION(ret)   return(ret)
 #endif /* DEBUG */
 
+#ifdef DEBUG_VERBOSE
+ #define ENTER_FUNCTION_X()       ENTER_FUNCTION()
+ #define LEAVE_FUNCTION_X()       LEAVE_FUNCTION()
+ #define RETURN_FUNCTION_X(ret)   RETURN_FUNCTION(ret)
+#else /* DEBUG_VERBOSE */
+ #define ENTER_FUNCTION_X()
+ #define LEAVE_FUNCTION_X()       return
+ #define RETURN_FUNCTION_X(ret)   return(ret)
+#endif /* DEBUG_VERBOSE */
 
 namespace csl {
   namespace common {
@@ -124,7 +153,7 @@ namespace csl {
 
     log levels are defined from DEBUG to CRITICAL
      */
-    typedef enum logger_types 
+    typedef enum logger_types
     {
       LOG_UNKNOWN     = 0,
       LOG_DEBUG       = 1,
@@ -141,14 +170,14 @@ namespace csl {
     @brief logger class used for tracing and printf style debugging
 
     this class is used by common classes for logging purpose. DEBUG
-    messages are only available in DEBUG builds. 
+    messages are only available in DEBUG builds.
      */
     class logger : public obj
     {
       CSL_OBJ(csl::common,logger);
 
       public:
-        /** @brief main logger function 
+        /** @brief main logger function
         @param type log level (debug, error, etc.)
         @param str  message to log */
         static void log( logger_types type, const str & str );
@@ -157,17 +186,17 @@ namespace csl {
         static void log( logger_types type, const char * fmt, ...);
         static void log( logger_types type, const wchar_t * fmt, ...);
 
-        /** @brief override default log file name and location 
+        /** @brief override default log file name and location
         @param logfile full path of demanded file name */
         static void             set_log_file( const char * logfile );
 
-        /** @brief shortcut function for critical errors  
+        /** @brief shortcut function for critical errors
         @param str  message to log */
-        static inline void      critical( const str & str ) 
+        static inline void      critical( const str & str )
         {
           log( LOG_CRITICAL, str );
         }
-        /** @brief shortcut function for info messages 
+        /** @brief shortcut function for info messages
         @param str  message to log */
         static inline void      info ( const str & str ) {
           log( LOG_INFO, str );
@@ -282,7 +311,7 @@ namespace csl {
 #endif /*DEBUG_ENABLE_INDENT*/
 
         /** @brief executed at program startup */
-        static int           init(); 
+        static int           init();
 
       private:
         static std::string   logfile_;
@@ -297,4 +326,4 @@ namespace csl {
 }; /* namespace csl */
 
 #endif /* __cplusplus */
-#endif /* _csl_common_logger_hh_included_ */ 
+#endif /* _csl_common_logger_hh_included_ */

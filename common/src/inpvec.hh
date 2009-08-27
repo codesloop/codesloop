@@ -45,16 +45,22 @@ namespace csl
     {
       public:
         // note: if width is changed, it implies lots of changes in the code....
+        typedef uint32_t  width_t;
+        typedef uint32_t  mul_t;
+        typedef uint8_t   free_t;
+
         static const uint16_t  width_         = 64;
         static const uint16_t  width_in_bits_ = 6;
+
         typedef uint64_t       bitmap_t;
 
         struct item
         {
           CSL_OBJ(csl::common,inpvec::item);
 
-          uint8_t     free_;
-          uint16_t    mul_;
+          free_t      free_;
+          mul_t       mul_;
+          uint8_t *   buffer_;
           bitmap_t  * bmap_;
           T         * items_;
           item *      next_;
@@ -63,7 +69,7 @@ namespace csl
           ~item()
           {
             destroy();
-            if( free_ ) { free(bmap_); free(items_); }
+            if( free_ ) { free(buffer_); }
           }
 
           uint64_t size() const { return mul_*width_; }
@@ -73,7 +79,7 @@ namespace csl
             const unsigned char * bb = byte_bits();
 
             uint64_t ret = 0;
-            for( uint32_t i=0;i<mul_; ++i )
+            for( mul_t i=0;i<mul_;++i )
             {
               ret += bb[((bmap_[i])&0xff)];
               ret += bb[((bmap_[i]>>8)&0xff)];
@@ -96,7 +102,7 @@ namespace csl
             uint8_t x1,x2,x3,x4;
             uint8_t y1,y2,y3,y4;
 
-            for( int32_t i=(mul_-1);i>=0;--i )
+            for( int64_t i=static_cast<int64_t>(mul_)-1;i>=0;--i )
             {
               if( bmap_[i] == 0x0UL ) ret = i*width_;
               else
@@ -121,51 +127,20 @@ namespace csl
                 else                                         { ret = i*width_+x4;    break; }
               }
             }
-
             RETURN_FUNCTION(ret);
           }
-#if 0
-          uint64_t last_used() const
-          {
-            const unsigned char * bl = byte_last_used();
-            uint64_t ret = size();
-
-            for( int32_t i=(mul_-1);i>=0;--i )
-            {
-              if( bmap_[i] == 0x0UL ) { }
-              else
-              {
-                TODO
-                if( bl[(bmap_[i]>>24)&0xff] == 255 )       return ret;
-                else if( bl[(bmap_[i]>>24)&0xff] != 0   )  return i*32+24+bl[(bmap_[i]>>24)&0xff];
-                else                                       ret = i*32+24;
-
-                if( bl[(bmap_[i]>>16)&0xff] == 255 )       return ret;
-                else if( bl[(bmap_[i]>>16)&0xff] != 0   )  return i*32+16+bl[(bmap_[i]>>16)&0xff];
-                else                                       ret = i*32+16;
-
-                if( bl[(bmap_[i]>>8)&0xff] == 255 )        return ret;
-                else if( bl[(bmap_[i]>>8)&0xff] != 0   )   return i*32+8+bl[(bmap_[i]>>8)&0xff];
-                else                                       ret = i*32+8;
-
-                if( bl[(bmap_[i])&0xff] == 255 )           return ret;
-                else if( bl[(bmap_[i])&0xff] != 0   )      return i*32+bl[(bmap_[i])&0xff];
-                else                                       ret = i*32;
-              }
-            }
-            return ret;
-          }
-#endif
-
           uint64_t n_free() const { return ((width_*mul_)-n_items()); }
 
           void destroy()
           {
+            ENTER_FUNCTION();
+            CSL_DEBUGF(L"destroy()");
+
             uint64_t n_i = 0;
             uint64_t * px = &n_i;
             if( parent_ ) px = &(parent_->n_items_);
 
-            for( uint32_t i=0;i<mul_; ++i )
+            for( mul_t i=0;i<mul_; ++i )
             {
               if( bmap_[i] != 0 )
               {
@@ -179,10 +154,13 @@ namespace csl
                 }
               }
             }
+            LEAVE_FUNCTION();
           }
 
           void destroy( uint64_t at )
           {
+            ENTER_FUNCTION();
+            CSL_DEBUGF(L"destroy(%lld)",at);
             uint64_t off = at/width_;
             uint64_t pos = at%width_;
 
@@ -192,17 +170,35 @@ namespace csl
               bmap_[off] = (bmap_[off] & (~(static_cast<bitmap_t>(1ULL)<<pos)));
               if( parent_ ) --(parent_->n_items_);
             }
+            LEAVE_FUNCTION();
           }
 
-          void mul_alloc( uint32_t m )
+          void mul_alloc( mul_t m )
           {
+            ENTER_FUNCTION();
+
+            uint64_t item_size    = (m*width_*sizeof(T));  // preallocated size for items
+            uint64_t bitmap_size  = (m*sizeof(bitmap_t));   // preallocated size for bitmap
+
             mul_         = m;
             free_        = 1;
-            items_       = reinterpret_cast<T *>(malloc(m*width_*sizeof(T)));
-            bmap_        = reinterpret_cast<bitmap_t *>(malloc(m*sizeof(bitmap_t)));
+
+            CSL_DEBUGF(L"allocating %lld bytes (items:%lld bitmap:%lld)",
+                       item_size+bitmap_size,item_size,bitmap_size);
+
+            /* one allocation is done here for the bitmap and the items */
+            buffer_      = reinterpret_cast<uint8_t *>(malloc(item_size+bitmap_size));
+
+            /* set the pointers pointing to the previously allocated buffer */
+            bmap_        = reinterpret_cast<bitmap_t *>(buffer_);
+            items_       = reinterpret_cast<T *>(buffer_+bitmap_size);
+
+            /* set pointers */
             next_        = 0;
             parent_      = 0;
-            memset( bmap_,0,(m*sizeof(bitmap_t)) );
+
+            memset( bmap_,0,bitmap_size );
+            LEAVE_FUNCTION();
           }
 
           inline void in_place_destruct(signed char * d) {}
@@ -354,9 +350,9 @@ namespace csl
 
           bool is_empty() const
           {
-            ENTER_FUNCTION();
+            ENTER_FUNCTION_X();
             bool ret = true;
-            for( uint16_t j=0;j<mul_;++j )
+            for( mul_t j=0;j<mul_;++j )
             {
               if( bmap_[j] != 0xFFFFFFFFUL )
               {
@@ -364,13 +360,13 @@ namespace csl
                 break;
               }
             }
-            CSL_DEBUGF(L"is_empty() => %s",(ret == true?"true":"false"));
-            RETURN_FUNCTION( ret );
+            CSL_DEBUGF_X(L"is_empty() => %s",(ret == true?"true":"false"));
+            RETURN_FUNCTION_X( ret );
           }
 
           bool is_empty(uint64_t at) const
           {
-            ENTER_FUNCTION();
+            ENTER_FUNCTION_X();
             uint64_t off = at/width_;
             uint64_t pos = at%width_;
 
@@ -383,15 +379,15 @@ namespace csl
                 ret = false;
               }
             }
-            CSL_DEBUGF(L"is_empty(%lld) [%lld:%lld] => %s",at,off,pos,(ret == true?"true":"false"));
-            RETURN_FUNCTION( ret );
+            CSL_DEBUGF_X(L"is_empty(%lld) [%lld:%lld] => %s",at,off,pos,(ret == true?"true":"false"));
+            RETURN_FUNCTION_X( ret );
           }
 
           void debug()
           {
 #ifdef DEBUG
             ENTER_FUNCTION();
-            for( uint64_t i=0;i<mul_;++i )
+            for( mul_t i=0;i<mul_;++i )
             {
               char xd[width_+1];
               for( unsigned char j=0;j<width_;++j )
@@ -409,30 +405,31 @@ namespace csl
 
           bool is_last(uint64_t at) const
           {
-            ENTER_FUNCTION();
+            ENTER_FUNCTION_X();
             uint64_t off = at/width_;
             uint64_t pos = at%width_;
 
-            CSL_DEBUGF(L"position: %lld [%lld:%lld mul:%d]",at,off,pos,mul_);
+            CSL_DEBUGF_X(L"position: %lld [%lld:%lld mul:%d]",at,off,pos,mul_);
 
             if( off > mul_ )
             {
-              CSL_DEBUGF(L"invalid position: %lld",at);
-              RETURN_FUNCTION( true );
+              CSL_DEBUGF_X(L"invalid position: %lld",at);
+              RETURN_FUNCTION_X( true );
             }
 
-            unsigned char i,j;
+            mul_t i;
+            width_t j;
 
-            for( j=pos+1;j<width_;++j )
+            for( j=static_cast<width_t>(pos+1);j<width_;++j )
             {
               if( (bmap_[off]>>j)&static_cast<bitmap_t>(1ULL) )
               {
-                CSL_DEBUGF(L"ret 1: %d",j);
-                RETURN_FUNCTION( false );
+                CSL_DEBUGF_X(L"ret 1: %d",j);
+                RETURN_FUNCTION_X( false );
               }
             }
 
-            for( i=off+1;i<mul_;++i )
+            for( i=static_cast<mul_t>(off+1);i<mul_;++i )
             {
               if( bmap_[i] == 0x0UL ) continue;
 
@@ -440,38 +437,37 @@ namespace csl
               {
                 if( (bmap_[i]>>j)&static_cast<bitmap_t>(1ULL) )
                 {
-                  CSL_DEBUGF(L"ret 2: [i:%d j:%d]",i,j);
-                  RETURN_FUNCTION( false );
+                  CSL_DEBUGF_X(L"ret 2: [i:%d j:%d]",i,j);
+                  RETURN_FUNCTION_X( false );
                 }
               }
             }
-            CSL_DEBUGF(L"ret 3");
-            RETURN_FUNCTION( true );
+            RETURN_FUNCTION_X( true );
           }
 
           inline T & get(uint64_t at) const
           {
-            ENTER_FUNCTION();
+            ENTER_FUNCTION_X();
             T * ret = (items_+at);
-            CSL_DEBUGF(L"returning ref to: %p at %lld",ret,at);
-            RETURN_FUNCTION( *ret );
+            CSL_DEBUGF_X(L"returning ref to: %p at %lld",ret,at);
+            RETURN_FUNCTION_X( *ret );
           }
 
           inline T * get_ptr(uint64_t at) const
           {
-            ENTER_FUNCTION();
+            ENTER_FUNCTION_X();
             uint64_t off = at/width_;
             uint64_t pos = at%width_;
 
-            CSL_DEBUGF(L"get_ptr(%lld) [off:%lld pos:%lld]",at,off,pos);
+            CSL_DEBUGF_X(L"get_ptr(%lld) [off:%lld pos:%lld]",at,off,pos);
 
             T * ret = 0;
 
             if( (bmap_[off]>>pos)&static_cast<bitmap_t>(1ULL) ) { ret = items_+at; }
 
-            CSL_DEBUGF(L"returning ptr: %p at %lld",ret,at);
+            CSL_DEBUGF_X(L"returning ptr: %p at %lld",ret,at);
 
-            RETURN_FUNCTION( ret );
+            RETURN_FUNCTION_X( ret );
           }
 
           T * next_used(uint64_t & at)
@@ -484,9 +480,7 @@ namespace csl
 
             T * ret = 0;
 
-            uint16_t i,j;
-
-            for( i=off;i<mul_;++i )
+            for( mul_t i=static_cast<mul_t>(off);i<mul_;++i )
             {
               if( bmap_[i] == 0ULL )
               {
@@ -494,7 +488,7 @@ namespace csl
               }
               else
               {
-                for( j=pos;j<width_;++j )
+                for( width_t j=static_cast<width_t>(pos);j<width_;++j )
                 {
                   uint64_t k = (bmap_[i]>>j);
                   if( k&static_cast<bitmap_t>(1ULL) )
@@ -540,7 +534,7 @@ namespace csl
           LEAVE_FUNCTION();
         }
 
-        void allocate(uint64_t mul)
+        void allocate(mul_t mul)
         {
           ENTER_FUNCTION();
           CSL_DEBUGF(L"allocate(%lld)",mul);
@@ -566,77 +560,79 @@ namespace csl
 
             iterator()
             {
-              ENTER_FUNCTION();
-              CSL_DEBUGF(L"iterator()");
-              LEAVE_FUNCTION();
+              ENTER_FUNCTION_X();
+              CSL_DEBUGF_X(L"iterator()");
+              LEAVE_FUNCTION_X();
             }
 
           public:
             /// @brief initializer constructor
             inline iterator(item * i, uint64_t pos, uint64_t gp) : i_(i), pos_(pos), gpos_(gp)
             {
-              ENTER_FUNCTION();
-              CSL_DEBUGF(L"iterator(item:%p, pos:%lld, gpos:%lld)",i,pos,gp);
-              LEAVE_FUNCTION();
+              ENTER_FUNCTION_X();
+              CSL_DEBUGF_X(L"iterator(item:%p, pos:%lld, gpos:%lld)",i,pos,gp);
+              LEAVE_FUNCTION_X();
             }
 
             void init(item * i, uint64_t pos, uint64_t gp)
             {
-              ENTER_FUNCTION();
-              CSL_DEBUGF(L"init(%p,%lld,%lld)",i,pos,gp);
+              ENTER_FUNCTION_X();
+              CSL_DEBUGF_X(L"init(%p,%lld,%lld)",i,pos,gp);
               i_ = i; pos_ = pos; gpos_ = gp;
-              LEAVE_FUNCTION();
+              LEAVE_FUNCTION_X();
             }
 
             /// @brief copy constructor
             inline iterator(const iterator & other) : i_(other.i_), pos_(other.pos_), gpos_(other.gpos_)
             {
-              ENTER_FUNCTION();
-              CSL_DEBUGF(L"iterator(iterator ref& %p)",&other);
-              LEAVE_FUNCTION();
+              ENTER_FUNCTION_X();
+              CSL_DEBUGF_X(L"iterator(iterator ref& %p)",&other);
+              LEAVE_FUNCTION_X();
             }
 
             /// @brief copy operator
             inline iterator & operator=(const iterator & other)
             {
-              ENTER_FUNCTION();
-              CSL_DEBUGF(L"operator=(iterator ref& %p)",&other);
+              ENTER_FUNCTION_X();
+              CSL_DEBUGF_X(L"operator=(iterator ref& %p)",&other);
+
               i_     = other.i_;
               pos_   = other.pos_;
               gpos_  = other.gpos_;
-              RETURN_FUNCTION(*this);
+
+              RETURN_FUNCTION_X(*this);
             }
 
             /// @brief creates an iterator of ls
             /// @param ls is the pvlist to be iterated over
             inline iterator(inpvec & ipv) : i_(&(ipv.head_)), pos_(0), gpos_(0)
             {
-              ENTER_FUNCTION();
-              CSL_DEBUGF(L"iterator(inpvec ref& %p)",&ipv);
+              ENTER_FUNCTION_X();
+              CSL_DEBUGF_X(L"iterator(inpvec ref& %p)",&ipv);
               if(!ipv.n_items_) i_ = 0;
-              LEAVE_FUNCTION();
+              LEAVE_FUNCTION_X();
             }
 
             /// @brief checks equality
             bool operator==(const iterator & other) const
             {
-              ENTER_FUNCTION();
-              CSL_DEBUGF(L"operator==(iterator ref& %p)",&other);
-              RETURN_FUNCTION((i_ == other.i_ && gpos_ == other.gpos_) ? true : false );
+              ENTER_FUNCTION_X();
+              CSL_DEBUGF_X(L"operator==(iterator ref& %p)",&other);
+              RETURN_FUNCTION_X((i_ == other.i_ && gpos_ == other.gpos_) ? true : false );
             }
 
             /// @brief checks if not equal
             bool operator!=(const iterator & other) const
             {
-              ENTER_FUNCTION();
-              CSL_DEBUGF(L"operator!=(iterator ref& %p)",&other);
-              RETURN_FUNCTION(!(operator==(other)));
+              ENTER_FUNCTION_X();
+              CSL_DEBUGF_X(L"operator!=(iterator ref& %p)",&other);
+              RETURN_FUNCTION_X(!(operator==(other)));
             }
 
             /// @brief step forward
             void operator++()
             {
-              ENTER_FUNCTION();
+              ENTER_FUNCTION_X();
               if( i_ == 0 )
               {
                 i_    = 0;
@@ -655,7 +651,7 @@ namespace csl
                 ++pos_;
                 ++gpos_;
               }
-              LEAVE_FUNCTION();
+              LEAVE_FUNCTION_X();
             }
 
             T * next_used()
@@ -702,38 +698,39 @@ namespace csl
             /// @brief sets the iterator to end
             void zero()
             {
-              ENTER_FUNCTION();
+              ENTER_FUNCTION_X();
               i_ = 0; pos_ = 0; gpos_ = 0;
-              LEAVE_FUNCTION();
+              LEAVE_FUNCTION_X();
             }
 
             bool at_end() const
             {
-              ENTER_FUNCTION();
-              RETURN_FUNCTION((i_ == 0 && pos_ == 0));
+              ENTER_FUNCTION_X();
+              CSL_DEBUGF_X(L"at_end() => %s",((i_ == 0 && pos_ == 0)?"true":"false"));
+              RETURN_FUNCTION_X((i_ == 0 && pos_ == 0));
             }
 
             /// @brief returns the pointed item
             T * operator*()
             {
-              ENTER_FUNCTION();
+              ENTER_FUNCTION_X();
               T * ret = 0;
               if( i_ ) { ret = ( i_->get_ptr(pos_) ); }
               else
               {
-                CSL_DEBUGF(L"i_ is null: %s",((pos_==0 && gpos_==0)?"(end iterator)":"(unknown error)") );
+                CSL_DEBUGF_X(L"i_ is null: %s",((pos_==0 && gpos_==0)?"(end iterator)":"(unknown error)") );
               }
-              RETURN_FUNCTION( ret );
+              RETURN_FUNCTION_X( ret );
             }
 
             /// @brief checks if the item is empty
             bool is_empty() const
             {
-              ENTER_FUNCTION();
+              ENTER_FUNCTION_X();
               bool ret = true;
               if( i_ ) { ret = i_->is_empty(pos_); }
-              CSL_DEBUGF(L"is_empty() : %s",(ret == true?"true":"false"));
-              RETURN_FUNCTION( ret );
+              CSL_DEBUGF_X(L"is_empty() : %s",(ret == true?"true":"false"));
+              RETURN_FUNCTION_X( ret );
             }
 
             /// @brief free item at the given iterator position
@@ -833,25 +830,25 @@ namespace csl
         /** @brief returns iterator represents the end of this container */
         const iterator & end()
         {
-          ENTER_FUNCTION( );
-          RETURN_FUNCTION( end_ );
+          ENTER_FUNCTION_X( );
+          RETURN_FUNCTION_X( end_ );
         }
 
         /** @brief returns iterator pointed at the beginning of the container */
         const iterator & begin()
         {
-          ENTER_FUNCTION( );
+          ENTER_FUNCTION_X( );
           if( n_items_ == 0 )
           {
-            CSL_DEBUGF(L"no items: returning end_");
-            RETURN_FUNCTION( end_ );
+            CSL_DEBUGF_X(L"no items: returning end_");
+            RETURN_FUNCTION_X( end_ );
           }
-          RETURN_FUNCTION( begin_ );
+          RETURN_FUNCTION_X( begin_ );
         }
 
         ~inpvec()
         {
-          ENTER_FUNCTION( );
+          ENTER_FUNCTION_X( );
           item * p = head_.next_;
           item * x = p;
 
@@ -861,13 +858,14 @@ namespace csl
             p = p->next_;
             delete x;
           }
-          LEAVE_FUNCTION( );
+          LEAVE_FUNCTION_X( );
         }
 
         inpvec() : pre_bmap_(0), begin_(&head_,0,0), end_(0,0,0)
         {
-          ENTER_FUNCTION( );
-          CSL_DEBUGF(L"inpvec()");
+          ENTER_FUNCTION_X( );
+          CSL_DEBUGF_X(L"inpvec()");
+          head_.buffer_      = 0;
           head_.free_        = 0;
           head_.mul_         = 1;
           head_.bmap_        = &pre_bmap_;
@@ -876,7 +874,7 @@ namespace csl
           head_.parent_      = this;
           tail_              = &head_;
           n_items_           = 0;
-          LEAVE_FUNCTION( );
+          LEAVE_FUNCTION_X( );
         }
 
         uint64_t n_items()
@@ -918,7 +916,7 @@ namespace csl
         iterator last_free()
         {
           ENTER_FUNCTION();
-          uint64_t mul = (tail_->mul_+2);
+          mul_t    mul = (tail_->mul_+2);
           uint64_t pos = tail_->last_free();
 
           if( pos == tail_->size() )
@@ -947,7 +945,7 @@ namespace csl
         iterator & last_free(iterator & ii)
         {
           ENTER_FUNCTION();
-          uint64_t mul = (tail_->mul_+2);
+          mul_t mul = (tail_->mul_+2);
           uint64_t pos = tail_->last_free();
 
           if( pos == tail_->size() )
@@ -994,7 +992,9 @@ namespace csl
             max_pos += (p->size());
             CSL_DEBUGF(L"Checking at: #%lld <? maxpos:%lld [sz:%lld]",pos,max_pos,p->size());
 #ifdef DEBUG
+#ifdef DEBUG_VERBOSE
             p->debug();
+#endif /*DEBUG_VERBOSE*/
 #endif /*DEBUG*/
             if( pos >= max_pos )
             {
@@ -1016,7 +1016,7 @@ namespace csl
           ENTER_FUNCTION();
           CSL_DEBUGF(L"force_iterator_at(%lld)",pos);
           uint64_t px       = pos;
-          uint64_t mul      = (tail_->mul_+2);
+          mul_t mul   = (tail_->mul_+2);
           uint64_t max_pos  = 0;
           item * p          = &head_;
 
@@ -1037,7 +1037,7 @@ namespace csl
           }
 
           px  = (pos-max_pos);
-          if( mul < ((px/width_)+2) ) mul = (px/width_)+2;
+          if( mul < ((px/width_)+2) ) mul = static_cast<mul_t>((px/width_)+2);
           allocate( mul );
 
           // recursive call : XXX may be dangerous
@@ -1049,7 +1049,7 @@ namespace csl
           ENTER_FUNCTION();
           CSL_DEBUGF(L"force_iterator_at(%lld)",pos);
           uint64_t px       = pos;
-          uint64_t mul      = (tail_->mul_+2);
+          mul_t mul         = (tail_->mul_+2);
           uint64_t max_pos  = 0;
           item * p          = &head_;
 
@@ -1071,7 +1071,7 @@ namespace csl
           }
 
           px  = (pos-max_pos);
-          if( mul < ((px/width_)+2) ) mul = (px/width_)+2;
+          if( mul < ((px/width_)+2) ) mul = static_cast<mul_t>((px/width_)+2);
           allocate( mul );
 
           // recursive call : XXX may be dangerous
@@ -1159,9 +1159,9 @@ namespace csl
 
         T * get_ptr(uint64_t at)
         {
-          ENTER_FUNCTION();
+          ENTER_FUNCTION_X();
 
-          CSL_DEBUGF(L"get_ptr(%lld)",at);
+          CSL_DEBUGF_X(L"get_ptr(%lld)",at);
           item * p = &head_;
           uint64_t max_pos = 0;
           T * ret = 0;
@@ -1169,7 +1169,7 @@ namespace csl
           while( p != 0 )
           {
             max_pos += (p->size());
-            CSL_DEBUGF(L"max_pos:%lld += size:%lld => max_pos:%lld",max_pos-p->size(),p->size(),max_pos);
+            CSL_DEBUGF_X(L"max_pos:%lld += size:%lld => max_pos:%lld",max_pos-p->size(),p->size(),max_pos);
             if( at >= max_pos )
             {
               p = p->next_;
@@ -1177,22 +1177,22 @@ namespace csl
             else
             {
               uint64_t pos = (max_pos-p->size());
-              CSL_DEBUGF(L"pos:%lld = (max_pos:%lld - size:%lld)",pos,max_pos,p->size());
-              CSL_DEBUGF(L"at:%lld - pos:%lld = %lld",at,pos,at-pos);
+              CSL_DEBUGF_X(L"pos:%lld = (max_pos:%lld - size:%lld)",pos,max_pos,p->size());
+              CSL_DEBUGF_X(L"at:%lld - pos:%lld = %lld",at,pos,at-pos);
               ret = p->get_ptr(at-pos);
               break;
             }
           }
 
-          CSL_DEBUGF(L"get_ptr(%lld) => %p",at,ret);
-          RETURN_FUNCTION( ret );
+          CSL_DEBUGF_X(L"get_ptr(%lld) => %p",at,ret);
+          RETURN_FUNCTION_X( ret );
         }
 
         uint64_t iterator_pos(const iterator & it)
         {
-          ENTER_FUNCTION();
-          CSL_DEBUGF(L"iterator gpos=%lld",it.get_pos());
-          RETURN_FUNCTION(it.get_pos());
+          ENTER_FUNCTION_X();
+          CSL_DEBUGF_X(L"iterator gpos=%lld",it.get_pos());
+          RETURN_FUNCTION_X(it.get_pos());
         }
 
         T * push_back(const T & t)
