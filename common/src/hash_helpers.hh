@@ -96,17 +96,6 @@ namespace csl
           typedef typename inpvec<contained_t>::iterator          contained_iter_t;
           typedef inpvec< page >                                  page_vec_t;
 
-          /*
-          static const uint64_t sz_       = 4096ULL;
-          static const uint64_t bits_     = 12ULL;
-          static const hash_key_t mask_   = 0xfff;
-          */
-          /*
-          static const uint64_t sz_       = 32ULL;
-          static const uint64_t bits_     = 5ULL;
-          static const hash_key_t mask_   = 0x1f;
-          */
-
           static const uint64_t sz_       = 256ULL;
           static const uint64_t bits_     = 8ULL;
           static const hash_key_t mask_   = 0xff;
@@ -183,8 +172,9 @@ namespace csl
             /* TODO */
           }
 
+#if 0
           //XXX create xtract op, rather than split ...
-          void split(uint64_t shift, page_vec_t & pagev, pos_vec_t & posv)
+          void split_old(uint64_t shift, page_vec_t & pagev, pos_vec_t & posv)
           {
             ENTER_FUNCTION();
             typedef typename page_vec_t::iterator it_t;
@@ -225,19 +215,108 @@ namespace csl
             }
             LEAVE_FUNCTION();
           }
+#endif
+
+          void free_after_item( contained_t * i )
+          {
+            ENTER_FUNCTION();
+            if( i && i->next() )
+            {
+              CSL_DEBUGF(L"free_after_item(pos:%lld) - freepos:%lld",i->pos(),i->next()->pos());
+              i->next(i->next()->next());
+              data_.free_at( i->next()->pos() );
+            }
+            LEAVE_FUNCTION();
+          }
+
+          void split(uint64_t pos, uint64_t shift, page & newpg, uint64_t pageid, pos_vec_t & posv)
+          {
+            ENTER_FUNCTION();
+            CSL_DEBUGF(L"split(pos:%lld,shift:%lld,page,pageid:%lld,posv)",pos,shift,pageid);
+
+            /* iterate through the given item */
+            contained_t * p   = data_.get_ptr(pos);
+            contained_t * pn  = p;
+
+            CSL_DEBUG_ASSERT( p!= 0 );
+            if( !p ) { LEAVE_FUNCTION(); }
+
+            /* check p first */
+
+            /* iterate through the items */
+
+            while( p )
+            {
+              pn = p->next();
+              if( pn )
+              {
+                hash_key_t hk      = p->hash_key();
+                uint64_t   newpos  = ((hk>>shift)&mask_);
+
+                if( newpos == 0 )
+                {
+                  /* leave where it is */
+                  //CSL_DEBUGF(L"leave item at: %lld",
+                }
+                else
+                {
+                  /* move item */
+                  newpg.add( newpos, pn->key(), pn->value(), newpos );
+                }
+              }
+              p = pn;
+            }
+
+#if 0
+            const contained_iter_t & en(data_.end());
+
+            uint64_t pos = 0;
+
+            for( ;(it!=en) && (pos<sz_);++it )
+            {
+              if( it.is_empty() == false && pos != 0 )
+              {
+                it_t pit = pagev.last_free();
+                uint64_t pageid = pagev.iterator_pos(pit);
+
+                /* create the new page */
+                pit.construct();
+
+                /* register the new page position */
+                posv.set( pos, pageid );
+                contained_t * p = (*it);
+                uint64_t px = 0;
+
+                while( p )
+                {
+                  hash_key_t hk = p->hash_key();
+                  (*pit)->add( ((hk>>shift)&mask_),p->key(),p->value(),hk );
+                  px = p->pos();
+                  p = p->next();
+                  /* remove the item from current container */
+                  data_.iterator_at(px).free();
+                }
+              }
+              ++pos;
+            }
+#endif
+            LEAVE_FUNCTION();
+          }
 
           contained_t * get(uint64_t pos)
           {
             if( pos > sz_ ) return 0;
-            else return *(data_.iterator_at(pos));
+            else return data_.get_ptr(pos);
           }
 
           uint64_t n_items() { return data_.n_items(); }
 
           uint64_t n_free()
           {
-            const contained_iter_t & it(data_.begin());
-            return it.n_free();
+            ENTER_FUNCTION();
+            uint64_t ret = data_.begin().n_free();
+            CSL_DEBUGF(L"n_free() => %lld",ret);
+            RETURN_FUNCTION( ret );
           }
 
           bool has_item(uint64_t pos)

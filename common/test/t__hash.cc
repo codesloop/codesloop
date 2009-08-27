@@ -35,6 +35,16 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif /* DEBUG */
 #endif
 
+#include "hash.hh"
+#include "tbuf.hh"
+#include "pbuf.hh"
+
+#include "test_timer.h"
+#include "logger.hh"
+#include "common.h"
+#include <assert.h>
+#include <vector>
+
 #define COMPARE_STD
 #ifdef COMPARE_STD
 #include <ext/hash_map>
@@ -52,15 +62,6 @@ namespace __gnu_cxx
 };
 #endif
 
-#include "hash.hh"
-#include "tbuf.hh"
-#include "pbuf.hh"
-
-#include "test_timer.h"
-#include "logger.hh"
-#include "common.h"
-#include <assert.h>
-#include <vector>
 
 using namespace csl::common;
 
@@ -85,33 +86,12 @@ namespace test_hash {
     h.set( 0ULL,0ULL );
   }
 
-  void funct1(int n)
+  void ghash_baseline()
   {
-    hash<uint64_t,uint64_t> h;
-
-    for( uint64_t i=0ULL;i<static_cast<uint64_t>(n);++i )
-    {
-      CSL_DEBUGF(L"set(%lld,%lld)\n",i+0,i);
-      h.set( i+0,i );
-
-#ifdef DEBUG
-      h.debug();
-#endif /*DEBUG*/
-
-      CSL_DEBUGF(L"set(%lld,%lld)\n",i+1,i);
-      h.set( i+1,i );
-
-#ifdef DEBUG
-      h.debug();
-#endif /*DEBUG*/
-
-      CSL_DEBUGF(L"set(%lld,%lld)\n",i+2,i);
-      h.set( i+2,i );
-
-#ifdef DEBUG
-      h.debug();
-#endif /*DEBUG*/
-    }
+#ifdef COMPARE_STD
+    typedef __gnu_cxx::hash_map<uint64_t, uint64_t, __gnu_cxx::hash<uint64_t> > ghash;
+    ghash h;
+#endif
   }
 
   void stdhash(int n)
@@ -129,14 +109,56 @@ namespace test_hash {
 #endif
   }
 
-  void ghash_baseline()
+  struct Contained
   {
-#ifdef COMPARE_STD
-    typedef __gnu_cxx::hash_map<uint64_t, uint64_t, __gnu_cxx::hash<uint64_t> > ghash;
-    ghash h;
-#endif
+    uint64_t k_;
+    uint64_t v_;
+    Contained(uint64_t k,uint64_t v) : k_(k), v_(v) {}
+  };
+
+  void simple(int n)
+  {
+    inpvec<Contained> pv;
+    inpvec<Contained>::iterator it = pv.force_iterator_at( n );
+
+    for( uint64_t i=0ULL;i<static_cast<uint64_t>(n);++i )
+    {
+      pv.set( i,i,i );
+    }
   }
 
+  struct  Item;
+  typedef inpvec<Item> item_vec_t;
+
+  struct Item
+  {
+    uint64_t     k_;
+    uint64_t     v_;
+    item_vec_t * next_;
+  };
+
+  struct Hsh
+  {
+    item_vec_t         head_;
+    inpvec<item_vec_t> pool_;
+  };
+
+  void hsh_baseline() { Hsh h; }
+
+  void funct1(int n)
+  {
+    hash<uint64_t,uint64_t> h;
+
+    for( uint64_t i=0ULL;i<static_cast<uint64_t>(n);++i )
+    {
+      CSL_DEBUGF(L"set(%lld,%lld)\n",i+0,i);
+      h.set( i,i );
+
+#ifdef DEBUG
+      h.debug();
+#endif /*DEBUG*/
+    }
+  }
 } // end of test_hash
 
 using namespace test_hash;
@@ -144,7 +166,7 @@ using namespace test_hash;
 int main()
 {
 #ifdef DEBUG
-  funct1(5);
+  funct1(400);
   //funct0();
 #else
 
@@ -152,6 +174,7 @@ int main()
   csl_common_print_results( "hash_baseline            ", csl_common_test_timer_v0(hash_baseline),"" );
   csl_common_print_results( "tbuf_baseline            ", csl_common_test_timer_v0(tbuf_baseline),"" );
   csl_common_print_results( "pbuf_baseline            ", csl_common_test_timer_v0(pbuf_baseline),"" );
+  csl_common_print_results( "hsh_baseline             ", csl_common_test_timer_v0(hsh_baseline),"" );
 
 #ifdef COMPARE_STD
   csl_common_print_results( "ghash_baseline           ", csl_common_test_timer_v0(ghash_baseline),"" );
@@ -163,9 +186,16 @@ int main()
   csl_common_print_results( "funct1(100)              ", csl_common_test_timer_i1(funct1,100),"" );
   csl_common_print_results( "funct1(3000)             ", csl_common_test_timer_i1(funct1,3000),"" );
 
+  csl_common_print_results( "simple(5)                ", csl_common_test_timer_i1(simple,5),"" );
+  csl_common_print_results( "simple(31)               ", csl_common_test_timer_i1(simple,31),"" );
+  csl_common_print_results( "simple(50)               ", csl_common_test_timer_i1(simple,50),"" );
+  csl_common_print_results( "simple(100)              ", csl_common_test_timer_i1(simple,100),"" );
+  csl_common_print_results( "simple(3000)             ", csl_common_test_timer_i1(simple,3000),"" );
+
 #ifdef COMPARE_STD
   csl_common_print_results( "stdhash(5)               ", csl_common_test_timer_i1(stdhash,5),"" );
   csl_common_print_results( "stdhash(31)              ", csl_common_test_timer_i1(stdhash,31),"" );
+  csl_common_print_results( "stdhash(50)              ", csl_common_test_timer_i1(stdhash,50),"" );
   csl_common_print_results( "stdhash(100)             ", csl_common_test_timer_i1(stdhash,100),"" );
   csl_common_print_results( "stdhash(3000)            ", csl_common_test_timer_i1(stdhash,3000),"" );
 #endif /*COMPARE_STD*/

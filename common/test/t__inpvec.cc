@@ -135,10 +135,10 @@ namespace test_inpvec {
     for( unsigned long long i=0;i<static_cast<unsigned long long>(p);++i )
     {
       vec.push_back( i );
-      assert( vec[i] == i );
+      assert( vec[static_cast<size_t>(i)] == i );
       assert( vec.size() == i+1 );
-      vec[i] = i;
-      vec[i/2] = i;
+      vec[static_cast<size_t>(i)] = i;
+      vec[static_cast<size_t>(i)/2] = i;
     }
   }
 

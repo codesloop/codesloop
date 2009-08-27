@@ -69,104 +69,130 @@ namespace csl
         bool get(const key_t & key, value_t & value) { return false; }
         bool del(const key_t & key) { return false; }
 
+      private:
+        page_t * create_page( uint64_t & pgid )
+        {
+          ENTER_FUNCTION();
+          page_iter_t it(pages_.last_free());
+          page_t * ret = it.construct();
+          pgid = pages_.iterator_pos( it );
+          CSL_DEBUGF( L"create_page(%lld) => %p",pgid,ret);
+          RETURN_FUNCTION(ret);
+        }
+
+        static const uint64_t no_hint_ = 0xFFFFFFFFFFFFFFFFULL;
+
+        uint64_t page_reuse_hint( uint64_t pos )
+        {
+          ENTER_FUNCTION();
+          CSL_DEBUGF(L"page_reuse_hint(%lld)",pos);
+
+          page_iter_t it(pages_.begin());
+          const page_iter_t & en(pages_.end());
+
+          for( ;it!=en;++it )
+          {
+            if( (*it)->get( pos ) == 0 )
+            {
+              CSL_DEBUGF(L"page_reuse_hint(%lld) => gpos:%lld at pos:%lld",it.get_pos(),pos);
+              RETURN_FUNCTION( it.get_pos() );
+            }
+          }
+
+          CSL_DEBUGF(L"page_reuse_hint(%lld) => no_hint_");
+          RETURN_FUNCTION( no_hint_ );
+        }
+
+      public:
         bool set( const key_t & key, const value_t & value )
         {
           ENTER_FUNCTION();
 
-          F          hash_fun;
-          uint64_t   pgpos      = 0;
           uint64_t   pageid     = 0;
-          hash_key_t hk         = hash_fun( key );
+          hash_key_t hk         = hash_fun_( key );
           uint64_t   shift      = 0;
+          uint64_t   pgpos      = (hk&(page_t::mask_));
+          page_t *   pg         = 0;
 
           /* check if there is a page allocated for this key */
           if( index_.get( hk, pageid, shift ) == false )
           {
-            /* no page for hash key yet */
             CSL_DEBUGF( L"no page for hash_key: [hk:%lld]", hk );
 
-            pgpos        = (hk&(page_t::mask_));
-            page_t * pg  = create_page( pageid );
+            uint64_t hn = page_reuse_hint( pgpos );
+
+            if( hn == no_hint_ ) { pg = create_page( pageid ); }
+            else
+            {
+              pg = pages_.get_ptr( hn );
+              pageid = hn;
+            }
 
             CSL_DEBUG_ASSERT( pg != 0 );
-            CSL_DEBUGF( L"page: %lld created for: [hk:%lld] at index pos:%lld", pageid, hk, pgpos );
 
             index_.internal_set( pgpos, pageid, true );
 #ifdef DEBUG
             int result =
-#endif /* DEBUG */
-            pg->add( (hk>>(index_t::bits_))&(page_t::mask_), key, value, hk );
-
-            /* this should return ok_ indicating that it went smoothly */
-            CSL_DEBUG_ASSERT( result == page_t::ok_ );
-            RETURN_FUNCTION( true );
-          }
-
-          CSL_DEBUGF(L"set(k,v) found hk:%lld on page:%lld",hk,pageid);
-
-          /* now we have a page id at 'pageid' so try to add the data to it */
-          page_t * pg = pages_.get_ptr( pageid );
-          CSL_DEBUG_ASSERT( pg != 0 );
-
-          /* check if there is an item at the desired position */
-          if( pg->has_item( (hk>>(index_t::bits_+shift))&(page_t::mask_) ) == false )
-          {
-            /* noone at the given position, the item should always be added, no split can happen */
-            CSL_DEBUGF( L"Add the first element to: [hk:%lld:%lld] pg:%lld",
-                        hk,(hk>>(index_t::bits_+shift))&(page_t::mask_),pageid );
-
-#ifdef DEBUG
-            int result =
 #endif /*DEBUG*/
-            pg->add( (hk>>(index_t::bits_+shift))&(page_t::mask_), key, value, hk );
+            pg->add( pgpos, key, value, hk );
 
-            /* this should return ok_ indicating that it went smoothly */
             CSL_DEBUG_ASSERT( result == page_t::ok_ );
-            RETURN_FUNCTION( true );
-          }
-
-          int result = pg->add( (hk>>(index_t::bits_+shift))&(page_t::mask_), key, value, hk );
-
-          if( result == page_t::has_already_ )
-          {
-            /* this means that this key <=> value pair already there, so
-            ** page didn't replace that */
-            CSL_DEBUGF( L"not replacing existing value. [hk:%lld]",hk);
-            RETURN_FUNCTION( false );
-          }
-          else if( result == page_t::append_ok_ )
-          {
-            /* k,v has been appended to the given position. this tells us
-            ** to check for the need to split the page */
-            CSL_DEBUGF( L"k,v appended at page:%lld pos:%lld ** [hk:%lld]",
-                        pageid,(hk>>(index_t::bits_+shift))&(page_t::mask_),hk );
-
-            uint64_t nf = pg->n_free();
-
-            if( (pg->n_items() > 1000 && nf < (page_t::sz_-1) ) || nf == 0 )
-            {
-              /* do split */
-              pos_vec_t  iv;
-
-              /* TODO : SPEEDUP HERE XXX */
-              pg->split( shift+(2*index_t::bits_), pages_, iv );
-
-#ifdef DEBUG
-              bool res =
-#endif /*DEBUG*/
-              index_.split( hk, shift, iv );
-
-              CSL_DEBUG_ASSERT( res == true );
-            }
-
             RETURN_FUNCTION( true );
           }
           else
           {
-            /* the page returned an unexpected value, telling us
-            ** something is wrong with its state */
-            THR(exc::rs_invalid_state,false);
+            CSL_DEBUGF(L"page:%lld found for (k,v) [hk:%lld shift:%lld]",pageid,hk,shift);
+
+            pg = pages_.get_ptr( pageid );
+            CSL_DEBUG_ASSERT( pg != 0 );
+
+            int result = pg->add( pgpos, key, value, hk );
+
+            if( result == page_t::ok_ )
+            {
+              CSL_DEBUGF( L"Added the first element [hk:%lld] to [pg:%lld pos:%lld]",hk,pageid,pgpos);
+              RETURN_FUNCTION( true );
+            }
+            else if( result == page_t::has_already_ )
+            {
+              CSL_DEBUGF( L"Not replacing existing value. [hk:%lld] on [pg:%lld pos:%lld]",hk,pageid,pgpos);
+              RETURN_FUNCTION( false );
+            }
+            else if( result == page_t::append_ok_ )
+            {
+              CSL_DEBUGF( L"(k,v) appended at [pg:%lld pos:%lld] ** [hk:%lld]",pageid,pgpos,hk );
+
+              uint64_t nf = pg->n_free();
+              if( nf == 0 || (pg->n_items() > page_t::sz_ && nf < (page_t::sz_/4*3) ) )
+              {
+                /* create a new page to share the items */
+                uint64_t newpgid = 0;
+                page_t * newpage = create_page( newpgid );
+
+                CSL_DEBUG_ASSERT( newpage != 0 );
+
+                pos_vec_t iv;
+                pg->split( pgpos,shift,*newpage,newpgid,iv );
+
+                /* TODO : SPEEDUP HERE XXX */
+                //pg->split( shift+(2*index_t::bits_), pages_, iv );
+#ifdef DEBUG
+                bool res =
+#endif /*DEBUG*/
+                index_.split( hk, shift, iv );
+                CSL_DEBUG_ASSERT( res == true );
+              }
+
+              RETURN_FUNCTION( true );
+            }
+            else
+            {
+              /* the page returned an unexpected value, telling us
+              ** something is wrong with its state */
+              THR(exc::rs_invalid_state,false);
+            }
           }
+
           RETURN_FUNCTION( false );
         }
 
@@ -190,18 +216,9 @@ namespace csl
         }
 
       private:
-        page_t * create_page( uint64_t & pgid )
-        {
-          ENTER_FUNCTION();
-          page_iter_t it(pages_.last_free());
-          page_t * ret = it.construct();
-          pgid = pages_.iterator_pos( it );
-          CSL_DEBUGF( L"create_page(%lld) => %p",pgid,ret);
-          RETURN_FUNCTION(ret);
-        }
-
         page_vec_t    pages_;
         index_t       index_;
+        F             hash_fun_;
 
         CSL_OBJ(csl::common,hash);
         USE_EXC();

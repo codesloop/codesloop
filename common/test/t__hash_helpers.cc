@@ -28,12 +28,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify hash related macros
  */
 
-#if 0
+//#if 0
 #ifndef DEBUG
 #define DEBUG_ENABLE_INDENT
 #define DEBUG
 #endif /* DEBUG */
-#endif
+//#endif
 
 #include "hash.hh"
 #include "hash_helpers.hh"
@@ -76,25 +76,15 @@ namespace test_hash_helpers {
     page_t::page_vec_t    res;
     pos_vec_t             ids;
     uint32_t              shift=0;
+    page_t *              pg = res.construct(0);
 
     assert( p.n_items() == page_t::sz_ );
 
-    p.split(shift,res,ids);
+    p.split(3,0,*pg,0,ids);
 
-    // the split creates n-1 pages evenly spreading the keys into them
-    assert( res.n_items() == (page_t::sz_ - 1) );
+    assert( ids.n_items() == 1 );
 
-    // each page is created in the res vector, and its page ids (indexes) are stored
-    // into the ids vector
-    assert( ids.n_items() == (page_t::sz_ - 1) );
-
-    page_t::page_vec_t::iterator it = res.begin();
-    page_t::page_vec_t::iterator en = res.begin();
-
-    for( ;it!=en;++it )
-    {
-      assert( (*it)->n_items() == 1 );
-    }
+    // TODO more tests here
   }
 
   void index_getset()
@@ -217,6 +207,48 @@ namespace test_hash_helpers {
 
   }
 
+  void index_get0()
+  {
+    hash_helpers::index idx;
+    uint64_t d0,d1;
+    for( uint64_t i=0;i<100;++i ) idx.get(i,d0,d1);
+  }
+
+  void create_page0()
+  {
+    typedef page<uint64_t,uint64_t> page_t;
+    page_t::page_vec_t pv;
+
+    for( uint64_t i=0;i<100;++i )
+    {
+      page_t::page_vec_t::iterator it(pv.last_free());
+      page_t * ret = it.construct();
+      uint64_t pgid = pv.iterator_pos( it );
+    }
+  }
+
+  void page_has_item0()
+  {
+    typedef page<uint64_t,uint64_t> page_t;
+    page_t p;
+
+    for( uint64_t i=0;i<100;++i )
+    {
+      p.has_item(i);
+    }
+  }
+
+  void page_add0()
+  {
+    typedef page<uint64_t,uint64_t> page_t;
+    page_t p;
+
+    for( uint64_t i=0;i<100;++i )
+    {
+      p.add(i,i,i,i);
+    }
+  }
+
 } // end of test_hash_helpers
 
 using namespace test_hash_helpers;
@@ -225,12 +257,18 @@ int main()
 {
 
 #ifdef DEBUG
+  page_add0();
   //index_split();
   //index_lookup_pp();
   //page_add(9);
   //page_split();
   //index_getset();
 #else
+
+  csl_common_print_results( "page add 0                   ", csl_common_test_timer_v0(page_add0),"" );
+  csl_common_print_results( "page has_item 0              ", csl_common_test_timer_v0(page_has_item0),"" );
+  csl_common_print_results( "create page 0                ", csl_common_test_timer_v0(create_page0),"" );
+  csl_common_print_results( "index get 0                  ", csl_common_test_timer_v0(index_get0),"" );
 
   csl_common_print_results( "index lookup page pos        ", csl_common_test_timer_v0(index_lookup_pp),"" );
   csl_common_print_results( "index split                  ", csl_common_test_timer_v0(index_split),"" );
