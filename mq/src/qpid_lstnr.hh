@@ -23,80 +23,48 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, objICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_mq_msg_hh_included_
-#define _csl_mq_msg_hh_included_
+#ifndef _csl_mq_qpid_lstnr_hh_included_
+#define _csl_mq_qpid_lstnr_hh_included_
 
 /**
    @file session.hh
-   @brief session interface for q'ing 
+   @brief session interface for q'ing
  */
 
 #include "obj.hh"
-#include "tbuf.hh"
 #include "sess.hh"
+#include "tbuf.hh"
+#include <qpid/client/Connection.h>
+#include <qpid/client/Session.h>
+#include <qpid/client/Message.h>
+#include <qpid/client/MessageListener.h>
+#include <qpid/client/SubscriptionManager.h>
+
 
 #ifdef __cplusplus
 namespace csl
 {
   namespace mq
   {
-    /**
-    @brief Message queue message
-
-    represents a transportable message 
-    */
-    class msg : public csl::common::obj
+    
+    class qpid_lstnr : public lstnr, public qpid::client::MessageListener
     {
-      CSL_OBJ(csl::mq,msg);      
-
+      CSL_OBJ(csl::mq,qpid_lstnr);
+    
     public:
-      /** standard constructor */
-      msg() {}
-      /** standard constructor with session */
-      msg(sess & s) 
+      virtual void received(qpid::client::Message& message)
       {
-        set_session(s);
+        qpid_msg m;
+        csl::common::tbuf<512> buf( message.getData().c_str() );
+        m.set_tbuf( &buf );
+
+        receive( m );
       }
 
-      virtual ~msg() {};
-
-      virtual inline void set_tbuf(const csl::common::tbuf<512> * buf)
-      {
-        buf_ = buf;
-      }
-
-      virtual inline const csl::common::tbuf<512> * get_tbuf() const
-      {
-        return buf_;
-      }
-
-      virtual inline void set_session(sess & s)
-      {
-        sess_ = &s;
-      }
-
-      virtual inline void set_routing_key(const char * key)
-      {
-        routing_key_ = key;
-      }
-
-      virtual inline const char * get_routing_key() const
-      {
-        return routing_key_;
-      }
-
-      virtual void send(const char * xchg) = 0;
-      virtual void send(const char * xchg,const char * routing_key) = 0;
-
-    protected: 
-      sess * sess_;
-      const csl::common::tbuf<512> * buf_;
-      const char * routing_key_;
     };
   }
 }
 
-
 #endif /* __cplusplus */
-#endif /* _csl_mq_msg_hh_included_ */
+#endif /* _csl_mq_qpid_lstnr_hh_included_ */
 

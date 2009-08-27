@@ -23,17 +23,16 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, objICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_mq_msg_hh_included_
-#define _csl_mq_msg_hh_included_
+#ifndef _csl_mq_lstnr_hh_included_
+#define _csl_mq_lstnr_hh_included_
 
 /**
-   @file session.hh
-   @brief session interface for q'ing 
+   @file lstnr.hh
+   @brief listener interface for message queues
  */
 
 #include "obj.hh"
-#include "tbuf.hh"
-#include "sess.hh"
+#include "msg.hh"
 
 #ifdef __cplusplus
 namespace csl
@@ -41,62 +40,66 @@ namespace csl
   namespace mq
   {
     /**
-    @brief Message queue message
+    @brief Message queue listener
 
-    represents a transportable message 
+    listen and process mq messages
     */
-    class msg : public csl::common::obj
+    class lstnr : public csl::common::obj
     {
-      CSL_OBJ(csl::mq,msg);      
+      CSL_OBJ(csl::mq,lstnr);      
 
     public:
       /** standard constructor */
-      msg() {}
+      lstnr() {}
       /** standard constructor with session */
-      msg(sess & s) 
+      lstnr(sess & s) 
       {
         set_session(s);
       }
 
-      virtual ~msg() {};
+      virtual ~lstnr() {};
 
-      virtual inline void set_tbuf(const csl::common::tbuf<512> * buf)
-      {
-        buf_ = buf;
-      }
-
-      virtual inline const csl::common::tbuf<512> * get_tbuf() const
-      {
-        return buf_;
-      }
+      /** @brief receives a message from queue
+      * 
+      * receive an mq message - should be override 
+      * by client implementation. Until the successfull
+      * function return the message will be not committed
+      * (= the function is transactional safe)
+      */
+      virtual void receive(msg & m) = 0;
 
       virtual inline void set_session(sess & s)
       {
         sess_ = &s;
       }
 
-      virtual inline void set_routing_key(const char * key)
+      /** subscribe to a message channel */
+      virtual inline void subscribe(const char * q)
       {
-        routing_key_ = key;
+        sess_->subscribe(*this,q);
       }
 
-      virtual inline const char * get_routing_key() const
+      /** unsubscribe to a message channel */
+      virtual inline void unsubscribe(const char * q)
       {
-        return routing_key_;
+        sess_->unsubscribe(*this,q);
       }
 
-      virtual void send(const char * xchg) = 0;
-      virtual void send(const char * xchg,const char * routing_key) = 0;
+      /** listen for incoming messages (blocking) */
+      virtual inline void listen()
+      {
+        sess_->listen();
+      }
+
+
 
     protected: 
       sess * sess_;
-      const csl::common::tbuf<512> * buf_;
-      const char * routing_key_;
     };
   }
 }
 
 
 #endif /* __cplusplus */
-#endif /* _csl_mq_msg_hh_included_ */
+#endif /* _csl_mq_lstnr_hh_included_ */
 

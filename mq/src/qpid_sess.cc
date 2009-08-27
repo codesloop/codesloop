@@ -28,11 +28,16 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief impl_ interface for qpid based queueing
  */
 
-#include "sess.hh"
+#include "logger.hh"
 #include "qpid_sess.hh"
+#include "sess.hh"
+#include "lstnr.hh"
 
 #include <qpid/client/Connection.h>
 #include <qpid/client/Session.h>
+#include <qpid/client/Message.h>
+#include <qpid/client/MessageListener.h>
+#include <qpid/client/SubscriptionManager.h>
 
 
 using namespace qpid::client;
@@ -44,16 +49,18 @@ namespace csl
   {
 
     qpid_sess::qpid_sess() 
+      : subs_(NULL)
     {
     }
 
     qpid_sess::qpid_sess(const char * url)  
+      : subs_(NULL)      
     {
       this->connect(url);
     }
 
     qpid_sess::~qpid_sess()
-    {
+    {      
       this->disconnect();
     }
 
@@ -61,12 +68,17 @@ namespace csl
     {
       conn_.open("127.0.0.1", 5672); // TODO: parse
       impl_ = conn_.newSession();
+      subs_ = new SubscriptionManager(impl_);
     }
 
     void qpid_sess::disconnect()
     {
       impl_.close();
       conn_.close();      
+      if ( subs_ ) {
+        delete subs_;
+        subs_ = NULL;
+      }
     }
 
     void qpid_sess::add_q(const char * q)
@@ -100,6 +112,34 @@ namespace csl
     {
       impl_.exchangeUnbind(arg::exchange=xchg, arg::queue=q, arg::bindingKey=routing_key);
     }
+
+    void qpid_sess::subscribe(lstnr & lst, const char * q)
+    {
+      ENTER_FUNCTION();
+      
+      subs_->subscribe(dynamic_cast<MessageListener&>(lst),q);
+
+      LEAVE_FUNCTION();
+    }
+
+    void qpid_sess::unsubscribe(lstnr & l, const char * q) 
+    {
+      ENTER_FUNCTION();
+      
+      subs_->cancel(q);
+
+      LEAVE_FUNCTION();
+    }
+
+    void qpid_sess::listen() 
+    {
+      ENTER_FUNCTION();
+
+      subs_->run();
+
+      LEAVE_FUNCTION();
+    }
+
 
   }
 }

@@ -33,13 +33,28 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "common.h"
 #include "obj.hh"
+#include "lstnr.hh"
 #include "qpid_sess.hh"
 #include "qpid_msg.hh"
+#include "qpid_lstnr.hh"
 #include <assert.h>
 #include <sys/stat.h>
 
 using namespace csl::common;
 using namespace csl::mq;
+
+#define TEST_MESSAGE1 "test message1"
+#define TEST_MESSAGE2 "test message2"
+
+class mylstnr : public qpid_lstnr 
+{
+  virtual void receive(msg & m)
+  {
+    printf("Message arrived: %s\n", m.get_tbuf()->data() );
+    if ( strcmp( (const char*)m.get_tbuf()->data(), TEST_MESSAGE2 ) == 0 )
+      unsubscribe( "qpid_sess.q1" );
+  }
+};
 
 int main()
 {
@@ -60,11 +75,21 @@ int main()
 
   qpid_msg msg;
 
-  tbuf<512> buf("test message");
+  tbuf<512> buf(TEST_MESSAGE1);
   msg.set_tbuf( &buf );
   msg.set_session( s );
+  msg.send( "qpid_sess.xchg","route1" );
 
-  msg.send("amq.direct", "routing_key");
+  buf.set( (const unsigned char *)TEST_MESSAGE2, strlen(TEST_MESSAGE2) );
+  msg.send( "qpid_sess.xchg","route1" );
+
+  mylstnr lst;
+
+  lst.set_session( s );
+  lst.subscribe("qpid_sess.q1");  
+  lst.listen();
+
+
 
   s.del_q("qpid_sess.q1");
   s.del_q("qpid_sess.q2");

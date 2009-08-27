@@ -35,6 +35,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "sess.hh"
 #include <qpid/client/Connection.h>
 #include <qpid/client/Session.h>
+#include <qpid/client/Message.h>
+#include <qpid/client/MessageListener.h>
+#include <qpid/client/SubscriptionManager.h>
 
 
 #ifdef __cplusplus
@@ -45,6 +48,8 @@ namespace csl
     
     class qpid_sess : public sess
     {
+      friend class lstnr;
+
       CSL_OBJ(csl::mq,qpid_sess);
 
       /** standard constructor */
@@ -88,9 +93,15 @@ namespace csl
         return impl_;
       }
 
+    protected:
+      virtual void subscribe(lstnr & lst, const char * q);
+      virtual void unsubscribe(lstnr & lst, const char * q);
+      virtual void listen();
+
     private:
       qpid::client::Session impl_; 
       qpid::client::Connection conn_;
+      qpid::client::SubscriptionManager * subs_;
     };
   }
 }

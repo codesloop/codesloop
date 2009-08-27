@@ -38,6 +38,8 @@ namespace csl
 {
   namespace mq
   {
+    class lstnr;
+
     /**
     @brief Message queue session
 
@@ -46,6 +48,8 @@ namespace csl
     */
     class sess : public csl::common::obj
     {
+      friend class lstnr;
+
       CSL_OBJ(csl::mq,sess);      
 
     protected:
@@ -85,7 +89,15 @@ namespace csl
       virtual void del_route(const char * xchg,
                      const char * q,
                      const char * routing_key) = 0;
-      
+
+    protected:
+      /** subscribe to a message channel */
+      virtual void subscribe(lstnr & l, const char * q) = 0;
+      /** unsubscribe to a message channel */
+      virtual void unsubscribe(lstnr & l, const char * q) = 0;
+      /** listen for incoming messages (blocking) */
+      virtual void listen() = 0;
+
     };
   }
 }
