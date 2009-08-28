@@ -110,7 +110,7 @@ namespace csl_test
         page() : shift_(0) {}
 
         CSL_OBJ(csl::common::hash_helpers,page);
-        USE_EXC();
+        //USE_EXC();
       };
     };
 
@@ -142,7 +142,7 @@ namespace csl_test
         F            hash_fun_;
 
         CSL_OBJ(csl::common,hash);
-        USE_EXC();
+        //USE_EXC();
     };
   };
 };
