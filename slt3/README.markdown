@@ -1,12 +1,14 @@
-slt3 module
-===========
+slt3 module sources
+===================
 
-A wrapper over SQLite3 interface. It provides object oriented wrapper over transactional semanics and other helpers like easy handling of blob fields. There is a really simple Object Relational Mapping provided which may save you lots of programing. Check sources and tests for more information.
+slt3 uses the csl::slt3 namespace and includes the following classes:
 
-* [Sources](src/)
-* [Tests](test/)
+* [conn.hh](./conn.hh) : 
+* [tran.hh](./tran.hh) : 
+* [synqry.hh](./synqry.hh) : 
+* [param.hh](./param.hh) : 
+* [reg.hh](./reg.hh) : 
+* [obj.hh](./obj.hh) : 
+* [var.hh](./var.hh) : 
+* [sql.hh](./sql.hh) : 
 
-Credits
--------
-
-slt3 is based on [SQLite3](http://www.sqlite.org/) The SQLite3 is licensed as Public Domain. Many thanks to the autors for doing so.
