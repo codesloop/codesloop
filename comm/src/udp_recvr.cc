@@ -214,7 +214,7 @@ namespace csl
         stop_me_ = yesno;
       }
 
-      udp::SAI recvr::addr()
+      SAI recvr::addr()
       {
         SAI ret;
         {
@@ -224,7 +224,7 @@ namespace csl
         return ret;
       }
 
-      void recvr::addr(const udp::SAI & a)
+      void recvr::addr(const SAI & a)
       {
         scoped_mutex m(mtx_);
         addr_ = a;

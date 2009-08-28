@@ -211,7 +211,6 @@ namespace csl
           bool init();
 
         public:
-
           /* pkt manipulation */
           bool prepare_auth( msg & m );
           bool init_htua( const msg & m );

@@ -53,7 +53,7 @@ namespace csl
     std::string logger::logfile_;
 #ifdef DEBUG
     str logger::class_to_trace_;
-                               
+
     bool   logger::enable_trace_;
     bool   logger::enable_stderr_;
 #endif
@@ -65,7 +65,7 @@ namespace csl
 
     int logger::init() {
       logfile_ = CSL_LOGFILE;
-#ifdef DEBUG      
+#ifdef DEBUG
       class_to_trace_= ( getenv(CSL_TRACE_SCOPE) == NULL  ?  L"all" : wgetenv(CSL_TRACE_SCOPE) );
       enable_trace_  = ( getenv(CSL_TRACE_ENABLE) == NULL ?  false : true );
       enable_stderr_ = ( getenv(CSL_TRACE_STDERR) == NULL ?  false : true ) ;

@@ -43,7 +43,7 @@ namespace test_udp_client {
   void basic()
   {
     udp::hello_cli c;
-    udp::SAI h;
+    SAI h;
 
     c.use_exc(false);
 
@@ -89,7 +89,7 @@ using namespace test_udp_client;
 int main()
 {
   udp::hello_cli c_global;
-  udp::SAI h;
+  SAI h;
 
   c_global.use_exc(false);
 

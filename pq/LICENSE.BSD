@@ -1,4 +1,3 @@
-/*
 Copyright (c) 2008,2009, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
@@ -21,65 +20,3 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
-
-/**
-   @file t__udp_server2.cc
-   @brief Tests to verify udp::srv routines
- */
-
-#include "udp_hello.hh"
-#include "test_timer.h"
-#include "common.h"
-#include <assert.h>
-
-using namespace csl::common;
-using namespace csl::comm;
-using namespace csl::sec;
-
-/** @brief contains tests related to udp servers */
-namespace test_udp_server2 {
-
-  void basic()
-  {
-    udp::hello_srv s;
-    SAI h;
-
-    s.use_exc(false);
-    s.debug(false);
-
-    memset( &h,0,sizeof(h) );
-    h.sin_family       = AF_INET;
-    h.sin_addr.s_addr  = htonl(INADDR_LOOPBACK);
-    h.sin_port         = htons(47781);
-
-    s.addr( h );
-
-    ecdh_key pubkey;
-    bignum   privkey;
-
-    pubkey.algname("prime192v3");
-
-    /* generate keypair */
-    assert( pubkey.gen_keypair(privkey) == true );
-
-    s.private_key( privkey );
-    s.public_key( pubkey );
-
-    assert( s.start() == true );
-
-    SleepSeconds( 60 );
-  }
-
-} // end of test_udp_server
-
-using namespace test_udp_server2;
-
-int main()
-{
-  //csl_common_print_results( "simplest      ", csl_common_test_timer_i1(simplest,0),"" );
-  basic();
-  return 0;
-}
-
-/* EOF */

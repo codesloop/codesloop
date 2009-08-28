@@ -47,7 +47,7 @@ namespace test_udp_auth_server {
   {
     udp::hello_srv hellosrv;
     udp::auth_srv authsrv;
-    udp::SAI h,a;
+    SAI h,a;
 
     hellosrv.use_exc(false);
     authsrv.use_exc(false);
