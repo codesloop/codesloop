@@ -21,8 +21,55 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# SET(CMAKE_VERBOSE_MAKEFILE ON)
+IF(WIN32)
 
-SUBDIRS(src test)
+  IF(MSYS)
+
+    ADD_DEFINITIONS( -Wall
+                     -Wwrite-strings
+                     -Wcast-qual
+                     -Wpointer-arith
+                     -Wold-style-cast
+                     -Wconversion
+                     -Wcomment
+                     -Wcast-align
+                     -Wshadow
+                     -Wredundant-decls
+                     -g3
+                   )
+
+  ENDIF(MSYS)
+
+  LINK_DIRECTORIES(
+      $ENV{ZLIB_DEV_ENV}/lib
+      ../../../3rdparty/zlib/GnuWin32/lib )
+
+  INCLUDE_DIRECTORIES(
+      $ENV{ZLIB_DEV_ENV}/include
+      ../../../3rdparty/zlib/GnuWin32/include )
+
+ELSE(WIN32)
+
+  ADD_DEFINITIONS(
+                   -Wall
+                   -Wwrite-strings
+                   -Wcast-qual
+                   -Wpointer-arith
+                   -Wold-style-cast
+                   -Wconversion
+                   -Wcomment
+                   -Wcast-align
+                   -Winline
+                   -Wshadow
+                   -Wredundant-decls
+                   -g3
+                 )
+
+ENDIF(WIN32)
+
+ADD_DEFINITIONS( -DDEBUG) 
+
+ADD_LIBRARY( csl_db STATIC
+             exc.cc  exc.hh )
 
 # -- EOF --
