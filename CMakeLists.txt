@@ -1,4 +1,4 @@
-# Copyright (c) 2008, David Beck
+# Copyright (c) 2008,2009, CodeSloop Team
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -31,7 +31,6 @@ SUBDIRS( common
          sec
          nthread
 	 db
-         slt3
          sched
          rpc
          # mq
