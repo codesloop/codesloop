@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009, David Beck
+# Copyright (c) 2008,2009, CodeSLoop Team
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -21,8 +21,71 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# SET(CMAKE_VERBOSE_MAKEFILE ON)
+LINK_DIRECTORIES(
+                  ../../nthread/src
+                  ../../common/src
+                  ../../sec/src
+                  ../../slt3/src
+                )
 
-SUBDIRS( src test )
+INCLUDE_DIRECTORIES(
+                     ../../nthread/src
+                     ../../common/src
+                     ../../sec/src
+                     ../../slt3/src
+                    )
+
+IF(WIN32)
+
+  IF(MSYS)
+
+    ADD_DEFINITIONS(
+                     -Wall
+                     -Wwrite-strings
+                     -Wcast-qual
+                     -Wpointer-arith
+                     -Wold-style-cast
+                     -Wconversion
+                     -Wcomment
+                     -Wcast-align
+                     -Wshadow
+                     -Wredundant-decls
+                     -g3
+                   )
+
+  ENDIF(MSYS)
+
+ELSE(WIN32)
+
+  ADD_DEFINITIONS(
+                   -Wall
+                   -Wwrite-strings
+                   -Wcast-qual
+                   -Wpointer-arith
+                   -Wold-style-cast
+                   -Wconversion
+                   -Wcomment
+                   -Wcast-align
+                   -Wshadow
+                   -Wredundant-decls
+                   -g3
+                 )
+
+  ENDIF(WIN32)
+
+ADD_LIBRARY( csl_sched STATIC
+             schedule.cc      schedule.hh
+             exc.cc           exc.hh
+             item.cc          item.hh
+             peer.cc          peer.hh
+             route.cc         route.hh
+             remote_peer.cc   remote_peer.hh
+             head.cc          head.hh
+             data.cc          data.hh
+             cfg.cc           cfg.hh
+             item_state.cc    item_state.hh
+             synchr.cc        synchr.hh
+           )
 
 # -- EOF --
+
