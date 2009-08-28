@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009, David Beck
+# Copyright (c) 2008,2009, CodeSLoop Team
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -21,8 +21,100 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-SUBDIRS(src test)
+IF(WIN32)
 
-# SET(CMAKE_VERBOSE_MAKEFILE ON)
+  IF(MSYS)
+
+    ADD_DEFINITIONS(
+                     -Wall
+                     -Wwrite-strings
+                     -Wcast-qual
+                     -Wpointer-arith
+                     -Wold-style-cast
+                     -Wconversion
+                     -Wcomment
+                     -Wcast-align
+                     -Wshadow
+                     -Wredundant-decls
+                     -g3
+                     -DUMAC_AE_USE_STDINT=1
+                     -DUMAC_AE_SUPPORT=1
+                     -DRUN_TESTS=0
+                     -DSSE2=0
+                     -DFORCE_C_ONLY=1
+                  )
+
+  ELSE(MSYS)
+
+    ADD_DEFINITIONS(
+                     -DUMAC_AE_USE_STDINT=0
+                     -DUMAC_AE_SUPPORT=1
+                     -DRUN_TESTS=0
+                     -DSSE2=0
+                     -DFORCE_C_ONLY=1
+                   )
+
+  ENDIF(MSYS)
+
+  INCLUDE_DIRECTORIES( ../../common/src
+                       $ENV{OPENSSL_DEV_ENV}/include
+                       c:/OpenSSL/include
+                       ../../../3rdparty/OpenSSL/include
+                       $ENV{ZLIB_DEV_ENV}/include
+                       ../../../3rdparty/zlib/GnuWin32/include
+                     )
+
+  LINK_DIRECTORIES( ../../common/src
+                    $ENV{OPENSSL_DEV_ENV}/lib/VC/static
+                    c:/OpenSSL/lib/VC/static
+                    $ENV{ZLIB_DEV_ENV}/lib
+                  )
+
+ELSE(WIN32)
+
+  ADD_DEFINITIONS(
+                   -Wall
+                   -Wwrite-strings
+                   -Wcast-qual
+                   -Wpointer-arith
+                   -Wold-style-cast
+                   -Wconversion
+                   -Wcomment
+                   -Wcast-align
+                   -Wshadow
+                   -Wredundant-decls
+                   -g3
+                   -DUMAC_AE_USE_STDINT=1
+                   -DUMAC_AE_SUPPORT=1
+                   -DRUN_TESTS=0
+                   -DSSE2=0
+                   -DFORCE_C_ONLY=1
+                  )
+
+  INCLUDE_DIRECTORIES( ../src
+                       ../../common/src
+                       /usr/local/ssl/include
+                     )
+
+  LINK_DIRECTORIES( ../../common/src
+                    ../src
+                    /usr/local/ssl/lib
+                   )
+
+ENDIF(WIN32)
+
+ADD_LIBRARY( csl_sec STATIC
+             exc.cc              exc.hh
+             bignum.cc           bignum.hh
+             ecdh_key.cc         ecdh_key.hh
+             sha1_conv.cc        csl_sec.h
+             gen_rand.cc
+             crypt_buf.cc        crypt_buf.hh
+             crypt_pkt.cc        crypt_pkt.hh
+             # -- 3rd party UMAC and AES
+             umac.c              umac.h  umac_ae.h
+             rijndael-alg-fst.c  rijndael-alg-fst.h
+           )
 
 # -- EOF --
+
