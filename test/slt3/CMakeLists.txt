@@ -22,15 +22,15 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 LINK_DIRECTORIES(
-                  ../src
-                  ../../nthread/src
-                  ../../common/src
+                  ../../slt3
+                  ../../nthread
+                  ../../common
                 )
 
 INCLUDE_DIRECTORIES(
-                     ../src
-                     ../../nthread/src
-                     ../../common/src
+                     ../../slt3
+                     ../../nthread
+                     ../../common
                    )
 
 IF(WIN32)

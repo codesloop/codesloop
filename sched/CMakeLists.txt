@@ -22,17 +22,17 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 LINK_DIRECTORIES(
-                  ../../nthread/src
-                  ../../common/src
-                  ../../sec/src
-                  ../../slt3/src
+                  ../nthread
+                  ../common
+                  ../sec
+                  ../slt3
                 )
 
 INCLUDE_DIRECTORIES(
-                     ../../nthread/src
-                     ../../common/src
-                     ../../sec/src
-                     ../../slt3/src
+                     ../nthread
+                     ../common
+                     ../sec
+                     ../slt3
                     )
 
 IF(WIN32)

@@ -56,7 +56,7 @@ IF(WIN32)
 
   ENDIF(MSYS)
 
-  INCLUDE_DIRECTORIES( ../../common/src
+  INCLUDE_DIRECTORIES( ../common
                        $ENV{OPENSSL_DEV_ENV}/include
                        c:/OpenSSL/include
                        ../../../3rdparty/OpenSSL/include
@@ -64,7 +64,7 @@ IF(WIN32)
                        ../../../3rdparty/zlib/GnuWin32/include
                      )
 
-  LINK_DIRECTORIES( ../../common/src
+  LINK_DIRECTORIES( ../common
                     $ENV{OPENSSL_DEV_ENV}/lib/VC/static
                     c:/OpenSSL/lib/VC/static
                     $ENV{ZLIB_DEV_ENV}/lib
@@ -91,13 +91,12 @@ ELSE(WIN32)
                    -DFORCE_C_ONLY=1
                   )
 
-  INCLUDE_DIRECTORIES( ../src
-                       ../../common/src
+  INCLUDE_DIRECTORIES( 
+                       ../common
                        /usr/local/ssl/include
                      )
 
-  LINK_DIRECTORIES( ../../common/src
-                    ../src
+  LINK_DIRECTORIES( ../common
                     /usr/local/ssl/lib
                    )
 

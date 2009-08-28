@@ -22,11 +22,11 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 LINK_DIRECTORIES(
-                  ../../common/src
+                  ../common
                 )
 
 INCLUDE_DIRECTORIES(
-                     ../../common/src
+                     ../common
                    )
 
 IF(NOT WIN32)

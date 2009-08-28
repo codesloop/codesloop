@@ -23,7 +23,7 @@
 
 IF(WIN32)
 
-  INCLUDE_DIRECTORIES( ../../common/src )
+  INCLUDE_DIRECTORIES( ../common )
 
   IF(MSYS)
 
@@ -60,7 +60,7 @@ ELSE(WIN32)
                    -pthread
                  )
 
-  INCLUDE_DIRECTORIES( ../../common/src )
+  INCLUDE_DIRECTORIES( ../common )
 
 ENDIF(WIN32)
 

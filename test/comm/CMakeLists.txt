@@ -36,20 +36,20 @@ IF(WIN32)
                   )
 
     INCLUDE_DIRECTORIES(
-                         ../src
-                         ../../nthread/src
-                         ../../sec/src
-                         ../../common/src 
+                         ../../comm
+                         ../../nthread
+                         ../../sec
+                         ../../common
                          c:/OpenSSL/include
                          $ENV{OPENSSL_DEV_ENV}/include
                          ../../../3rdparty/OpenSSL/include
                        )
 
     LINK_DIRECTORIES(
-                      ../src
-                      ../../nthread/src
-                      ../../sec/src
-                      ../../common/src
+                      ../../comm 
+                      ../../nthread
+                      ../../sec
+                      ../../common
                       c:/OpenSSL/lib/MinGW
                       $ENV{OPENSSL_DEV_ENV}/lib/MinGW
                       ../../../3rdparty/OpenSSL/lib/MinGW
@@ -83,8 +83,8 @@ IF(WIN32)
                   )
 
     INCLUDE_DIRECTORIES(
-                         ../src
-                         ../../common/src 
+                         ../../comm
+                         ../../common
                          c:/OpenSSL/include
                          $ENV{OPENSSL_DEV_ENV}/include
                          ../../../3rdparty/OpenSSL/include
@@ -93,8 +93,8 @@ IF(WIN32)
                        )
 
     LINK_DIRECTORIES(
-                      ../src
-                      ../../common/src
+                      ../../comm
+                      ../../common
                       c:/OpenSSL/lib/VC/static
                       $ENV{OPENSSL_DEV_ENV}/lib/VC/static
                       ../../../3rdparty/OpenSSL/lib/VC/static
@@ -117,17 +117,17 @@ ELSE(WIN32)
  ENDIF(DLOPEN_FOUND)
 
   LINK_DIRECTORIES(
-                    ../src
-                    ../../nthread/src
-                    ../../sec/src
-                    ../../common/src
+                    ../../comm
+                    ../../nthread
+                    ../../sec
+                    ../../common
                   )
 
   INCLUDE_DIRECTORIES(
-                       ../src
-                       ../../nthread/src
-                       ../../sec/src
-                       ../../common/src 
+                       ../../comm
+                       ../../nthread
+                       ../../sec
+                       ../../common
                      )
 
   ADD_DEFINITIONS(

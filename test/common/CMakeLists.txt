@@ -48,14 +48,14 @@ IF(WIN32)
   ENDIF(MSYS)
 
   LINK_DIRECTORIES(
-                    ../src
+                    ../../common
                     "C:/Program Files/GnuWin32/lib/"
                     $ENV{ZLIB_DEV_ENV}/lib
                     ../../../3rdparty/zlib/GnuWin32/lib
                   )
 
   INCLUDE_DIRECTORIES(
-                       ../src
+                       ../../common
                        "C:/Program Files/GnuWin32/include/"
                        $ENV{ZLIB_DEV_ENV}/include
                        ../../../3rdparty/zlib/GnuWin32/include
@@ -84,9 +84,9 @@ ELSE(WIN32)
                    -g3
                  )
 
-  LINK_DIRECTORIES( ../src )
+  LINK_DIRECTORIES( ../../common )
 
-  INCLUDE_DIRECTORIES( ../src )
+  INCLUDE_DIRECTORIES( ../../common )
 
   LINK_LIBRARIES(
                   csl_common

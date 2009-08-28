@@ -39,22 +39,22 @@ IF(WIN32)
                   )
 
     INCLUDE_DIRECTORIES(
-                         ../src
-                         ../../common/src
-                         ../../nthread/src
-                         ../../sec/src
-                         ../../slt3/src
+                         ../../sched
+                         ../../common
+                         ../../nthread
+                         ../../sec
+                         ../../slt3
                          c:/OpenSSL/include
                          $ENV{OPENSSL_DEV_ENV}/include
                          ../../../3rdparty/OpenSSL/include
                        )
 
     LINK_DIRECTORIES(
-                      ../src
-                      ../../common/src
-                      ../../nthread/src
-                      ../../sec/src
-                      ../../slt3/src
+                      ../../sched
+                      ../../common
+                      ../../nthread
+                      ../../sec
+                      ../../slt3
                       c:/OpenSSL/lib/MinGW
                       $ENV{OPENSSL_DEV_ENV}/lib/MinGW
                       ../../../3rdparty/OpenSSL/lib/MinGW
@@ -89,11 +89,11 @@ IF(WIN32)
                   )
 
     INCLUDE_DIRECTORIES(
-                         ../src
-                         ../../common/src
-                         ../../nthread/src
-                         ../../sec/src
-                         ../../slt3/src
+                         ../../sched
+                         ../../common
+                         ../../nthread
+                         ../../sec
+                         ../../slt3
                          $ENV{OPENSSL_DEV_ENV}/include
                          ../../../3rdparty/OpenSSL/include
                          $ENV{ZLIB_DEV_ENV}/include
@@ -102,11 +102,11 @@ IF(WIN32)
                        )
 
     LINK_DIRECTORIES(
-                      ../src
-                      ../../common/src
-                      ../../nthread/src
-                      ../../sec/src
-                      ../../slt3/src
+                      ../../sched
+                      ../../common
+                      ../../nthread
+                      ../../sec
+                      ../../slt3
                       $ENV{OPENSSL_DEV_ENV}/lib/VC/static
                       ../../../3rdparty/OpenSSL/lib/VC/static
                       $ENV{ZLIB_DEV_ENV}/lib
@@ -141,11 +141,11 @@ ELSE(WIN32)
                  )
 
   INCLUDE_DIRECTORIES(
-                       ../src
-                       ../../common/src
-                       ../../nthread/src
-                       ../../sec/src
-                       ../../slt3/src
+                       ../../sched
+                       ../../common
+                       ../../nthread
+                       ../../sec
+                       ../../slt3
                        /usr/local/ssl/include
                      )
 
@@ -164,10 +164,10 @@ ELSE(WIN32)
                 )
 
   LINK_DIRECTORIES(
-                    ../src
-                    ../../common/src
-                    ../../sec/src
-                    ../../slt3/src
+                    ../../sched
+                    ../../common
+                    ../../sec
+                    ../../slt3
                     /usr/local/ssl/lib
                   )
 

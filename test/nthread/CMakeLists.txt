@@ -58,15 +58,15 @@ IF(WIN32)
   ENDIF(MSYS)
 
   INCLUDE_DIRECTORIES(
-                        ../src
-                        ../../common/src
+                        ../../nthread
+                        ../../common
                         $ENV{ZLIB_DEV_ENV}/include
                         ../../../3rdparty/zlib/GnuWin32/include
                       )
 
   LINK_DIRECTORIES(
-                    ../src
-                    ../../common/src
+                    ../../nthread
+                    ../../common
                     $ENV{ZLIB_DEV_ENV}/lib
                     ../../../3rdparty/zlib/GnuWin32/lib
                   )
@@ -88,16 +88,16 @@ ELSE(WIN32)
                    -pthread
                  )
 
-  INCLUDE_DIRECTORIES( ../src
-                       ../../common/src )
+  INCLUDE_DIRECTORIES( ../../nthread
+                       ../../common )
 
   LINK_LIBRARIES( csl_nthread
                   csl_common
                   pthread
                   z )
 
-  LINK_DIRECTORIES( ../src
-                    ../../common/src )
+  LINK_DIRECTORIES( ../../nthread
+                    ../../common )
 
   ADD_EXECUTABLE( t__pt_mutex      t__pt_mutex.cc )
 

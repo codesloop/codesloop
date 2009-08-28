@@ -21,11 +21,11 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-LINK_DIRECTORIES( ../../nthread/src
-                  ../../common/src )
+LINK_DIRECTORIES( ../nthread
+                  ../common )
 
-INCLUDE_DIRECTORIES( ../../nthread/src
-                     ../../common/src )
+INCLUDE_DIRECTORIES( ../nthread
+                     ../common )
 
 IF(NOT WIN32)
 

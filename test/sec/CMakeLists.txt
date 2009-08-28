@@ -36,15 +36,15 @@ IF(WIN32)
                   )
 
     INCLUDE_DIRECTORIES(
-                         ../src
-                         ../../common/src 
+                         ../../sec
+                         ../../common
                          c:/OpenSSL/include
                          $ENV{OPENSSL_DEV_ENV}/include
                          ../../../3rdparty/OpenSSL/include
                        )
 
-    LINK_DIRECTORIES( ../src
-                      ../../common/src
+    LINK_DIRECTORIES( ../../sec
+                      ../../common
                       c:/OpenSSL/lib/MinGW
                       $ENV{OPENSSL_DEV_ENV}/lib/MinGW
                       ../../../3rdparty/OpenSSL/lib/MinGW
@@ -76,8 +76,8 @@ IF(WIN32)
                   )
 
     INCLUDE_DIRECTORIES(
-                         ../src
-                         ../../common/src 
+                         ../../sec
+                         ../../common
                          c:/OpenSSL/include
                          $ENV{OPENSSL_DEV_ENV}/include
                          ../../../3rdparty/OpenSSL/include
@@ -85,8 +85,8 @@ IF(WIN32)
                          ../../../3rdparty/zlib/GnuWin32/include
                        )
 
-    LINK_DIRECTORIES( ../src
-                      ../../common/src
+    LINK_DIRECTORIES( ../../sec
+                      ../../common
                       c:/OpenSSL/lib/VC/static
                       $ENV{OPENSSL_DEV_ENV}/lib/VC/static
                       ../../../3rdparty/OpenSSL/lib/VC/static
@@ -120,8 +120,8 @@ ELSE(WIN32)
                  )
 
   INCLUDE_DIRECTORIES(
-      ../src
-      ../../common/src
+      ../../sec
+      ../../common
       /usr/local/ssl/include )
 
   LINK_LIBRARIES(
@@ -134,8 +134,8 @@ ELSE(WIN32)
       ${LIBDL} )
 
   LINK_DIRECTORIES(
-      ../src
-      ../../common/src
+      ../../sec
+      ../../common
        /usr/local/ssl/lib )
 
 ENDIF(WIN32)
