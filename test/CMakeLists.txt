@@ -31,6 +31,5 @@ SUBDIRS( common
          slt3
          sched
          rpc
-         # mq 
-       )
+         mq )
 

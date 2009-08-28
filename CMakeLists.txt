@@ -33,7 +33,7 @@ SUBDIRS( common
 	 db
          sched
          rpc
-         # mq
+         mq
          example
          test )
 
