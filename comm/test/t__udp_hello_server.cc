@@ -43,7 +43,7 @@ namespace test_udp_server2 {
   void basic()
   {
     udp::hello_srv s;
-    udp::SAI h;
+    SAI h;
 
     s.use_exc(false);
     s.debug(false);

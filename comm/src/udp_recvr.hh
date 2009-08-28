@@ -26,6 +26,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_comm_udp_recvr_hh_included_
 #define _csl_comm_udp_recvr_hh_included_
 
+#include "sai.hh"
 #include "csl_nthread.hh"
 #include "csl_common.hh"
 #include "ecdh_key.hh"
@@ -45,11 +46,6 @@ namespace csl
   {
     namespace udp
     {
-#ifndef CSL_COMM_SAI_DEFINED
-#define CSL_COMM_SAI_DEFINED
-      typedef struct sockaddr_in SAI;
-#endif
-
       struct msg
       {
         enum { max_len_v = 65536 };

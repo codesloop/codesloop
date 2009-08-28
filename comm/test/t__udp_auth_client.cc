@@ -45,7 +45,7 @@ namespace test_udp_auth_client {
   {
     udp::hello_cli ch;
     udp::auth_cli ca;
-    udp::SAI h,a;
+    SAI h,a;
 
     ch.use_exc(false);
     ca.use_exc(false);
@@ -106,7 +106,7 @@ int main()
   udp::hello_cli ch_global;
   udp::auth_cli  ca_global;
 
-  udp::SAI h,a;
+  SAI h,a;
 
   ch_global.use_exc(false);
   ca_global.use_exc(false);

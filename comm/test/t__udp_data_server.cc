@@ -62,7 +62,7 @@ namespace test_udp_data_server {
       SessionStore * sessions_;
       RegisterCB(SessionStore & s) : sessions_(&s) {}
 
-      bool operator()( const udp::SAI & addr,
+      bool operator()( const SAI & addr,
                        const ustr & login,
                        const ustr & pass,
                        const ustr & session_key,
@@ -88,7 +88,7 @@ namespace test_udp_data_server {
       LookupCB(SessionStore & s) : sessions_(&s) {}
 
       bool operator()( const udp::saltbuf_t & old_salt,
-                       const udp::SAI & addr,
+                       const SAI & addr,
                        ustr & sesskey )
       {
         const unsigned char * dp = old_salt.data();
@@ -116,7 +116,7 @@ namespace test_udp_data_server {
 
       bool operator()( const udp::saltbuf_t & old_salt,  // in: from request
                        const udp::saltbuf_t & new_salt,  // in: generated
-                       const udp::SAI & addr,            // in: from request
+                       const SAI & addr,                 // in: from request
                        const ustr & sesskey,             // in: looked up in cb
                        int sock,                         // in: from handler
                        const udp::b1024_t & data )       // in: decrypted from request
@@ -136,7 +136,7 @@ namespace test_udp_data_server {
 
       bool operator()( const udp::saltbuf_t & old_salt,          // in
                        const udp::saltbuf_t & new_salt,          // in
-                       const udp::SAI & addr,                    // in
+                       const SAI & addr,                         // in
                        const ustr & sesskey )                    // in
       {
         const unsigned char * dp = old_salt.data();
@@ -164,7 +164,7 @@ namespace test_udp_data_server {
     udp::hello_srv hellosrv;
     udp::auth_srv authsrv;
     udp::data_srv datasrv;
-    udp::SAI h,a,d;
+    SAI h,a,d;
 
     hellosrv.use_exc(false);
     authsrv.use_exc(false);

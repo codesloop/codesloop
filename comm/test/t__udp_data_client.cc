@@ -47,7 +47,7 @@ namespace test_udp_data_client {
     udp::hello_cli ch;
     udp::auth_cli  ca;
     udp::data_cli  cd;
-    udp::SAI h,a,d;
+    SAI h,a,d;
 
     ch.use_exc(false);
     ca.use_exc(false);
@@ -144,7 +144,7 @@ int main()
   udp::auth_cli  ca_global;
   udp::data_cli  cd_global;
 
-  udp::SAI h,a,d;
+  SAI h,a,d;
 
   ch_global.use_exc(false);
   ca_global.use_exc(false);
