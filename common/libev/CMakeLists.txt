@@ -53,8 +53,14 @@ ELSE(WIN32)
                    -g3
                  )
 
+  ADD_CUSTOM_COMMAND(
+     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/config.h 
+     COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/config.h-Linux-i686 ${CMAKE_CURRENT_BINARY_DIR}/config.h
+     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/config.h-Linux-i686
+   )
+
 ENDIF(WIN32)
 
-ADD_LIBRARY( csl_common_libev STATIC ev.c ev.h )
+ADD_LIBRARY( csl_common_libev STATIC ev.c ev.h config.h )
 
 # -- EOF --

@@ -51,7 +51,7 @@ IF(WIN32)
                   ../common
                   ../sec
                   ../nthread
-                  ../slt3
+                  ../db
                   "C:/Program Files/GnuWin32/lib/"
                   $ENV{ZLIB_DEV_ENV}/lib
                   ../../3rdparty/zlib/GnuWin32/lib
@@ -61,7 +61,7 @@ IF(WIN32)
                   ../common
                   ../sec
                   ../nthread
-                  ../slt3
+                  ../db
                   "C:/Program Files/GnuWin32/include/"
                   $ENV{ZLIB_DEV_ENV}/include
                   ../../3rdparty/zlib/GnuWin32/include
@@ -88,14 +88,14 @@ ELSE(WIN32)
                   ../common
                   ../sec
                   ../nthread
-                  ../slt3
+                  ../db
                   )
 
   INCLUDE_DIRECTORIES( 
                      ../common
                      ../sec
                      ../nthread
-                     ../slt3
+                     ../db
                      )
 
   ADD_DEFINITIONS(

@@ -84,7 +84,7 @@ ELSE(NOT WIN32)
     
 ENDIF(NOT WIN32)
 
-ADD_LIBRARY( csl_slt3 STATIC
+ADD_LIBRARY( csl_db_slt3 STATIC
              sqlite3.c
              _shared_impl.cc _shared_impl.hh
              sql.cc     sql.hh
@@ -96,5 +96,7 @@ ADD_LIBRARY( csl_slt3 STATIC
              query.cc   query.hh
              obj.cc     obj.hh
            )
+
+ADD_LIBRARY( csl_db STATIC dummy.cc )
 
 # -- EOF --

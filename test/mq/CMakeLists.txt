@@ -31,13 +31,15 @@ IF(WIN32)
                   )
 
     INCLUDE_DIRECTORIES(
-                         ../src
-                         ../../common/src 
+                         ../../mq
+                         ../../common
+                         /usr/local/qpid/include
                        )
 
     LINK_DIRECTORIES(
-                      ../src
-                      ../../common/src
+                      ../../mq
+                      ../../common
+                      /usr/local/qpid/lib
                       )
 
     ADD_DEFINITIONS(
@@ -63,13 +65,15 @@ IF(WIN32)
                   )
 
     INCLUDE_DIRECTORIES(
-                         ../src
-                         ../../common/src 
+                         ../../mq
+                         ../../common
+                         /usr/local/qpid/include
                        )
 
     LINK_DIRECTORIES(
-                      ../src
-                      ../../common/src
+                      ../../mq
+                      ../../common
+                      /usr/local/qpid/lib
                      )
   ENDIF(MSYS)
 
@@ -87,13 +91,15 @@ ELSE(WIN32)
  ENDIF(DLOPEN_FOUND)
 
   LINK_DIRECTORIES(
-                    ../src
-                    ../../common/src
+                    ../../mq
+                    ../../common
+                    /usr/local/qpid/lib
                   )
 
   INCLUDE_DIRECTORIES(
-                       ../src
-                       ../../common/src 
+                       ../../mq
+                       ../../common
+                       /usr/local/qpid/include
                      )
 
   ADD_DEFINITIONS(
