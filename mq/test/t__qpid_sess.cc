@@ -29,8 +29,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify qpid session management
  */
 
-#define DEBUG 
-
 #include "common.h"
 #include "obj.hh"
 #include "lstnr.hh"
