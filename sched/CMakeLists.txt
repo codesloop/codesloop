@@ -25,14 +25,14 @@ LINK_DIRECTORIES(
                   ../nthread
                   ../common
                   ../sec
-                  ../slt3
+                  ../db
                 )
 
 INCLUDE_DIRECTORIES(
                      ../nthread
                      ../common
                      ../sec
-                     ../slt3
+                     ../db
                     )
 
 IF(WIN32)
