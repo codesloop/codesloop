@@ -21,8 +21,80 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# SET(CMAKE_VERBOSE_MAKEFILE ON)
+LINK_DIRECTORIES( ../nthread
+                  ../common )
 
-SUBDIRS(src test)
+INCLUDE_DIRECTORIES( ../nthread
+                     ../common )
+
+IF(NOT WIN32)
+
+  SET( CMAKE_CXX_FLAGS "-Wconversion -Wcast-qual -Wpointer-arith -Wcast-align -Wold-style-cast" )
+
+  ADD_DEFINITIONS(
+                    -Wall
+                    -g3
+                    # -O3 -Os
+                   -DTHREADSAFE=1
+                   -DSQLITE_DEFAULT_PAGE_SIZE=32768
+                   -DSQLITE_MAX_ATTACHED=30
+                   -DSQLITE_ENABLE_COLUMN_METADATA=1
+                   -DSQLITE_DEFAULT_CACHE_SIZE=10000
+                   -Wwrite-strings
+                   -Wcomment
+                   -Wshadow
+                   -Wredundant-decls
+                 )
+
+ELSE(NOT WIN32)
+
+  IF(MSYS)
+  
+    SET( CMAKE_CXX_FLAGS "-Wconversion -Wcast-qual -Wpointer-arith -Wcast-align -Wold-style-cast" )
+  
+    ADD_DEFINITIONS(
+                      -Wall
+                      -g3
+                      -DTHREADSAFE=1
+                      -DSQLITE_DEFAULT_PAGE_SIZE=32768
+                      -DSQLITE_MAX_ATTACHED=30
+                      -DSQLITE_ENABLE_COLUMN_METADATA=1
+                      -DSQLITE_DEFAULT_CACHE_SIZE=10000
+                      # -DDEBUG
+                      # -DPRINT_SQL
+                     -Wwrite-strings
+                     -Wcomment
+                     -Wshadow
+                     -Wredundant-decls
+                   )
+
+  ELSE(MSYS)
+  
+    ADD_DEFINITIONS(
+                     -DTHREADSAFE=1
+                     -DSQLITE_DEFAULT_PAGE_SIZE=32768
+                     -DSQLITE_MAX_ATTACHED=30
+                     -DSQLITE_ENABLE_COLUMN_METADATA=1
+                     -DSQLITE_DEFAULT_CACHE_SIZE=10000
+                     # -DDEBUG
+                     # -DPRINT_SQL    
+                   )
+
+  ENDIF(MSYS)
+    
+ENDIF(NOT WIN32)
+
+ADD_LIBRARY( csl_slt3 STATIC
+             sqlite3.c
+             _shared_impl.cc _shared_impl.hh
+             sql.cc     sql.hh
+             var.cc     var.hh
+             exc.cc     exc.hh
+             reg.cc     reg.hh
+             conn.cc    conn.hh
+             tran.cc    tran.hh
+             query.cc   query.hh
+             obj.cc     obj.hh
+           )
 
 # -- EOF --

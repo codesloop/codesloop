@@ -48,21 +48,20 @@ IF(WIN32)
   ENDIF(MSYS)
 
   LINK_DIRECTORIES(
-                  ../common/src
-                  ../sec/src
-                  ../rx/src
-                  ../nthread/src
-                  ../slt3/src
+                  ../common
+                  ../sec
+                  ../nthread
+                  ../slt3
                   "C:/Program Files/GnuWin32/lib/"
                   $ENV{ZLIB_DEV_ENV}/lib
                   ../../3rdparty/zlib/GnuWin32/lib
                   )
 
   INCLUDE_DIRECTORIES(
-                  ../common/src
-                  ../sec/src
-                  ../nthread/src
-                  ../slt3/src
+                  ../common
+                  ../sec
+                  ../nthread
+                  ../slt3
                   "C:/Program Files/GnuWin32/include/"
                   $ENV{ZLIB_DEV_ENV}/include
                   ../../3rdparty/zlib/GnuWin32/include
@@ -86,17 +85,17 @@ ELSE(WIN32)
   ENDIF(DLOPEN_FOUND)
 
   LINK_DIRECTORIES( 
-                  ../common/src
-                  ../sec/src
-                  ../nthread/src
-                  ../slt3/src
+                  ../common
+                  ../sec
+                  ../nthread
+                  ../slt3
                   )
 
   INCLUDE_DIRECTORIES( 
-                     ../common/src
-                     ../sec/src
-                     ../nthread/src
-                     ../slt3/src
+                     ../common
+                     ../sec
+                     ../nthread
+                     ../slt3
                      )
 
   ADD_DEFINITIONS(

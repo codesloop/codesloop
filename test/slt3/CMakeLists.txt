@@ -21,9 +21,28 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+LINK_DIRECTORIES(
+                  ../../slt3
+                  ../../nthread
+                  ../../common
+                )
+
+INCLUDE_DIRECTORIES(
+                     ../../slt3
+                     ../../nthread
+                     ../../common
+                   )
+
 IF(WIN32)
 
   IF(MSYS)
+
+    LINK_LIBRARIES(
+                    csl_slt3
+                    csl_nthread
+                    csl_common
+                    wsock32
+                  )
 
     ADD_DEFINITIONS( -Wall
                      -Wwrite-strings
@@ -38,17 +57,26 @@ IF(WIN32)
                      -g3
                    )
 
+  ELSE(MSYS)
+
+    LINK_LIBRARIES(
+                    csl_slt3
+                    csl_nthread
+                    csl_common
+                    wsock32
+                  )
+
   ENDIF(MSYS)
 
-  LINK_DIRECTORIES(
-      $ENV{ZLIB_DEV_ENV}/lib
-      ../../../3rdparty/zlib/GnuWin32/lib )
-
-  INCLUDE_DIRECTORIES(
-      $ENV{ZLIB_DEV_ENV}/include
-      ../../../3rdparty/zlib/GnuWin32/include )
-
 ELSE(WIN32)
+
+  find_library(DLOPEN_FOUND NAMES dl PATH /usr/lib /lib /usr/local/lib)
+  set(LIBDL)
+
+  if (DLOPEN_FOUND)
+   set(LIBDL dl)
+   set(HAVE_LIBDL TRUE)
+  endif (DLOPEN_FOUND)
 
   ADD_DEFINITIONS(
                    -Wall
@@ -59,38 +87,27 @@ ELSE(WIN32)
                    -Wconversion
                    -Wcomment
                    -Wcast-align
-                   -Winline
                    -Wshadow
                    -Wredundant-decls
                    -g3
                  )
 
+  LINK_LIBRARIES(
+                  csl_slt3 
+                  csl_nthread 
+                  csl_common
+                  pthread 
+                  ${LIBDL}
+                )
+
 ENDIF(WIN32)
 
-ADD_DEFINITIONS( -DDEBUG)
-
-ADD_LIBRARY( csl_common STATIC
-             cexc.cc       cexc.hh
-             exc.cc        exc.hh
-             zfile.cc      zfile.hh
-             pbuf.cc       pbuf.hh
-             xdrbuf.cc     xdrbuf.hh
-             test_timer.c  test_timer.h
-             common.h      pvlist.hh
-             circbuf.hh
-             mpool.hh      tbuf.hh 
-             logger.cc     logger.hh
-             arch.cc       arch.hh
-             serializable.hh
-             obj.cc        obj.hh
-             hlprs.cc      hlprs.hh
-             hash.cc       hash.hh
-             hash_helpers.hh
-             var.hh
-             int64.cc      int64.hh
-             dbl.cc        dbl.hh
-             str.cc        str.hh
-             ustr.cc       ustr.hh
-             binry.cc      binry.hh )
+ADD_EXECUTABLE(t__sqlite       t__sqlite.cc)
+ADD_EXECUTABLE(t__conn         t__conn.cc)
+ADD_EXECUTABLE(t__tran         t__tran.cc)
+ADD_EXECUTABLE(t__query        t__query.cc)
+ADD_EXECUTABLE(t__reg          t__reg.cc)
+ADD_EXECUTABLE(t__var          t__var.cc)
+ADD_EXECUTABLE(t__sql_helper   t__sql_helper.cc)
 
 # -- EOF --

@@ -25,7 +25,15 @@ IF(WIN32)
 
   IF(MSYS)
 
-    ADD_DEFINITIONS( -Wall
+    LINK_LIBRARIES(
+                    csl_nthread
+                    csl_common
+                    z
+                    wsock32
+                  )
+
+    ADD_DEFINITIONS(
+                     -Wall
                      -Wwrite-strings
                      -Wcast-qual
                      -Wpointer-arith
@@ -38,15 +46,30 @@ IF(WIN32)
                      -g3
                    )
 
+  ELSE(MSYS)
+
+    LINK_LIBRARIES(
+                    csl_nthread
+                    csl_common
+                    zlib
+                    wsock32
+                  )
+
   ENDIF(MSYS)
 
-  LINK_DIRECTORIES(
-      $ENV{ZLIB_DEV_ENV}/lib
-      ../../../3rdparty/zlib/GnuWin32/lib )
-
   INCLUDE_DIRECTORIES(
-      $ENV{ZLIB_DEV_ENV}/include
-      ../../../3rdparty/zlib/GnuWin32/include )
+                        ../../nthread
+                        ../../common
+                        $ENV{ZLIB_DEV_ENV}/include
+                        ../../../3rdparty/zlib/GnuWin32/include
+                      )
+
+  LINK_DIRECTORIES(
+                    ../../nthread
+                    ../../common
+                    $ENV{ZLIB_DEV_ENV}/lib
+                    ../../../3rdparty/zlib/GnuWin32/lib
+                  )
 
 ELSE(WIN32)
 
@@ -59,38 +82,32 @@ ELSE(WIN32)
                    -Wconversion
                    -Wcomment
                    -Wcast-align
-                   -Winline
                    -Wshadow
                    -Wredundant-decls
                    -g3
+                   -pthread
                  )
+
+  INCLUDE_DIRECTORIES( ../../nthread
+                       ../../common )
+
+  LINK_LIBRARIES( csl_nthread
+                  csl_common
+                  pthread
+                  z )
+
+  LINK_DIRECTORIES( ../../nthread
+                    ../../common )
+
+  ADD_EXECUTABLE( t__pt_mutex      t__pt_mutex.cc )
 
 ENDIF(WIN32)
 
-ADD_DEFINITIONS( -DDEBUG)
 
-ADD_LIBRARY( csl_common STATIC
-             cexc.cc       cexc.hh
-             exc.cc        exc.hh
-             zfile.cc      zfile.hh
-             pbuf.cc       pbuf.hh
-             xdrbuf.cc     xdrbuf.hh
-             test_timer.c  test_timer.h
-             common.h      pvlist.hh
-             circbuf.hh
-             mpool.hh      tbuf.hh 
-             logger.cc     logger.hh
-             arch.cc       arch.hh
-             serializable.hh
-             obj.cc        obj.hh
-             hlprs.cc      hlprs.hh
-             hash.cc       hash.hh
-             hash_helpers.hh
-             var.hh
-             int64.cc      int64.hh
-             dbl.cc        dbl.hh
-             str.cc        str.hh
-             ustr.cc       ustr.hh
-             binry.cc      binry.hh )
+ADD_EXECUTABLE( t__mutex         t__mutex.cc )
+ADD_EXECUTABLE( t__thread        t__thread.cc )
+ADD_EXECUTABLE( t__event         t__event.cc )
+ADD_EXECUTABLE( t__pevent        t__pevent.cc )
+ADD_EXECUTABLE( t__thrpool       t__thrpool.cc )
 
 # -- EOF --

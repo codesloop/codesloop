@@ -1,5 +1,5 @@
 # Copyright (c) 2008,2009, CodeSLoop Team
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
@@ -25,7 +25,10 @@ IF(WIN32)
 
   IF(MSYS)
 
-    ADD_DEFINITIONS( -Wall
+    SET(ZLIB z)
+
+    ADD_DEFINITIONS(
+                     -Wall
                      -Wwrite-strings
                      -Wcast-qual
                      -Wpointer-arith
@@ -38,15 +41,31 @@ IF(WIN32)
                      -g3
                    )
 
+  ELSE(MSYS)
+
+    SET(ZLIB zlib)
+
   ENDIF(MSYS)
 
   LINK_DIRECTORIES(
-      $ENV{ZLIB_DEV_ENV}/lib
-      ../../../3rdparty/zlib/GnuWin32/lib )
+                    ../../common
+                    "C:/Program Files/GnuWin32/lib/"
+                    $ENV{ZLIB_DEV_ENV}/lib
+                    ../../../3rdparty/zlib/GnuWin32/lib
+                  )
 
   INCLUDE_DIRECTORIES(
-      $ENV{ZLIB_DEV_ENV}/include
-      ../../../3rdparty/zlib/GnuWin32/include )
+                       ../../common
+                       "C:/Program Files/GnuWin32/include/"
+                       $ENV{ZLIB_DEV_ENV}/include
+                       ../../../3rdparty/zlib/GnuWin32/include
+                     )
+
+  LINK_LIBRARIES(
+                  csl_common
+                  ${ZLIB}
+                  wsock32
+                )
 
 ELSE(WIN32)
 
@@ -65,32 +84,39 @@ ELSE(WIN32)
                    -g3
                  )
 
+  LINK_DIRECTORIES( ../../common )
+
+  INCLUDE_DIRECTORIES( ../../common )
+
+  LINK_LIBRARIES(
+                  csl_common
+                  z
+                )
+
 ENDIF(WIN32)
 
-ADD_DEFINITIONS( -DDEBUG)
+ADD_EXECUTABLE( t__zfile         t__zfile.cc )
+ADD_EXECUTABLE( t__circbuf       t__circbuf.cc )
+ADD_EXECUTABLE( t__pvlist        t__pvlist.cc )
+ADD_EXECUTABLE( t__mpool         t__mpool.cc )
+ADD_EXECUTABLE( t__pbuf          t__pbuf.cc )
+ADD_EXECUTABLE( t__tbuf          t__tbuf.cc )
+ADD_EXECUTABLE( t__xdrbuf        t__xdrbuf.cc )
+ADD_EXECUTABLE( t__logger        t__logger.cc )
+ADD_EXECUTABLE( t__str           t__str.cc )
+ADD_EXECUTABLE( t__ustr          t__ustr.cc )
+ADD_EXECUTABLE( t__int64         t__int64.cc )
+ADD_EXECUTABLE( t__dbl           t__dbl.cc )
+ADD_EXECUTABLE( t__binry         t__binry.cc )
+ADD_EXECUTABLE( t__serial        t__serial.cc )
+ADD_EXECUTABLE( t__obj           t__obj.cc )
+ADD_EXECUTABLE( t__inpvec        t__inpvec.cc )
+ADD_EXECUTABLE( t__hash          t__hash.cc )
+ADD_EXECUTABLE( t__hash_helpers  t__hash_helpers.cc )
+ADD_EXECUTABLE( t__hash_exp      t__hash_exp.cc )
 
-ADD_LIBRARY( csl_common STATIC
-             cexc.cc       cexc.hh
-             exc.cc        exc.hh
-             zfile.cc      zfile.hh
-             pbuf.cc       pbuf.hh
-             xdrbuf.cc     xdrbuf.hh
-             test_timer.c  test_timer.h
-             common.h      pvlist.hh
-             circbuf.hh
-             mpool.hh      tbuf.hh 
-             logger.cc     logger.hh
-             arch.cc       arch.hh
-             serializable.hh
-             obj.cc        obj.hh
-             hlprs.cc      hlprs.hh
-             hash.cc       hash.hh
-             hash_helpers.hh
-             var.hh
-             int64.cc      int64.hh
-             dbl.cc        dbl.hh
-             str.cc        str.hh
-             ustr.cc       ustr.hh
-             binry.cc      binry.hh )
+#ADD_EXECUTABLE( t__hash_macros   t__hash_macros.cc )
+#SET_TARGET_PROPERTIES( t__hash PROPERTIES LINK_FLAGS -pg )
+#SET_TARGET_PROPERTIES( t__inpvec PROPERTIES LINK_FLAGS -pg )
 
 # -- EOF --

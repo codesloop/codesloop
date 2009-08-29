@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009, David Beck
+# Copyright (c) 2008,2009, CodeSLoop Team
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -21,8 +21,56 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# SET(CMAKE_VERBOSE_MAKEFILE ON)
+IF(WIN32)
 
-SUBDIRS(src test)
+  INCLUDE_DIRECTORIES( ../common )
+
+  IF(MSYS)
+
+    ADD_DEFINITIONS(
+                     -Wall
+                     -Wwrite-strings
+                     -Wcast-qual
+                     -Wpointer-arith
+                     -Wold-style-cast
+                     -Wconversion
+                     -Wcomment
+                     -Wcast-align
+                     -Wshadow
+                     -Wredundant-decls
+                     -g3
+                   )
+
+  ENDIF(MSYS)
+
+ELSE(WIN32)
+
+  ADD_DEFINITIONS(
+                   -Wall
+                   -Wwrite-strings
+                   -Wcast-qual
+                   -Wpointer-arith
+                   -Wold-style-cast
+                   -Wconversion
+                   -Wcomment
+                   -Wcast-align
+                   -Wshadow
+                   -Wredundant-decls
+                   -g3
+                   -pthread
+                 )
+
+  INCLUDE_DIRECTORIES( ../common )
+
+ENDIF(WIN32)
+
+ADD_LIBRARY(
+    csl_nthread STATIC
+    exc.cc       exc.hh
+    mutex.cc     mutex.hh
+    event.cc     event.hh
+    pevent.cc    pevent.hh
+    thread.cc    thread.hh
+    thrpool.cc   thrpool.hh )
 
 # -- EOF --

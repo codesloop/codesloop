@@ -21,9 +21,6 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-PROJECT(codesloop)
-
 # SET(CMAKE_VERBOSE_MAKEFILE ON)
 
 SUBDIRS( common
@@ -31,10 +28,8 @@ SUBDIRS( common
          sec
          nthread
 	 db
+         slt3
          sched
          rpc
-         mq
-         example
-         test )
+         mq )
 
-# -- EOF --

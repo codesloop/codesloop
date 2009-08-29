@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009, David Beck, Tamas Foldi
+# Copyright (c) 2008,2009, CodeSLoop Team
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -23,6 +23,45 @@
 
 # SET(CMAKE_VERBOSE_MAKEFILE ON)
 
-SUBDIRS(src test)
 
-# -- EOF --
+IF(WIN32)
+  ADD_DEFINITIONS(-Wall)
+ELSE(WIN32)
+  ADD_DEFINITIONS(
+                   -Wall
+                   -Wwrite-strings
+                   -Wcast-qual
+                   -Wpointer-arith
+                   -Wold-style-cast
+                   -Wconversion
+                   -Wcomment
+                   -Wcast-align
+                   -Winline
+                   -Wshadow
+                   -Wredundant-decls
+                   -g3
+                 )
+ENDIF(WIN32)
+
+ADD_DEFINITIONS( -DDEBUG )
+
+INCLUDE_DIRECTORIES( ../common ) 
+LINK_DIRECTORIES( ../common )
+LINK_LIBRARIES( csl_common )
+
+ADD_CUSTOM_COMMAND( OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/csrparser.cc
+                  PRE_BUILD
+                  COMMAND ragel -G2 ARGS -o csrparser.cc csrparser.rl
+                  MAIN_DEPENDENCY csrparser.rl
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} )
+
+ADD_EXECUTABLE( csrgen  csrparser.cc    csrparser.hh
+                        iface.cc        iface.hh 
+                        stub_base.cc    stub_base.hh
+                        stub_header.cc  stub_header.hh
+                        stub_server.cc  stub_server.hh
+                        stub_client.cc  stub_client.hh
+                        exc.cc          exc.hh
+                        csrgen_main.cc 
+                        csrgen.hh)
+# -- EOF 
