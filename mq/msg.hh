@@ -47,6 +47,8 @@ namespace csl
     */
     class msg : public csl::common::obj
     {
+      friend class lstnr;
+
       CSL_OBJ(csl::mq,msg);      
 
     public:
@@ -85,6 +87,26 @@ namespace csl
         return routing_key_;
       }
 
+      virtual inline const char * get_destination() const
+      {
+        return destination_;
+      }
+
+      virtual inline void set_destination(const char * dest)
+      {
+        destination_ = dest;
+      }
+
+      virtual inline const char * get_xchg() const
+      {
+        return xchg_;
+      }
+
+      virtual inline void set_xchg(const char * xchg)
+      {
+        xchg_ = xchg;
+      }
+
       virtual void send(const char * xchg) = 0;
       virtual void send(const char * xchg,const char * routing_key) = 0;
 
@@ -92,6 +114,8 @@ namespace csl
       sess * sess_;
       const csl::common::tbuf<512> * buf_;
       const char * routing_key_;
+      const char * destination_;
+      const char * xchg_;
     };
   }
 }

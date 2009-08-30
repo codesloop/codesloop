@@ -31,13 +31,13 @@ IF(WIN32)
                   )
 
     INCLUDE_DIRECTORIES(
-                         ../src
-                         ../../common/src 
+                         ../../mq
+                         ../../common 
                        )
 
     LINK_DIRECTORIES(
-                      ../src
-                      ../../common/src
+                      ../../mq
+                      ../../common
                       )
 
     ADD_DEFINITIONS(
@@ -63,14 +63,15 @@ IF(WIN32)
                   )
 
     INCLUDE_DIRECTORIES(
-                         ../src
-                         ../../common/src 
+                         ../../mq
+                         ../../common
                        )
 
     LINK_DIRECTORIES(
-                      ../src
-                      ../../common/src
+                         ../../mq
+                         ../../common
                      )
+
   ENDIF(MSYS)
 
 ELSE(WIN32)
@@ -87,13 +88,13 @@ ELSE(WIN32)
  ENDIF(DLOPEN_FOUND)
 
   LINK_DIRECTORIES(
-                    ../src
-                    ../../common/src
+                    ../../mq
+                    ../../common
                   )
 
   INCLUDE_DIRECTORIES(
-                       ../src
-                       ../../common/src 
+                       ../../mq
+                       ../../common 
                      )
 
   ADD_DEFINITIONS(

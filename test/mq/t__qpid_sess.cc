@@ -48,7 +48,11 @@ class mylstnr : public qpid_lstnr
 {
   virtual void receive(msg & m)
   {
-    printf("Message arrived: %s\n", m.get_tbuf()->data() );
+    printf("Message arrived from %s: %s (exchange: %s, queue: %s)\n", m.get_routing_key(),
+        m.get_tbuf()->data(),
+        m.get_xchg(),
+        m.get_destination()
+      );
     if ( strcmp( (const char*)m.get_tbuf()->data(), TEST_MESSAGE2 ) == 0 )
       unsubscribe( "qpid_sess.q1" );
   }
