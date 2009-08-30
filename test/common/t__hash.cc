@@ -45,7 +45,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <assert.h>
 #include <vector>
 
-#define COMPARE_STD
+//#define COMPARE_STD
 #ifdef COMPARE_STD
 #include <ext/hash_map>
 
