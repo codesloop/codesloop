@@ -29,8 +29,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify qpid session management
  */
 
-#define DEBUG 
-
 #include "common.h"
 #include "obj.hh"
 #include "lstnr.hh"
@@ -50,9 +48,13 @@ class mylstnr : public qpid_lstnr
 {
   virtual void receive(msg & m)
   {
-    printf("Message arrived: %s\n", m.get_tbuf()->data() );
+    printf("Message arrived from %s: %s (exchange: %s, queue: %s)\n", m.get_routing_key(),
+        m.get_tbuf()->data(),
+        m.get_xchg(),
+        m.get_destination()
+      );
     if ( strcmp( (const char*)m.get_tbuf()->data(), TEST_MESSAGE2 ) == 0 )
-      unsubscribe( "qpid_sess.q1" );
+      unsubscribe( m.get_destination() );
   }
 };
 
@@ -81,12 +83,15 @@ int main()
   msg.send( "qpid_sess.xchg","route1" );
 
   buf.set( (const unsigned char *)TEST_MESSAGE2, strlen(TEST_MESSAGE2) );
+  msg.send( "qpid_sess.xchg","route2" );
+  buf.set( (const unsigned char *)TEST_MESSAGE2, strlen(TEST_MESSAGE2) );
   msg.send( "qpid_sess.xchg","route1" );
 
   mylstnr lst;
 
   lst.set_session( s );
   lst.subscribe("qpid_sess.q1");  
+  lst.subscribe("qpid_sess.q2");  
   lst.listen();
 
 

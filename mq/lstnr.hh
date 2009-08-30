@@ -42,7 +42,7 @@ namespace csl
     /**
     @brief Message queue listener
 
-    listen and process mq messages
+    listen and process mq messages. 
     */
     class lstnr : public csl::common::obj
     {
@@ -50,7 +50,9 @@ namespace csl
 
     public:
       /** standard constructor */
-      lstnr() {}
+      lstnr() 
+      {}
+
       /** standard constructor with session */
       lstnr(sess & s) 
       {
@@ -90,8 +92,6 @@ namespace csl
       {
         sess_->listen();
       }
-
-
 
     protected: 
       sess * sess_;

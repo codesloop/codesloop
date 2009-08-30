@@ -75,6 +75,7 @@ IF(WIN32)
                       ../../common
                       /usr/local/qpid/lib
                      )
+
   ENDIF(MSYS)
 
 ELSE(WIN32)

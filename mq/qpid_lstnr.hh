@@ -57,6 +57,9 @@ namespace csl
         qpid_msg m;
         csl::common::tbuf<512> buf( message.getData().c_str() );
         m.set_tbuf( &buf );
+        m.set_routing_key(message.getDeliveryProperties().getRoutingKey().c_str());
+        m.set_destination(message.getDestination().c_str());
+        m.set_xchg(message.getDeliveryProperties().getExchange().c_str());
 
         receive( m );
       }
