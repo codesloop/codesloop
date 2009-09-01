@@ -9,7 +9,7 @@
 # 2. Redistributions in binary form must reproduce the above copyright
 #    notice, this list of conditions and the following disclaimer in the
 #    documentation and/or other materials provided with the distribution.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
 # IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
 # OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -71,6 +71,7 @@ ELSE(NOT WIN32)
 ENDIF(NOT WIN32)
 
 ADD_LIBRARY( csl_comm STATIC
+             tcp_lstnr.cc         tcp_lstnr.hh
              udp_recvr.cc         udp_recvr.hh
              udp_hello.cc         udp_hello.hh
              udp_auth.cc          udp_auth.hh

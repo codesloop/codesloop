@@ -77,6 +77,7 @@ namespace csl
           rs_need_pass,           ///<Need pass.
           rs_sesskey_empty,       ///<session key is not set
           rs_salt_size,           ///<invalid salt size
+          rs_not_implemented,     ///<Function is not implemented
         };
 
         enum {
@@ -97,7 +98,7 @@ namespace csl
         /** @brief converts reason code to string */
         static const wchar_t * reason_string(int rc);
 
-        /** @brief constructor 
+        /** @brief constructor
          *   @param component that caused the exception
          */
         exc(const wchar_t * component)
