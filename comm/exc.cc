@@ -68,6 +68,7 @@ namespace csl
         case rs_need_pass:            return L"Need pass.";
         case rs_sesskey_empty:        return L"session key is not set";
         case rs_salt_size:            return L"invalid salt size";
+        case rs_not_implemented:      return L"Function is not implemented.";
         case rs_unknown:
           default:                    return L"Unknown reason";
       };
