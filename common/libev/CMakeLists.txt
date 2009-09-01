@@ -1,5 +1,5 @@
 # Copyright (c) 2008,2009, CodeSLoop Team
-#
+# 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
@@ -23,12 +23,7 @@
 
 IF(WIN32)
 
-  IF(MSYS)
-
-    SET(ZLIB z)
-
-    ADD_DEFINITIONS(
-                     -Wall
+    ADD_DEFINITIONS( -Wall
                      -Wwrite-strings
                      -Wcast-qual
                      -Wpointer-arith
@@ -40,32 +35,6 @@ IF(WIN32)
                      -Wredundant-decls
                      -g3
                    )
-
-  ELSE(MSYS)
-
-    SET(ZLIB zlib)
-
-  ENDIF(MSYS)
-
-  LINK_DIRECTORIES(
-                    ../src
-                    "C:/Program Files/GnuWin32/lib/"
-                    $ENV{ZLIB_DEV_ENV}/lib
-                    ../../../3rdparty/zlib/GnuWin32/lib
-                  )
-
-  INCLUDE_DIRECTORIES(
-                       ../src
-                       "C:/Program Files/GnuWin32/include/"
-                       $ENV{ZLIB_DEV_ENV}/include
-                       ../../../3rdparty/zlib/GnuWin32/include
-                     )
-
-  LINK_LIBRARIES(
-                  csl_common
-                  ${ZLIB}
-                  wsock32
-                )
 
 ELSE(WIN32)
 
@@ -84,17 +53,14 @@ ELSE(WIN32)
                    -g3
                  )
 
-  LINK_DIRECTORIES( ../src )
-
-  INCLUDE_DIRECTORIES( ../src )
-
-  LINK_LIBRARIES(
-                  csl_common
-                  z
-                )
+  ADD_CUSTOM_COMMAND(
+     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/config.h 
+     COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/config.h-Linux-i686 ${CMAKE_CURRENT_BINARY_DIR}/config.h
+     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/config.h-Linux-i686
+   )
 
 ENDIF(WIN32)
 
-# -- ADD_EXECUTABLE( t__  t__.cc )
+ADD_LIBRARY( csl_common_libev STATIC ev.c ev.h config.h )
 
 # -- EOF --

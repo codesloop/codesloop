@@ -50,6 +50,8 @@ IF(WIN32)
 
 ELSE(WIN32)
 
+  SUBDIRS( libev )
+
   ADD_DEFINITIONS(
                    -Wall
                    -Wwrite-strings

@@ -28,7 +28,6 @@ SUBDIRS( common
          sec
          nthread
 	 db
-         slt3
          sched
          rpc
          mq )

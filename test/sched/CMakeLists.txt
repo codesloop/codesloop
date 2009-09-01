@@ -29,7 +29,8 @@ IF(WIN32)
 
     LINK_LIBRARIES(
                     csl_sched
-                    csl_slt3
+                    csl_db_slt3
+                    csl_db
                     csl_sec
                     csl_nthread
                     csl_common
@@ -43,7 +44,7 @@ IF(WIN32)
                          ../../common
                          ../../nthread
                          ../../sec
-                         ../../slt3
+                         ../../db
                          c:/OpenSSL/include
                          $ENV{OPENSSL_DEV_ENV}/include
                          ../../../3rdparty/OpenSSL/include
@@ -54,7 +55,7 @@ IF(WIN32)
                       ../../common
                       ../../nthread
                       ../../sec
-                      ../../slt3
+                      ../../db
                       c:/OpenSSL/lib/MinGW
                       $ENV{OPENSSL_DEV_ENV}/lib/MinGW
                       ../../../3rdparty/OpenSSL/lib/MinGW
@@ -78,7 +79,8 @@ IF(WIN32)
   
     LINK_LIBRARIES(
                     csl_sched
-                    csl_slt3
+                    csl_db_slt3
+                    csl_db
                     csl_sec
                     csl_nthread
                     csl_common
@@ -93,7 +95,7 @@ IF(WIN32)
                          ../../common
                          ../../nthread
                          ../../sec
-                         ../../slt3
+                         ../../db
                          $ENV{OPENSSL_DEV_ENV}/include
                          ../../../3rdparty/OpenSSL/include
                          $ENV{ZLIB_DEV_ENV}/include
@@ -106,7 +108,7 @@ IF(WIN32)
                       ../../common
                       ../../nthread
                       ../../sec
-                      ../../slt3
+                      ../../db
                       $ENV{OPENSSL_DEV_ENV}/lib/VC/static
                       ../../../3rdparty/OpenSSL/lib/VC/static
                       $ENV{ZLIB_DEV_ENV}/lib
@@ -145,13 +147,14 @@ ELSE(WIN32)
                        ../../common
                        ../../nthread
                        ../../sec
-                       ../../slt3
+                       ../../db
                        /usr/local/ssl/include
                      )
 
   LINK_LIBRARIES(
                   csl_sched
-                  csl_slt3
+                  csl_db_slt3
+                  csl_db
                   csl_sec
                   csl_nthread
                   csl_common
@@ -167,7 +170,7 @@ ELSE(WIN32)
                     ../../sched
                     ../../common
                     ../../sec
-                    ../../slt3
+                    ../../db
                     /usr/local/ssl/lib
                   )
 
@@ -179,6 +182,6 @@ ADD_EXECUTABLE( t__item      t__item.cc )
 #ADD_EXECUTABLE( t__states   t__states.cc )
 #ADD_EXECUTABLE( t__send_msg t__send_msg.cc )
 #ADD_EXECUTABLE( t__recv_msg t__recv_msg.cc )
-ADD_EXECUTABLE( t__iface    t__iface.cc )
+ADD_EXECUTABLE( t__iface     t__iface.cc )
 
 # -- EOF --
