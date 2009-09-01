@@ -1,15 +1,15 @@
 # Copyright (c) 2008,2009, CodeSLoop Team
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
-# 
+#
 # 1. Redistributions of source code must retain the above copyright
 #    notice, this list of conditions and the following disclaimer.
 # 2. Redistributions in binary form must reproduce the above copyright
 #    notice, this list of conditions and the following disclaimer in the
 #    documentation and/or other materials provided with the distribution.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
 # IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
 # OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -21,10 +21,12 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+# test/comm
+
 IF(WIN32)
 
   IF(MSYS)
-  
+
     LINK_LIBRARIES(
                     csl_comm
                     csl_sec
@@ -46,10 +48,11 @@ IF(WIN32)
                        )
 
     LINK_DIRECTORIES(
-                      ../../comm 
+                      ../../comm
                       ../../nthread
                       ../../sec
                       ../../common
+                      ../../common/libev
                       c:/OpenSSL/lib/MinGW
                       $ENV{OPENSSL_DEV_ENV}/lib/MinGW
                       ../../../3rdparty/OpenSSL/lib/MinGW
@@ -76,6 +79,7 @@ IF(WIN32)
                     csl_sec
                     csl_nthread
                     csl_common
+                    csl_common_libev
                     ssleay32MT
                     libeay32MT
                     zlib
@@ -109,7 +113,7 @@ ELSE(WIN32)
  SET(LIBDL)
 
  IF(DLOPEN_FOUND)
- 
+
    SET(LIBDL dl)
 
    SET(HAVE_LIBDL TRUE)
@@ -150,6 +154,7 @@ ELSE(WIN32)
                   csl_sec
                   csl_nthread
                   csl_common
+                  csl_common_libev
                   ssl
                   crypto
                   z
@@ -160,6 +165,7 @@ ELSE(WIN32)
 ENDIF(WIN32)
 
 ADD_EXECUTABLE(t__mt_udp              t__mt_udp.cc)
+ADD_EXECUTABLE(t__tcp_libev           t__tcp_libev.cc)
 ADD_EXECUTABLE(t__udp_hello_client    t__udp_hello_client.cc)
 ADD_EXECUTABLE(t__udp_hello_server    t__udp_hello_server.cc)
 ADD_EXECUTABLE(t__udp_auth_client     t__udp_auth_client.cc)

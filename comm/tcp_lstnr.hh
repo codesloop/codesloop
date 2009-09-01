@@ -45,7 +45,7 @@ namespace csl
       class notify_new_conn_cb
       {
         public:
-          virtual ~new_conn_cb() {}
+          virtual ~notify_new_conn_cb() {}
           virtual bool operator()( const SAI & lstnr_addr, // in
                                    const SAI & peer_addr,  // in
                                    int peer_fd             // in
