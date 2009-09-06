@@ -133,8 +133,8 @@ namespace csl
 
           void destroy()
           {
-            ENTER_FUNCTION();
-            CSL_DEBUGF(L"destroy()");
+            ENTER_FUNCTION_X();
+            CSL_DEBUGF_X(L"destroy()");
 
             uint64_t n_i = 0;
             uint64_t * px = &n_i;
@@ -154,13 +154,13 @@ namespace csl
                 }
               }
             }
-            LEAVE_FUNCTION();
+            LEAVE_FUNCTION_X();
           }
 
           void destroy( uint64_t at )
           {
-            ENTER_FUNCTION();
-            CSL_DEBUGF(L"destroy(%lld)",at);
+            ENTER_FUNCTION_X();
+            CSL_DEBUGF_X(L"destroy(%lld)",at);
             uint64_t off = at/width_;
             uint64_t pos = at%width_;
 
@@ -170,7 +170,7 @@ namespace csl
               bmap_[off] = (bmap_[off] & (~(static_cast<bitmap_t>(1ULL)<<pos)));
               if( parent_ ) --(parent_->n_items_);
             }
-            LEAVE_FUNCTION();
+            LEAVE_FUNCTION_X();
           }
 
           void mul_alloc( mul_t m )
@@ -187,7 +187,7 @@ namespace csl
                        item_size+bitmap_size,item_size,bitmap_size);
 
             /* one allocation is done here for the bitmap and the items */
-            buffer_      = reinterpret_cast<uint8_t *>(malloc(item_size+bitmap_size));
+            buffer_      = reinterpret_cast<uint8_t *>(malloc(static_cast<size_t>(item_size+bitmap_size)));
 
             /* set the pointers pointing to the previously allocated buffer */
             bmap_        = reinterpret_cast<bitmap_t *>(buffer_);
@@ -197,7 +197,7 @@ namespace csl
             next_        = 0;
             parent_      = 0;
 
-            memset( bmap_,0,bitmap_size );
+            memset( bmap_,0,static_cast<size_t>(bitmap_size));
             LEAVE_FUNCTION();
           }
 

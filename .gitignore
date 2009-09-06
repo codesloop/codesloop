@@ -1,3 +1,7 @@
+.anjuta
+*.anjuta
+.tm*
+*/*/csl.log
 *~
 *.swp
 *.o

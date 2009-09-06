@@ -32,6 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "exc.hh"
+#include "obj.hh"
 #ifdef __cplusplus
 #include "common.h"
 
@@ -60,7 +61,6 @@ namespace csl
      */
     template <typename T,unsigned long long MaxSize> class circbuf : public obj
     {
-      CSL_OBJ(csl::common,circuf);
       private:
         /**
         @brief internal list-item type to store the user's items
@@ -324,7 +324,7 @@ namespace csl
 
         this only retrieves the oldest item but does not remove from the active list
         */
- 
+
         inline T & oldest()
         {
           if( n_items_ == 0 )
@@ -342,12 +342,9 @@ namespace csl
 
         /* event upcalls */
         inline virtual void on_new_item() {} ///<event upcall: called when new item is placed into the list
-        inline virtual void on_del_item() {} ///<event upcall: called when an item is removed from the active list 
+        inline virtual void on_del_item() {} ///<event upcall: called when an item is removed from the active list
         inline virtual void on_full() {}     ///<event upcall: called when the active list is full
         inline virtual void on_empty() {}    ///<event upcall: called when the active list becomes empty
-
-        inline void use_exc(bool yesno) { use_exc_ = yesno; } ///<sets the exception usage
-        inline bool use_exc() const     { return use_exc_; }  ///<checks the exception usage
 
       private:
         unsigned long long  n_items_;  ///<the number of active items
@@ -356,7 +353,9 @@ namespace csl
         item                head_;     ///<head of active list
         item                freelist_; ///<head of free list
         item                preplist_; ///<head of preapred (reserved) item list
-        bool                use_exc_;  ///<use exceptions?
+
+        CSL_OBJ(csl::common,circuf);
+        USE_EXC();
     };
   }
 }
