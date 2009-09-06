@@ -71,6 +71,7 @@ ADD_LIBRARY( csl_mq STATIC
              sess.hh                  msg.hh
              qpid_sess.cc             qpid_sess.hh
              qpid_msg.cc              qpid_msg.hh
+             mqfactory.cc             mqfactory.hh
            )
 
 # -- EOF --
