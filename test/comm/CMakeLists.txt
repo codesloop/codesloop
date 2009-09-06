@@ -121,6 +121,7 @@ ELSE(WIN32)
  ENDIF(DLOPEN_FOUND)
 
   LINK_DIRECTORIES(
+                    /usr/local/ssl/lib/
                     ../../comm
                     ../../nthread
                     ../../sec
@@ -128,6 +129,7 @@ ELSE(WIN32)
                   )
 
   INCLUDE_DIRECTORIES(
+                       /usr/local/ssl/include/
                        ../../comm
                        ../../nthread
                        ../../sec
