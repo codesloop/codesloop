@@ -23,16 +23,12 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_comm_tcp_conn_hh_included_
-#define _csl_comm_tcp_conn_hh_included_
-
 /**
-   @file tcp_conn.hh
+   @file tcp_handler.cc
    @brief @todo
  */
 
-#include "csl_common.hh"
-#ifdef __cplusplus
+#include "tcp_handler.hh"
 
 namespace csl
 {
@@ -40,10 +36,8 @@ namespace csl
   {
     namespace tcp
     {
-      typedef uint32_t connid_t;
     }
   }
 }
 
-#endif /*__cplusplus*/
-#endif /* _csl_comm_tcp_conn_hh_included_ */
+/* EOF */
