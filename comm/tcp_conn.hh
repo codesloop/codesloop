@@ -41,6 +41,8 @@ namespace csl
     namespace tcp
     {
       typedef uint32_t connid_t;
+
+      /* TODO buffered socket here... */
     }
   }
 }

@@ -31,9 +31,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief @todo
  */
 
+#include "sai.hh"
+#include "read_res.hh"
 #include "tcp_conn.hh"
+#include "tcp_handler.hh"
 #include "csl_common.hh"
 #ifdef __cplusplus
+#include <memory>
 
 namespace csl
 {
@@ -44,6 +48,35 @@ namespace csl
       class client
       {
         public:
+          client();
+          virtual ~client();
+
+          /* address, to be setup during initialization */
+          const SAI & peer_addr() const;
+
+          bool init(handler & h, SAI address);
+          bool start();
+          bool stop();
+
+          /* network ops */
+          read_res read(size_t sz, uint32_t timeout_ms);
+          bool write(uint8_t * data, size_t sz);
+
+          /* info ops */
+          const SAI & own_addr() const;
+
+          struct impl;
+        private:
+          /* private implementation */
+          std::auto_ptr<impl> impl_;
+
+          /* no-copy */
+          client(const client & other);
+          client & operator=(const client & other);
+
+          /* for trace and debug */
+          CSL_OBJ(csl::comm::tcp,client);
+          USE_EXC();
       };
     }
   }

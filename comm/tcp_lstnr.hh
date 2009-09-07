@@ -32,6 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "sai.hh"
+#include "read_res.hh"
 #include "tcp_conn.hh"
 #include "tcp_handler.hh"
 #include "csl_common.hh"
@@ -51,28 +52,18 @@ namespace csl
           virtual ~lstnr();
 
           /* address, to be setup during initialization */
-          const SAI & addr() const;
+          const SAI & own_addr() const;
 
           bool init(handler & h, SAI address);
           bool start();
           bool stop();
 
           /* network ops */
-          struct read_results
-          {
-            uint8_t *  data_;
-            size_t     bytes_;
-            bool       timed_out_;
-            bool       failed_;
-
-            read_results() : data_(0), bytes_(0), timed_out_(false), failed_(false) {}
-          };
-
-          read_results read(connid_t id, size_t sz, uint32_t timeout_ms);
+          read_res read(connid_t id, size_t sz, uint32_t timeout_ms);
           bool write(connid_t id, uint8_t * data, size_t sz);
 
           /* info ops */
-          SAI peer_addr(connid_t id) const;
+          const SAI & peer_addr(connid_t id) const;
 
           struct impl;
         private:

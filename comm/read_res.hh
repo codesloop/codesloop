@@ -23,8 +23,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_comm_sai_hh_included_
-#define _csl_comm_sai_hh_included_
+#ifndef _csl_comm_read_res_hh_included_
+#define _csl_comm_read_res_hh_included_
 
 #include "common.h"
 #ifdef __cplusplus
@@ -33,12 +33,17 @@ namespace csl
 {
   namespace comm
   {
-#ifndef CSL_COMM_SAI_DEFINED
-#define CSL_COMM_SAI_DEFINED
-      typedef struct sockaddr_in SAI;
-#endif /*CSL_COMM_SAI_DEFINED*/
+    struct read_res
+    {
+      uint8_t *  data_;
+      size_t     bytes_;
+      bool       timed_out_;
+      bool       failed_;
+
+      read_res() : data_(0), bytes_(0), timed_out_(false), failed_(false) {}
+    };
   }
 }
 
 #endif /* __cplusplus */
-#endif /* _csl_comm_sai_hh_included_ */
+#endif /* _csl_comm_read_res_hh_included_ */
