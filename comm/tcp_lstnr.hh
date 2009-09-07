@@ -33,6 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "sai.hh"
 #include "tcp_conn.hh"
+#include "tcp_handler.hh"
 #include "csl_common.hh"
 #ifdef __cplusplus
 #include <memory>
@@ -43,15 +44,6 @@ namespace csl
   {
     namespace tcp
     {
-      class handler
-      {
-        public:
-          virtual bool on_conn(connid_t id)    { return false; }
-          virtual bool on_data(connid_t id)    { return false; }
-          virtual void on_disconn(connid_t id) { return; }
-          virtual ~handler() {}
-      };
-
       class lstnr
       {
         public:
@@ -59,9 +51,9 @@ namespace csl
           virtual ~lstnr();
 
           /* address, to be setup during initialization */
-          SAI addr();
+          const SAI & addr() const;
 
-          bool init();
+          bool init(handler & h, SAI address);
           bool start();
           bool stop();
 
@@ -72,13 +64,15 @@ namespace csl
             size_t     bytes_;
             bool       timed_out_;
             bool       failed_;
+
+            read_results() : data_(0), bytes_(0), timed_out_(false), failed_(false) {}
           };
 
           read_results read(connid_t id, size_t sz, uint32_t timeout_ms);
-          bool write(connid_t id, uint8_t * buf, size_t sz);
+          bool write(connid_t id, uint8_t * data, size_t sz);
 
           /* info ops */
-          SAI peer_addr(connid_t id);
+          SAI peer_addr(connid_t id) const;
 
           struct impl;
         private:

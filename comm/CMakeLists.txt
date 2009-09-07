@@ -72,6 +72,7 @@ ENDIF(NOT WIN32)
 
 ADD_LIBRARY( csl_comm STATIC
              tcp_lstnr.cc         tcp_lstnr.hh
+             tcp_client.cc        tcp_client.hh
              tcp_conn.hh
              tcp_handler.cc       tcp_handler.hh
              udp_recvr.cc         udp_recvr.hh

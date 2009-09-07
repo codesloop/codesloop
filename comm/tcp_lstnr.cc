@@ -42,7 +42,7 @@ namespace csl
       };
 
       /* forwarding functions */
-      SAI lstnr::addr()                { return impl_->addr_; }
+      const SAI & lstnr::addr() const { return impl_->addr_; }
 
       /* default constructor, destructor */
       lstnr::lstnr() : impl_(new impl()) { }
