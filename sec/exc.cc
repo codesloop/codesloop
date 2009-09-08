@@ -24,8 +24,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "exc.hh"
-#include "common.h"
-#include "str.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/str.hh"
 
 /**
   @file sec/src/exc.cc

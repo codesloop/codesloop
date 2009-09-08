@@ -31,10 +31,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief remote_peer @todo remote_peer
  */
 
-#include "conn.hh"
-#include "reg.hh"
-#include "obj.hh"
-#include "var.hh"
+#include "codesloop/db/conn.hh"
+#include "codesloop/db/reg.hh"
+#include "codesloop/common/obj.hh"
+#include "codesloop/common/var.hh"
 #ifdef __cplusplus
 
 #ifndef SCHED_REMOTE_PEER_DB_NAME

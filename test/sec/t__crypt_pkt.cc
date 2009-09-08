@@ -29,12 +29,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "exc.hh"
-#include "pbuf.hh"
-#include "zfile.hh"
-#include "crypt_pkt.hh"
-#include "crypt_buf.hh"
-#include "test_timer.h"
-#include "common.h"
+#include "codesloop/common/pbuf.hh"
+#include "codesloop/common/zfile.hh"
+#include "codesloop/sec/crypt_pkt.hh"
+#include "codesloop/sec/crypt_buf.hh"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/common/common.h"
 #include <assert.h>
 
 using csl::sec::crypt_pkt;

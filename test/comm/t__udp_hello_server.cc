@@ -28,9 +28,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify udp::srv routines
  */
 
-#include "udp_hello.hh"
-#include "test_timer.h"
-#include "common.h"
+#include "codesloop/comm/udp_hello.hh"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/common/common.h"
 #include <assert.h>
 
 using namespace csl::common;

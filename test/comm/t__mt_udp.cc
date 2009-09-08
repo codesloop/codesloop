@@ -28,12 +28,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify multithreading and udp socket interworking
  */
 
-#include "wsa.hh"
-#include "thread.hh"
-#include "event.hh"
-#include "mutex.hh"
-#include "test_timer.h"
-#include "common.h"
+#include "codesloop/comm/wsa.hh"
+#include "codesloop/nthread/thread.hh"
+#include "codesloop/nthread/event.hh"
+#include "codesloop/nthread/mutex.hh"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/common/common.h"
 #include <assert.h>
 #include <list>
 

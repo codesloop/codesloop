@@ -34,8 +34,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    default is pvlist
 */
 
-#include "pvlist.hh"
-#include "common.h"
+#include "codesloop/common/pvlist.hh"
+#include "codesloop/common/common.h"
 #ifdef __cplusplus
 
 namespace csl

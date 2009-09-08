@@ -28,9 +28,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify circbuf
  */
 
-#include "circbuf.hh"
-#include "test_timer.h"
-#include "common.h"
+#include "codesloop/common/circbuf.hh"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/common/common.h"
 #include <assert.h>
 #include <list>
 

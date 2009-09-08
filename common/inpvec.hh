@@ -31,10 +31,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief vector that utilizes in-place construction
  */
 
-#include "logger.hh"
-#include "hlprs.hh"
+#include "codesloop/common/logger.hh"
+#include "codesloop/common/hlprs.hh"
 #include "exc.hh"
-#include "common.h"
+#include "codesloop/common/common.h"
 #ifdef __cplusplus
 
 namespace csl

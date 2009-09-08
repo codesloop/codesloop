@@ -28,10 +28,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify umac routines
  */
 
-#include "umac_ae.h"
-#include "tbuf.hh"
-#include "test_timer.h"
-#include "common.h"
+#include "codesloop/sec/umac_ae.h"
+#include "codesloop/common/tbuf.hh"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/common/common.h"
 #include <assert.h>
 
 using namespace csl::common;

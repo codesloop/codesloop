@@ -23,13 +23,13 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "dbl.hh"
-#include "int64.hh"
-#include "str.hh"
-#include "ustr.hh"
-#include "binry.hh"
+#include "codesloop/common/dbl.hh"
+#include "codesloop/common/int64.hh"
+#include "codesloop/common/str.hh"
+#include "codesloop/common/ustr.hh"
+#include "codesloop/common/binry.hh"
 #include "exc.hh"
-#include "xdrbuf.hh"
+#include "codesloop/common/xdrbuf.hh"
 
 /**
   @file common/src/int64.cc

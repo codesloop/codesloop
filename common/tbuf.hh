@@ -31,9 +31,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Preallocated template buffer
  */
 
-#include "pbuf.hh"
-#include "hlprs.hh"
-#include "common.h"
+#include "codesloop/common/pbuf.hh"
+#include "codesloop/common/hlprs.hh"
+#include "codesloop/common/common.h"
 #ifdef __cplusplus
 
 namespace csl

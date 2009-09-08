@@ -23,8 +23,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "bignum.hh"
-#include "csl_common.hh"
+#include "codesloop/sec/bignum.hh"
+#include "codesloop/common/csl_common.hh"
 
 /**
   @file bignum.cc

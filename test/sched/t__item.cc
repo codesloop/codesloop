@@ -28,11 +28,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to check various sched::item features
  */
 
-#include "test_timer.h"
-#include "item.hh"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/sched/item.hh"
 #include "exc.hh"
-#include "common.h"
-#include "mpool.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/mpool.hh"
 #include <assert.h>
 #include <stdlib.h>
 

@@ -32,14 +32,14 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #define CSL_WINDOWS_H_INCLUDED
-#include "query.hh"
-#include "conn.hh"
-#include "tran.hh"
+#include "codesloop/db/query.hh"
+#include "codesloop/db/conn.hh"
+#include "codesloop/db/tran.hh"
 #include "exc.hh"
-#include "reg.hh"
-#include "var.hh"
-#include "obj.hh"
-#include "sql.hh"
+#include "codesloop/db/reg.hh"
+#include "codesloop/common/var.hh"
+#include "codesloop/common/obj.hh"
+#include "codesloop/db/sql.hh"
 #ifdef __cplusplus
 
 namespace csl

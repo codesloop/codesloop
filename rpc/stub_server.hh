@@ -26,11 +26,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_rpc_stub_server_hh_included_
 #define _csl_rpc_stub_server_hh_included_
 
-#include "common.h"
+#include "codesloop/common/common.h"
 #ifdef __cplusplus
-#include "obj.hh"
-#include "iface.hh"
-#include "csrgen.hh"
+#include "codesloop/common/obj.hh"
+#include "codesloop/rpc/iface.hh"
+#include "codesloop/rpc/csrgen.hh"
 
 namespace csl 
 { 

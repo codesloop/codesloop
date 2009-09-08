@@ -28,14 +28,14 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to check and measure various slt3::tran features
  */
 
-#include "common.h"
-#include "test_timer.h"
-#include "tran.hh"
-#include "conn.hh"
-#include "query.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/db/tran.hh"
+#include "codesloop/db/conn.hh"
+#include "codesloop/db/query.hh"
 #include "exc.hh"
-#include "str.hh"
-#include "ustr.hh"
+#include "codesloop/common/str.hh"
+#include "codesloop/common/ustr.hh"
 #include <assert.h>
 
 using namespace csl::slt3;

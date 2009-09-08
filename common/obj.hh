@@ -32,7 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @todo document me
  */
 
-#include "common.h"
+#include "codesloop/common/common.h"
 #ifdef __cplusplus
 
 #define CSL_OBJ( namesp_, class_)                               \

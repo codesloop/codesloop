@@ -35,13 +35,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif /* DEBUG */
 #endif
 
-#include "hash.hh"
-#include "tbuf.hh"
-#include "pbuf.hh"
+#include "codesloop/common/hash.hh"
+#include "codesloop/common/tbuf.hh"
+#include "codesloop/common/pbuf.hh"
 
-#include "test_timer.h"
-#include "logger.hh"
-#include "common.h"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/common/logger.hh"
+#include "codesloop/common/common.h"
 #include <assert.h>
 #include <vector>
 

@@ -25,7 +25,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <openssl/rand.h>
 #include <stdio.h>
-#include "csl_sec.h"
+#include "codesloop/sec/csl_sec.h"
 
 /**
    @file gen_rand.cc

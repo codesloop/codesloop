@@ -23,9 +23,9 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "thread.hh"
-#include "mutex.hh"
-#include "common.h"
+#include "codesloop/nthread/thread.hh"
+#include "codesloop/nthread/mutex.hh"
+#include "codesloop/common/common.h"
 #include <windows.h>
 
 /**

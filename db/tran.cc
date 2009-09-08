@@ -23,8 +23,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "tran.hh"
-#include "_shared_impl.hh"
+#include "codesloop/db/tran.hh"
+#include "codesloop/db/_shared_impl.hh"
 
 /**
   @file tran.cc

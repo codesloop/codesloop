@@ -24,9 +24,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "exc.hh"
-#include "udp_recvr.hh"
-#include "mutex.hh"
-#include "common.h"
+#include "codesloop/comm/udp_recvr.hh"
+#include "codesloop/nthread/mutex.hh"
+#include "codesloop/common/common.h"
 
 namespace csl
 {

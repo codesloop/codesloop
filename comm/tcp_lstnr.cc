@@ -24,7 +24,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "exc.hh"
-#include "tcp_lstnr.hh"
+#include "codesloop/comm/tcp_lstnr.hh"
 
 namespace csl
 {

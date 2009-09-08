@@ -24,9 +24,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "exc.hh"
-#include "event.hh"
-#include "common.h"
-#include "str.hh"
+#include "codesloop/nthread/event.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/str.hh"
 
 #ifdef WIN32
 # include "event_impl_windows.cc"

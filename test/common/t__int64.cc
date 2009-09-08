@@ -28,13 +28,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify int64
  */
 
-#include "int64.hh"
-#include "dbl.hh"
-#include "str.hh"
-#include "ustr.hh"
-#include "xdrbuf.hh"
-#include "test_timer.h"
-#include "common.h"
+#include "codesloop/common/int64.hh"
+#include "codesloop/common/dbl.hh"
+#include "codesloop/common/str.hh"
+#include "codesloop/common/ustr.hh"
+#include "codesloop/common/xdrbuf.hh"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/common/common.h"
 #include <assert.h>
 #include <string>
 

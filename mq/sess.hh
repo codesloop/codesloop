@@ -31,7 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief session interface for q'ing 
  */
 
-#include "obj.hh"
+#include "codesloop/common/obj.hh"
 
 #ifdef __cplusplus
 namespace csl

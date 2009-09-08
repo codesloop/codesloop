@@ -28,10 +28,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to check and measure various slt3::conn features
  */
 
-#include "test_timer.h"
-#include "conn.hh"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/db/conn.hh"
 #include "exc.hh"
-#include "common.h"
+#include "codesloop/common/common.h"
 #include <assert.h>
 #include <stdlib.h>
 

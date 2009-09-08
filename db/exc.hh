@@ -31,8 +31,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief common exception class for slt3
  */
 
-#include "cexc.hh"
-#include "str.hh"
+#include "codesloop/common/cexc.hh"
+#include "codesloop/common/str.hh"
 #ifdef __cplusplus
 
 namespace csl

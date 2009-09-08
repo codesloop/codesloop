@@ -34,12 +34,12 @@ Credits: some techniques and code pieces are stolen from Christian
    @brief simple but efficient wide string class
  */
 
-#include "common.h"
-#include "obj.hh"
-#include "tbuf.hh"
-#include "var.hh"
-#include "binry.hh"
-#include "arch.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/obj.hh"
+#include "codesloop/common/tbuf.hh"
+#include "codesloop/common/var.hh"
+#include "codesloop/common/binry.hh"
+#include "codesloop/common/arch.hh"
 #include <wctype.h>
 #ifdef __cplusplus
 #include <string>

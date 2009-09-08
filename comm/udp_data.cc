@@ -24,15 +24,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "exc.hh"
-#include "udp_data.hh"
-#include "mutex.hh"
-#include "crypt_pkt.hh"
-#include "csl_sec.h"
-#include "pbuf.hh"
-#include "xdrbuf.hh"
-#include "common.h"
-#include "str.hh"
-#include "ustr.hh"
+#include "codesloop/comm/udp_data.hh"
+#include "codesloop/nthread/mutex.hh"
+#include "codesloop/sec/crypt_pkt.hh"
+#include "codesloop/sec/csl_sec.h"
+#include "codesloop/common/pbuf.hh"
+#include "codesloop/common/xdrbuf.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/str.hh"
+#include "codesloop/common/ustr.hh"
 
 namespace csl
 {

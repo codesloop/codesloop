@@ -31,7 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Various templated helpers
  */
 
-#include "common.h"
+#include "codesloop/common/common.h"
 #ifdef __cplusplus
 
 namespace csl

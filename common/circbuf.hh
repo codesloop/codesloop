@@ -32,9 +32,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "exc.hh"
-#include "obj.hh"
+#include "codesloop/common/obj.hh"
 #ifdef __cplusplus
-#include "common.h"
+#include "codesloop/common/common.h"
 
 namespace csl
 {

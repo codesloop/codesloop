@@ -28,7 +28,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   @brief basic zfile usage for reading and writing files
  */
 
-#include "zfile.hh"
+#include "codesloop/common/zfile.hh"
 #include <stdlib.h>
 
 using namespace csl::common;

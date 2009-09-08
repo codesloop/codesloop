@@ -28,9 +28,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   @brief basic thread and event usage
  */
 
-#include "common.h"
-#include "thread.hh"
-#include "event.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/nthread/thread.hh"
+#include "codesloop/nthread/event.hh"
 
 using namespace csl::nthread;
 

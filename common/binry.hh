@@ -31,10 +31,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief binary type to be used in interfaces
  */
 
-#include "var.hh"
-#include "dbl.hh"
-#include "tbuf.hh"
-#include "arch.hh"
+#include "codesloop/common/var.hh"
+#include "codesloop/common/dbl.hh"
+#include "codesloop/common/tbuf.hh"
+#include "codesloop/common/arch.hh"
 #ifdef __cplusplus
 
 namespace csl

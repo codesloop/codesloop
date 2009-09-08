@@ -24,7 +24,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <typeinfo>
-#include "obj.hh"
+#include "codesloop/common/obj.hh"
 
 /**
   @file common/src/obj.cc

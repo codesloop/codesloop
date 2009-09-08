@@ -31,9 +31,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief double precision floating point type to be used in interfaces
  */
 
-#include "var.hh"
-#include "int64.hh"
-#include "arch.hh"
+#include "codesloop/common/var.hh"
+#include "codesloop/common/int64.hh"
+#include "codesloop/common/arch.hh"
 #ifdef __cplusplus
 
 namespace csl

@@ -31,8 +31,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief 64 bit signed integer type to be used in interfaces
  */
 
-#include "var.hh"
-#include "arch.hh"
+#include "codesloop/common/var.hh"
+#include "codesloop/common/arch.hh"
 #ifdef __cplusplus
 
 namespace csl

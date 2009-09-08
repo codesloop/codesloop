@@ -26,16 +26,16 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_rpc_stub_base_hh_included_
 #define _csl_rpc_stub_base_hh_included_
 
-#include "common.h"
+#include "codesloop/common/common.h"
 #ifdef __cplusplus
 #include <fstream>
 #include <string>
 
-#include "obj.hh"
-#include "iface.hh"
-#include "csrgen.hh"
-#include "ustr.hh"
-#include "str.hh"
+#include "codesloop/common/obj.hh"
+#include "codesloop/rpc/iface.hh"
+#include "codesloop/rpc/csrgen.hh"
+#include "codesloop/common/ustr.hh"
+#include "codesloop/common/str.hh"
 
 
 

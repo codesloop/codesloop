@@ -31,8 +31,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief common exception class for sched
  */
 
-#include "str.hh"
-#include "cexc.hh"
+#include "codesloop/common/str.hh"
+#include "codesloop/common/cexc.hh"
 #ifdef __cplusplus
 
 namespace csl

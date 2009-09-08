@@ -31,7 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief @todo
  */
 
-#include "csl_common.hh"
+#include "codesloop/common/csl_common.hh"
 #ifdef __cplusplus
 
 namespace csl

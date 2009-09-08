@@ -31,9 +31,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief @todo
  */
 
-#include "sai.hh"
-#include "tcp_conn.hh"
-#include "csl_common.hh"
+#include "codesloop/comm/sai.hh"
+#include "codesloop/comm/tcp_conn.hh"
+#include "codesloop/common/csl_common.hh"
 #ifdef __cplusplus
 #include <memory>
 

@@ -31,8 +31,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief listener interface for message queues
  */
 
-#include "obj.hh"
-#include "msg.hh"
+#include "codesloop/common/obj.hh"
+#include "codesloop/mq/msg.hh"
 
 #ifdef __cplusplus
 namespace csl

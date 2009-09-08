@@ -26,10 +26,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_rpc_csrparser_hh_included_
 #define _csl_rpc_csrparser_hh_included_
 
-#include "csl_common.hh"
+#include "codesloop/common/csl_common.hh"
 #ifdef __cplusplus
-#include "obj.hh"
-#include "iface.hh"
+#include "codesloop/common/obj.hh"
+#include "codesloop/rpc/iface.hh"
 
 namespace csl 
 {

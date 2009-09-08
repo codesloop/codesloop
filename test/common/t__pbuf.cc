@@ -28,10 +28,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify pbuf
  */
 
-#include "pbuf.hh"
-#include "test_timer.h"
-#include "zfile.hh"
-#include "common.h"
+#include "codesloop/common/pbuf.hh"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/common/zfile.hh"
+#include "codesloop/common/common.h"
 #include <assert.h>
 
 using csl::common::pbuf;

@@ -35,13 +35,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   database fields.
  */
 
-#include "pvlist.hh"
-#include "pbuf.hh"
-#include "query.hh"
-#include "int64.hh"
-#include "dbl.hh"
-#include "binry.hh"
-#include "ustr.hh"
+#include "codesloop/common/pvlist.hh"
+#include "codesloop/common/pbuf.hh"
+#include "codesloop/db/query.hh"
+#include "codesloop/common/int64.hh"
+#include "codesloop/common/dbl.hh"
+#include "codesloop/common/binry.hh"
+#include "codesloop/common/ustr.hh"
 #ifdef __cplusplus
 #include <vector>
 

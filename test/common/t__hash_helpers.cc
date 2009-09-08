@@ -35,11 +35,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif /* DEBUG */
 //#endif
 
-#include "hash.hh"
-#include "hash_helpers.hh"
-#include "inpvec.hh"
-#include "test_timer.h"
-#include "common.h"
+#include "codesloop/common/hash.hh"
+#include "codesloop/common/hash_helpers.hh"
+#include "codesloop/common/inpvec.hh"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/common/common.h"
 #include <assert.h>
 
 using namespace csl::common;

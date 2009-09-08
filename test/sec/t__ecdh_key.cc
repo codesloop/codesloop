@@ -28,15 +28,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify ecdh_key
  */
 
-#include "ecdh_key.hh"
-#include "bignum.hh"
-#include "test_timer.h"
-#include "zfile.hh"
-#include "xdrbuf.hh"
-#include "pbuf.hh"
-#include "common.h"
-#include "str.hh"
-#include "ustr.hh"
+#include "codesloop/sec/ecdh_key.hh"
+#include "codesloop/sec/bignum.hh"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/common/zfile.hh"
+#include "codesloop/common/xdrbuf.hh"
+#include "codesloop/common/pbuf.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/str.hh"
+#include "codesloop/common/ustr.hh"
 #include <assert.h>
 
 using namespace csl::sec;

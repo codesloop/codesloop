@@ -31,11 +31,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Common security related functions
  */
 
-#include "csl_sec.h"
+#include "codesloop/sec/csl_sec.h"
 #include "exc.hh"
-#include "bignum.hh"
-#include "crypt_buf.hh"
-#include "crypt_pkt.hh"
-#include "ecdh_key.hh"
+#include "codesloop/sec/bignum.hh"
+#include "codesloop/sec/crypt_buf.hh"
+#include "codesloop/sec/crypt_pkt.hh"
+#include "codesloop/sec/ecdh_key.hh"
 
 #endif /* _csl_sec_csl_sec_hh_included_ */

@@ -31,13 +31,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief peer @todo peer
  */
 
-#include "ecdh_key.hh"
-#include "bignum.hh"
-#include "conn.hh"
-#include "reg.hh"
-#include "obj.hh"
-#include "var.hh"
-#include "str.hh"
+#include "codesloop/sec/ecdh_key.hh"
+#include "codesloop/sec/bignum.hh"
+#include "codesloop/db/conn.hh"
+#include "codesloop/db/reg.hh"
+#include "codesloop/common/obj.hh"
+#include "codesloop/common/var.hh"
+#include "codesloop/common/str.hh"
 #ifdef __cplusplus
 
 #ifndef SCHED_PEER_DB_NAME

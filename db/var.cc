@@ -23,14 +23,14 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "obj.hh"
-#include "var.hh"
-#include "sql.hh"
-#include "conn.hh"
-#include "tran.hh"
-#include "query.hh"
-#include "ustr.hh"
-#include "common.h"
+#include "codesloop/common/obj.hh"
+#include "codesloop/common/var.hh"
+#include "codesloop/db/sql.hh"
+#include "codesloop/db/conn.hh"
+#include "codesloop/db/tran.hh"
+#include "codesloop/db/query.hh"
+#include "codesloop/common/ustr.hh"
+#include "codesloop/common/common.h"
 
 /**
   @file var.cc

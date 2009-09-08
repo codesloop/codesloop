@@ -31,9 +31,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief XDR helper to reduce XDR dependecies
 */
 
-#include "common.h"
-#include "obj.hh"
-#include "xdrbuf.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/obj.hh"
+#include "codesloop/common/xdrbuf.hh"
 #ifdef __cplusplus
 #include <utility>
 

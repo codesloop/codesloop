@@ -31,11 +31,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   @brief sql helper to be used to generate ORM related SQL queries
  */
 
-#include "pvlist.hh"
-#include "mpool.hh"
-#include "tbuf.hh"
-#include "var.hh"
-#include "ustr.hh"
+#include "codesloop/common/pvlist.hh"
+#include "codesloop/common/mpool.hh"
+#include "codesloop/common/tbuf.hh"
+#include "codesloop/common/var.hh"
+#include "codesloop/common/ustr.hh"
 #ifdef __cplusplus
 
 namespace csl

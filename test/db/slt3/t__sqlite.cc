@@ -28,12 +28,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to check and measure various sqlite features
  */
 
-#include "common.h"
-#include "test_timer.h"
-#include "sqlite3.h"
-#include "conn.hh"
-#include "tran.hh"
-#include "query.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/db/sqlite3.h"
+#include "codesloop/db/conn.hh"
+#include "codesloop/db/tran.hh"
+#include "codesloop/db/query.hh"
 #include <math.h>
 #include <assert.h>
 

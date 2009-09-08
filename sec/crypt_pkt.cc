@@ -23,12 +23,12 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "crypt_pkt.hh"
+#include "codesloop/sec/crypt_pkt.hh"
 #include "exc.hh"
-#include "csl_sec.hh"
-#include "common.h"
-#include "tbuf.hh"
-#include "umac_ae.h"
+#include "codesloop/sec/csl_sec.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/tbuf.hh"
+#include "codesloop/sec/umac_ae.h"
 #include <openssl/rand.h>
 
 /**

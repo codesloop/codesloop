@@ -28,7 +28,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to check pthread mutex behaviour
 */
 
-#include "test_timer.h"
+#include "codesloop/common/test_timer.h"
 #include <stdio.h>
 #ifndef WIN32
 # include <pthread.h> 

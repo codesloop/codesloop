@@ -28,10 +28,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief impl_ interface for qpid based queueing
  */
 
-#include "sess.hh"
-#include "qpid_msg.hh"
-#include "qpid_sess.hh"
-#include "logger.hh"
+#include "codesloop/mq/sess.hh"
+#include "codesloop/mq/qpid_msg.hh"
+#include "codesloop/mq/qpid_sess.hh"
+#include "codesloop/common/logger.hh"
 
 #include <qpid/client/Connection.h>
 #include <qpid/client/Session.h>

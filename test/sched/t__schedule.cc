@@ -28,11 +28,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to check and measure various sched::schedule features
  */
 
-#include "test_timer.h"
-#include "schedule.hh"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/sched/schedule.hh"
 #include "exc.hh"
-#include "common.h"
-#include "mpool.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/mpool.hh"
 #include <assert.h>
 #include <stdlib.h>
 

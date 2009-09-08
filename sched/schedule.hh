@@ -31,11 +31,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief schedule @todo schedule
  */
 
-#include "conn.hh"
-#include "reg.hh"
-#include "obj.hh"
-#include "var.hh"
-#include "item.hh"
+#include "codesloop/db/conn.hh"
+#include "codesloop/db/reg.hh"
+#include "codesloop/common/obj.hh"
+#include "codesloop/common/var.hh"
+#include "codesloop/sched/item.hh"
 #ifdef __cplusplus
 
 #ifndef SCHED_SCHEDULE_DB_NAME

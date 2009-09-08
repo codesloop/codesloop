@@ -33,7 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    Implementation is based on pthread (posix threads)
 */
 
-#include "pevent.hh"
+#include "codesloop/nthread/pevent.hh"
 #ifdef __cplusplus
 #include <memory>
 

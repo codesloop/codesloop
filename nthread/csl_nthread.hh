@@ -32,10 +32,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "exc.hh"
-#include "thread.hh"
-#include "mutex.hh"
-#include "event.hh"
-#include "pevent.hh"
-#include "thrpool.hh"
+#include "codesloop/nthread/thread.hh"
+#include "codesloop/nthread/mutex.hh"
+#include "codesloop/nthread/event.hh"
+#include "codesloop/nthread/pevent.hh"
+#include "codesloop/nthread/thrpool.hh"
 
 #endif /* _csl_nthread_csl_nthread_hh_included_ */

@@ -31,9 +31,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief session interface for q'ing
  */
 
-#include "obj.hh"
-#include "sess.hh"
-#include "tbuf.hh"
+#include "codesloop/common/obj.hh"
+#include "codesloop/mq/sess.hh"
+#include "codesloop/common/tbuf.hh"
 #include <qpid/client/Connection.h>
 #include <qpid/client/Session.h>
 #include <qpid/client/Message.h>

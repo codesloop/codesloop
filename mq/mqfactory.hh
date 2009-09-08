@@ -31,9 +31,9 @@
      @brief listener interface for message queues
    */
 
-#include "obj.hh"
-#include "msg.hh"
-#include "sess.hh"
+#include "codesloop/common/obj.hh"
+#include "codesloop/mq/msg.hh"
+#include "codesloop/mq/sess.hh"
 
 #ifdef __cplusplus
 namespace csl

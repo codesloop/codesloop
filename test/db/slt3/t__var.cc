@@ -28,17 +28,17 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to check and measure various slt3::var features
  */
 
-#include "test_timer.h"
-#include "obj.hh"
-#include "var.hh"
-#include "sql.hh"
-#include "reg.hh"
-#include "conn.hh"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/common/obj.hh"
+#include "codesloop/common/var.hh"
+#include "codesloop/db/sql.hh"
+#include "codesloop/db/reg.hh"
+#include "codesloop/db/conn.hh"
 #include "exc.hh"
-#include "common.h"
-#include "mpool.hh"
-#include "str.hh"
-#include "ustr.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/mpool.hh"
+#include "codesloop/common/str.hh"
+#include "codesloop/common/ustr.hh"
 #include <assert.h>
 #include <vector>
 

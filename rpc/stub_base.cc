@@ -23,11 +23,11 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "stub_base.hh"
-#include "common.h"
-#include "ustr.hh"
-#include "csrparser.hh"
-#include "logger.hh"
+#include "codesloop/rpc/stub_base.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/ustr.hh"
+#include "codesloop/rpc/csrparser.hh"
+#include "codesloop/common/logger.hh"
 
 #include <iostream>
 #include <fstream>

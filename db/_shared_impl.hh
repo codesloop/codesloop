@@ -23,18 +23,18 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "pvlist.hh"
-#include "mpool.hh"
-#include "conn.hh"
-#include "tran.hh"
-#include "query.hh"
+#include "codesloop/common/pvlist.hh"
+#include "codesloop/common/mpool.hh"
+#include "codesloop/db/conn.hh"
+#include "codesloop/db/tran.hh"
+#include "codesloop/db/query.hh"
 #include "exc.hh"
-#include "sqlite3.h"
-#include "mpool.hh"
-#include "str.hh"
-#include "ustr.hh"
-#include "common.h"
-#include "csl_common.hh"
+#include "codesloop/db/sqlite3.h"
+#include "codesloop/common/mpool.hh"
+#include "codesloop/common/str.hh"
+#include "codesloop/common/ustr.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/csl_common.hh"
 
 /**
   @file _shared_impl.hh

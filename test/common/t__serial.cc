@@ -34,13 +34,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DEBUG
 #endif /* DEBUG */
 
-#include "common.h"
-#include "str.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/str.hh"
 #include "exc.hh"
-#include "arch.hh"
-#include "logger.hh"
-#include "xdrbuf.hh"
-#include "pbuf.hh"
+#include "codesloop/common/arch.hh"
+#include "codesloop/common/logger.hh"
+#include "codesloop/common/xdrbuf.hh"
+#include "codesloop/common/pbuf.hh"
 #include <assert.h>
 #include <sys/stat.h>
 
