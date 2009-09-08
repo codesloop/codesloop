@@ -54,7 +54,7 @@ IF(WIN32)
                     ../../../3rdparty/zlib/GnuWin32/lib
                   )
 
-  INCLUDE_DIRECTORIES(
+  INCLUDE_DIRECTORIES( ../../..  
                        ../../common
                        "C:/Program Files/GnuWin32/include/"
                        $ENV{ZLIB_DEV_ENV}/include
@@ -86,7 +86,7 @@ ELSE(WIN32)
 
   LINK_DIRECTORIES( ../../common )
 
-  INCLUDE_DIRECTORIES( ../../common )
+  INCLUDE_DIRECTORIES( ../../..   ../../common )
 
   LINK_LIBRARIES(
                   csl_common

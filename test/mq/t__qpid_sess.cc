@@ -30,11 +30,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "codesloop/common/common.h"
-#include "codesloop/common/codesloop/db/obj.hh"
+#include "codesloop/common/obj.hh"
 #include "codesloop/mq/lstnr.hh"
-#include "qpid_codesloop/mq/sess.hh"
-#include "codesloop/mq/qpid_codesloop/mq/msg.hh"
-#include "codesloop/mq/qpid_codesloop/mq/lstnr.hh"
+#include "codesloop/mq/qpid_msg.hh"
+#include "codesloop/mq/qpid_lstnr.hh"
+#include "codesloop/mq/qpid_sess.hh"
 #include "codesloop/mq/mqfactory.hh"
 #include <assert.h>
 #include <sys/stat.h>

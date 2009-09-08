@@ -35,7 +35,7 @@ IF(WIN32)
                     wsock32
                   )
 
-    INCLUDE_DIRECTORIES(
+    INCLUDE_DIRECTORIES( ../../..  
                          ../../sec
                          ../../common
                          c:/OpenSSL/include
@@ -75,7 +75,7 @@ IF(WIN32)
                     wsock32
                   )
 
-    INCLUDE_DIRECTORIES(
+    INCLUDE_DIRECTORIES( ../../..  
                          ../../sec
                          ../../common
                          c:/OpenSSL/include
@@ -119,7 +119,7 @@ ELSE(WIN32)
                    -g3
                  )
 
-  INCLUDE_DIRECTORIES(
+  INCLUDE_DIRECTORIES( ../../..  
       ../../sec
       ../../common
       /usr/local/ssl/include )

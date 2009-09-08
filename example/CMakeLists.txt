@@ -108,7 +108,7 @@ ELSE(WIN32)
                  )
 
   LINK_LIBRARIES(
-                  csl_slt3
+                  csl_db_slt3
                   csl_nthread
                   csl_common
                   pthread

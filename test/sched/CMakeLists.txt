@@ -39,7 +39,7 @@ IF(WIN32)
                     wsock32
                   )
 
-    INCLUDE_DIRECTORIES(
+    INCLUDE_DIRECTORIES( ../../..  
                          ../../sched
                          ../../common
                          ../../nthread
@@ -90,7 +90,7 @@ IF(WIN32)
                     wsock32
                   )
 
-    INCLUDE_DIRECTORIES(
+    INCLUDE_DIRECTORIES( ../../..  
                          ../../sched
                          ../../common
                          ../../nthread
@@ -142,7 +142,7 @@ ELSE(WIN32)
                    -g3
                  )
 
-  INCLUDE_DIRECTORIES(
+  INCLUDE_DIRECTORIES( ../../..  
                        ../../sched
                        ../../common
                        ../../nthread
