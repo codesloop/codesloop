@@ -29,13 +29,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify qpid session management
  */
 
-#include "common.h"
-#include "obj.hh"
-#include "lstnr.hh"
-#include "qpid_sess.hh"
-#include "qpid_msg.hh"
-#include "qpid_lstnr.hh"
-#include "mqfactory.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/codesloop/db/obj.hh"
+#include "codesloop/mq/lstnr.hh"
+#include "qpid_codesloop/mq/sess.hh"
+#include "codesloop/mq/qpid_codesloop/mq/msg.hh"
+#include "codesloop/mq/qpid_codesloop/mq/lstnr.hh"
+#include "codesloop/mq/mqfactory.hh"
 #include <assert.h>
 #include <sys/stat.h>
 
@@ -65,42 +65,42 @@ int main()
 
   s->connect("qpid://localhost:5672");
 
-  s->add_q("qpid_sess->q1");
-  s->add_q("qpid_sess->q2");
-  s->add_xchg("qpid_sess->xchg");
+  s->add_q("qpid_sess.q1");
+  s->add_q("qpid_sess.q2");
+  s->add_xchg("qpid_sess.xchg");
 
   // xchg based route
-  s->add_route("qpid_sess->xchg", "qpid_sess->q1", "route1");
-  s->add_route("qpid_sess->xchg", "qpid_sess->q2", "route2");
+  s->add_route("qpid_sess.xchg", "qpid_sess.q1", "route1");
+  s->add_route("qpid_sess.xchg", "qpid_sess.q2", "route2");
 
   // use direct transport 
-  s->add_route("amq.direct", "qpid_sess->q1", "route1");
-  s->add_route("amq.direct", "qpid_sess->q2", "route2");
+  s->add_route("amq.direct", "qpid_sess.q1", "route1");
+  s->add_route("amq.direct", "qpid_sess.q2", "route2");
 
   msg * msg = mqfactory::build_msg("qpid");
 
   tbuf<512> buf(TEST_MESSAGE1);
   msg->set_tbuf( &buf );
   msg->set_session( *s );
-  msg->send( "qpid_sess->xchg","route1" );
+  msg->send( "qpid_sess.xchg","route1" );
 
   buf.set( (const unsigned char *)TEST_MESSAGE2, strlen(TEST_MESSAGE2) );
-  msg->send( "qpid_sess->xchg","route2" );
+  msg->send( "qpid_sess.xchg","route2" );
   buf.set( (const unsigned char *)TEST_MESSAGE2, strlen(TEST_MESSAGE2) );
-  msg->send( "qpid_sess->xchg","route1" );
+  msg->send( "qpid_sess.xchg","route1" );
 
   mylstnr lst;
 
   lst.set_session( *s );
-  lst.subscribe("qpid_sess->q1");  
-  lst.subscribe("qpid_sess->q2");  
+  lst.subscribe("qpid_sess.q1");  
+  lst.subscribe("qpid_sess.q2");  
   lst.listen();
 
 
-
-  s->del_q("qpid_sess->q1");
-  s->del_q("qpid_sess->q2");
-  s->del_xchg("qpid_sess->xchg");
+ 
+  s->del_q("qpid_sess.q1");
+  s->del_q("qpid_sess.q2");
+  s->del_xchg("qpid_sess.xchg");
 
   s->disconnect();
 
