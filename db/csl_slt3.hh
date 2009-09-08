@@ -35,7 +35,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/db/query.hh"
 #include "codesloop/db/conn.hh"
 #include "codesloop/db/tran.hh"
-#include "exc.hh"
+#include "codesloop/db/exc.hh"
 #include "codesloop/db/reg.hh"
 #include "codesloop/common/var.hh"
 #include "codesloop/common/obj.hh"

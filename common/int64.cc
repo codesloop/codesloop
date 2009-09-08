@@ -28,7 +28,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/common/str.hh"
 #include "codesloop/common/ustr.hh"
 #include "codesloop/common/binry.hh"
-#include "exc.hh"
+#include "codesloop/common/exc.hh"
 #include "codesloop/common/xdrbuf.hh"
 
 /**

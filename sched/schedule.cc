@@ -25,7 +25,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "codesloop/db/csl_slt3.hh"
 #include "codesloop/sched/schedule.hh"
-#include "exc.hh"
+#include "codesloop/sched/exc.hh"
 #include "codesloop/common/mpool.hh"
 #include "codesloop/common/common.h"
 #include <memory>

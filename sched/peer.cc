@@ -25,7 +25,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "codesloop/db/csl_slt3.hh"
 #include "codesloop/sched/peer.hh"
-#include "exc.hh"
+#include "codesloop/sched/exc.hh"
 #include "codesloop/common/xdrbuf.hh"
 #include "codesloop/common/pbuf.hh"
 #include <memory>

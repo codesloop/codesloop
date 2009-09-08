@@ -31,7 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Include all comm headers
  */
 
-#include "exc.hh"
+#include "codesloop/comm/exc.hh"
 #include "codesloop/comm/udp_recvr.hh"
 #include "codesloop/comm/udp_hello.hh"
 #include "codesloop/comm/udp_auth.hh"

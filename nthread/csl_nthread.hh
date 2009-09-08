@@ -31,7 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief CSL threading features
  */
 
-#include "exc.hh"
+#include "codesloop/nthread/exc.hh"
 #include "codesloop/nthread/thread.hh"
 #include "codesloop/nthread/mutex.hh"
 #include "codesloop/nthread/event.hh"

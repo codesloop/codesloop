@@ -32,7 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "codesloop/sec/csl_sec.h"
-#include "exc.hh"
+#include "codesloop/sec/exc.hh"
 #include "codesloop/sec/bignum.hh"
 #include "codesloop/sec/crypt_buf.hh"
 #include "codesloop/sec/crypt_pkt.hh"

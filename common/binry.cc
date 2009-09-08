@@ -29,7 +29,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/common/ustr.hh"
 #include "codesloop/common/binry.hh"
 #include "codesloop/common/xdrbuf.hh"
-#include "exc.hh"
+#include "codesloop/common/exc.hh"
 
 /**
   @file common/src/binry.cc

@@ -24,7 +24,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "codesloop/sec/crypt_pkt.hh"
-#include "exc.hh"
+#include "codesloop/sec/exc.hh"
 #include "codesloop/sec/csl_sec.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/tbuf.hh"

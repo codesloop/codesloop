@@ -26,7 +26,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/common/arch.hh"
 #include "codesloop/common/common.h"
 #include <memory>
-#include "exc.hh"
+#include "codesloop/common/exc.hh"
 #include "codesloop/common/var.hh"
 #include "codesloop/common/xdrbuf.hh"
 

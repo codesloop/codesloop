@@ -28,7 +28,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/db/conn.hh"
 #include "codesloop/db/tran.hh"
 #include "codesloop/db/query.hh"
-#include "exc.hh"
+#include "codesloop/db/exc.hh"
 #include "codesloop/db/sqlite3.h"
 #include "codesloop/common/mpool.hh"
 #include "codesloop/common/str.hh"

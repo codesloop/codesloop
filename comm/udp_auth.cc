@@ -23,7 +23,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "exc.hh"
+#include "codesloop/comm/exc.hh"
 #include "codesloop/comm/udp_auth.hh"
 #include "codesloop/nthread/mutex.hh"
 #include "codesloop/sec/crypt_pkt.hh"
