@@ -82,10 +82,11 @@ ADD_LIBRARY( csl_comm STATIC
              udp_data.cc          udp_data.hh
              # -- Generic --
              bfd.cc               bfd.hh
-             csl_comm.hh          sai.hh
-             read_res.hh
              exc.cc               exc.hh
              wsa.cc               wsa.hh
+             sai.hh               connid.hh
+             read_res.hh
+             csl_comm.hh
            )
 
 # -- EOF --

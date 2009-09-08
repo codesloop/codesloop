@@ -23,65 +23,24 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_comm_tcp_client_hh_included_
-#define _csl_comm_tcp_client_hh_included_
+#ifndef _csl_comm_connid_hh_included_
+#define _csl_comm_connid_hh_included_
 
 /**
-   @file tcp_client.hh
+   @file connid.hh
    @brief @todo
  */
 
-#include "sai.hh"
-#include "read_res.hh"
-#include "bfd.hh"
-#include "connid.hh"
-#include "tcp_handler.hh"
 #include "csl_common.hh"
 #ifdef __cplusplus
-#include <memory>
 
 namespace csl
 {
   namespace comm
   {
-    namespace tcp
-    {
-      class client
-      {
-        public:
-          client();
-          virtual ~client();
-
-          /* address, to be setup during initialization */
-          const SAI & peer_addr() const;
-
-          bool init(handler & h, SAI address);
-          bool start();
-          bool stop();
-
-          /* network ops */
-          read_res read(size_t sz, uint32_t timeout_ms);
-          bool write(uint8_t * data, size_t sz);
-
-          /* info ops */
-          const SAI & own_addr() const;
-
-          struct impl;
-        private:
-          /* private implementation */
-          std::auto_ptr<impl> impl_;
-
-          /* no-copy */
-          client(const client & other);
-          client & operator=(const client & other);
-
-          /* for trace and debug */
-          CSL_OBJ(csl::comm::tcp,client);
-          USE_EXC();
-      };
-    }
+    typedef uint32_t connid_t;
   }
 }
 
 #endif /*__cplusplus*/
-#endif /* _csl_comm_tcp_client_hh_included_ */
+#endif /* _csl_comm_connid_hh_included_ */

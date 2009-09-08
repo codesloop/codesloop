@@ -43,6 +43,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mutex.hh"
 #include "logger.hh"
 #include "common.h"
+#include "test_timer.h"
 #include <assert.h>
 
 using namespace csl::comm;
@@ -318,6 +319,42 @@ namespace test_tcp_libev {
     LEAVE_FUNCTION();
   }
 
+  void evnow()
+  {
+    ev_tstamp ts = ev_now(ev_default_loop(0));
+  }
+
+  void evtime()
+  {
+    ev_tstamp ts = ev_time();
+  }
+
+  void gettimeod()
+  {
+    struct timeval tv;
+    gettimeofday(&tv,0);
+  }
+
+  void crloop()
+  {
+    struct ev_loop * evs = ev_loop_new(EVFLAG_AUTO);
+    ev_loop_destroy( evs );
+  }
+
+  void evsleep()
+  {
+    ev_tstamp ts0 = ev_time();
+    ev_sleep( 1.0 );
+    ev_tstamp ts1 = ev_time();
+    SleepSeconds( 1.0 );
+    ev_tstamp ts2 = ev_time();
+
+    CSL_DEBUGF( L"ts0:%lf  ts1:%lf  ts2:%lf",ts0,ts1,ts2 );
+
+    assert( (ts1-ts0) > 0.95 );
+    assert( (ts2-ts1) > 0.95 );
+  }
+
 } // end of test_tcp_libev
 
 using namespace test_tcp_libev;
@@ -325,10 +362,19 @@ using namespace test_tcp_libev;
 int main()
 {
   wsa w;
+
+  csl_common_print_results( "evnow          ", csl_common_test_timer_v0(evnow),"" );
+  csl_common_print_results( "evtime         ", csl_common_test_timer_v0(evtime),"" );
+  csl_common_print_results( "crloop         ", csl_common_test_timer_v0(crloop),"" );
+  csl_common_print_results( "gettimeod      ", csl_common_test_timer_v0(gettimeod),"" );
+  evsleep();
+
+
   which_backends();
   timeout_test();
   test_listen();
   test_reader();
+
   return 0;
 }
 /* EOF */

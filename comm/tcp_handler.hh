@@ -31,7 +31,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief @todo
  */
 
-#include "tcp_conn.hh"
+#include "bfd.hh"
+#include "connid.hh"
 #include "csl_common.hh"
 #ifdef __cplusplus
 

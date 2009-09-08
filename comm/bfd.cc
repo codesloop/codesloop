@@ -28,14 +28,128 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief @todo
  */
 
-#include "conn.hh"
+#include "bfd.hh"
+#include "libev/evwrap.h"
 
 namespace csl
 {
   namespace comm
   {
-    namespace tcp
+    bfd::bfd() : fd_(bfd::not_initialized_), start_(0), len_(0), use_exc_(false) {}
+
+    bfd::~bfd()
     {
+      if( fd_ > 0 ) { CloseSocket( fd_ ); }
+      fd_ = closed_;
+    }
+
+    read_res bfd::read(size_t sz, uint32_t timeout_ms)
+    {
+      read_res ret;
+      if( fd_ <= 0 ) { ret.failed_=true; return ret; }
+      return ret;
+    }
+
+    bool bfd::write(uint8_t * data, size_t sz)
+    {
+      return false;
+    }
+
+    read_res bfd::recv(size_t sz, uint32_t timeout_ms)
+    {
+      read_res ret;
+      if( fd_ <= 0 ) { ret.failed_=true; return ret; }
+      return ret;
+    }
+
+    bool bfd::send(uint8_t * data, size_t sz)
+    {
+      return false;
+    }
+
+    read_res bfd::recvfrom(size_t sz, SAI & from, uint32_t timeout_ms)
+    {
+      read_res ret;
+      if( fd_ <= 0 ) { ret.failed_=true; return ret; }
+      return ret;
+    }
+
+    bool bfd::sendto(uint8_t * data, size_t sz,const SAI & to)
+    {
+      return false;
+    }
+
+    int bfd::state() const
+    {
+      if( fd_ > 0 ) return ok_;
+      else          return fd_;
+    }
+
+    bool bfd::can_read(uint32_t timeout_ms)
+    {
+      if( fd_ <= 0 ) return false;
+
+      fd_set         fds;
+      unsigned long  timeout_sec    = timeout_ms/1000;
+      unsigned long  timeout_usec   = (timeout_ms%1000)*1000;
+      struct timeval tv             = { timeout_sec, timeout_usec };
+
+      FD_ZERO( &fds );
+      FD_SET( fd_, &fds );
+
+      int err = ::select( fd_+1,&fds,NULL,NULL,&tv );
+
+      if( err < 0 ) /* error */
+      {
+        CloseSocket( fd_ );
+        fd_ = fd_error_;
+        return false;
+      }
+      else if( err == 0 ) /* timeout */
+      {
+        return false;
+      }
+      else /* ok, can read */
+      {
+        return true;
+      }
+    }
+
+    bool bfd::can_write(uint32_t timeout_ms)
+    {
+      if( fd_ <= 0 ) return false;
+
+      fd_set         fds;
+      unsigned long  timeout_sec    = timeout_ms/1000;
+      unsigned long  timeout_usec   = (timeout_ms%1000)*1000;
+      struct timeval tv             = { timeout_sec, timeout_usec };
+
+      FD_ZERO( &fds );
+      FD_SET( fd_, &fds );
+
+      int err = ::select( fd_+1,NULL,&fds,NULL,&tv );
+
+      if( err < 0 ) /* error */
+      {
+        CloseSocket( fd_ );
+        fd_ = fd_error_;
+        return false;
+      }
+      else if( err == 0 ) /* timeout */
+      {
+        return false;
+      }
+      else /* ok, can read */
+      {
+        return true;
+      }
+
+      return false;
+    }
+
+    size_t bfd::size() const
+    {
+      return len_;
     }
   }
 }

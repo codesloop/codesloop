@@ -33,7 +33,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "sai.hh"
 #include "read_res.hh"
-#include "conn.hh"
+#include "bfd.hh"
+#include "connid.hh"
 #include "tcp_handler.hh"
 #include "csl_common.hh"
 #ifdef __cplusplus

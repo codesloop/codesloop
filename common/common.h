@@ -67,6 +67,52 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #ifdef WIN32
+# ifdef __MINGW32__
+#  ifndef CSL_UNISTD_H_INCLUDED
+#   define CSL_UNISTD_H_INCLUDED
+#   include <unistd.h>
+#  endif /*CSL_UNISTD_H_INCLUDED*/
+#  ifndef CSL_SYS_TIME_H_INCLUDED
+#   define CSL_SYS_TIME_H_INCLUDED
+#   include <sys/time.h>
+#  endif /*CSL_SYS_TIME_H_INCLUDED*/
+#  ifndef CSL_TIME_H_INCLUDED
+#   define CSL_TIME_H_INCLUDED
+#   include <time.h>
+#  endif /*CSL_TIME_H_INCLUDED*/
+# endif /*__MINGW32__*/
+# ifndef ShutdownCloseSocket
+#  define ShutdownCloseSocket(S) { ::shutdown(S,2); ::closesocket(S); }
+# endif /*ShutdownCloseSocket*/
+# ifndef CloseSocket
+#  define CloseSocket(S) { ::closesocket(S); }
+# endif /*CloseSocket*/
+# ifndef CSL_WINDOWS_H_INCLUDED
+#  define CSL_WINDOWS_H_INCLUDED
+#  include <windows.h>
+# endif /*CSL_WINDOWS_H_INCLUDED*/
+# ifndef SleepSeconds
+#  define SleepSeconds(A) ::Sleep(A*1000)
+# endif /*SleepSeconds*/
+# ifndef SleepMiliseconds
+#  define SleepMiliseconds(A) ::Sleep(A)
+# endif /*SleepMiliseconds*/
+# ifndef CSL_BASETSD_H_INCLUDED
+#  define CSL_BASETSD_H_INCLUDED
+#  include <BaseTsd.h>
+# endif /*CSL_BASETSD_H_INCLUDED*/
+# ifndef CSL_INT32_T_DEFINED
+#  define CSL_INT32_T_DEFINED
+   typedef INT32 int32_t;
+# endif /*CSL_INT32_T_DEFINED*/
+# ifndef CSL_UINT32_T_DEFINED
+#  define CSL_UINT32_T_DEFINED
+   typedef DWORD32 uint32_t;
+# endif /*CSL_UINT32_T_DEFINED*/
+# ifndef CSL_SOCKLEN_T_DEFINED
+# define CSL_SOCKLEN_T_DEFINED
+   typedef int socklen_t;
+# endif /*CSL_SOCKLEN_T_DEFINED*/
 # ifndef SNPRINTF
 #  define SNPRINTF _snprintf
 # endif /*SNPRINTF*/
@@ -102,7 +148,50 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ifndef STRDUP
 #  define STRDUP _strdup
 # endif /*STRDUP*/
-#else /* WIN32 */
+# ifndef __MINGW32__
+#  define getpid()  0
+# endif
+# ifndef __MINGW32__
+void gettimeofday(struct timeval * tv, void * p)
+{
+        unsigned long tc = GetTickCount();
+        tv->tv_sec  = tc/1000;
+        tv->tv_usec = (tc%1000)*1000;
+}
+#endif /* __MINGW32__ */
+#else /* WIN32 ------------------------------------- WIN32 */
+# ifndef CSL_ARPA_INET_H_INCLUDED
+#  define CSL_ARPA_INET_H_INCLUDED
+#  include <arpa/inet.h>
+# endif /*CSL_ARPA_INET_H_INCLUDED*/
+# ifndef CSL_NETINET_IN_H_INCLUDED
+#  define CSL_NETINET_IN_H_INCLUDED
+#  include <netinet/in.h>
+# endif /*CSL_NETINET_IN_H_INCLUDED*/
+# ifndef CSL_UNISTD_H_INCLUDED
+#  define CSL_UNISTD_H_INCLUDED
+#  include <unistd.h>
+# endif /*CSL_UNISTD_H_INCLUDED*/
+# ifndef CSL_SYS_SOCKET_H_INCLUDED
+#  define CSL_SYS_SOCKET_H_INCLUDED
+#  include <sys/socket.h>
+# endif /*CSL_SYS_SOCKET_H_INCLUDED*/
+# ifndef CSL_SYS_TIME_H_INCLUDED
+#  define CSL_SYS_TIME_H_INCLUDED
+#  include <sys/time.h>
+# endif /*CSL_SYS_TIME_H_INCLUDED*/
+# ifndef SleepSeconds
+#  define SleepSeconds(A) ::sleep(A)
+# endif /*SleepSeconds*/
+# ifndef SleepMiliseconds
+#  define SleepMiliseconds(A) ::usleep(A*1000)
+# endif /*SleepMiliseconds*/
+# ifndef ShutdownCloseSocket
+#  define ShutdownCloseSocket(S) { ::shutdown(S,2); ::close(S); }
+# endif /*ShutdownCloseSocket*/
+# ifndef CloseSocket
+#  define CloseSocket(S) { ::close(S); }
+# endif /*CloseSocket*/
 # ifndef SNPRINTF
 #  define SNPRINTF snprintf
 # endif /*SNPRINTF*/
@@ -212,82 +301,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif /*THRNORET*/
 #endif /*__cplusplus*/
 
-#ifndef WIN32
-# ifndef CSL_ARPA_INET_H_INCLUDED
-#  define CSL_ARPA_INET_H_INCLUDED
-#  include <arpa/inet.h>
-# endif /*CSL_ARPA_INET_H_INCLUDED*/
-# ifndef CSL_NETINET_IN_H_INCLUDED
-#  define CSL_NETINET_IN_H_INCLUDED
-#  include <netinet/in.h>
-# endif /*CSL_NETINET_IN_H_INCLUDED*/
-# ifndef CSL_UNISTD_H_INCLUDED
-#  define CSL_UNISTD_H_INCLUDED
-#  include <unistd.h>
-# endif /*CSL_UNISTD_H_INCLUDED*/
-# ifndef CSL_SYS_SOCKET_H_INCLUDED
-#  define CSL_SYS_SOCKET_H_INCLUDED
-#  include <sys/socket.h>
-# endif /*CSL_SYS_SOCKET_H_INCLUDED*/
-# ifndef CSL_SYS_TIME_H_INCLUDED
-#  define CSL_SYS_TIME_H_INCLUDED
-#  include <sys/time.h>
-# endif /*CSL_SYS_TIME_H_INCLUDED*/
-# ifndef SleepSeconds
-#  define SleepSeconds(A) ::sleep(A)
-# endif /*SleepSeconds*/
-# ifndef SleepMiliseconds
-#  define SleepMiliseconds(A) ::usleep(A*1000)
-# endif /*SleepMiliseconds*/
-# ifndef ShutdownCloseSocket
-#  define ShutdownCloseSocket(S) { ::shutdown(S,2); ::close(S); }
-# endif /*SleepMiliseconds*/
-#else
-# ifdef __MINGW32__
-#  ifndef CSL_UNISTD_H_INCLUDED
-#   define CSL_UNISTD_H_INCLUDED
-#   include <unistd.h>
-#  endif /*CSL_UNISTD_H_INCLUDED*/
-#  ifndef CSL_SYS_TIME_H_INCLUDED
-#   define CSL_SYS_TIME_H_INCLUDED
-#   include <sys/time.h>
-#  endif /*CSL_SYS_TIME_H_INCLUDED*/
-#  ifndef CSL_TIME_H_INCLUDED
-#   define CSL_TIME_H_INCLUDED
-#   include <time.h>
-#  endif /*CSL_TIME_H_INCLUDED*/
-# endif /*__MINGW32__*/
-# ifndef ShutdownCloseSocket
-#  define ShutdownCloseSocket(S) { ::shutdown(S,2); ::closesocket(S); }
-# endif /*SleepMiliseconds*/
-# ifndef CSL_WINDOWS_H_INCLUDED
-#  define CSL_WINDOWS_H_INCLUDED
-#  include <windows.h>
-# endif /*CSL_WINDOWS_H_INCLUDED*/
-# ifndef SleepSeconds
-#  define SleepSeconds(A) ::Sleep(A*1000)
-# endif /*SleepSeconds*/
-# ifndef SleepMiliseconds
-#  define SleepMiliseconds(A) ::Sleep(A)
-# endif /*SleepMiliseconds*/
-# ifndef CSL_BASETSD_H_INCLUDED
-#  define CSL_BASETSD_H_INCLUDED
-#  include <BaseTsd.h>
-# endif /*CSL_BASETSD_H_INCLUDED*/
-# ifndef CSL_INT32_T_DEFINED
-#  define CSL_INT32_T_DEFINED
-   typedef INT32 int32_t;
-# endif /*CSL_INT32_T_DEFINED*/
-# ifndef CSL_UINT32_T_DEFINED
-#  define CSL_UINT32_T_DEFINED
-   typedef DWORD32 uint32_t;
-# endif /*CSL_UINT32_T_DEFINED*/
-# ifndef CSL_SOCKLEN_T_DEFINED
-# define CSL_SOCKLEN_T_DEFINED
-   typedef int socklen_t;
-# endif /*CSL_SOCKLEN_T_DEFINED*/
-#endif /* WIN32 */
-
 #ifndef CSL_STDIO_H_INCLUDED
 # define CSL_STDIO_H_INCLUDED
 # include <stdio.h>
@@ -317,12 +330,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CSL_STDARG_H_INCLUDED
 #include <stdarg.h>
 #endif /*CSL_STDARG_H_INCLUDED*/
-
-#ifdef WIN32
-# ifndef __MINGW32__
-#  define getpid()  0
-# endif
-#endif /* WIN32 */
 
 /* types */
 #ifndef CSL_TYPE_UNKNOWN

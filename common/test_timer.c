@@ -23,19 +23,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef WIN32
-#  include <sys/time.h>
-#else
-# ifndef __MINGW32__
-#  include <windows.h>
-void gettimeofday(struct timeval * tv, void * p)
-{
-	unsigned long tc = GetTickCount();
-	tv->tv_sec  = tc/1000;
-	tv->tv_usec = (tc%1000)*1000;
-}
-#endif /* __MINGW32__ */
-#endif /* WIN32 */
 #include <stdio.h>
 #include <stdlib.h>
 #include "test_timer.h"
