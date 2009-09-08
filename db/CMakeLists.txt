@@ -24,8 +24,8 @@
 LINK_DIRECTORIES( ../nthread
                   ../common )
 
-INCLUDE_DIRECTORIES( ../nthread
-                     ../common )
+INCLUDE_DIRECTORIES( ../..
+                      )
 
 IF(NOT WIN32)
 

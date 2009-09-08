@@ -58,10 +58,7 @@ IF(WIN32)
                   )
 
   INCLUDE_DIRECTORIES(
-                  ../common
-                  ../sec
-                  ../nthread
-                  ../db
+                  ../..
                   "C:/Program Files/GnuWin32/include/"
                   $ENV{ZLIB_DEV_ENV}/include
                   ../../3rdparty/zlib/GnuWin32/include
@@ -92,10 +89,7 @@ ELSE(WIN32)
                   )
 
   INCLUDE_DIRECTORIES( 
-                     ../common
-                     ../sec
-                     ../nthread
-                     ../db
+                     ../..
                      )
 
   ADD_DEFINITIONS(

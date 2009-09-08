@@ -35,8 +35,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/sec/bignum.hh"
 #include "codesloop/db/conn.hh"
 #include "codesloop/db/reg.hh"
-#include "codesloop/common/obj.hh"
-#include "codesloop/common/var.hh"
+#include "codesloop/db/obj.hh"
+#include "codesloop/db/var.hh"
 #include "codesloop/common/str.hh"
 #ifdef __cplusplus
 

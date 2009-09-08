@@ -28,9 +28,7 @@ LINK_DIRECTORIES(
                 )
 
 INCLUDE_DIRECTORIES(
-                     ../nthread
-                     ../common
-                     ../sec
+                     ../..
                    )
 
 IF(NOT WIN32)

@@ -26,7 +26,7 @@ LINK_DIRECTORIES(
                 )
 
 INCLUDE_DIRECTORIES(
-                     ../common
+                     ../..
                      /usr/local/qpid/include
                    )
 

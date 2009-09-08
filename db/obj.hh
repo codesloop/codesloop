@@ -31,7 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   @brief slt3::obj is the base class of the ORM mapped classes
  */
 
-#include "codesloop/common/var.hh"
+#include "codesloop/db/var.hh"
 #include "codesloop/db/conn.hh"
 #include "codesloop/db/tran.hh"
 #include "codesloop/db/sql.hh"
