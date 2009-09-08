@@ -28,8 +28,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief @todo
  */
 
-#include "bfd.hh"
-#include "libev/evwrap.h"
+#include "codesloop/comm/bfd.hh"
+#include "codesloop/common/libev/evwrap.h"
 
 namespace csl
 {

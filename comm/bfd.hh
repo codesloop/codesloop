@@ -31,9 +31,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief buffered file descriptor (fd)
  */
 
-#include "sai.hh"
-#include "read_res.hh"
-#include "csl_common.hh"
+#include "codesloop/comm/sai.hh"
+#include "codesloop/comm/read_res.hh"
+#include "codesloop/common/csl_common.hh"
 #ifdef __cplusplus
 
 namespace csl

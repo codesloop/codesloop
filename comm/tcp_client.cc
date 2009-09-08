@@ -28,7 +28,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief @todo
  */
 
-#include "tcp_client.hh"
+#include "codesloop/comm/tcp_client.hh"
 
 namespace csl
 {

@@ -26,7 +26,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_comm_initcomm_hh_included_
 #define _csl_comm_initcomm_hh_included_
 
-#include "common.h"
+#include "codesloop/common/common.h"
 #ifdef __cplusplus
 
 namespace csl

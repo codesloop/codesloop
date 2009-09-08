@@ -23,9 +23,9 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "initcomm.hh"
-#include "exc.hh"
-#include "common.h"
+#include "codesloop/comm/initcomm.hh"
+#include "codesloop/comm/exc.hh"
+#include "codesloop/common/common.h"
 
 namespace csl
 {
