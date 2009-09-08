@@ -39,7 +39,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "inpvec.hh"
 #include "sai.hh"
 #include "libev/evwrap.h"
-#include "wsa.hh"
+#include "initcomm.hh"
 #include "mutex.hh"
 #include "logger.hh"
 #include "common.h"
@@ -355,18 +355,28 @@ namespace test_tcp_libev {
     assert( (ts2-ts1) > 0.95 );
   }
 
+  void selct()
+  {
+    fd_set fds;
+    FD_ZERO( &fds );
+    FD_SET( STDIN_FILENO, &fds );
+    struct timeval tv = { 0, 0 };
+    int err = ::select( STDIN_FILENO+1, &fds, NULL, NULL, &tv );
+  }
+
 } // end of test_tcp_libev
 
 using namespace test_tcp_libev;
 
 int main()
 {
-  wsa w;
+  initcomm w;
 
   csl_common_print_results( "evnow          ", csl_common_test_timer_v0(evnow),"" );
   csl_common_print_results( "evtime         ", csl_common_test_timer_v0(evtime),"" );
   csl_common_print_results( "crloop         ", csl_common_test_timer_v0(crloop),"" );
   csl_common_print_results( "gettimeod      ", csl_common_test_timer_v0(gettimeod),"" );
+  csl_common_print_results( "selct          ", csl_common_test_timer_v0(selct),"" );
   evsleep();
 
 

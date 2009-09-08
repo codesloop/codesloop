@@ -23,14 +23,15 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "wsa.hh"
+#include "initcomm.hh"
 #include "exc.hh"
+#include "common.h"
 
 namespace csl
 {
   namespace comm
   {
-    wsa::wsa()
+    initcomm::initcomm()
     {
 #ifdef WIN32
       WORD    Version;
@@ -49,10 +50,12 @@ namespace csl
                          L""__FILE__,
                          __LINE__ );
       }
+#else
+      signal( SIGPIPE, SIG_IGN );
 #endif
     }
 
-    wsa::~wsa()
+    initcomm::~initcomm()
     {
 #ifdef WIN32
       WSACleanup();

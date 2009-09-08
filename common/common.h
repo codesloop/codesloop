@@ -160,6 +160,10 @@ void gettimeofday(struct timeval * tv, void * p)
 }
 #endif /* __MINGW32__ */
 #else /* WIN32 ------------------------------------- WIN32 */
+# ifndef CSL_SIGNAL_H_INCLUDED
+#  define CSL_SIGNAL_H_INCLUDED
+#  include <signal.h>
+# endif /* CSL_SIGNAL_H_INCLUDED */
 # ifndef CSL_ARPA_INET_H_INCLUDED
 #  define CSL_ARPA_INET_H_INCLUDED
 #  include <arpa/inet.h>

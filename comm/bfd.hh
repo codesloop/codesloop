@@ -63,9 +63,12 @@ namespace csl
 
         int state() const;
         size_t size() const;
+        size_t n_free() const;
 
         bool can_read(uint32_t timeout_ms);
-        bool can_write(uint32_t timeout_ms);
+
+        // not implemented
+        //bool can_write(uint32_t timeout_ms);
 
       private:
         int        fd_;

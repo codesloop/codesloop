@@ -83,7 +83,7 @@ ADD_LIBRARY( csl_comm STATIC
              # -- Generic --
              bfd.cc               bfd.hh
              exc.cc               exc.hh
-             wsa.cc               wsa.hh
+             initcomm.cc          initcomm.hh
              sai.hh               connid.hh
              read_res.hh
              csl_comm.hh

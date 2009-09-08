@@ -47,6 +47,10 @@ namespace csl
     {
       read_res ret;
       if( fd_ <= 0 ) { ret.failed_=true; return ret; }
+      if( can_read(timeout_ms) )
+      {
+      }
+      else { ret.timed_out_=true; }
       return ret;
     }
 
@@ -59,6 +63,10 @@ namespace csl
     {
       read_res ret;
       if( fd_ <= 0 ) { ret.failed_=true; return ret; }
+      if( can_read(timeout_ms) )
+      {
+      }
+      else { ret.timed_out_=true; }
       return ret;
     }
 
@@ -71,6 +79,10 @@ namespace csl
     {
       read_res ret;
       if( fd_ <= 0 ) { ret.failed_=true; return ret; }
+      if( can_read(timeout_ms) )
+      {
+      }
+      else { ret.timed_out_=true; }
       return ret;
     }
 
@@ -115,41 +127,21 @@ namespace csl
       }
     }
 
+    /* not implemented
     bool bfd::can_write(uint32_t timeout_ms)
     {
       if( fd_ <= 0 ) return false;
-
-      fd_set         fds;
-      unsigned long  timeout_sec    = timeout_ms/1000;
-      unsigned long  timeout_usec   = (timeout_ms%1000)*1000;
-      struct timeval tv             = { timeout_sec, timeout_usec };
-
-      FD_ZERO( &fds );
-      FD_SET( fd_, &fds );
-
-      int err = ::select( fd_+1,NULL,&fds,NULL,&tv );
-
-      if( err < 0 ) /* error */
-      {
-        CloseSocket( fd_ );
-        fd_ = fd_error_;
-        return false;
-      }
-      else if( err == 0 ) /* timeout */
-      {
-        return false;
-      }
-      else /* ok, can read */
-      {
-        return true;
-      }
-
       return false;
-    }
+    }*/
 
     size_t bfd::size() const
     {
       return len_;
+    }
+
+    size_t bfd::n_free() const
+    {
+      return (sizeof(buf_)-(len_+start_));
     }
   }
 }

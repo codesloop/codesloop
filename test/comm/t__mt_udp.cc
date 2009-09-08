@@ -28,7 +28,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify multithreading and udp socket interworking
  */
 
-#include "wsa.hh"
+#include "initcomm.hh"
 #include "thread.hh"
 #include "event.hh"
 #include "mutex.hh"
@@ -357,7 +357,7 @@ using namespace test_mt_udp;
 
 int main()
 {
-  wsa w;
+  initcomm w;
   basic();
   return 0;
 }

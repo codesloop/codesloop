@@ -37,7 +37,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "bfd.hh"
-#include "wsa.hh"
+#include "initcomm.hh"
 #include "logger.hh"
 #include "common.h"
 #include "test_timer.h"
@@ -58,7 +58,7 @@ using namespace test_bfd;
 
 int main()
 {
-  wsa w;
+  initcomm w;
   csl_common_print_results( "baseline          ", csl_common_test_timer_v0(baseline),"" );
   return 0;
 }

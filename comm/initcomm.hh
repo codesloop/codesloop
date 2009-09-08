@@ -23,8 +23,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_comm_wsa_hh_included_
-#define _csl_comm_wsa_hh_included_
+#ifndef _csl_comm_initcomm_hh_included_
+#define _csl_comm_initcomm_hh_included_
 
 #include "common.h"
 #ifdef __cplusplus
@@ -33,18 +33,18 @@ namespace csl
 {
   namespace comm
   {
-    class wsa
+    class initcomm
     {
       public:
-        wsa();
-        ~wsa();
+        initcomm();
+        ~initcomm();
 
       private:
-        wsa(const wsa & other) {}
-        wsa & operator=(const wsa & other) { return *this; }
+        initcomm(const initcomm & other) {}
+        initcomm & operator=(const initcomm & other) { return *this; }
     };
   }
 }
 
 #endif /* __cplusplus */
-#endif /* _csl_comm_udp_olleh_hh_included_ */
+#endif /* _csl_comm_initcomm_hh_included_ */
