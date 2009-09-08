@@ -31,9 +31,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   @brief ECDH key helper w/ XDR features
  */
 
-#include "bignum.hh"
-#include "xdrbuf.hh"
-#include "ustr.hh"
+#include "codesloop/sec/bignum.hh"
+#include "codesloop/common/xdrbuf.hh"
+#include "codesloop/common/ustr.hh"
 #ifdef __cplusplus
 
 namespace csl

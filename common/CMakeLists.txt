@@ -71,6 +71,11 @@ ENDIF(WIN32)
 
 ADD_DEFINITIONS( -DDEBUG)
 
+INCLUDE_DIRECTORIES(
+             ../..
+             )
+
+
 ADD_LIBRARY( csl_common STATIC
              cexc.cc       cexc.hh
              exc.cc        exc.hh

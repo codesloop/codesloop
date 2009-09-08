@@ -28,9 +28,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   @brief basic thread pool usage
  */
 
-#include "thrpool.hh"
-#include "common.h"
-#include "event.hh"
+#include "codesloop/nthread/thrpool.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/nthread/event.hh"
 
 using namespace csl::nthread;
 

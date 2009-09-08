@@ -31,7 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Some common security related functions
 */
 
-#include "common.h"
+#include "codesloop/common/common.h"
 
 /* sha1 support functions */
 

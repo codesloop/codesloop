@@ -33,7 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    Encryption is based on OpenSSL and Blowfish
 */
 
-#include "common.h"
+#include "codesloop/common/common.h"
 #ifdef __cplusplus
 #include <memory>
 

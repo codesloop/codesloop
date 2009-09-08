@@ -28,13 +28,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify bignum
  */
 
-#include "bignum.hh"
-#include "ecdh_key.hh"
-#include "zfile.hh"
-#include "xdrbuf.hh"
-#include "pbuf.hh"
-#include "test_timer.h"
-#include "common.h"
+#include "codesloop/sec/bignum.hh"
+#include "codesloop/sec/ecdh_key.hh"
+#include "codesloop/common/zfile.hh"
+#include "codesloop/common/xdrbuf.hh"
+#include "codesloop/common/pbuf.hh"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/common/common.h"
 #include <assert.h>
 
 using namespace csl::sec;

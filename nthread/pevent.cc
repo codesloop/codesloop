@@ -23,10 +23,10 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "exc.hh"
-#include "pevent.hh"
-#include "str.hh"
-#include "common.h"
+#include "codesloop/nthread/exc.hh"
+#include "codesloop/nthread/pevent.hh"
+#include "codesloop/common/str.hh"
+#include "codesloop/common/common.h"
 
 #ifdef WIN32
 # include "pevent_impl_windows.cc"

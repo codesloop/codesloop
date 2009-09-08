@@ -31,10 +31,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief the authentication part of the UDP communication layer
  */
 
-#include "udp_hello.hh"
-#include "udp_recvr.hh"
-#include "csl_sec.hh"
-#include "csl_common.hh"
+#include "codesloop/comm/udp_hello.hh"
+#include "codesloop/comm/udp_recvr.hh"
+#include "codesloop/sec/csl_sec.hh"
+#include "codesloop/common/csl_common.hh"
 #ifdef __cplusplus
 
 namespace csl

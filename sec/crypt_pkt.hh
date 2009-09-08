@@ -32,7 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    Encryption is based on AES and UMAC
  */
 
-#include "csl_common.hh"
+#include "codesloop/common/csl_common.hh"
 #ifdef __cplusplus
 #include <memory>
 

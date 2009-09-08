@@ -23,8 +23,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "stub_server.hh"
-#include "common.h"
+#include "codesloop/rpc/stub_server.hh"
+#include "codesloop/common/common.h"
 
 /**
   @file rpc/src/stub_server.cc

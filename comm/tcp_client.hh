@@ -31,12 +31,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief @todo
  */
 
-#include "sai.hh"
-#include "read_res.hh"
-#include "bfd.hh"
-#include "connid.hh"
-#include "tcp_handler.hh"
-#include "csl_common.hh"
+
+#include "codesloop/comm/sai.hh"
+#include "codesloop/comm/read_res.hh"
+#include "codesloop/comm/bfd.hh"
+#include "codesloop/comm/connid.hh"
+#include "codesloop/comm/tcp_handler.hh"
+#include "codesloop/common/csl_common.hh"
 #ifdef __cplusplus
 #include <memory>
 

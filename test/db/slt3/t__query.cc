@@ -28,13 +28,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to check and measure various slt3::query features
  */
 
-#include "test_timer.h"
-#include "query.hh"
-#include "tran.hh"
-#include "conn.hh"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/db/query.hh"
+#include "codesloop/db/tran.hh"
+#include "codesloop/db/conn.hh"
 #include "exc.hh"
-#include "str.hh"
-#include "common.h"
+#include "codesloop/common/str.hh"
+#include "codesloop/common/common.h"
 #include <assert.h>
 
 using namespace csl::slt3;

@@ -28,7 +28,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   @brief basic zfile demonstration of compressing in-memory data
  */
 
-#include "zfile.hh"
+#include "codesloop/common/zfile.hh"
 #include <memory>
 
 using namespace csl::common;

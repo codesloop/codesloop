@@ -23,10 +23,10 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "exc.hh"
-#include "thread.hh"
-#include "common.h"
-#include "str.hh"
+#include "codesloop/nthread/exc.hh"
+#include "codesloop/nthread/thread.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/str.hh"
 
 #ifdef WIN32
 # include "thread_impl_windows.cc"

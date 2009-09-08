@@ -31,11 +31,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief generic hash table class
  */
 
-#include "obj.hh"
-#include "hash_helpers.hh"
-#include "exc.hh"
-#include "logger.hh"
-#include "common.h"
+#include "codesloop/common/obj.hh"
+#include "codesloop/common/hash_helpers.hh"
+#include "codesloop/common/exc.hh"
+#include "codesloop/common/logger.hh"
+#include "codesloop/common/common.h"
 #ifdef __cplusplus
 
 namespace csl

@@ -35,11 +35,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    registry helps the ORM mapper.
  */
 
-#include "pvlist.hh"
-#include "conn.hh"
-#include "mpool.hh"
-#include "str.hh"
-#include "ustr.hh"
+#include "codesloop/common/pvlist.hh"
+#include "codesloop/db/conn.hh"
+#include "codesloop/common/mpool.hh"
+#include "codesloop/common/str.hh"
+#include "codesloop/common/ustr.hh"
 #ifdef __cplusplus
 #include <memory>
 

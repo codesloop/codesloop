@@ -34,13 +34,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DEBUG
 #endif /* DEBUG */
 
-#include "logger.hh"
-#include "obj.hh"
+#include "codesloop/common/logger.hh"
+#include "codesloop/common/obj.hh"
 #include "exc.hh"
-#include "common.h"
-#include "str.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/str.hh"
 #include <assert.h>
-#include "test_timer.h"
+#include "codesloop/common/test_timer.h"
 #include <sys/stat.h>
 
 #define LOG_TEST_MSG L"logger test"

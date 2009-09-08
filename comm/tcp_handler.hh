@@ -31,9 +31,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief @todo
  */
 
-#include "bfd.hh"
-#include "connid.hh"
-#include "csl_common.hh"
+#include "codesloop/comm/bfd.hh"
+#include "codesloop/comm/connid.hh"
+#include "codesloop/common/csl_common.hh"
 #ifdef __cplusplus
 
 namespace csl
@@ -56,3 +56,4 @@ namespace csl
 
 #endif /*__cplusplus*/
 #endif /* _csl_comm_tcp_handler_hh_included_ */
+

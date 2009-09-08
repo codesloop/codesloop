@@ -25,7 +25,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <openssl/sha.h>
 #include <stdio.h>
-#include "csl_sec.h"
+#include "codesloop/sec/csl_sec.h"
 
 /**
    @file sha1_conv.cc

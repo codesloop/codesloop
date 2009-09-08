@@ -28,9 +28,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to check csl event behaviour
 */
 
-#include "test_timer.h"
-#include "event.hh"
-#include "thread.hh"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/nthread/event.hh"
+#include "codesloop/nthread/thread.hh"
 #include <assert.h>
 #include <stdio.h>
 #ifndef WIN32

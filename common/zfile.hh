@@ -33,8 +33,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    Compression is based on zlib
 */
 
-#include "pbuf.hh"
-#include "str.hh"
+#include "codesloop/common/pbuf.hh"
+#include "codesloop/common/str.hh"
 #ifdef __cplusplus
 #include <memory>
 #include <vector>

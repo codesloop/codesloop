@@ -27,7 +27,7 @@ LINK_DIRECTORIES(
                   ../../common
                 )
 
-INCLUDE_DIRECTORIES(
+INCLUDE_DIRECTORIES( ../../..  
                      ../../slt3
                      ../../nthread
                      ../../common

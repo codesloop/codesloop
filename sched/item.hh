@@ -31,9 +31,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief item @todo item
  */
 
-#include "csl_slt3.hh"
-#include "head.hh"
-#include "data.hh"
+#include "codesloop/db/csl_slt3.hh"
+#include "codesloop/sched/head.hh"
+#include "codesloop/sched/data.hh"
 #ifdef __cplusplus
 
 #ifndef SCHED_ITEM_DB_NAME

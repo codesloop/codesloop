@@ -23,11 +23,11 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "common.h"
-#include "mpool.hh"
-#include "pvlist.hh"
-#include "zfile.hh"
-#include "str.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/mpool.hh"
+#include "codesloop/common/pvlist.hh"
+#include "codesloop/common/zfile.hh"
+#include "codesloop/common/str.hh"
 #include <zlib.h>
 
 /**

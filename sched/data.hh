@@ -31,10 +31,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief data @todo data
  */
 
-#include "conn.hh"
-#include "reg.hh"
-#include "obj.hh"
-#include "var.hh"
+#include "codesloop/db/conn.hh"
+#include "codesloop/db/reg.hh"
+#include "codesloop/db/obj.hh"
+#include "codesloop/db/var.hh"
 #ifdef __cplusplus
 
 #ifndef SCHED_DATA_DB_NAME

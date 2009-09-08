@@ -30,7 +30,7 @@ IF(WIN32)
                     csl_common
                   )
 
-    INCLUDE_DIRECTORIES(
+    INCLUDE_DIRECTORIES( ../../..  
                          ../../mq
                          ../../common
                          /usr/local/qpid/include
@@ -64,9 +64,7 @@ IF(WIN32)
                     qpidclient
                   )
 
-    INCLUDE_DIRECTORIES(
-                         ../../mq
-                         ../../common
+    INCLUDE_DIRECTORIES( ../../..  
                          /usr/local/qpid/include
                        )
 
@@ -97,7 +95,7 @@ ELSE(WIN32)
                     /usr/local/qpid/lib
                   )
 
-  INCLUDE_DIRECTORIES(
+  INCLUDE_DIRECTORIES( ../../..  
                        ../../mq
                        ../../common
                        /usr/local/qpid/include

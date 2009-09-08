@@ -31,15 +31,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Common schedule related functions
  */
 
-#include "cfg.hh"
-#include "data.hh"
-#include "exc.hh"
-#include "head.hh"
-#include "item.hh"
-#include "item_state.hh"
-#include "peer.hh"
-#include "remote_peer.hh"
-#include "route.hh"
-#include "schedule.hh"
+#include "codesloop/sched/cfg.hh"
+#include "codesloop/sched/data.hh"
+#include "codesloop/sched/exc.hh"
+#include "codesloop/sched/head.hh"
+#include "codesloop/sched/item.hh"
+#include "codesloop/sched/item_state.hh"
+#include "codesloop/sched/peer.hh"
+#include "codesloop/sched/remote_peer.hh"
+#include "codesloop/sched/route.hh"
+#include "codesloop/sched/schedule.hh"
 
 #endif /* _csl_sched_csl_sched_hh_included_ */

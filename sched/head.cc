@@ -23,11 +23,11 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "csl_slt3.hh"
-#include "head.hh"
-#include "exc.hh"
-#include "mpool.hh"
-#include "common.h"
+#include "codesloop/db/csl_slt3.hh"
+#include "codesloop/sched/head.hh"
+#include "codesloop/sched/exc.hh"
+#include "codesloop/common/mpool.hh"
+#include "codesloop/common/common.h"
 #include <memory>
 
 /**

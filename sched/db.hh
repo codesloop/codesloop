@@ -31,9 +31,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief db @todo db
  */
 
-#include "pvlist.hh"
-#include "conn.hh"
-#include "mpool.hh"
+#include "codesloop/common/pvlist.hh"
+#include "codesloop/db/conn.hh"
+#include "codesloop/common/mpool.hh"
 #ifdef __cplusplus
 
 namespace csl

@@ -31,8 +31,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief common base exception class for codesloop classes
  */
 
-#include "str.hh"
-#include "logger.hh"
+#include "codesloop/common/str.hh"
+#include "codesloop/common/logger.hh"
 #ifdef __cplusplus
 
 namespace csl

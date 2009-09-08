@@ -28,13 +28,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to check and measure various sched::peer features
  */
 
-#include "csl_slt3.hh"
-#include "test_timer.h"
-#include "peer.hh"
+#include "codesloop/db/csl_slt3.hh"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/sched/peer.hh"
 #include "exc.hh"
-#include "common.h"
-#include "mpool.hh"
-#include "str.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/mpool.hh"
+#include "codesloop/common/str.hh"
 #include <assert.h>
 
 using namespace csl::slt3;

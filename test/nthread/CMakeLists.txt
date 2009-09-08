@@ -57,7 +57,7 @@ IF(WIN32)
 
   ENDIF(MSYS)
 
-  INCLUDE_DIRECTORIES(
+  INCLUDE_DIRECTORIES( ../../..  
                         ../../nthread
                         ../../common
                         $ENV{ZLIB_DEV_ENV}/include
@@ -88,7 +88,7 @@ ELSE(WIN32)
                    -pthread
                  )
 
-  INCLUDE_DIRECTORIES( ../../nthread
+  INCLUDE_DIRECTORIES( ../../..   ../../nthread
                        ../../common )
 
   LINK_LIBRARIES( csl_nthread

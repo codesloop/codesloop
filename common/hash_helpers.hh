@@ -26,10 +26,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_common_hash_helpers_hh_included_
 #define _csl_common_hash_helpers_hh_included_
 
-#include "inpvec.hh"
-#include "obj.hh"
-#include "logger.hh"
-#include "common.h"
+#include "codesloop/common/inpvec.hh"
+#include "codesloop/common/obj.hh"
+#include "codesloop/common/logger.hh"
+#include "codesloop/common/common.h"
 
 #ifdef __cplusplus
 

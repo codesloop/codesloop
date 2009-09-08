@@ -30,11 +30,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <fstream>
 
-#include "csrparser.hh"
+#include "codesloop/rpc/csrparser.hh"
 
-#include "stub_header.hh"
-#include "stub_client.hh"
-#include "stub_server.hh"
+#include "codesloop/rpc/stub_header.hh"
+#include "codesloop/rpc/stub_client.hh"
+#include "codesloop/rpc/stub_server.hh"
 
 using namespace csl::rpc;
 

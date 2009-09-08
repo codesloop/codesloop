@@ -23,8 +23,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "event.hh"
-#include "common.h"
+#include "codesloop/nthread/event.hh"
+#include "codesloop/common/common.h"
 #include <windows.h> 
 #include <errno.h>
 

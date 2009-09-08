@@ -31,8 +31,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief comm exception class for common
  */
 
-#include "str.hh"
-#include "cexc.hh"
+#include "codesloop/common/str.hh"
+#include "codesloop/common/cexc.hh"
 #ifdef __cplusplus
 
 namespace csl

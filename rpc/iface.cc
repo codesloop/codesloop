@@ -23,8 +23,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "iface.hh"
-#include "common.h"
+#include "codesloop/rpc/iface.hh"
+#include "codesloop/common/common.h"
 
 /**
   @file rpc/src/iface.cc

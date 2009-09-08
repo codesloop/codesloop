@@ -31,8 +31,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   @brief big number helper w/ XDR features
  */
 
-#include "tbuf.hh"
-#include "xdrbuf.hh"
+#include "codesloop/common/tbuf.hh"
+#include "codesloop/common/xdrbuf.hh"
 #ifdef __cplusplus
 
 namespace csl

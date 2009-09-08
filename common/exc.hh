@@ -31,9 +31,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief common exception class for common
  */
 
-#include "cexc.hh"
-#include "str.hh"
-#include "logger.hh"
+#include "codesloop/common/cexc.hh"
+#include "codesloop/common/str.hh"
+#include "codesloop/common/logger.hh"
 #ifdef __cplusplus
 
 namespace csl

@@ -33,7 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    The implementation is based on SQLite3
  */
 
-#include "ustr.hh"
+#include "codesloop/common/ustr.hh"
 #ifdef __cplusplus
 #include <memory>
 

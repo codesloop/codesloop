@@ -32,9 +32,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DEBUG
 #endif /* DEBUG */
 
-#include "pvlist.hh"
-#include "test_timer.h"
-#include "common.h"
+#include "codesloop/common/pvlist.hh"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/common/common.h"
 #include <vector>
 #include <assert.h>
 #ifdef TEST_BOOST_POOL

@@ -28,11 +28,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify udp::data_cli routines
  */
 
-#include "udp_hello.hh"
-#include "udp_auth.hh"
-#include "udp_data.hh"
-#include "test_timer.h"
-#include "common.h"
+#include "codesloop/comm/udp_hello.hh"
+#include "codesloop/comm/udp_auth.hh"
+#include "codesloop/comm/udp_data.hh"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/common/common.h"
 #include <assert.h>
 
 using namespace csl::common;

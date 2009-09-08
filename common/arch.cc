@@ -23,12 +23,12 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "arch.hh"
-#include "common.h"
+#include "codesloop/common/arch.hh"
+#include "codesloop/common/common.h"
 #include <memory>
-#include "exc.hh"
-#include "var.hh"
-#include "xdrbuf.hh"
+#include "codesloop/common/exc.hh"
+#include "codesloop/common/var.hh"
+#include "codesloop/common/xdrbuf.hh"
 
 /**
    @file arch.cc

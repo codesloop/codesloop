@@ -27,10 +27,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <string.h>
 
-#include "csrgen.hh"
-#include "csrparser.hh"
-#include "iface.hh"
-#include "logger.hh"
+#include "codesloop/rpc/csrgen.hh"
+#include "codesloop/rpc/csrparser.hh"
+#include "codesloop/rpc/iface.hh"
+#include "codesloop/common/logger.hh"
 
 const char * csl::rpc::token_type_name[] = {
   "unknown",

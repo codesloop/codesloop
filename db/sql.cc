@@ -23,11 +23,11 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "pbuf.hh"
-#include "sql.hh"
-#include "var.hh"
-#include "common.h"
-#include "ustr.hh"
+#include "codesloop/common/pbuf.hh"
+#include "codesloop/db/sql.hh"
+#include "codesloop/common/var.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/ustr.hh"
 
 /**
   @file sqhelpr.cc

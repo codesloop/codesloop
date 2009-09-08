@@ -26,10 +26,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_comm_udp_recvr_hh_included_
 #define _csl_comm_udp_recvr_hh_included_
 
-#include "sai.hh"
-#include "csl_nthread.hh"
-#include "csl_common.hh"
-#include "ecdh_key.hh"
+#include "codesloop/comm/sai.hh"
+#include "codesloop/nthread/csl_nthread.hh"
+#include "codesloop/common/csl_common.hh"
+#include "codesloop/sec/ecdh_key.hh"
 #ifdef __cplusplus
 
 namespace csl

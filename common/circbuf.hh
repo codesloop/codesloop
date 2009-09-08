@@ -31,10 +31,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief curcular buffer implementation designed for multithreaded message buffering
  */
 
-#include "exc.hh"
-#include "obj.hh"
+#include "codesloop/common/exc.hh"
+#include "codesloop/common/obj.hh"
 #ifdef __cplusplus
-#include "common.h"
+#include "codesloop/common/common.h"
 
 namespace csl
 {

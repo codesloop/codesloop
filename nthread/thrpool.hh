@@ -31,10 +31,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief thread pool
  */
 
-#include "event.hh"
-#include "mutex.hh"
-#include "thread.hh"
-#include "csl_common.hh"
+#include "codesloop/nthread/event.hh"
+#include "codesloop/nthread/mutex.hh"
+#include "codesloop/nthread/thread.hh"
+#include "codesloop/common/csl_common.hh"
 #ifdef __cplusplus
 #include <list>
 

@@ -23,8 +23,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "pbuf.hh"
-#include "arch.hh"
+#include "codesloop/common/pbuf.hh"
+#include "codesloop/common/arch.hh"
 
 /**
    @file pbuf.cc

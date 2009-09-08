@@ -36,11 +36,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif /* DEBUG */
 #endif
 
-#include "bfd.hh"
-#include "initcomm.hh"
-#include "logger.hh"
-#include "common.h"
-#include "test_timer.h"
+#include "codesloop/comm/bfd.hh"
+#include "codesloop/comm/initcomm.hh"
+#include "codesloop/common/logger.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/test_timer.h"
 #include <assert.h>
 
 using namespace csl::comm;
@@ -62,4 +62,6 @@ int main()
   csl_common_print_results( "baseline          ", csl_common_test_timer_v0(baseline),"" );
   return 0;
 }
+
 /* EOF */
+

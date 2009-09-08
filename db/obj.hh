@@ -31,11 +31,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   @brief slt3::obj is the base class of the ORM mapped classes
  */
 
-#include "var.hh"
-#include "conn.hh"
-#include "tran.hh"
-#include "sql.hh"
-#include "csl_common.hh"
+#include "codesloop/db/var.hh"
+#include "codesloop/db/conn.hh"
+#include "codesloop/db/tran.hh"
+#include "codesloop/db/sql.hh"
+#include "codesloop/common/csl_common.hh"
 #ifdef __cplusplus
 
 namespace csl

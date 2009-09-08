@@ -32,9 +32,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DEBUG
 #endif /* DEBUG */
 
-#include "zfile.hh"
-#include "test_timer.h"
-#include "common.h"
+#include "codesloop/common/zfile.hh"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/common/common.h"
 #include <assert.h>
 #include <zlib.h>
 

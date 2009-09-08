@@ -26,9 +26,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_rpc_csrgen_hh_included_
 #define _csl_rpc_csrgen_hh_included_
 
-#include "common.h"
+#include "codesloop/common/common.h"
 #ifdef __cplusplus
-#include "obj.hh"
+#include "codesloop/common/obj.hh"
 
 namespace csl 
 { 

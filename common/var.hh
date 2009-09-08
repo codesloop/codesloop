@@ -31,9 +31,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief super class of all variable types
  */
 
-#include "obj.hh"
-#include "common.h"
-#include "serializable.hh"
+#include "codesloop/common/obj.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/serializable.hh"
 #ifdef __cplusplus
 #include <string>
 

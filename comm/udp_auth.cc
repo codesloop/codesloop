@@ -23,15 +23,15 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "exc.hh"
-#include "udp_auth.hh"
-#include "mutex.hh"
-#include "crypt_pkt.hh"
-#include "csl_sec.h"
-#include "pbuf.hh"
-#include "xdrbuf.hh"
-#include "common.h"
-#include "str.hh"
+#include "codesloop/comm/exc.hh"
+#include "codesloop/comm/udp_auth.hh"
+#include "codesloop/nthread/mutex.hh"
+#include "codesloop/sec/crypt_pkt.hh"
+#include "codesloop/sec/csl_sec.h"
+#include "codesloop/common/pbuf.hh"
+#include "codesloop/common/xdrbuf.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/str.hh"
 
 namespace csl
 {

@@ -23,13 +23,13 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "crypt_buf.hh"
-#include "csl_sec.h"
+#include "codesloop/sec/crypt_buf.hh"
+#include "codesloop/sec/csl_sec.h"
 #include <openssl/blowfish.h>
 #include <openssl/rand.h>
 #include <openssl/sha.h>
-#include "str.hh"
-#include "common.h"
+#include "codesloop/common/str.hh"
+#include "codesloop/common/common.h"
 
 /**
   @file crypt_buf.cc

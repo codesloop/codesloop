@@ -31,11 +31,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Include all comm headers
  */
 
-#include "exc.hh"
-#include "udp_recvr.hh"
-#include "udp_hello.hh"
-#include "udp_auth.hh"
-#include "udp_data.hh"
+#include "codesloop/comm/exc.hh"
+#include "codesloop/comm/udp_recvr.hh"
+#include "codesloop/comm/udp_hello.hh"
+#include "codesloop/comm/udp_auth.hh"
+#include "codesloop/comm/udp_data.hh"
 
 #ifdef __cplusplus
 #endif /* __cplusplus */

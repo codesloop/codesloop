@@ -31,7 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief common logger class
  */
 
-#include "str.hh"
+#include "codesloop/common/str.hh"
 #ifdef __cplusplus
 #include <string>
 

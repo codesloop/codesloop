@@ -26,12 +26,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_slt3_query_hh_included_
 #define _csl_slt3_query_hh_included_
 
-#include "pvlist.hh"
-#include "int64.hh"
-#include "dbl.hh"
-#include "binry.hh"
-#include "ustr.hh"
-#include "common.h"
+#include "codesloop/common/pvlist.hh"
+#include "codesloop/common/int64.hh"
+#include "codesloop/common/dbl.hh"
+#include "codesloop/common/binry.hh"
+#include "codesloop/common/ustr.hh"
+#include "codesloop/common/common.h"
 #ifdef __cplusplus
 #include <memory>
 

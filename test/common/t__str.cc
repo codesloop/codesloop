@@ -32,17 +32,17 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DEBUG
 #endif /* DEBUG */
 
-#include "logger.hh"
+#include "codesloop/common/logger.hh"
 #include "exc.hh"
-#include "common.h"
-#include "str.hh"
-#include "ustr.hh"
-#include "int64.hh"
-#include "dbl.hh"
-#include "binry.hh"
-#include "pbuf.hh"
-#include "xdrbuf.hh"
-#include "test_timer.h"
+#include "codesloop/common/common.h"
+#include "codesloop/common/str.hh"
+#include "codesloop/common/ustr.hh"
+#include "codesloop/common/int64.hh"
+#include "codesloop/common/dbl.hh"
+#include "codesloop/common/binry.hh"
+#include "codesloop/common/pbuf.hh"
+#include "codesloop/common/xdrbuf.hh"
+#include "codesloop/common/test_timer.h"
 #include <assert.h>
 #include <sys/stat.h>
 

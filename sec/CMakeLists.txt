@@ -56,7 +56,7 @@ IF(WIN32)
 
   ENDIF(MSYS)
 
-  INCLUDE_DIRECTORIES( ../common
+  INCLUDE_DIRECTORIES( ../..
                        $ENV{OPENSSL_DEV_ENV}/include
                        c:/OpenSSL/include
                        ../../../3rdparty/OpenSSL/include
@@ -92,7 +92,7 @@ ELSE(WIN32)
                   )
 
   INCLUDE_DIRECTORIES( 
-                       ../common
+                       ../..
                        /usr/local/ssl/include
                      )
 

@@ -32,9 +32,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DEBUG
 #endif /* DEBUG */
 
-#include "mpool.hh"
-#include "test_timer.h"
-#include "common.h"
+#include "codesloop/common/mpool.hh"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/common/common.h"
 #include <vector>
 #include <assert.h>
 

@@ -34,11 +34,11 @@ Credits: some techniques and code pieces are stolen from Christian
    @brief simple but efficient utf-8 based string class
  */
 
-#include "common.h"
-#include "obj.hh"
-#include "tbuf.hh"
-#include "str.hh"
-#include "var.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/obj.hh"
+#include "codesloop/common/tbuf.hh"
+#include "codesloop/common/str.hh"
+#include "codesloop/common/var.hh"
 #ifdef __cplusplus
 #include <string>
 

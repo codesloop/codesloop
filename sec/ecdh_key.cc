@@ -23,15 +23,15 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "ecdh_key.hh"
-#include "bignum.hh"
-#include "csl_sec.h"
+#include "codesloop/sec/ecdh_key.hh"
+#include "codesloop/sec/bignum.hh"
+#include "codesloop/sec/csl_sec.h"
 #include <openssl/ec.h>
 #include <openssl/ecdh.h>
 #include <openssl/bn.h>
 #include <openssl/objects.h>
-#include "ustr.hh"
-#include "csl_common.hh"
+#include "codesloop/common/ustr.hh"
+#include "codesloop/common/csl_common.hh"
 
 /**
   @file ecdh_key.cc

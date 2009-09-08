@@ -34,11 +34,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif /* DEBUG */
 #endif
 
-#include "inpvec.hh"
-#include "test_timer.h"
-#include "ustr.hh"
-#include "logger.hh"
-#include "common.h"
+#include "codesloop/common/inpvec.hh"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/common/ustr.hh"
+#include "codesloop/common/logger.hh"
+#include "codesloop/common/common.h"
 #include <assert.h>
 #include <vector>
 #include <string>

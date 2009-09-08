@@ -32,12 +32,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DEBUG
 #endif /* DEBUG */
 
-#include "pbuf.hh"
-#include "tbuf.hh"
-#include "str.hh"
-#include "test_timer.h"
-#include "zfile.hh"
-#include "common.h"
+#include "codesloop/common/pbuf.hh"
+#include "codesloop/common/tbuf.hh"
+#include "codesloop/common/str.hh"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/common/zfile.hh"
+#include "codesloop/common/common.h"
 #include <assert.h>
 #include <string>
 

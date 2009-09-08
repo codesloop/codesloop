@@ -31,10 +31,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define DEBUG 
 
-#include "common.h"
-#include "obj.hh"
-#include "str.hh"
-#include "ustr.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/obj.hh"
+#include "codesloop/common/str.hh"
+#include "codesloop/common/ustr.hh"
 #include <assert.h>
 #include <sys/stat.h>
 

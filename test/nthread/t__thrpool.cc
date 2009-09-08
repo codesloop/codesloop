@@ -28,10 +28,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to check thrpool behaviour
  */
 
-#include "test_timer.h"
-#include "thrpool.hh"
-#include "mutex.hh"
-#include "common.h"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/nthread/thrpool.hh"
+#include "codesloop/nthread/mutex.hh"
+#include "codesloop/common/common.h"
 #include <assert.h>
 #include <stdio.h>
 

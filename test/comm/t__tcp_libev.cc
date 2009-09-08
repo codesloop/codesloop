@@ -36,14 +36,14 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif /* DEBUG */
 //#endif
 
-#include "inpvec.hh"
-#include "sai.hh"
-#include "libev/evwrap.h"
-#include "initcomm.hh"
-#include "mutex.hh"
-#include "logger.hh"
-#include "common.h"
-#include "test_timer.h"
+#include "codesloop/common/libev/evwrap.h"
+#include "codesloop/common/inpvec.hh"
+#include "codesloop/comm/sai.hh"
+#include "codesloop/comm/initcomm.hh"
+#include "codesloop/nthread/mutex.hh"
+#include "codesloop/common/logger.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/test_timer.h"
 #include <assert.h>
 
 using namespace csl::comm;
@@ -387,4 +387,6 @@ int main()
 
   return 0;
 }
+
 /* EOF */
+
