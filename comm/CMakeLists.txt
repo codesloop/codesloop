@@ -78,12 +78,11 @@ ADD_LIBRARY( csl_comm STATIC
              udp_auth.cc          udp_auth.hh
              udp_data.cc          udp_data.hh
              # -- Generic --
-             handler.cc           handler.hh
              bfd.cc               bfd.hh
              exc.cc               exc.hh
              initcomm.cc          initcomm.hh
              sai.hh               connid.hh
-             read_res.hh
+             read_res.hh          handler.hh
              csl_comm.hh
            )
 

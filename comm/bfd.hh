@@ -45,7 +45,11 @@ namespace csl
     {
       public:
         bfd();
+        bfd(int fd);
+
         ~bfd();
+
+        void init(int fd);
 
         read_res read(uint32_t sz, uint32_t timeout_ms);
         read_res recv(uint32_t sz, uint32_t timeout_ms);
@@ -71,9 +75,6 @@ namespace csl
 
         bool can_read(uint32_t timeout_ms);
         bool read_buf(read_res & res, uint32_t sz);
-
-        // not implemented
-        //bool can_write(uint32_t timeout_ms);
 
       private:
         int        fd_;

@@ -62,6 +62,7 @@ namespace csl
 
           /* network ops */
           read_res read(connid_t id, size_t sz, uint32_t timeout_ms);
+          read_res & read(connid_t id, size_t sz, uint32_t timeout_ms, read_res & rr);
           bool write(connid_t id, uint8_t * data, size_t sz);
 
           /* info ops */

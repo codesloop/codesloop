@@ -35,8 +35,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/comm/sai.hh"
 #include "codesloop/comm/read_res.hh"
 #include "codesloop/comm/bfd.hh"
-#include "codesloop/comm/connid.hh"
-#include "codesloop/comm/handler.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/obj.hh"
 #ifdef __cplusplus
@@ -54,25 +52,23 @@ namespace csl
           client();
           virtual ~client();
 
-          /* address, to be setup during initialization */
-          const SAI & peer_addr() const;
-
-          bool init(handler & h, SAI address);
-          bool start();
-          bool stop();
+          bool init(SAI address);
 
           /* network ops */
-          read_res read(size_t sz, uint32_t timeout_ms);
-          read_res & read(size_t sz, uint32_t timeout_ms, read_res & rr);
-          bool write(uint8_t * data, size_t sz);
+          read_res read(size_t sz, uint32_t timeout_ms)                  { return bfd_.recv(sz, timeout_ms);     }
+          read_res & read(size_t sz, uint32_t timeout_ms, read_res & rr) { return bfd_.recv(sz, timeout_ms, rr); }
+          bool write(uint8_t * data, size_t sz)                          { return bfd_.write(data, sz);          }
+
+          /* address, to be setup during initialization */
+          const SAI & peer_addr() const { return peer_addr_; }
 
           /* info ops */
-          const SAI & own_addr() const;
+          const SAI & own_addr() const { return own_addr_; }
 
-          struct impl;
         private:
-          /* private implementation */
-          std::auto_ptr<impl> impl_;
+          bfd bfd_;
+          SAI own_addr_;
+          SAI peer_addr_;
 
           /* no-copy */
           client(const client & other);

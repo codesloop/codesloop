@@ -28,13 +28,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief @todo
  */
 
-#if 0
+//#if 0
 #ifndef DEBUG
 #define DEBUG
 #define DEBUG_ENABLE_INDENT
 //#define DEBUG_VERBOSE
 #endif /* DEBUG */
-#endif
+//#endif
 
 #include "codesloop/comm/bfd.hh"
 #include "codesloop/comm/initcomm.hh"
@@ -50,7 +50,41 @@ using namespace csl::comm;
 /** @brief @todo */
 namespace test_bfd {
 
+  /*
+  ** DEBUG support --------------------------------------------------------------------
+  */
+  static inline const wchar_t * get_namespace()   { return L"test_bfd"; }
+  static inline const wchar_t * get_class_name()  { return L"test_bfd::noclass"; }
+  static inline const wchar_t * get_class_short() { return L"noclass"; }
+
   void baseline() { bfd o; }
+
+  void conn()
+  {
+    ENTER_FUNCTION();
+    in_addr_t saddr = inet_addr("127.0.0.1");
+    int sock = ::socket( AF_INET, SOCK_STREAM, 0 );
+    SAI peer;
+
+    ::memset( &peer,0,sizeof(peer) );
+    ::memcpy( &(peer.sin_addr),&saddr,sizeof(saddr) );
+
+    peer.sin_family  = AF_INET;
+    peer.sin_port = htons( 19026 );
+
+    int err = ::connect( sock, reinterpret_cast<struct sockaddr *>(&peer), sizeof(SAI) );
+
+    CSL_DEBUGF( L"connect(sock:%d,...) => %d",sock,err );
+
+    if( !err )
+    {
+      bfd bf;
+      bf.init( sock );
+      read_res rr = bf.read(80000,9000);
+    }
+
+    LEAVE_FUNCTION();
+  }
 
 } /* end of test_bfd */
 
@@ -59,6 +93,7 @@ using namespace test_bfd;
 int main()
 {
   initcomm w;
+  conn();
   csl_common_print_results( "baseline          ", csl_common_test_timer_v0(baseline),"" );
   return 0;
 }
