@@ -33,8 +33,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "codesloop/comm/udp_hello.hh"
 #include "codesloop/comm/udp_recvr.hh"
-#include "codesloop/sec/csl_sec.hh"
-#include "codesloop/common/csl_common.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/obj.hh"
 #ifdef __cplusplus
 
 namespace csl

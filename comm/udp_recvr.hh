@@ -27,8 +27,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _csl_comm_udp_recvr_hh_included_
 
 #include "codesloop/comm/sai.hh"
-#include "codesloop/nthread/csl_nthread.hh"
-#include "codesloop/common/csl_common.hh"
+#include "codesloop/nthread/thread.hh"
+#include "codesloop/nthread/event.hh"
+#include "codesloop/nthread/mutex.hh"
+#include "codesloop/nthread/thrpool.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/obj.hh"
 #include "codesloop/sec/ecdh_key.hh"
 #ifdef __cplusplus
 

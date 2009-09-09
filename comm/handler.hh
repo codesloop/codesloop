@@ -23,37 +23,33 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_comm_tcp_handler_hh_included_
-#define _csl_comm_tcp_handler_hh_included_
+#ifndef _csl_comm_handler_hh_included_
+#define _csl_comm_handler_hh_included_
 
 /**
-   @file tcp_handler.hh
+   @file handler.hh
    @brief @todo
  */
 
-#include "codesloop/comm/bfd.hh"
 #include "codesloop/comm/connid.hh"
-#include "codesloop/common/csl_common.hh"
+#include "codesloop/common/common.h"
 #ifdef __cplusplus
 
 namespace csl
 {
   namespace comm
   {
-    namespace tcp
+    class handler
     {
-      class handler
-      {
-        public:
-          virtual bool on_conn(connid_t id)    { return false; }
-          virtual bool on_data(connid_t id)    { return false; }
-          virtual void on_disconn(connid_t id) { return; }
-          virtual ~handler() {}
-      };
-    }
+      public:
+        virtual bool on_conn(connid_t id)    { return false; }
+        virtual bool on_data(connid_t id)    { return false; }
+        virtual void on_disconn(connid_t id) { return; }
+        virtual ~handler() {}
+    };
   }
 }
 
 #endif /*__cplusplus*/
-#endif /* _csl_comm_tcp_handler_hh_included_ */
+#endif /* _csl_comm_handler_hh_included_ */
 

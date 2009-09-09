@@ -36,11 +36,19 @@ namespace csl
     struct read_res
     {
       uint8_t *  data_;
-      size_t     bytes_;
+      uint64_t   bytes_;
       bool       timed_out_;
       bool       failed_;
 
       read_res() : data_(0), bytes_(0), timed_out_(false), failed_(false) {}
+
+      void reset()
+      {
+        data_       = 0;
+        bytes_      = 0;
+        timed_out_  = false;
+        failed_     = false;
+      }
     };
   }
 }

@@ -24,19 +24,16 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
-   @file tcp_handler.cc
+   @file handler.cc
    @brief @todo
  */
 
-#include "codesloop/comm/tcp_handler.hh"
+#include "codesloop/comm/handler.hh"
 
 namespace csl
 {
   namespace comm
   {
-    namespace tcp
-    {
-    }
   }
 }
 

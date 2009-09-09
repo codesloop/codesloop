@@ -36,8 +36,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/comm/read_res.hh"
 #include "codesloop/comm/bfd.hh"
 #include "codesloop/comm/connid.hh"
-#include "codesloop/comm/tcp_handler.hh"
-#include "codesloop/common/csl_common.hh"
+#include "codesloop/comm/handler.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/obj.hh"
 #ifdef __cplusplus
 #include <memory>
 
@@ -62,6 +63,7 @@ namespace csl
 
           /* network ops */
           read_res read(size_t sz, uint32_t timeout_ms);
+          read_res & read(size_t sz, uint32_t timeout_ms, read_res & rr);
           bool write(uint8_t * data, size_t sz);
 
           /* info ops */

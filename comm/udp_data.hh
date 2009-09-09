@@ -27,7 +27,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _csl_comm_udp_data_hh_included_
 
 #include "codesloop/comm/udp_auth.hh"
-#include "codesloop/common/csl_common.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/obj.hh"
 #ifdef __cplusplus
 
 namespace csl

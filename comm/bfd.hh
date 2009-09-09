@@ -33,7 +33,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "codesloop/comm/sai.hh"
 #include "codesloop/comm/read_res.hh"
-#include "codesloop/common/csl_common.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/obj.hh"
 #ifdef __cplusplus
 
 namespace csl
@@ -46,14 +47,17 @@ namespace csl
         bfd();
         ~bfd();
 
-        read_res read(size_t sz, uint32_t timeout_ms);
-        bool write(uint8_t * data, size_t sz);
+        read_res read(uint32_t sz, uint32_t timeout_ms);
+        read_res recv(uint32_t sz, uint32_t timeout_ms);
+        read_res recvfrom(uint32_t sz, SAI & from, uint32_t timeout_ms);
 
-        read_res recv(size_t sz, uint32_t timeout_ms);
-        bool send(uint8_t * data, size_t sz);
+        read_res & read(uint32_t sz, uint32_t timeout_ms, read_res & rr);
+        read_res & recv(uint32_t sz, uint32_t timeout_ms, read_res & rr);
+        read_res & recvfrom(uint32_t sz, SAI & from, uint32_t timeout_ms, read_res & rr);
 
-        read_res recvfrom(size_t sz, SAI & from, uint32_t timeout_ms);
-        bool sendto(uint8_t * data, size_t sz,const SAI & to);
+        bool write(uint8_t * data, uint32_t sz);
+        bool send(uint8_t * data, uint32_t sz);
+        bool sendto(uint8_t * data, uint32_t sz,const SAI & to);
 
         static const int ok_                =  0;
         static const int unknonwn_error_    = -1;
@@ -62,10 +66,11 @@ namespace csl
         static const int fd_error_          = -4;
 
         int state() const;
-        size_t size() const;
-        size_t n_free() const;
+        uint32_t size() const;
+        uint32_t n_free() const;
 
         bool can_read(uint32_t timeout_ms);
+        bool read_buf(read_res & res, uint32_t sz);
 
         // not implemented
         //bool can_write(uint32_t timeout_ms);
