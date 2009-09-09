@@ -37,7 +37,7 @@ IF(WIN32)
                     wsock32
                   )
 
-    INCLUDE_DIRECTORIES( ../../..  
+    INCLUDE_DIRECTORIES( ../../..
                          ../../comm
                          ../../nthread
                          ../../sec
@@ -86,7 +86,7 @@ IF(WIN32)
                     wsock32
                   )
 
-    INCLUDE_DIRECTORIES( ../../..  
+    INCLUDE_DIRECTORIES( ../../..
                          ../../comm
                          ../../common
                          c:/OpenSSL/include
@@ -128,7 +128,7 @@ ELSE(WIN32)
                     ../../common
                   )
 
-  INCLUDE_DIRECTORIES( ../../..  
+  INCLUDE_DIRECTORIES( ../../..
                        /usr/local/ssl/include/
                        ../../comm
                        ../../nthread
@@ -169,6 +169,7 @@ ENDIF(WIN32)
 ADD_EXECUTABLE(t__bfd                 t__bfd.cc)
 ADD_EXECUTABLE(t__mt_udp              t__mt_udp.cc)
 ADD_EXECUTABLE(t__tcp_libev           t__tcp_libev.cc)
+ADD_EXECUTABLE(t__tcp_client          t__tcp_client.cc)
 ADD_EXECUTABLE(t__udp_hello_client    t__udp_hello_client.cc)
 ADD_EXECUTABLE(t__udp_hello_server    t__udp_hello_server.cc)
 ADD_EXECUTABLE(t__udp_auth_client     t__udp_auth_client.cc)
