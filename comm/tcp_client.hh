@@ -50,7 +50,7 @@ namespace csl
       {
         public:
           client();
-          virtual ~client();
+          virtual ~client() { }
 
           bool init(SAI address);
 
@@ -71,8 +71,8 @@ namespace csl
           SAI peer_addr_;
 
           /* no-copy */
-          client(const client & other);
-          client & operator=(const client & other);
+          client(const client & other) { }
+          client & operator=(const client & other) { return *this; }
 
           /* for trace and debug */
           CSL_OBJ(csl::comm::tcp,client);

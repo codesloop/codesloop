@@ -76,6 +76,8 @@ namespace csl
         bool can_read(uint32_t timeout_ms);
         bool read_buf(read_res & res, uint32_t sz);
 
+        void shutdown();
+
       private:
         int        fd_;
         uint16_t   start_;
@@ -83,7 +85,6 @@ namespace csl
         uint8_t    buf_[65536]; // 64k
 
         CSL_OBJ(csl::comm,bfd);
-        USE_EXC();
     };
   }
 }

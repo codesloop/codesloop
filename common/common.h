@@ -81,16 +81,22 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #   include <time.h>
 #  endif /*CSL_TIME_H_INCLUDED*/
 # endif /*__MINGW32__*/
+# ifndef CSL_WINDOWS_H_INCLUDED
+#  define CSL_WINDOWS_H_INCLUDED
+#  include <windows.h>
+# endif /*CSL_WINDOWS_H_INCLUDED*/
+# ifndef ShutdownSocket
+#  define ShutdownSocket(S) { ::shutdown(S,2); }
+# endif /*ShutdownSocket*/
 # ifndef ShutdownCloseSocket
 #  define ShutdownCloseSocket(S) { ::shutdown(S,2); ::closesocket(S); }
 # endif /*ShutdownCloseSocket*/
 # ifndef CloseSocket
 #  define CloseSocket(S) { ::closesocket(S); }
 # endif /*CloseSocket*/
-# ifndef CSL_WINDOWS_H_INCLUDED
-#  define CSL_WINDOWS_H_INCLUDED
-#  include <windows.h>
-# endif /*CSL_WINDOWS_H_INCLUDED*/
+# ifndef Close
+#  define Close(S) { ::close(S); }
+# endif /*Clos*/
 # ifndef SleepSeconds
 #  define SleepSeconds(A) ::Sleep(A*1000)
 # endif /*SleepSeconds*/
@@ -190,12 +196,18 @@ void gettimeofday(struct timeval * tv, void * p)
 # ifndef SleepMiliseconds
 #  define SleepMiliseconds(A) ::usleep(A*1000)
 # endif /*SleepMiliseconds*/
+# ifndef ShutdownSocket
+#  define ShutdownSocket(S) { ::shutdown(S,2); }
+# endif /*ShutdownSocket*/
 # ifndef ShutdownCloseSocket
 #  define ShutdownCloseSocket(S) { ::shutdown(S,2); ::close(S); }
 # endif /*ShutdownCloseSocket*/
 # ifndef CloseSocket
 #  define CloseSocket(S) { ::close(S); }
 # endif /*CloseSocket*/
+# ifndef Close
+#  define Close(S) { ::close(S); }
+# endif /*Close*/
 # ifndef SNPRINTF
 #  define SNPRINTF snprintf
 # endif /*SNPRINTF*/
@@ -236,74 +248,6 @@ void gettimeofday(struct timeval * tv, void * p)
 #  define CSL_DEBUG_ASSERT(EXPR)
 # endif /*DEBUG*/
 #endif /*CSL_DEBUG_ASSERT*/
-
-#ifdef __cplusplus
-#ifndef THR
-#define THR(REASON,RET) \
-    do { \
-      CSL_DEBUGF(L"Exception(%ls:%d): [%ls] [%ls]\n", \
-          L""__FILE__,__LINE__, \
-          get_class_name(), \
-          exc::reason_string(REASON)); \
-      if( this->use_exc() ) \
-        throw exc(REASON,get_class_name(),L"",L""__FILE__,__LINE__); \
-      return RET; } while(false);
-#endif /*THR*/
-
-#ifndef THRR
-#define THRR(REASON,MSG,RET) \
-    do { \
-      CSL_DEBUGF(L"Exception(%ls:%d): [%ls] [%ls] [%ls]\n", \
-          L""__FILE__,__LINE__, \
-          get_class_name(), \
-          exc::reason_string(REASON), \
-          MSG ); \
-      if( this->use_exc() ) \
-        throw exc(REASON,get_class_name(),MSG,L""__FILE__,__LINE__); \
-      return RET; } while(false);
-#endif /*THRR*/
-
-#ifndef THRC
-#define THRC(REASON,RET) \
-    do { \
-      CSL_DEBUGF(L"Exception(%ls:%d): [%ls] [%ls]\n", \
-        L""__FILE__,__LINE__, \
-        get_class_name(), \
-        exc::reason_string(REASON)); \
-      if( this->use_exc() ) { \
-        wchar_t errstr[256]; \
-        mbstowcs( errstr,strerror(errno),255 ); \
-        throw exc(REASON,get_class_name(),errstr,L""__FILE__,__LINE__); \
-      } \
-      return RET; } while(false);
-#endif /*THRC*/
-
-#ifndef THREX
-#define THREX(E,RET) \
-    do { \
-      if( this->use_exc() ) { \
-        throw E; \
-        return RET; } \
-      else { \
-        CSL_DEBUGF(L"Exception(%ls:%d): [%ls] [%ls]\n", \
-            E.file_.c_str(),E.line_, \
-            get_class_name(), \
-            exc::reason_string(E.reason_)); \
-        return RET; } } while(false);
-#endif /*THR*/
-
-#ifndef THRNORET
-#define THRNORET(REASON) \
-    do { \
-      CSL_DEBUGF(L"Exception(%ls:%d): [%ls] [%ls]\n", \
-          L""__FILE__,__LINE__, \
-          get_class_name(), \
-          exc::reason_string(REASON)); \
-      if( this->use_exc() )  \
-        throw exc(REASON,get_class_name(),L"",L""__FILE__,__LINE__); \
-      } while(false);
-#endif /*THRNORET*/
-#endif /*__cplusplus*/
 
 #ifndef CSL_STDIO_H_INCLUDED
 # define CSL_STDIO_H_INCLUDED

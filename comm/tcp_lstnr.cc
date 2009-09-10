@@ -23,26 +23,128 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/**
+  @file tcp_lstnr.cc
+  @brief @todo
+*/
+
+#ifndef DEBUG
+#define DEBUG
+#define DEBUG_ENABLE_INDENT
+//#define DEBUG_VERBOSE
+#endif /* DEBUG */
+
+#include "codesloop/common/inpvec.hh"
+#include "codesloop/common/libev/evwrap.h"
+#include "codesloop/common/auto_close.hh"
 #include "codesloop/comm/exc.hh"
 #include "codesloop/comm/tcp_lstnr.hh"
+#include "codesloop/comm/bfd.hh"
+#include "codesloop/comm/sai.hh"
+#include "codesloop/nthread/mutex.hh"
 
 namespace csl
 {
-  // using namespace nthread;
-  // using namespace sec;
+  using namespace nthread;
   using namespace common;
 
   namespace comm
   {
     namespace tcp
     {
+      namespace
+      {
+        struct tcp_conn
+        {
+          bfd                bfd_;
+          SAI                peer_addr_;
+          mutex              mtx_;
+
+          ~tcp_conn() { bfd_.shutdown(); }
+        };
+
+        struct ev_data
+        {
+          ev_io              watcher_;
+          struct ev_loop *   loop_;
+          tcp_conn *         conn_;
+        };
+      };
+
       struct lstnr::impl
       {
-        SAI addr_;
+        SAI                  addr_;
+        inpvec<ev_data>      ev_pool_;
+        inpvec<tcp_conn>     conn_pool_;
+        inpvec<ev_data *>    unqueued_;
+        auto_close_socket    listener_;
+        struct ev_loop *     loop_;
+
+        impl()
+        {
+          loop_ = ev_loop_new( EVFLAG_AUTO );
+        }
+
+        ~impl()
+        {
+          if( loop_ ) ev_loop_destroy( loop_ );
+          loop_ = 0;
+        }
+
+        bool init(handler & h, SAI address) { return false; } // TODO
+        bool start() { return false; } // TODO
+        bool stop() { return false; } // TODO
+
+        /* network ops */
+        read_res read(connid_t id, size_t sz, uint32_t timeout_ms) { read_res rr; return rr; } // TODO
+        read_res & read(connid_t id, size_t sz, uint32_t timeout_ms, read_res & rr) { return rr; } // TODO
+        bool write(connid_t id, uint8_t * data, size_t sz) { return false; } // TODO
+
+        /* info ops */
+        const SAI & peer_addr(connid_t id) const { return addr_; } // TODO
+
       };
 
       /* forwarding functions */
-      const SAI & lstnr::own_addr() const { return impl_->addr_; }
+      const SAI & lstnr::peer_addr(connid_t id) const
+      {
+        return impl_->peer_addr(id);
+      }
+
+      const SAI & lstnr::own_addr() const
+      {
+        return impl_->addr_;
+      }
+
+      bool lstnr::init(handler & h, SAI address)
+      {
+        return impl_->init(h,address);
+      }
+
+      bool lstnr::start()
+      {
+        return impl_->start();
+      }
+
+      bool lstnr::stop()
+      {
+        return impl_->stop();
+      }
+
+      read_res lstnr::read(connid_t id, size_t sz, uint32_t timeout_ms)
+      {
+        return impl_->read(id,sz,timeout_ms);
+      }
+
+      read_res & lstnr::read(connid_t id, size_t sz, uint32_t timeout_ms, read_res & rr)
+      {
+        return impl_->read(id, sz, timeout_ms, rr);
+      }
+
+      bool lstnr::write(connid_t id, uint8_t * data, size_t sz)
+      {
+        return impl_->write(id, data, sz);
+      }
 
       /* default constructor, destructor */
       lstnr::lstnr() : impl_(new impl()) { }

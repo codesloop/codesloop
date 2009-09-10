@@ -38,6 +38,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "codesloop/common/libev/evwrap.h"
 #include "codesloop/common/inpvec.hh"
+#include "codesloop/common/auto_close.hh"
 #include "codesloop/comm/sai.hh"
 #include "codesloop/comm/initcomm.hh"
 #include "codesloop/nthread/mutex.hh"
@@ -147,6 +148,7 @@ namespace test_tcp_libev {
     ENTER_FUNCTION();
     SAI server;
     in_addr_t saddr = inet_addr("127.0.0.1");
+    auto_close_socket ac_sock;
 
     struct ev_loop * evs = ev_loop_new(EVFLAG_AUTO);
     int sock = ::socket( AF_INET, SOCK_STREAM, 0 );
@@ -172,6 +174,8 @@ namespace test_tcp_libev {
                 sizeof(server) ) == -1 )    { perror( "bind" );   goto bail; }
     if( ::listen( sock, 100 ) == -1 )       { perror( "listen" ); goto bail; }
 
+    ac_sock = sock;
+
     ev_init( &accept_watcher, acc_cb );
 
     CSL_DEBUGF(L"init socket watcher");
@@ -189,7 +193,6 @@ namespace test_tcp_libev {
 
   bail:
     ev_loop_destroy( evs );
-    ShutdownCloseSocket( sock );
     LEAVE_FUNCTION();
   }
 
@@ -264,6 +267,7 @@ namespace test_tcp_libev {
     in_addr_t saddr = inet_addr("127.0.0.1");
     int sock = ::socket( AF_INET, SOCK_STREAM, 0 );
     ev_io accept_watcher;
+    auto_close_socket ac_sock;
 
     /* the userdata pool */
     conn_pool_t pool;
@@ -295,6 +299,8 @@ namespace test_tcp_libev {
                 sizeof(server) ) == -1 )    { perror( "bind" );   goto bail; }
     if( ::listen( sock, 100 ) == -1 )       { perror( "listen" ); goto bail; }
 
+    ac_sock = sock;
+
     /* socket watcher */
     CSL_DEBUGF(L"init socket watcher");
     ev_init( &accept_watcher, acc_cb2 );
@@ -315,7 +321,6 @@ namespace test_tcp_libev {
 
   bail:
     ev_loop_destroy( evs );
-    ShutdownCloseSocket( sock );
     LEAVE_FUNCTION();
   }
 

@@ -32,24 +32,24 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
    @file arch.cc
-   @brief arch saves a complex network of objects in a permanent binary form 
+   @brief arch saves a complex network of objects in a permanent binary form
 */
 
 namespace csl
 {
   namespace common
   {
-    arch::arch( direction d ) 
-      : direction_(d) 
+    arch::arch( direction d )
+      : direction_(d)
     {
       pbuf_ = new pbuf;
       xdrbuf_ = new xdrbuf(*pbuf_);
 
       if ( !pbuf_ || !xdrbuf_ )
-        THR(exc::rs_out_of_memory,);      
+        THRNORET(exc::rs_out_of_memory);
     }
 
-    arch::~arch() 
+    arch::~arch()
     {
       if ( pbuf_ )
         delete pbuf_;
@@ -63,12 +63,12 @@ namespace csl
     }
 
     pbuf * arch::get_pbuf() const
-    { 
+    {
       return pbuf_;
     }
-    
-    void arch::set_pbuf( const pbuf & src ) 
-    { 
+
+    void arch::set_pbuf( const pbuf & src )
+    {
       *pbuf_ = src;
       if ( xdrbuf_ )
         delete xdrbuf_;
@@ -76,7 +76,7 @@ namespace csl
       xdrbuf_ = new xdrbuf(*pbuf_);
 
       if ( !xdrbuf_ )
-        THR(exc::rs_out_of_memory,);
+        THRNORET(exc::rs_out_of_memory);
     }
   }
 }

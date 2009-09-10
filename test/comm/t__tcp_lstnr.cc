@@ -6,10 +6,10 @@ modification, are permitted provided that the following conditions
 are met:
 
 1. Redistributions of source code must retain the above copyright
-   notice, this list of conditions and the following disclaimer.
+notice, this list of conditions and the following disclaimer.
 2. Redistributions in binary form must reproduce the above copyright
-   notice, this list of conditions and the following disclaimer in the
-   documentation and/or other materials provided with the distribution.
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
 
 THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
 IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -24,9 +24,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
-   @file t__bfd.cc
-   @brief @todo
- */
+  @file t__tcp_lstnr.cc
+  @brief @todo
+*/
 
 //#if 0
 #ifndef DEBUG
@@ -37,65 +37,46 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#endif
 
 #include "codesloop/comm/bfd.hh"
+#include "codesloop/comm/tcp_lstnr.hh"
 #include "codesloop/comm/initcomm.hh"
 #include "codesloop/common/logger.hh"
-#include "codesloop/common/auto_close.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/test_timer.h"
 #include <assert.h>
 
 using namespace csl::comm;
+using namespace csl::comm::tcp;
 //using namespace csl::common;
 //using namespace csl::nthread;
 
 /** @brief @todo */
-namespace test_bfd {
+namespace test_tcp_lstnr {
 
   /*
   ** DEBUG support --------------------------------------------------------------------
   */
-  static inline const wchar_t * get_namespace()   { return L"test_bfd"; }
-  static inline const wchar_t * get_class_name()  { return L"test_bfd::noclass"; }
+  static inline const wchar_t * get_namespace()   { return L"test_tcp_lstnr"; }
+  static inline const wchar_t * get_class_name()  { return L"test_tcp_lstnr::noclass"; }
   static inline const wchar_t * get_class_short() { return L"noclass"; }
 
-  void baseline() { bfd o; }
+  void baseline() { lstnr o; }
 
   void conn()
   {
     ENTER_FUNCTION();
-    in_addr_t saddr = inet_addr("127.0.0.1");
-    int sock = ::socket( AF_INET, SOCK_STREAM, 0 );
-    SAI peer;
-
-    ::memset( &peer,0,sizeof(peer) );
-    ::memcpy( &(peer.sin_addr),&saddr,sizeof(saddr) );
-
-    peer.sin_family  = AF_INET;
-    peer.sin_port = htons( 19026 );
-
-    int err = ::connect( sock, reinterpret_cast<struct sockaddr *>(&peer), sizeof(SAI) );
-
-    CSL_DEBUGF( L"connect(sock:%d,...) => %d",sock,err );
-
-    if( !err )
-    {
-      bfd bf;
-      bf.init( sock );
-      read_res rr = bf.read(80000,9000);
-    }
-
+    lstnr o;
     LEAVE_FUNCTION();
   }
 
-} /* end of test_bfd */
+} /* end of test_tcp_lstnr */
 
-using namespace test_bfd;
+using namespace test_tcp_lstnr;
 
 int main()
 {
   initcomm w;
   conn();
-  csl_common_print_results( "baseline          ", csl_common_test_timer_v0(baseline),"" );
+  //csl_common_print_results( "baseline          ", csl_common_test_timer_v0(baseline),"" );
   return 0;
 }
 

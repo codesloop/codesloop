@@ -1,15 +1,15 @@
 # Copyright (c) 2008,2009, CodeSLoop Team
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
-# 
+#
 # 1. Redistributions of source code must retain the above copyright
 #    notice, this list of conditions and the following disclaimer.
 # 2. Redistributions in binary form must reproduce the above copyright
 #    notice, this list of conditions and the following disclaimer in the
 #    documentation and/or other materials provided with the distribution.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
 # IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
 # OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -85,7 +85,7 @@ ADD_LIBRARY( csl_common STATIC
              test_timer.c  test_timer.h
              common.h      pvlist.hh
              circbuf.hh
-             mpool.hh      tbuf.hh 
+             mpool.hh      tbuf.hh
              logger.cc     logger.hh
              arch.cc       arch.hh
              serializable.hh
@@ -93,6 +93,7 @@ ADD_LIBRARY( csl_common STATIC
              hlprs.cc      hlprs.hh
              hash.cc       hash.hh
              hash_helpers.hh
+             auto_close.hh
              var.hh
              int64.cc      int64.hh
              dbl.cc        dbl.hh

@@ -42,8 +42,8 @@ namespace csl
 {
   namespace comm
   {
-    bfd::bfd() : fd_(bfd::not_initialized_), start_(0), len_(0), use_exc_(false) { }
-    bfd::bfd(int fd) : fd_(fd), start_(0), len_(0), use_exc_(false) { }
+    bfd::bfd() : fd_(bfd::not_initialized_), start_(0), len_(0) { }
+    bfd::bfd(int fd) : fd_(fd), start_(0), len_(0) { }
 
     bfd::~bfd()
     {
@@ -55,6 +55,14 @@ namespace csl
         LEAVE_FUNCTION();
       }
       fd_ = closed_;
+    }
+
+    void bfd::shutdown()
+    {
+      ENTER_FUNCTION();
+      CSL_DEBUGF( L"shutdown() fd:%d",fd_ );
+      if( fd_ > 0 ) { ShutdownSocket(fd_); }
+      LEAVE_FUNCTION();
     }
 
     void bfd::init(int fd)
@@ -83,12 +91,12 @@ namespace csl
         len_   -= static_cast<uint16_t>(res.bytes_);
         start_ += static_cast<uint16_t>(res.bytes_);
 
-        CSL_DEBUGF( L"read_buf(res,sz:%d) => TRUE res{ bytes_:%lld data_:%p failed_:%s timed_out_:%s }",
+        CSL_DEBUGF( L"read_buf(res,sz:%d) => TRUE res{ bytes_:%lld data_:%p%s%s }",
                     sz,
                     res.bytes_,
                     res.data_,
-                    (res.failed_==true?"TRUE":"FALSE"),
-                    (res.timed_out_==true?"TRUE":"FALSE") );
+                    (res.failed_==true?" failed_:TRUE":""),
+                    (res.timed_out_==true?" timed_out_:TRUE":"") );
 
         RETURN_FUNCTION( true );
       }
@@ -103,7 +111,7 @@ namespace csl
     {
       ENTER_FUNCTION();
       read_res ret;
-      read(sz, timeout_ms, ret);
+      this->read(sz, timeout_ms, ret);
       RETURN_FUNCTION( ret );
     }
 
@@ -111,7 +119,7 @@ namespace csl
     {
       ENTER_FUNCTION();
       read_res ret;
-      recv(sz, timeout_ms, ret);
+      this->recv(sz, timeout_ms, ret);
       RETURN_FUNCTION( ret );
     }
 
@@ -119,7 +127,7 @@ namespace csl
     {
       ENTER_FUNCTION();
       read_res ret;
-      recvfrom(sz, from, timeout_ms, ret);
+      this->recvfrom(sz, from, timeout_ms, ret);
       RETURN_FUNCTION( ret );
     }
 
@@ -176,7 +184,9 @@ namespace csl
         {
           CSL_DEBUGF( L"read %d bytes",err );
           len_ += static_cast<uint16_t>(err);
-          goto return_ok;
+          /* */
+          if( this->read_buf(ret,sz) ) { goto return_ok;     }
+          else                         { goto return_failed; }
         }
       }
       else
@@ -190,13 +200,13 @@ namespace csl
       ret.failed_ = true;
 
     return_ok:
-      CSL_DEBUGF( L"read(sz:%d, timeout_ms:%d) => res{ bytes_:%lld data_:%p failed_:%s timed_out_:%s }",
+      CSL_DEBUGF( L"read(sz:%d, timeout_ms:%d) => res{ bytes_:%lld data_:%p%s%s }",
                   sz,
                   timeout_ms,
                   ret.bytes_,
                   ret.data_,
-                  (ret.failed_==true?"TRUE":"FALSE"),
-                  (ret.timed_out_==true?"TRUE":"FALSE") );
+                  (ret.failed_==true?" failed_:TRUE":""),
+                  (ret.timed_out_==true?" timed_out_:TRUE":"") );
 
       RETURN_FUNCTION( ret );
     }
@@ -250,7 +260,9 @@ namespace csl
         {
           CSL_DEBUGF( L"received %d bytes",err );
           len_ += static_cast<uint16_t>(err);
-          goto return_ok;
+          /* */
+          if( this->read_buf(ret,sz) ) { goto return_ok;     }
+          else                         { goto return_failed; }
         }
       }
       else
@@ -264,13 +276,13 @@ namespace csl
       ret.failed_ = true;
 
       return_ok:
-      CSL_DEBUGF( L"recv(sz:%d, timeout_ms:%d) => res{ bytes_:%lld data_:%p failed_:%s timed_out_:%s }",
+      CSL_DEBUGF( L"recv(sz:%d, timeout_ms:%d) => res{ bytes_:%lld data_:%p%s%s }",
                          sz,
                          timeout_ms,
                          ret.bytes_,
                          ret.data_,
-                         (ret.failed_==true?"TRUE":"FALSE"),
-                         (ret.timed_out_==true?"TRUE":"FALSE") );
+                         (ret.failed_==true?" failed_:TRUE":""),
+                         (ret.timed_out_==true?" timed_out_:TRUE":"") );
 
        RETURN_FUNCTION( ret );
     }
@@ -328,7 +340,9 @@ namespace csl
         {
           CSL_DEBUGF( L"received %d bytes from:%s:%d",err,inet_ntoa(from.sin_addr),ntohs(from.sin_port));
           len_ += static_cast<uint16_t>(err);
-          goto return_ok;
+          /* */
+          if( this->read_buf(ret,sz) ) { goto return_ok;     }
+          else                         { goto return_failed; }
         }
       }
       else
@@ -342,13 +356,13 @@ namespace csl
       ret.failed_ = true;
 
     return_ok:
-      CSL_DEBUGF( L"recvfrom(sz:%d, timeout_ms:%d) => res{ bytes_:%lld data_:%p failed_:%s timed_out_:%s }",
+      CSL_DEBUGF( L"recvfrom(sz:%d, timeout_ms:%d) => res{ bytes_:%lld data_:%p%s%s }",
                   sz,
                   timeout_ms,
                   ret.bytes_,
                   ret.data_,
-                  (ret.failed_==true?"TRUE":"FALSE"),
-                  (ret.timed_out_==true?"TRUE":"FALSE") );
+                  (ret.failed_==true?" failed_:TRUE":""),
+                  (ret.timed_out_==true?" timed_out_:TRUE":"") );
 
       RETURN_FUNCTION( ret );
     }
