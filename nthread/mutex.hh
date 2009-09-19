@@ -33,6 +33,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    Implementation is based on pthread (posix threads)
 */
 
+#include "codesloop/common/common.h"
+#include "codesloop/common/obj.hh"
+
 #ifdef __cplusplus
 #include <memory>
 
@@ -126,6 +129,9 @@ namespace csl
       // no-copy
       mutex(const mutex & other);
       mutex & operator=(const mutex & other);
+
+      CSL_OBJ(csl::nthread, mutex);
+      USE_EXC();
     };
 
     /** @brief scoped mutex template */
@@ -152,6 +158,8 @@ namespace csl
       scoped_mutex_template() : mtx_(0) {}
       scoped_mutex_template(const scoped_mutex_template &) : mtx_(0) {}
       scoped_mutex_template & operator=(const scoped_mutex_template &) { return *this; }
+
+      CSL_OBJ(csl::nthread, scoped_mutex_template);
     };
 
     /** @brief scoped mutex */
@@ -202,6 +210,8 @@ namespace csl
       // no copying
       ondemand_mutex(const ondemand_mutex &) : mtx_(0) {}
       ondemand_mutex & operator=(const ondemand_mutex &) { return *this; }
+
+      CSL_OBJ(csl::nthread, scoped_mutex_template);
     };
 
     /** @brief scoped mutex w/ ondemand_mutex */

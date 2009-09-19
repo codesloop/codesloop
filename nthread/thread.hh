@@ -33,6 +33,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    Implementation is based on pthread (posix threads)
 */
 
+#include "codesloop/common/common.h"
+#include "codesloop/common/obj.hh"
 #include "codesloop/nthread/pevent.hh"
 #ifdef __cplusplus
 #include <memory>
@@ -168,6 +170,9 @@ namespace csl
       // no-copy
       thread(const thread & other);
       thread & operator=(const thread & other);
+
+      CSL_OBJ(csl::nthread,thread);
+      USE_EXC();
     };
   }
 }

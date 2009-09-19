@@ -69,6 +69,8 @@ namespace csl
           struct ev_loop *   loop_;
           tcp_conn *         conn_;
         };
+
+        void lstnr_accept_cb( struct ev_loop *loop, ev_io *w, int revents );
       };
 
       struct lstnr::impl
@@ -79,6 +81,7 @@ namespace csl
         inpvec<ev_data *>    unqueued_;
         auto_close_socket    listener_;
         struct ev_loop *     loop_;
+        ev_io                accept_watcher_;
 
         impl()
         {
@@ -103,6 +106,7 @@ namespace csl
         /* info ops */
         const SAI & peer_addr(connid_t id) const { return addr_; } // TODO
 
+        CSL_OBJ(csl::comm, lstnr::impl);
       };
 
       /* forwarding functions */
@@ -153,16 +157,23 @@ namespace csl
       /* no copy */
       lstnr::lstnr(const lstnr & other) : impl_(reinterpret_cast<impl *>(0))
       {
-        throw comm::exc(exc::rs_not_implemented,L"csl::nthread::event");
+        THRNORET(exc::rs_not_implemented);
       }
 
       lstnr & lstnr::operator=(const lstnr & other)
       {
-        throw comm::exc(exc::rs_not_implemented,L"csl::nthread::event");
+        THR(exc::rs_not_implemented, *this);
         return *this;
       }
-    }
-  }
-}
+
+      namespace {
+        void lstnr_accept_cb( struct ev_loop *loop, ev_io *w, int revents )
+        {
+        }
+      }
+
+    } /* end of ns:tcp */
+  } /* end of ns:comm */
+} /* end of ns::csl */
 
 /* EOF */

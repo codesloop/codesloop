@@ -25,10 +25,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "codesloop/nthread/event.hh"
 #include "codesloop/common/common.h"
-#include <pthread.h> 
-#include <unistd.h>
-#include <sys/time.h>
-#include <errno.h>
+#include <pthread.h>
 
 /**
   @file event_impl_pthread.cc

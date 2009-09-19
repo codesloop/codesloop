@@ -64,6 +64,15 @@ namespace test_tcp_lstnr {
   void conn()
   {
     ENTER_FUNCTION();
+    in_addr_t   saddr = inet_addr("127.0.0.1");
+    SAI         addr;
+
+    ::memset( &addr,0,sizeof(addr) );
+    ::memcpy( &(addr.sin_addr),&saddr,sizeof(saddr) );
+
+    addr.sin_family  = AF_INET;
+    addr.sin_port    = htons(49912);
+
     lstnr o;
     LEAVE_FUNCTION();
   }

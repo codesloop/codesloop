@@ -26,9 +26,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/nthread/mutex.hh"
 #include "codesloop/common/common.h"
 #include <pthread.h>
-#include <unistd.h>
-#include <sys/time.h>
-#include <errno.h>
 
 /**
   @file mutex_impl_pthread.cc

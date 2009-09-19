@@ -25,8 +25,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "codesloop/nthread/pevent.hh"
 #include "codesloop/common/common.h"
-#include <windows.h> 
-#include <errno.h>
 
 /**
   @file pevent_impl_windows.cc
@@ -131,7 +129,7 @@ namespace csl
 
         if( WaitForSingleObject( *mutex_, INFINITE ) == WAIT_OBJECT_0 )
         {
-          if( invalid_ ) 
+          if( invalid_ )
           {
             ret = false;
             ReleaseMutex( *mutex_ );
@@ -144,7 +142,7 @@ namespace csl
           }
           else if( available_ )
           {
-            --available_; 
+            --available_;
             if( !available_ ) ResetEvent(*event_);
             ReleaseMutex( *mutex_ );
           }
@@ -160,10 +158,10 @@ retry_wait:
               else
               {
                 if( available_ == 0 )
-                { 
-                  if( !permanent_ ) goto retry_wait; 
+                {
+                  if( !permanent_ ) goto retry_wait;
                 } // this should not happen
-                else 
+                else
                 {
                   --available_;
                   if( !available_  ) { ResetEvent(*event_); }
@@ -183,7 +181,7 @@ retry_wait:
       {
         bool ret = false;
         if( WaitForSingleObject( *mutex_, INFINITE ) == WAIT_OBJECT_0 )
-        {          
+        {
           if( invalid_ ) { ret = false; }
           else if( available_ )
           {

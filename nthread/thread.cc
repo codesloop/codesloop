@@ -43,7 +43,7 @@ namespace csl
 {
   namespace nthread
   {
-    thread::thread() : impl_(new impl) {}
+    thread::thread() : impl_(new impl), use_exc_(true) {}
     thread::~thread() {}
 
     void thread::set_entry(callback & entry)
@@ -104,10 +104,15 @@ namespace csl
     }
 
     // no-copy
-    thread::thread(const thread & other) 
-      : impl_( reinterpret_cast<impl *>(0) ) { throw nthread::exc(exc::rs_not_implemented,L"csl::nthread::thread"); }
+    thread::thread(const thread & other) : impl_( reinterpret_cast<impl *>(0) )
+    {
+      THRNORET(exc::rs_not_implemented);
+    }
 
-    thread & thread::operator=(const thread & other) { return *this; }
+    thread & thread::operator=(const thread & other)
+    {
+      THR(exc::rs_not_implemented, *this);
+    }
   }
 }
 
