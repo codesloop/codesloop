@@ -64,4 +64,13 @@ ADD_EXECUTABLE( csrgen  csrparser.cc    csrparser.hh
                         exc.cc          exc.hh
                         csrgen_main.cc 
                         csrgen.hh)
+
+FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
+INSTALL( FILES ${includes} DESTINATION include/codesloop/rpc )
+
+INSTALL(TARGETS csrgen
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
 # -- EOF 
