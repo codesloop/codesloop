@@ -75,9 +75,9 @@ namespace csl
           mutex              mtx_;
         };
 
-        void lstnr_accept_cb( struct ev_loop *loop, ev_io *w, int revents );
+        void lstnr_accept_cb( struct ev_loop *loop, struct ev_io *w, int revents );
         void lstnr_wakeup_cb( struct ev_loop *loop, struct ev_async *w, int revents );
-
+        void lstnr_timer_cb( struct ev_loop *loop, struct ev_timer *w, int revents );
       };
 
       struct lstnr::impl
@@ -105,6 +105,7 @@ namespace csl
         struct ev_loop *     loop_;
         ev_io                accept_watcher_;
         ev_async             wakeup_watcher_;
+        ev_timer             periodic_watcher_;
         listener_entry       entry_;
         thread               entry_thread_;
         bool                 stop_me_;
@@ -112,7 +113,21 @@ namespace csl
 
         impl() : entry_(this), stop_me_(false), use_exc_(false)
         {
+          // create loop object
           loop_ = ev_loop_new( EVFLAG_AUTO );
+
+          // accept watcher init
+          ev_init( &accept_watcher_, lstnr_accept_cb );
+          accept_watcher_.data = this;
+
+          // async notifier init
+          ev_async_init( &wakeup_watcher_, lstnr_wakeup_cb );
+          wakeup_watcher_.data = this;
+
+          // timer init
+          ev_init( &periodic_watcher_, lstnr_timer_cb );
+          periodic_watcher_.repeat = 15.0;
+          periodic_watcher_.data   = this;
         }
 
         ~impl()
@@ -124,30 +139,35 @@ namespace csl
         // TODO things to be implemented:
         //   - async watcher cleanup ???
 
-        bool init(handler & h, SAI address)
+        bool init(handler & h, SAI address, int backlog)
         {
-          // TODO
-          //  - listener socket and co. init
+          ENTER_FUNCTION();
+
+          //  listener socket and co. init
           int sock = ::socket( AF_INET, SOCK_STREAM, 0 );
-          if( sock < 0 )
-          {
-            THRC(exc::rs_socket_failed,false);
-          }
+          if( sock < 0 ) { THRC(exc::rs_socket_failed,false); }
+
+          // this ensures that the listener socket will be closed
+          listener_.init(sock);
 
           int on = 1;
+          if( ::setsockopt( sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on) ) < 0 )    { THRC(exc::rs_setsockopt,false); }
+          if( ::bind( sock, (const struct sockaddr *)&address, sizeof(address) ) < 0 ) { THRC(exc::rs_bind_failed,false); }
+          if( ::listen( sock, backlog ) < 0 )                                          { THRC(exc::rs_listen_failed,false); }
 
-          if( ::setsockopt( sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on) ) < 0)
-          {
-            THRC(exc::rs_setsockopt,false);
-          }
-          //  - accept watcher init
+          // save the listener address
+          addr_ = address;
+
           //  - register async notifier
           //  - register accept watcher
 
-          // async notifier init
-          ev_async_init( &wakeup_watcher_, lstnr_wakeup_cb );
-          return false;
+          RETURN_FUNCTION(false);
         }
+
+
+        void accept_cb( struct ev_io *w, int revents ) { }
+        void wakeup_cb( struct ev_async *w, int revents ) { }
+        void timer_cb( struct ev_timer *w, int revents ) { }
 
         bool start()
         {
@@ -179,12 +199,22 @@ namespace csl
 
       namespace
       {
-        void lstnr_accept_cb( struct ev_loop *loop, ev_io *w, int revents )
+        void lstnr_accept_cb( struct ev_loop *loop, struct ev_io *w, int revents )
         {
+          lstnr::impl * this_ptr = reinterpret_cast<lstnr::impl *>(w->data);
+          this_ptr->accept_cb(w, revents);
         }
 
         void lstnr_wakeup_cb( struct ev_loop *loop, struct ev_async *w, int revents )
         {
+          lstnr::impl * this_ptr = reinterpret_cast<lstnr::impl *>(w->data);
+          this_ptr->wakeup_cb(w, revents);
+        }
+
+        void lstnr_timer_cb( struct ev_loop *loop, struct ev_timer *w, int revents)
+        {
+          lstnr::impl * this_ptr = reinterpret_cast<lstnr::impl *>(w->data);
+          this_ptr->timer_cb(w, revents);
         }
       }
 
@@ -199,9 +229,9 @@ namespace csl
         return impl_->addr_;
       }
 
-      bool lstnr::init(handler & h, SAI address)
+      bool lstnr::init(handler & h, SAI address, int backlog)
       {
-        return impl_->init(h,address);
+        return impl_->init(h,address,backlog);
       }
 
       bool lstnr::start()

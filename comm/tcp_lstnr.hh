@@ -56,7 +56,7 @@ namespace csl
           /* address, to be setup during initialization */
           const SAI & own_addr() const;
 
-          bool init(handler & h, SAI address);
+          bool init(handler & h, SAI address, int backlog=100);
           bool start();
           bool stop();
 
