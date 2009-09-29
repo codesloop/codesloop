@@ -37,11 +37,14 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/common/inpvec.hh"
 #include "codesloop/common/libev/evwrap.h"
 #include "codesloop/common/auto_close.hh"
+#include "codesloop/common/logger.hh"
 #include "codesloop/comm/exc.hh"
 #include "codesloop/comm/tcp_lstnr.hh"
 #include "codesloop/comm/bfd.hh"
 #include "codesloop/comm/sai.hh"
 #include "codesloop/nthread/mutex.hh"
+#include "codesloop/nthread/thread.hh"
+#include "codesloop/nthread/thrpool.hh"
 
 namespace csl
 {
@@ -58,7 +61,6 @@ namespace csl
         {
           bfd                bfd_;
           SAI                peer_addr_;
-          mutex              mtx_;
 
           ~tcp_conn() { bfd_.shutdown(); }
         };
@@ -68,13 +70,33 @@ namespace csl
           ev_io              watcher_;
           struct ev_loop *   loop_;
           tcp_conn *         conn_;
+          connid_t           id_;
+          bool               is_active_;
+          mutex              mtx_;
         };
 
         void lstnr_accept_cb( struct ev_loop *loop, ev_io *w, int revents );
+        void lstnr_wakeup_cb( struct ev_loop *loop, struct ev_async *w, int revents );
+
       };
 
       struct lstnr::impl
       {
+        class listener_entry : public thread::callback
+        {
+          private:
+            lstnr::impl * impl_;
+
+          public:
+            listener_entry(lstnr::impl * i) : impl_(i) { }
+
+            virtual void operator()(void)
+            {
+              CSL_DEBUGF(L"listener_entry::operator()");
+            }
+            CSL_OBJ(csl::comm, lstnr::impl::listener_entry);
+        };
+
         SAI                  addr_;
         inpvec<ev_data>      ev_pool_;
         inpvec<tcp_conn>     conn_pool_;
@@ -82,8 +104,13 @@ namespace csl
         auto_close_socket    listener_;
         struct ev_loop *     loop_;
         ev_io                accept_watcher_;
+        ev_async             wakeup_watcher_;
+        listener_entry       entry_;
+        thread               entry_thread_;
+        bool                 stop_me_;
+        mutex                mtx_;
 
-        impl()
+        impl() : entry_(this), stop_me_(false), use_exc_(false)
         {
           loop_ = ev_loop_new( EVFLAG_AUTO );
         }
@@ -94,9 +121,49 @@ namespace csl
           loop_ = 0;
         }
 
-        bool init(handler & h, SAI address) { return false; } // TODO
-        bool start() { return false; } // TODO
-        bool stop() { return false; } // TODO
+        // TODO things to be implemented:
+        //   - async watcher cleanup ???
+
+        bool init(handler & h, SAI address)
+        {
+          // TODO
+          //  - listener socket and co. init
+          int sock = ::socket( AF_INET, SOCK_STREAM, 0 );
+          if( sock < 0 )
+          {
+            THRC(exc::rs_socket_failed,false);
+          }
+
+          int on = 1;
+
+          if( ::setsockopt( sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on) ) < 0)
+          {
+            THRC(exc::rs_setsockopt,false);
+          }
+          //  - accept watcher init
+          //  - register async notifier
+          //  - register accept watcher
+
+          // async notifier init
+          ev_async_init( &wakeup_watcher_, lstnr_wakeup_cb );
+          return false;
+        }
+
+        bool start()
+        {
+          // TODO
+          //  - start listener thread
+          return false;
+        }
+
+        bool stop()
+        {
+          // TODO
+          // - set stop flag
+          // - stop loop
+          // - stop listener thread
+          return false;
+        }
 
         /* network ops */
         read_res read(connid_t id, size_t sz, uint32_t timeout_ms) { read_res rr; return rr; } // TODO
@@ -107,7 +174,19 @@ namespace csl
         const SAI & peer_addr(connid_t id) const { return addr_; } // TODO
 
         CSL_OBJ(csl::comm, lstnr::impl);
+        USE_EXC();
       };
+
+      namespace
+      {
+        void lstnr_accept_cb( struct ev_loop *loop, ev_io *w, int revents )
+        {
+        }
+
+        void lstnr_wakeup_cb( struct ev_loop *loop, struct ev_async *w, int revents )
+        {
+        }
+      }
 
       /* forwarding functions */
       const SAI & lstnr::peer_addr(connid_t id) const
@@ -164,12 +243,6 @@ namespace csl
       {
         THR(exc::rs_not_implemented, *this);
         return *this;
-      }
-
-      namespace {
-        void lstnr_accept_cb( struct ev_loop *loop, ev_io *w, int revents )
-        {
-        }
       }
 
     } /* end of ns:tcp */

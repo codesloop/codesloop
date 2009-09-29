@@ -42,9 +42,9 @@ namespace csl
     class handler
     {
       public:
-        virtual bool on_conn(connid_t id)    { return false; }
-        virtual bool on_data(connid_t id)    { return false; }
-        virtual void on_disconn(connid_t id) { return; }
+        virtual bool on_connected(connid_t id)       { return false; }
+        virtual bool on_data_arrival(connid_t id)    { return false; }
+        virtual void on_disconnected(connid_t id)    { return; }
         virtual ~handler() {}
     };
   }

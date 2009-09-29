@@ -77,7 +77,12 @@ namespace csl
         void init(int fd)
         {
           ENTER_FUNCTION();
-          CSL_DEBUGF( L"init(fd:%d)",fd );
+          CSL_DEBUGF( L"init(fd:%d) [current fd:%d]",fd,fd_ );
+          if( fd_ > 0 )
+          {
+            CSL_DEBUGF( L"closing already initialized fd:%d",fd_ );
+            close_fd( fd_ );
+          }
           fd_ = fd;
           LEAVE_FUNCTION();
         }

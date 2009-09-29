@@ -112,3 +112,6 @@ test/comm/t__bfd
 test/comm/t__tcp_client
 test/comm/t__tcp_lstnr
 csl.log
+TODO.tasks
+tags
+test/common/t__auto_cloce
