@@ -59,6 +59,10 @@ namespace csl
         read_res & recv(uint32_t sz, uint32_t timeout_ms, read_res & rr);
         read_res & recvfrom(uint32_t sz, SAI & from, uint32_t timeout_ms, read_res & rr);
 
+        uint32_t read_some(uint32_t timeout_ms);  ///<try to read, and return the number of bytes in the buffer
+        uint32_t recv_some(uint32_t timeout_ms);  ///<try to recv, and return the number of bytes in the buffer
+        uint32_t recvfrom_some(SAI & from, uint32_t timeout_ms); ///<try to recvfrom, and return the number of bytes in the buffer
+
         bool write(uint8_t * data, uint32_t sz);
         bool send(uint8_t * data, uint32_t sz);
         bool sendto(uint8_t * data, uint32_t sz,const SAI & to);

@@ -74,6 +74,131 @@ namespace csl
       LEAVE_FUNCTION();
     }
 
+    uint32_t bfd::read_some(uint32_t timeout_ms)
+    {
+      ENTER_FUNCTION();
+      CSL_DEBUGF( L"read_some(timeout_ms:%d)", timeout_ms );
+      uint32_t free_space = n_free();
+      int err = 0;
+
+      if( fd_ <= 0 )             { CSL_DEBUGF(L"invalid fd:%d",fd_); }
+      else if( free_space == 0 ) { CSL_DEBUGF(L"no space for data  len_:%d start_:%d max size:%d",len_,start_,sizeof(buf_)); }
+      else if( can_read( timeout_ms ) )
+      {
+        if( fd_ < 0 ) { CSL_DEBUGF(L"invalid fd:%d after data check",fd_); }
+        else
+        {
+          if( (err = ::read( fd_, buf_+start_, free_space)) < 0 )
+          {
+            CSL_DEBUGF( L"read(fd:%d, buf+start_:%p+%d, sz:%d) => FAILED %d [%s]",fd_,buf_,start_,free_space,err,strerror(errno) );
+            CloseSocket( fd_ );
+            fd_ = fd_error_;
+          }
+          else if( err == 0 )
+          {
+            /* socket closed */
+            CSL_DEBUGF( L"read(fd:%d, buf+start_:%p+%d, sz:%d) => EOF %d",fd_,buf_,start_,free_space,err );
+            CloseSocket( fd_ );
+            fd_ = closed_;
+          }
+          else
+          {
+            CSL_DEBUGF( L"read %d bytes",err );
+            len_ += static_cast<uint16_t>(err);
+          }
+        }
+      }
+      else { CSL_DEBUGF( L"timed out: timeout:%d",timeout_ms ); }
+      CSL_DEBUGF( L"read_some(timeout_ms:%d) => %d [%s]",timeout_ms,size(),(n_free()==free_space?"FAILED":"OK"));
+      RETURN_FUNCTION( this->size() );
+    }
+
+    uint32_t bfd::recv_some(uint32_t timeout_ms)
+    {
+      ENTER_FUNCTION();
+      CSL_DEBUGF( L"recv_some(timeout_ms:%d)", timeout_ms );
+      uint32_t free_space = n_free();
+      int err = 0;
+
+      if( fd_ <= 0 )             { CSL_DEBUGF(L"invalid fd:%d",fd_); }
+      else if( free_space == 0 ) { CSL_DEBUGF(L"no space for data  len_:%d start_:%d max size:%d",len_,start_,sizeof(buf_)); }
+      else if( can_read( timeout_ms ) )
+      {
+        if( fd_ < 0 ) { CSL_DEBUGF(L"invalid fd:%d after data check",fd_); }
+        else
+        {
+          if( (err = ::recv( fd_, buf_+start_, free_space, 0)) < 0 )
+          {
+            CSL_DEBUGF( L"recv(fd:%d, buf+start_:%p+%d, sz:%d, 0) => FAILED %d [%s]",fd_,buf_,start_,free_space,err,strerror(errno) );
+            CloseSocket( fd_ );
+            fd_ = fd_error_;
+          }
+          else if( err == 0 )
+          {
+            /* socket closed */
+            CSL_DEBUGF( L"recv(fd:%d, buf+start_:%p+%d, sz:%d, 0) => EOF %d",fd_,buf_,start_,free_space,err );
+            CloseSocket( fd_ );
+            fd_ = closed_;
+          }
+          else
+          {
+            CSL_DEBUGF( L"read %d bytes",err );
+            len_ += static_cast<uint16_t>(err);
+          }
+        }
+      }
+      else { CSL_DEBUGF( L"timed out: timeout:%d",timeout_ms ); }
+
+      CSL_DEBUGF( L"recv_some(timeout_ms:%d) => %d [%s]",timeout_ms,size(),(n_free()==free_space?"FAILED":"OK"));
+
+      RETURN_FUNCTION( this->size() );
+    }
+
+    uint32_t bfd::recvfrom_some(SAI & from, uint32_t timeout_ms)
+    {
+      ENTER_FUNCTION();
+      CSL_DEBUGF( L"recvfrom_some(from, timeout_ms:%d)", timeout_ms );
+      uint32_t free_space = n_free();
+      int err = 0;
+
+      if( fd_ <= 0 )             { CSL_DEBUGF(L"invalid fd:%d",fd_); }
+      else if( free_space == 0 ) { CSL_DEBUGF(L"no space for data  len_:%d start_:%d max size:%d",len_,start_,sizeof(buf_)); }
+      else if( can_read( timeout_ms ) )
+      {
+        if( fd_ < 0 ) { CSL_DEBUGF(L"invalid fd:%d after data check",fd_); }
+        else
+        {
+          socklen_t slen = sizeof(SAI);
+
+          if( (err = ::recvfrom( fd_, buf_+start_, free_space, 0, reinterpret_cast<struct sockaddr *>(&from), &slen)) < 0 )
+          {
+            CSL_DEBUGF( L"recvfrom(fd:%d, buf+start_:%p+%d, sz:%d, 0, addr, len) => FAILED %d [%s]",fd_,buf_,start_,free_space,err,strerror(errno) );
+            CloseSocket( fd_ );
+            fd_ = fd_error_;
+          }
+          else if( err == 0 )
+          {
+            /* socket closed */
+            CSL_DEBUGF( L"recvfrom(fd:%d, buf+start_:%p+%d, sz:%d, 0, addr, len) => EOF %d",fd_,buf_,start_,free_space,err );
+            CloseSocket( fd_ );
+            fd_ = closed_;
+          }
+          else
+          {
+            CSL_DEBUGF( L"received %d bytes from:%s:%d",err,inet_ntoa(from.sin_addr),ntohs(from.sin_port));
+            len_ += static_cast<uint16_t>(err);
+          }
+        }
+      }
+      else { CSL_DEBUGF( L"timed out: timeout:%d",timeout_ms ); }
+
+      CSL_DEBUGF( L"recvfrom_some(addr:%s:%d, timeout_ms:%d) => %d [%s]",
+                  inet_ntoa(from.sin_addr),ntohs(from.sin_port), timeout_ms,size(),
+                  (n_free()==free_space?"FAILED":"OK"));
+
+      RETURN_FUNCTION( this->size() );
+    }
+
     bool bfd::read_buf(read_res & res, uint32_t sz)
     {
       ENTER_FUNCTION();
@@ -107,39 +232,13 @@ namespace csl
       }
     }
 
-    read_res bfd::read(uint32_t sz, uint32_t timeout_ms)
-    {
-      ENTER_FUNCTION();
-      read_res ret;
-      this->read(sz, timeout_ms, ret);
-      RETURN_FUNCTION( ret );
-    }
-
-    read_res bfd::recv(uint32_t sz, uint32_t timeout_ms)
-    {
-      ENTER_FUNCTION();
-      read_res ret;
-      this->recv(sz, timeout_ms, ret);
-      RETURN_FUNCTION( ret );
-    }
-
-    read_res bfd::recvfrom(uint32_t sz, SAI & from, uint32_t timeout_ms)
-    {
-      ENTER_FUNCTION();
-      read_res ret;
-      this->recvfrom(sz, from, timeout_ms, ret);
-      RETURN_FUNCTION( ret );
-    }
-
     read_res & bfd::read(uint32_t sz, uint32_t timeout_ms, read_res & ret)
     {
       ENTER_FUNCTION();
       int32_t  err  = 0;
       ret.reset();
 
-      CSL_DEBUGF( L"read(sz:%d, timeout_ms:%d)",
-                  sz,
-                  timeout_ms );
+      CSL_DEBUGF( L"read(sz:%d, timeout_ms:%d)", sz, timeout_ms );
 
       if( sz == 0 )
       {
@@ -154,7 +253,7 @@ namespace csl
         CSL_DEBUG_ASSERT( len_ == 0 );
       }
 
-      if( fd_ <= 0 )         goto return_failed;
+      if( fd_ <= 0 ) goto return_failed;
 
       if( can_read(timeout_ms) )
       {
@@ -524,6 +623,30 @@ namespace csl
       {
         RETURN_FUNCTION( true );
       }
+    }
+
+    read_res bfd::read(uint32_t sz, uint32_t timeout_ms)
+    {
+      ENTER_FUNCTION();
+      read_res ret;
+      this->read(sz, timeout_ms, ret);
+      RETURN_FUNCTION( ret );
+    }
+
+    read_res bfd::recv(uint32_t sz, uint32_t timeout_ms)
+    {
+      ENTER_FUNCTION();
+      read_res ret;
+      this->recv(sz, timeout_ms, ret);
+      RETURN_FUNCTION( ret );
+    }
+
+    read_res bfd::recvfrom(uint32_t sz, SAI & from, uint32_t timeout_ms)
+    {
+      ENTER_FUNCTION();
+      read_res ret;
+      this->recvfrom(sz, from, timeout_ms, ret);
+      RETURN_FUNCTION( ret );
     }
 
     uint32_t bfd::size() const
