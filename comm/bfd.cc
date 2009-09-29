@@ -47,14 +47,7 @@ namespace csl
 
     bfd::~bfd()
     {
-      if( fd_ > 0 )
-      {
-        ENTER_FUNCTION();
-        CSL_DEBUGF( L"closing fd:%d",fd_ );
-        CloseSocket( fd_ );
-        LEAVE_FUNCTION();
-      }
-      fd_ = closed_;
+      this->close();
     }
 
     void bfd::shutdown()
@@ -62,6 +55,15 @@ namespace csl
       ENTER_FUNCTION();
       CSL_DEBUGF( L"shutdown() fd:%d",fd_ );
       if( fd_ > 0 ) { ShutdownSocket(fd_); }
+      LEAVE_FUNCTION();
+    }
+
+    void bfd::close()
+    {
+      ENTER_FUNCTION();
+      CSL_DEBUGF( L"close() fd:%d",fd_ );
+      if( fd_ > 0 ) { CloseSocket(fd_); }
+      fd_ = closed_;
       LEAVE_FUNCTION();
     }
 
@@ -199,38 +201,6 @@ namespace csl
       RETURN_FUNCTION( this->size() );
     }
 
-    bool bfd::read_buf(read_res & res, uint32_t sz)
-    {
-      ENTER_FUNCTION();
-      CSL_DEBUGF( L"read_buf(res,sz:%d) [len_:%d start_:%d fd_:%d]",sz,len_,start_,fd_ );
-
-      if( len_ > 0 )
-      {
-        // fill res members
-        res.bytes_      = (sz < len_ ? sz : len_);
-        res.data_       = buf_+start_;
-        res.failed_     = false;
-        res.timed_out_  = false;
-
-        // fill own members
-        len_   -= static_cast<uint16_t>(res.bytes_);
-        start_ += static_cast<uint16_t>(res.bytes_);
-
-        CSL_DEBUGF( L"read_buf(res,sz:%d) => TRUE res{ bytes_:%lld data_:%p%s%s }",
-                    sz,
-                    res.bytes_,
-                    res.data_,
-                    (res.failed_==true?" failed_:TRUE":""),
-                    (res.timed_out_==true?" timed_out_:TRUE":"") );
-
-        RETURN_FUNCTION( true );
-      }
-      else
-      {
-        CSL_DEBUGF( L"read_buf(res,sz:%d) => FALSE",sz );
-        RETURN_FUNCTION( false );
-      }
-    }
 
     read_res & bfd::read(uint32_t sz, uint32_t timeout_ms, read_res & ret)
     {
@@ -578,12 +548,6 @@ namespace csl
       RETURN_FUNCTION( ret );
     }
 
-    int bfd::state() const
-    {
-      if( fd_ > 0 ) return ok_;
-      else          return fd_;
-    }
-
     bool bfd::can_read(uint32_t timeout_ms)
     {
       ENTER_FUNCTION();
@@ -649,6 +613,12 @@ namespace csl
       RETURN_FUNCTION( ret );
     }
 
+    int bfd::state() const
+    {
+      if( fd_ > 0 ) return ok_;
+      else          return fd_;
+    }
+
     uint32_t bfd::size() const
     {
       return len_;
@@ -657,6 +627,39 @@ namespace csl
     uint32_t bfd::n_free() const
     {
       return (sizeof(buf_)-(len_+start_));
+    }
+
+    bool bfd::read_buf(read_res & res, uint32_t sz)
+    {
+      ENTER_FUNCTION();
+      CSL_DEBUGF( L"read_buf(res,sz:%d) [len_:%d start_:%d fd_:%d]",sz,len_,start_,fd_ );
+
+      if( len_ > 0 )
+      {
+        // fill res members
+        res.bytes_      = (sz < len_ ? sz : len_);
+        res.data_       = buf_+start_;
+        res.failed_     = false;
+        res.timed_out_  = false;
+
+        // fill own members
+        len_   -= static_cast<uint16_t>(res.bytes_);
+        start_ += static_cast<uint16_t>(res.bytes_);
+
+        CSL_DEBUGF( L"read_buf(res,sz:%d) => TRUE res{ bytes_:%lld data_:%p%s%s }",
+                    sz,
+                    res.bytes_,
+                    res.data_,
+                    (res.failed_==true?" failed_:TRUE":""),
+                    (res.timed_out_==true?" timed_out_:TRUE":"") );
+
+                    RETURN_FUNCTION( true );
+      }
+      else
+      {
+        CSL_DEBUGF( L"read_buf(res,sz:%d) => FALSE",sz );
+        RETURN_FUNCTION( false );
+      }
     }
   }
 }
