@@ -55,16 +55,18 @@ namespace csl
     In other scenarios the data may arrive in smaller portions than it makes sense for the application.
     Buffering helps to merge small pieces together. However the application must keep in mind that it only
     have a limited buffer space, so care must be taken.
+
+    The write-like operations are not buffered at all.
     */
     class bfd
     {
       public:
         bfd();
-        bfd(int fd);
+        bfd(int fd); ///<constructs the class w/ an open file descriptor
 
         ~bfd();
 
-        void init(int fd);
+        void init(int fd); ///<initializes the class w/ an open file descriptor
 
         /**
         @brief read n bytes either from the buffer or the network
@@ -82,7 +84,6 @@ namespace csl
         and it is a POD. many compilers optimize this pretty well. for time critical functions a variation is
         provided that returns a reference.
 
-        the write-like operations are not buffered at all
         */
         read_res read(uint32_t sz, uint32_t timeout_ms);
         read_res recv(uint32_t sz, uint32_t timeout_ms);                  ///<same as read() but uses recv()
