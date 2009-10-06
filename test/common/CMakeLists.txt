@@ -3,13 +3,13 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
-# 
+#
 # 1. Redistributions of source code must retain the above copyright
 #    notice, this list of conditions and the following disclaimer.
 # 2. Redistributions in binary form must reproduce the above copyright
 #    notice, this list of conditions and the following disclaimer in the
 #    documentation and/or other materials provided with the distribution.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
 # IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
 # OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -54,7 +54,7 @@ IF(WIN32)
                     ../../../3rdparty/zlib/GnuWin32/lib
                   )
 
-  INCLUDE_DIRECTORIES( ../../..  
+  INCLUDE_DIRECTORIES( ../../..
                        ../../common
                        "C:/Program Files/GnuWin32/include/"
                        $ENV{ZLIB_DEV_ENV}/include
@@ -111,6 +111,7 @@ ADD_EXECUTABLE( t__binry         t__binry.cc )
 ADD_EXECUTABLE( t__serial        t__serial.cc )
 ADD_EXECUTABLE( t__obj           t__obj.cc )
 ADD_EXECUTABLE( t__inpvec        t__inpvec.cc )
+ADD_EXECUTABLE( t__queue         t__queue.cc )
 ADD_EXECUTABLE( t__hash          t__hash.cc )
 ADD_EXECUTABLE( t__hash_helpers  t__hash_helpers.cc )
 ADD_EXECUTABLE( t__hash_exp      t__hash_exp.cc )

@@ -106,7 +106,6 @@ rpc/csrgen
 rpc/csrparser.cc
 rpc/experiment/csl_rpc
 test/mq/t__qpid_sess
-
 test/comm/t__tcp_libev
 test/comm/t__bfd
 test/comm/t__tcp_client
@@ -115,3 +114,4 @@ csl.log
 TODO.tasks
 tags
 test/common/t__auto_cloce
+test/common/t__queue

@@ -1157,6 +1157,14 @@ namespace csl
           RETURN_FUNCTION( pos );
         }
 
+        uint64_t first_free_pos() const
+        {
+          ENTER_FUNCTION();
+          // TODO : implement here
+          uint64_t pos = last_free_pos();
+          RETURN_FUNCTION( pos );
+        }
+
         T * get_ptr(uint64_t at)
         {
           ENTER_FUNCTION_X();

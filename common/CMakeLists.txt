@@ -84,7 +84,7 @@ ADD_LIBRARY( csl_common STATIC
              xdrbuf.cc     xdrbuf.hh
              test_timer.c  test_timer.h
              common.h      pvlist.hh
-             circbuf.hh
+             circbuf.hh    queue.hh
              mpool.hh      tbuf.hh
              logger.cc     logger.hh
              arch.cc       arch.hh
