@@ -99,8 +99,7 @@ namespace csl
             ENTER_FUNCTION();
             const unsigned char * bl = byte_last_free();
             uint64_t ret = size();
-            uint8_t x1,x2,x3,x4;
-            uint8_t y1,y2,y3,y4;
+            uint8_t x1,x2,x3,x4, y1,y2,y3,y4;
 
             for( int64_t i=static_cast<int64_t>(mul_)-1;i>=0;--i )
             {
@@ -129,6 +128,42 @@ namespace csl
             }
             RETURN_FUNCTION(ret);
           }
+
+          uint64_t first_free() const
+          {
+            ENTER_FUNCTION();
+            const unsigned char * bf = byte_first_free();
+            uint64_t ret = size();
+            uint8_t x1,x2,x3,x4, y1,y2,y3,y4;
+
+            for( int64_t i=0;i<static_cast<int64_t>(mul_);++i )
+            {
+              if( bmap_[i] == 0xFFFFFFFFFFFFFFFFULL ) ret = (i+1)*width_;
+              else
+              {
+                // for 32 bits
+                if( (x4 = (bf[(bmap_[i])&0xff])) == 0xff )      { ret = i*width_;              }
+                else                                            { ret = i*width_+x4;    break; }
+                if( (x3 = (bf[(bmap_[i]>>8)&0xff])) == 0xff )   { ret = i*width_+8;            }
+                else                                            { ret = i*width_+8+x3;  break; }
+                if( (x2 = (bf[(bmap_[i]>>16)&0xff])) == 0xff )  { ret = i*width_+16;           }
+                else                                            { ret = i*width_+16+x2; break; }
+                if( (x1 = (bf[(bmap_[i]>>24)&0xff])) == 0xff )  { ret = i*width_+24;           }
+                else                                            { ret = i*width_+24+x1; break; }
+                // for 64 bits
+                if( (y4 = (bf[(bmap_[i]>>32)&0xff])) == 0xff )  { ret = i*width_+32;           }
+                else                                            { ret = i*width_+32+y4; break; }
+                if( (y3 = (bf[(bmap_[i]>>40)&0xff])) == 0xff )  { ret = i*width_+40;           }
+                else                                            { ret = i*width_+40+y3; break; }
+                if( (y2 = (bf[(bmap_[i]>>48)&0xff])) == 0xff )  { ret = i*width_+48;           }
+                else                                            { ret = i*width_+48+y2; break; }
+                if( (y1 = (bf[(bmap_[i]>>56)&0xff])) == 0xff )  { ret = i*width_+56;           }
+                else                                            { ret = i*width_+56+y1; break; }
+              }
+            }
+            RETURN_FUNCTION(ret);
+          }
+
           uint64_t n_free() const { return ((width_*mul_)-n_items()); }
 
           void destroy()
@@ -1160,8 +1195,19 @@ namespace csl
         uint64_t first_free_pos() const
         {
           ENTER_FUNCTION();
-          // TODO : implement here
-          uint64_t pos = last_free_pos();
+          uint64_t pos = 0;
+          uint64_t f   = 0;
+
+          const item * p = &head_;
+
+          while( p != NULL )
+          {
+            f = p->first_free();
+            pos += f;
+            if( f != p->size() ) break;
+            p = p->next_;
+          }
+          CSL_DEBUGF(L"first_free_pos() => %lld",pos);
           RETURN_FUNCTION( pos );
         }
 
