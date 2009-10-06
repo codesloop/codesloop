@@ -25,7 +25,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
   @file tcp_lstnr.cc
-  @brief @todo
+  @brief TODO: complete description
 */
 
 #ifndef DEBUG
@@ -86,15 +86,9 @@ namespace csl
         {
           private:
             lstnr::impl * impl_;
-
           public:
             listener_entry(lstnr::impl * i) : impl_(i) { }
-
-            virtual void operator()(void)
-            {
-              CSL_DEBUGF(L"listener_entry::operator()");
-            }
-            CSL_OBJ(csl::comm, lstnr::impl::listener_entry);
+            virtual void operator()(void) { impl_->listener_entry_cb(); }
         };
 
         SAI                  addr_;
@@ -107,7 +101,7 @@ namespace csl
         ev_async             wakeup_watcher_;
         ev_timer             periodic_watcher_;
         listener_entry       entry_;
-        thread               entry_thread_;
+        thread               listener_thread_;
         bool                 stop_me_;
         mutex                mtx_;
 
@@ -128,6 +122,9 @@ namespace csl
           ev_init( &periodic_watcher_, lstnr_timer_cb );
           periodic_watcher_.repeat = 15.0;
           periodic_watcher_.data   = this;
+
+          // set thread entry
+          listener_thread_.set_entry( entry_ );
         }
 
         ~impl()
@@ -135,9 +132,6 @@ namespace csl
           if( loop_ ) ev_loop_destroy( loop_ );
           loop_ = 0;
         }
-
-        // TODO things to be implemented:
-        //   - async watcher cleanup ???
 
         bool init(handler & h, SAI address, int backlog)
         {
@@ -159,21 +153,71 @@ namespace csl
           addr_ = address;
 
           //  - register async notifier
-          //  - register accept watcher
+          ev_async_start( loop_, &wakeup_watcher_ );
 
-          RETURN_FUNCTION(false);
+          //  - register accept watcher
+          ev_io_set( &accept_watcher_, sock, EV_READ  );
+          ev_io_start( loop_, &accept_watcher_ );
+
+          RETURN_FUNCTION(true);
         }
 
+        /* network ops */
+        read_res read(connid_t id, size_t sz, uint32_t timeout_ms) { read_res rr; return rr; } // TODO
+        read_res & read(connid_t id, size_t sz, uint32_t timeout_ms, read_res & rr) { return rr; } // TODO
+        bool write(connid_t id, uint8_t * data, size_t sz) { return false; } // TODO
 
-        void accept_cb( struct ev_io *w, int revents ) { }
-        void wakeup_cb( struct ev_async *w, int revents ) { }
-        void timer_cb( struct ev_timer *w, int revents ) { }
+        /* info ops */
+        const SAI & peer_addr(connid_t id) const { return addr_; } // TODO
+
+        void accept_cb( struct ev_io *w, int revents )
+        {
+          ENTER_FUNCTION();
+          CSL_DEBUGF(L"accept conn: fd:%d w->events:%d revents:%d",w->fd,w->events,revents);
+          SAI addr;
+          socklen_t sz = sizeof(addr);
+          int conn_fd = ::accept( w->fd,reinterpret_cast<struct sockaddr *>(&addr),&sz );
+          CSL_DEBUGF(L"accepted conn: %d from %s:%d",conn_fd,inet_ntoa(addr.sin_addr),ntohs(addr.sin_port));
+          CSL_DEBUGF(L"closing socket");
+          ShutdownCloseSocket( conn_fd );
+          LEAVE_FUNCTION();
+        }
+
+        void wakeup_cb( struct ev_async *w, int revents )
+        {
+          ENTER_FUNCTION();
+          LEAVE_FUNCTION();
+        }
+
+        void timer_cb( struct ev_timer *w, int revents )
+        {
+          ENTER_FUNCTION();
+          LEAVE_FUNCTION();
+        }
+
+        void listener_entry_cb( )
+        {
+          CSL_DEBUGF(L"launch loop: %p",loop_);
+          ev_loop( loop_, 0 );
+          CSL_DEBUGF(L"loop has been stopped: %p",loop_);
+          ev_loop_destroy( loop_ );
+          CSL_DEBUGF(L"exiting listener thread");
+        }
 
         bool start()
         {
-          // TODO
-          //  - start listener thread
-          return false;
+          ENTER_FUNCTION();
+          bool ret = listener_thread_.start();
+
+          if( ret )
+          {
+            CSL_DEBUGF(L"start waiting for the thread to be really started");
+            ret = listener_thread_.start_event().wait();
+            CSL_DEBUGF(L"thread %s",(ret==true?"STARTED":"NOT STARTED"));
+          }
+
+          CSL_DEBUGF(L"start() => %s",(ret==true?"OK":"FAILED"));
+          RETURN_FUNCTION(ret);
         }
 
         bool stop()
@@ -185,13 +229,15 @@ namespace csl
           return false;
         }
 
-        /* network ops */
-        read_res read(connid_t id, size_t sz, uint32_t timeout_ms) { read_res rr; return rr; } // TODO
-        read_res & read(connid_t id, size_t sz, uint32_t timeout_ms, read_res & rr) { return rr; } // TODO
-        bool write(connid_t id, uint8_t * data, size_t sz) { return false; } // TODO
+        pevent & start_event()
+        {
+          return listener_thread_.start_event();
+        }
 
-        /* info ops */
-        const SAI & peer_addr(connid_t id) const { return addr_; } // TODO
+        pevent & exit_event()
+        {
+          return listener_thread_.exit_event();
+        }
 
         CSL_OBJ(csl::comm, lstnr::impl);
         USE_EXC();
@@ -199,6 +245,9 @@ namespace csl
 
       namespace
       {
+        //
+        // event handlers. these forward the call to the implementation object
+        //
         void lstnr_accept_cb( struct ev_loop *loop, struct ev_io *w, int revents )
         {
           lstnr::impl * this_ptr = reinterpret_cast<lstnr::impl *>(w->data);
@@ -219,30 +268,19 @@ namespace csl
       }
 
       /* forwarding functions */
-      const SAI & lstnr::peer_addr(connid_t id) const
-      {
-        return impl_->peer_addr(id);
-      }
-
-      const SAI & lstnr::own_addr() const
-      {
-        return impl_->addr_;
-      }
+      const SAI & lstnr::peer_addr(connid_t id) const { return impl_->peer_addr(id); }
+      const SAI & lstnr::own_addr() const             { return impl_->addr_;         }
 
       bool lstnr::init(handler & h, SAI address, int backlog)
       {
         return impl_->init(h,address,backlog);
       }
 
-      bool lstnr::start()
-      {
-        return impl_->start();
-      }
+      bool lstnr::start() { return impl_->start(); }
+      bool lstnr::stop()  { return impl_->stop();  }
 
-      bool lstnr::stop()
-      {
-        return impl_->stop();
-      }
+      pevent & lstnr::start_event() { return impl_->start_event(); }
+      pevent & lstnr::exit_event()  { return impl_->exit_event();  }
 
       read_res lstnr::read(connid_t id, size_t sz, uint32_t timeout_ms)
       {

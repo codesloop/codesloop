@@ -61,6 +61,30 @@ namespace test_tcp_lstnr {
 
   void baseline() { lstnr o; }
 
+  class my_tcp_handler : public csl::comm::handler
+  {
+    public:
+      virtual bool on_connected(connid_t id)
+      {
+        ENTER_FUNCTION();
+        RETURN_FUNCTION(false);
+      }
+
+      virtual bool on_data_arrival(connid_t id)
+      {
+        ENTER_FUNCTION();
+        RETURN_FUNCTION(false);
+      }
+
+      virtual void on_disconnected(connid_t id)
+      {
+        ENTER_FUNCTION();
+        LEAVE_FUNCTION();
+      }
+
+      CSL_OBJ(test_tcp_lstnr,my_tcp_handler);
+  };
+
   void conn()
   {
     ENTER_FUNCTION();
@@ -73,7 +97,11 @@ namespace test_tcp_lstnr {
     addr.sin_family  = AF_INET;
     addr.sin_port    = htons(49912);
 
-    lstnr o;
+    lstnr l;
+    my_tcp_handler h;
+    l.init(h, addr);
+    l.start();
+    l.exit_event().wait();
     LEAVE_FUNCTION();
   }
 

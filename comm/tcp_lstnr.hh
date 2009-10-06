@@ -28,7 +28,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
    @file tcp_lstnr.hh
-   @brief @todo
+   @brief TODO: complete description
  */
 
 #include "codesloop/comm/sai.hh"
@@ -38,11 +38,14 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/comm/handler.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/obj.hh"
+#include "codesloop/nthread/pevent.hh"
 #ifdef __cplusplus
 #include <memory>
 
 namespace csl
 {
+  using nthread::pevent;
+
   namespace comm
   {
     namespace tcp
@@ -59,6 +62,9 @@ namespace csl
           bool init(handler & h, SAI address, int backlog=100);
           bool start();
           bool stop();
+
+          pevent & start_event();
+          pevent & exit_event();
 
           /* network ops */
           read_res read(connid_t id, size_t sz, uint32_t timeout_ms);
