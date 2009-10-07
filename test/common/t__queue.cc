@@ -31,6 +31,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #if 0
 #ifndef DEBUG
 #define DEBUG
+#define DEBUG_ENABLE_INDENT
+#define DEBUG_VERBOSE
 #endif /* DEBUG */
 #endif
 
@@ -100,6 +102,39 @@ namespace test_queue {
     assert( q.size() == 0 );
   }
 
+  void queue_pushpopB()
+  {
+    queue<uint64_t> q;
+    for( uint64_t i=0;i<200;++i )
+    {
+      assert( q.n_items() == i );
+      q.push( i );
+    }
+    uint64_t j=0;
+    while( q.n_items() > 100 )
+    {
+      queue<uint64_t>::handler h;
+      assert( q.pop(h) == true );
+      assert( *(h.get()) == j );
+      ++j;
+    }
+    for( uint64_t i=200;i<400;++i )
+    {
+      assert( q.n_items() == i-100 );
+      q.push( i );
+    }
+    while( q.n_items() > 0 )
+    {
+      queue<uint64_t>::handler h;
+      assert( q.pop(h) == true );
+      assert( *(h.get()) == j );
+      ++j;
+    }
+    assert( j == 400 );
+    assert( q.n_items() == 0 );
+    assert( q.size() == 0 );
+  }
+
   void queue_pushpop2()
   {
     queue<X> q;
@@ -162,6 +197,38 @@ namespace test_queue {
     assert( q.size() == 0 );
   }
 
+  void stdlist_pushpopB()
+  {
+    std::list<uint64_t> q;
+    for( uint64_t i=0;i<200;++i )
+    {
+      assert( q.size() == i );
+      q.push_back( i );
+    }
+    uint64_t j=0;
+    while( q.size() > 100 )
+    {
+      uint64_t x = q.front();
+      q.pop_front();
+      assert( x == j );
+      ++j;
+    }
+    for( uint64_t i=200;i<400;++i )
+    {
+      assert( q.size() == i-100 );
+      q.push_back( i );
+    }
+    while( q.size() > 0 )
+    {
+      uint64_t x = q.front();
+      q.pop_front();
+      assert( x == j );
+      ++j;
+    }
+    assert( j == 400 );
+    assert( q.size() == 0 );
+  }
+
   void stdlist_pushpop2()
   {
     std::list<X> q;
@@ -198,6 +265,8 @@ int main()
   csl_common_print_results( "stdlist_pushpop   ", csl_common_test_timer_v0(stdlist_pushpop),"" );
   csl_common_print_results( "queue_pushpop2    ", csl_common_test_timer_v0(queue_pushpop2),"" );
   csl_common_print_results( "stdlist_pushpop2  ", csl_common_test_timer_v0(stdlist_pushpop2),"" );
+  csl_common_print_results( "queue_pushpopB    ", csl_common_test_timer_v0(queue_pushpopB),"" );
+  csl_common_print_results( "stdlist_pushpopB  ", csl_common_test_timer_v0(stdlist_pushpopB),"" );
   return 0;
 }
 

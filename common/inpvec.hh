@@ -364,16 +364,24 @@ namespace csl
         uint64_t n_items();
         uint64_t size();
         void debug();
+
+        // last free position
         iterator last_free();
         iterator & last_free(iterator & ii);
+        uint64_t last_free_pos() const;
+
+        // first free position
+        iterator first_free();
+        iterator & first_free(iterator & ii);
+        uint64_t first_free_pos() const;
+
         iterator iterator_at(uint64_t pos);
         iterator force_iterator_at(uint64_t pos);
         iterator & force_iterator_at(uint64_t pos,iterator & ii);
+
         bool free_at(uint64_t pos);
         bool is_free_at(uint64_t pos);
         T & get(uint64_t at);
-        uint64_t last_free_pos() const;
-        uint64_t first_free_pos() const;
         T * get_ptr(uint64_t at);
         uint64_t iterator_pos(const iterator & it);
         T * construct(uint64_t pos);

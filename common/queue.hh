@@ -86,36 +86,50 @@ namespace csl
 
         void free_item( item * i )
         {
-          if( i ) { items_.free_at( i->pos_ ); }
+          ENTER_FUNCTION();
+          CSL_DEBUG_ASSERT( i != NULL );
+          if( i )
+          {
+            CSL_DEBUGF(L"free item at:%lld [next_:%lld]",i->pos_,i->next_);
+            items_.free_at( i->pos_ );
+          }
+          LEAVE_FUNCTION();
         }
 
         T * append_item( item * i, iterator_t & it )
         {
+          ENTER_FUNCTION();
           T * ret = 0;
+          CSL_DEBUG_ASSERT( i != NULL );
           if( i )
           {
+            CSL_DEBUGF(L"head_:%p tail_:%p n_items_:%lld size:%lld",head_,tail_,n_items_,size());
+
             i->pos_       = it.get_pos();
             i->next_      = 0;
             ret           = &(i->item_);
 
-            // first item ?
+            CSL_DEBUGF(L"append_at(i->pos_:%lld) ret:%p",i->pos_,ret);
+
             if( tail_ == 0 )
             {
+              CSL_DEBUGF(L"removing first item");
               CSL_DEBUG_ASSERT( head_ == 0 );
               head_ = tail_ = i;
             }
             else
             {
               tail_->next_  = i->pos_;
-              tail_ = i;
+              tail_         = i;
+              tail_->next_  = 0;
             }
             ++n_items_;
           }
-          return ret;
+          RETURN_FUNCTION( ret );
         }
 
       public:
-        queue() : head_(0), tail_(0), n_items_(0), use_exc_(true) {}
+        queue() : head_(0), tail_(0), n_items_(0), use_exc_(false) {}
 
         class handler
         {
@@ -146,7 +160,7 @@ namespace csl
           private:
             friend class queue;
 
-            handler(const handler & other) {}
+            handler(const handler & other) : q_(0), i_(0) {} // enforce error
 
             void set( queue * q, item * i )
             {
@@ -172,7 +186,7 @@ namespace csl
         T * push(const T & t)
         {
           typename inpvec<item>::iterator ii(items_.end());
-          item * i = (items_.last_free(ii).set(t));
+          item * i = (items_.first_free(ii).set(t));
           return append_item( i, ii );
         }
 
@@ -180,7 +194,7 @@ namespace csl
         T * push(const T1 & t1)
         {
           typename inpvec<item>::iterator ii(items_.end());
-          item * i = (items_.last_free(ii).set(t1));
+          item * i = (items_.first_free(ii).set(t1));
           return append_item( i, ii );
         }
 
@@ -188,7 +202,7 @@ namespace csl
         T * push(const T1 & t1,const T2 & t2)
         {
           typename inpvec<item>::iterator ii(items_.end());
-          item * i = (items_.last_free(ii).set(t1,t2));
+          item * i = (items_.first_free(ii).set(t1,t2));
           return append_item( i, ii );
         }
 
@@ -196,7 +210,7 @@ namespace csl
         T * push(const T1 & t1,const T2 & t2,const T3 & t3)
         {
           typename inpvec<item>::iterator ii(items_.end());
-          item * i = (items_.last_free(ii).set(t1,t2,t3));
+          item * i = (items_.first_free(ii).set(t1,t2,t3));
           return append_item( i, ii );
         }
 
@@ -204,14 +218,16 @@ namespace csl
         T * push(const T1 & t1,const T2 & t2,const T3 & t3,const T4 & t4)
         {
           typename inpvec<item>::iterator ii(items_.end());
-          item * i = (items_.last_free(ii).set(t1,t2,t3,t4));
+          item * i = (items_.first_free(ii).set(t1,t2,t3,t4));
           return append_item( i, ii );
         }
 
         bool pop(handler & h)
         {
+          ENTER_FUNCTION();
           if( head_ )
           {
+            CSL_DEBUGF(L"head_:%p tail_:%p n_items_:%lld size:%lld",head_,tail_,n_items_,size());
             item * i = head_;
 
             if( head_ == tail_ ) { head_ = tail_ = 0; } // last item
@@ -225,12 +241,14 @@ namespace csl
             }
             --n_items_;
             h.set(this,i);
-            return true;
+            CSL_DEBUGF(L"head_:%p tail_:%p n_items_:%lld size:%lld",head_,tail_,n_items_,size());
+            RETURN_FUNCTION( true );
           }
           else
           {
             // error, no items in the queue
-            return false;
+            CSL_DEBUGF(L"no items in the queue: head_=NULL tail_:%p [n_items_:%lld] [size:%lld]",tail_,n_items_,size());
+            RETURN_FUNCTION( false );
           }
         }
 

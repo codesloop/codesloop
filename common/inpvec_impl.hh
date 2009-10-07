@@ -653,65 +653,6 @@ namespace csl
 #endif /*DEBUG*/
         }
 
-        template <typename T> typename inpvec<T>::iterator inpvec<T>::last_free()
-        {
-          ENTER_FUNCTION();
-          mul_t    mul = (tail_->mul_+2);
-          uint64_t pos = tail_->last_free();
-
-          if( pos == tail_->size() )
-          {
-            uint64_t sz  = size();
-            allocate(mul);
-            CSL_DEBUGF(L"Allocate. Returning last allocated position: %lld [it:%p]",pos,tail_);
-            RETURN_FUNCTION(iterator(tail_,tail_->last_free(),sz));
-          }
-          else
-          {
-            uint64_t gp = pos;
-            item * p = &head_;
-
-            while( p!=tail_ )
-            {
-              gp += p->size();
-              p = p->next_;
-            }
-
-            CSL_DEBUGF(L"last_free() => [it:%p pos:%lld gp:%lld]",tail_,pos,gp);
-            RETURN_FUNCTION(iterator(tail_,pos,gp));
-          }
-        }
-
-        template <typename T> typename inpvec<T>::iterator & inpvec<T>::last_free(iterator & ii)
-        {
-          ENTER_FUNCTION();
-          mul_t mul = (tail_->mul_+2);
-          uint64_t pos = tail_->last_free();
-
-          if( pos == tail_->size() )
-          {
-            uint64_t sz  = size();
-            allocate(mul);
-            CSL_DEBUGF(L"Allocate. Returning last allocated position: %lld [it:%p]",pos,tail_);
-            ii.init( tail_,tail_->last_free(),sz );
-          }
-          else
-          {
-            uint64_t gp = pos;
-            item * p = &head_;
-
-            while( p != tail_ )
-            {
-              gp += p->size();
-              p = p->next_;
-            }
-
-            CSL_DEBUGF(L"last_free() => ref ii& [it:%p pos:%lld gp:%lld]",tail_,pos,gp);
-            ii.init(tail_,pos,gp);
-          }
-          RETURN_FUNCTION( ii );
-        }
-
         template <typename T> typename inpvec<T>::iterator inpvec<T>::iterator_at(uint64_t pos)
         {
           ENTER_FUNCTION();
@@ -880,6 +821,65 @@ namespace csl
           THR( exc::rs_invalid_param, (tail_->get(0)) );
         }
 
+        template <typename T> typename inpvec<T>::iterator inpvec<T>::last_free()
+        {
+          ENTER_FUNCTION();
+          mul_t    mul = (tail_->mul_+2);
+          uint64_t pos = tail_->last_free();
+
+          if( pos == tail_->size() )
+          {
+            uint64_t sz  = size();
+            allocate(mul);
+            CSL_DEBUGF(L"Allocate. Returning last allocated position: %lld [it:%p]",pos,tail_);
+            RETURN_FUNCTION(iterator(tail_,tail_->last_free(),sz));
+          }
+          else
+          {
+            uint64_t gp = pos;
+            item * p = &head_;
+
+            while( p!=tail_ )
+            {
+              gp += p->size();
+              p = p->next_;
+            }
+
+            CSL_DEBUGF(L"last_free() => [it:%p pos:%lld gp:%lld]",tail_,pos,gp);
+            RETURN_FUNCTION(iterator(tail_,pos,gp));
+          }
+        }
+
+        template <typename T> typename inpvec<T>::iterator & inpvec<T>::last_free(iterator & ii)
+        {
+          ENTER_FUNCTION();
+          mul_t mul = (tail_->mul_+2);
+          uint64_t pos = tail_->last_free();
+
+          if( pos == tail_->size() )
+          {
+            uint64_t sz  = size();
+            allocate(mul);
+            CSL_DEBUGF(L"Allocate. Returning last allocated position: %lld [it:%p]",pos,tail_);
+            ii.init( tail_,tail_->last_free(),sz );
+          }
+          else
+          {
+            uint64_t gp = pos;
+            item * p = &head_;
+
+            while( p != tail_ )
+            {
+              gp += p->size();
+              p = p->next_;
+            }
+
+            CSL_DEBUGF(L"last_free() => ref ii& [it:%p pos:%lld gp:%lld]",tail_,pos,gp);
+            ii.init(tail_,pos,gp);
+          }
+          RETURN_FUNCTION( ii );
+        }
+
         template <typename T> uint64_t inpvec<T>::last_free_pos() const
         {
           ENTER_FUNCTION();
@@ -895,6 +895,81 @@ namespace csl
 
           CSL_DEBUGF(L"last_free_pos() => %lld",pos);
           RETURN_FUNCTION( pos );
+        }
+
+        template <typename T> typename inpvec<T>::iterator inpvec<T>::first_free()
+        {
+          ENTER_FUNCTION();
+          mul_t    mul = (tail_->mul_+2);
+          uint64_t pos = 0;
+          uint64_t f   = 0;
+
+          item * p = &head_;
+
+          while( p != NULL )
+          {
+            f = p->first_free();
+            pos += f;
+#ifdef DEBUG
+#ifdef DEBUG_VERBOSE
+            p->debug();
+            CSL_DEBUGF_X(L"f:%lld pos:%lld",f,pos);
+#endif /*DEBUG_VERBOSE*/
+#endif /*DEBUG*/
+            if( f != p->size() ) break;
+            p = p->next_;
+          }
+
+          if( p == NULL )
+          {
+            uint64_t sz  = size();
+            allocate(mul);
+            CSL_DEBUGF(L"Allocate. Returning last allocated position: %lld [it:%p]",sz,tail_);
+            RETURN_FUNCTION(iterator(tail_,0,sz));
+          }
+          else
+          {
+            CSL_DEBUGF(L"first_free() => ref ii& [it:%p pos:%lld gp:%lld]",p,f,pos);
+            RETURN_FUNCTION(iterator(p,f,pos));
+          }
+        }
+
+        template <typename T> typename inpvec<T>::iterator & inpvec<T>::first_free(iterator & ii)
+        {
+          ENTER_FUNCTION();
+          mul_t    mul = (tail_->mul_+2);
+          uint64_t pos = 0;
+          uint64_t f   = 0;
+
+          item * p = &head_;
+
+          while( p != NULL )
+          {
+            f = p->first_free();
+            pos += f;
+#ifdef DEBUG
+#ifdef DEBUG_VERBOSE
+            p->debug();
+            CSL_DEBUGF_X(L"f:%lld pos:%lld",f,pos);
+#endif /*DEBUG_VERBOSE*/
+#endif /*DEBUG*/
+            if( f != p->size() ) break;
+            p = p->next_;
+          }
+
+          if( p == NULL )
+          {
+            uint64_t sz  = size();
+            allocate(mul);
+            CSL_DEBUGF(L"Allocate. Returning last allocated position: %lld [it:%p]",sz,tail_);
+            ii.init(tail_,0,sz);
+          }
+          else
+          {
+            CSL_DEBUGF(L"first_free() => ref ii& [it:%p pos:%lld gp:%lld]",p,f,pos);
+            ii.init(p,f,pos);
+          }
+          RETURN_FUNCTION( ii );
         }
 
         template <typename T> uint64_t inpvec<T>::first_free_pos() const
