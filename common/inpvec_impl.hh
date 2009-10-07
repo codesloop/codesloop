@@ -700,7 +700,7 @@ namespace csl
             uint64_t gp = pos;
             item * p = &head_;
 
-            while( p!=tail_ )
+            while( p != tail_ )
             {
               gp += p->size();
               p = p->next_;

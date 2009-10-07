@@ -44,12 +44,37 @@ namespace csl
   {
     template <typename T> class queue
     {
+      public:
+        class handler;
+        friend class handler;
+
       private:
         struct item
         {
           T         item_;
           uint64_t  pos_;   // reference itself (not strictly needed)
           uint64_t  next_;
+
+          item() : pos_(0xBadBeafFeedBaccULL), next_(0xFeedBadBeefBaccULL) { }
+
+          item(const item & other) :
+            item_(other), pos_(0xBadBeafFeedBaccULL), next_(0xFeedBadBeefBaccULL) { }
+
+          template <typename T1>
+          item(const T1 & t1) :
+            item_(t1), pos_(0xBadBeafFeedBaccULL), next_(0xFeedBadBeefBaccULL) { }
+
+          template <typename T1, typename T2>
+          item(const T1 & t1, const T2 & t2) :
+            item_(t1, t2), pos_(0xBadBeafFeedBaccULL), next_(0xFeedBadBeefBaccULL) { }
+
+          template <typename T1, typename T2, typename T3>
+          item(const T1 & t1, const T2 & t2, const T3 & t3) :
+            item_(t1, t2, t3), pos_(0xBadBeafFeedBaccULL), next_(0xFeedBadBeefBaccULL) { }
+
+          template <typename T1, typename T2, typename T3, typename T4>
+          item(const T1 & t1, const T2 & t2, const T3 & t3, const T4 & t4) :
+            item_(t1, t2, t3, t4), pos_(0xBadBeafFeedBaccULL), next_(0xFeedBadBeefBaccULL) { }
         };
 
         inpvec<item>  items_;
@@ -72,7 +97,6 @@ namespace csl
             i->pos_       = it.get_pos();
             i->next_      = 0;
             ret           = &(i->item_);
-            tail_->next_  = i->pos_;
 
             // first item ?
             if( tail_ == 0 )
@@ -80,6 +104,12 @@ namespace csl
               CSL_DEBUG_ASSERT( head_ == 0 );
               head_ = tail_ = i;
             }
+            else
+            {
+              tail_->next_  = i->pos_;
+              tail_ = i;
+            }
+            ++n_items_;
           }
           return ret;
         }
@@ -90,27 +120,10 @@ namespace csl
         class handler
         {
           public:
-            handler(queue * q, item * i) : q_(q), i_(i) { }
+            explicit handler(queue * q=0, item * i=0) : q_(q), i_(i) { }
 
-            ~handler()
-            {
-              // destructor checks wether it is OK to free the item of not
-              if( i_ != NULL )
-              {
-                q_->free_item( i_ );
-                i_ = 0;
-                q_ = 0; // enforce error
-              }
-            }
+            ~handler() { reset(); }
 
-            // copy modifies the source
-            handler(handler & other)
-            {
-              q_   = other.q_;
-              i_   = other.i_; other.i_ = 0; // !!!
-            }
-
-            // copy modifies the source
             handler & operator=(handler & other)
             {
               q_   = other.q_;
@@ -131,21 +144,34 @@ namespace csl
             }
 
           private:
+            friend class queue;
+
+            handler(const handler & other) {}
+
+            void set( queue * q, item * i )
+            {
+              reset();
+              q_ = q;
+              i_ = i;
+            }
+
+            void reset()
+            {
+              if( i_ != NULL && q_ != NULL )
+              {
+                q_->free_item( i_ );
+                i_ = 0;
+                q_ = 0;
+              }
+            }
+
             queue *   q_;
             item  *   i_;
-
-            // no default construction
-            handler() : q_(0), i_(0) {}
-            // copy modifies the source, otherwise disallowed
-            handler(const handler & other) {}
-            handler & operator=(const handler & other) { return *this; }
         };
-
-        friend class handler;
 
         T * push(const T & t)
         {
-          typename inpvec<item>::iterator ii;
+          typename inpvec<item>::iterator ii(items_.end());
           item * i = (items_.last_free(ii).set(t));
           return append_item( i, ii );
         }
@@ -153,7 +179,7 @@ namespace csl
         template <typename T1>
         T * push(const T1 & t1)
         {
-          typename inpvec<item>::iterator ii;
+          typename inpvec<item>::iterator ii(items_.end());
           item * i = (items_.last_free(ii).set(t1));
           return append_item( i, ii );
         }
@@ -161,7 +187,7 @@ namespace csl
         template <typename T1,typename T2>
         T * push(const T1 & t1,const T2 & t2)
         {
-          typename inpvec<item>::iterator ii;
+          typename inpvec<item>::iterator ii(items_.end());
           item * i = (items_.last_free(ii).set(t1,t2));
           return append_item( i, ii );
         }
@@ -169,7 +195,7 @@ namespace csl
         template <typename T1,typename T2,typename T3>
         T * push(const T1 & t1,const T2 & t2,const T3 & t3)
         {
-          typename inpvec<item>::iterator ii;
+          typename inpvec<item>::iterator ii(items_.end());
           item * i = (items_.last_free(ii).set(t1,t2,t3));
           return append_item( i, ii );
         }
@@ -177,12 +203,12 @@ namespace csl
         template <typename T1,typename T2,typename T3,typename T4>
         T * push(const T1 & t1,const T2 & t2,const T3 & t3,const T4 & t4)
         {
-          typename inpvec<item>::iterator ii;
+          typename inpvec<item>::iterator ii(items_.end());
           item * i = (items_.last_free(ii).set(t1,t2,t3,t4));
           return append_item( i, ii );
         }
 
-        handler pop()
+        bool pop(handler & h)
         {
           if( head_ )
           {
@@ -194,16 +220,17 @@ namespace csl
               head_         = 0; // enforce error if failed
               item * inext  = items_.get_ptr( i->next_ );
 
-              if( inext == NULL ) { THR(common::exc::rs_invalid_state,handler(0,0)); }
+              if( inext == NULL ) { THR(common::exc::rs_invalid_state,false); }
               head_ = inext;
             }
             --n_items_;
-            return handler(this,i);
+            h.set(this,i);
+            return true;
           }
           else
           {
             // error, no items in the queue
-            return handler(0,0);
+            return false;
           }
         }
 

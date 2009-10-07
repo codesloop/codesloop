@@ -327,10 +327,7 @@ namespace csl
         iterator end_;
 
       public:
-        /** @brief returns iterator represents the end of this container */
         const iterator & end();
-
-        /** @brief returns iterator pointed at the beginning of the container */
         const iterator & begin();
 
         ~inpvec()
