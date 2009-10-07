@@ -270,6 +270,7 @@ namespace test_inpvec {
   // TODO: - iterator : operator++
   // TODO: - iterator : constructors
   // TODO: - force_iterator_at(a), force_iterator_at(a,b)
+  // TODO: - test first_free position and iterator
 
   void fun_get_set()
   {

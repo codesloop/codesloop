@@ -49,6 +49,15 @@ namespace csl
         friend class handler;
 
       private:
+        class lock_helper
+        {
+          private:
+            queue * q_;
+          public:
+            lock_helper(queue * q) : q_(q) { q_->on_lock_queue();   }
+            ~lock_helper()                 { q_->on_unlock_queue(); }
+        };
+
         struct item
         {
           T         item_;
@@ -84,186 +93,115 @@ namespace csl
 
         typedef typename inpvec<item>::iterator iterator_t;
 
-        void free_item( item * i )
-        {
-          ENTER_FUNCTION();
-          CSL_DEBUG_ASSERT( i != NULL );
-          if( i )
-          {
-            CSL_DEBUGF(L"free item at:%lld [next_:%lld]",i->pos_,i->next_);
-            items_.free_at( i->pos_ );
-          }
-          LEAVE_FUNCTION();
-        }
-
-        T * append_item( item * i, iterator_t & it )
-        {
-          ENTER_FUNCTION();
-          T * ret = 0;
-          CSL_DEBUG_ASSERT( i != NULL );
-          if( i )
-          {
-            CSL_DEBUGF(L"head_:%p tail_:%p n_items_:%lld size:%lld",head_,tail_,n_items_,size());
-
-            i->pos_       = it.get_pos();
-            i->next_      = 0;
-            ret           = &(i->item_);
-
-            CSL_DEBUGF(L"append_at(i->pos_:%lld) ret:%p",i->pos_,ret);
-
-            if( tail_ == 0 )
-            {
-              CSL_DEBUGF(L"removing first item");
-              CSL_DEBUG_ASSERT( head_ == 0 );
-              head_ = tail_ = i;
-            }
-            else
-            {
-              tail_->next_  = i->pos_;
-              tail_         = i;
-              tail_->next_  = 0;
-            }
-            ++n_items_;
-          }
-          RETURN_FUNCTION( ret );
-        }
+        void free_item( item * i );
+        T * append_item( item * i, iterator_t & it );
 
       public:
         queue() : head_(0), tail_(0), n_items_(0), use_exc_(false) {}
+        virtual ~queue() {}
 
         class handler
         {
           public:
             explicit handler(queue * q=0, item * i=0) : q_(q), i_(i) { }
-
             ~handler() { reset(); }
-
-            handler & operator=(handler & other)
-            {
-              q_   = other.q_;
-              i_   = other.i_; other.i_ = 0; // !!!
-              return *this;
-            }
-
-            T * operator->() const
-            {
-              if( i_ ) return (&(i_->item_));
-              else     return 0;
-            }
-
-            T * get() const
-            {
-              if( i_ ) return (&(i_->item_));
-              else     return 0;
-            }
+            handler & operator=(handler & other);
+            T * operator->() const;
+            T * get() const;
 
           private:
             friend class queue;
-
             handler(const handler & other) : q_(0), i_(0) {} // enforce error
 
-            void set( queue * q, item * i )
-            {
-              reset();
-              q_ = q;
-              i_ = i;
-            }
-
-            void reset()
-            {
-              if( i_ != NULL && q_ != NULL )
-              {
-                q_->free_item( i_ );
-                i_ = 0;
-                q_ = 0;
-              }
-            }
+            void set( queue * q, item * i );
+            void reset();
 
             queue *   q_;
             item  *   i_;
         };
 
-        T * push(const T & t)
-        {
-          typename inpvec<item>::iterator ii(items_.end());
-          item * i = (items_.first_free(ii).set(t));
-          return append_item( i, ii );
-        }
+        T * push(const T & t);
 
         template <typename T1>
         T * push(const T1 & t1)
         {
-          typename inpvec<item>::iterator ii(items_.end());
-          item * i = (items_.first_free(ii).set(t1));
-          return append_item( i, ii );
+          T * ret = 0;
+          {
+            lock_helper l(this);
+            typename inpvec<item>::iterator ii(items_.end());
+            item * i = (items_.first_free(ii).set(t1));
+            ret = append_item( i, ii );
+          }
+          on_new_item();
+          return ret;
         }
 
         template <typename T1,typename T2>
         T * push(const T1 & t1,const T2 & t2)
         {
-          typename inpvec<item>::iterator ii(items_.end());
-          item * i = (items_.first_free(ii).set(t1,t2));
-          return append_item( i, ii );
+          T * ret = 0;
+          {
+            lock_helper l(this);
+            typename inpvec<item>::iterator ii(items_.end());
+            item * i = (items_.first_free(ii).set(t1,t2));
+            ret = append_item( i, ii );
+          }
+          on_new_item();
+          return ret;
         }
 
         template <typename T1,typename T2,typename T3>
         T * push(const T1 & t1,const T2 & t2,const T3 & t3)
         {
-          typename inpvec<item>::iterator ii(items_.end());
-          item * i = (items_.first_free(ii).set(t1,t2,t3));
-          return append_item( i, ii );
+          T * ret = 0;
+          {
+            lock_helper l(this);
+            typename inpvec<item>::iterator ii(items_.end());
+            item * i = (items_.first_free(ii).set(t1,t2,t3));
+            ret = append_item( i, ii );
+          }
+          on_new_item();
+          return ret;
         }
 
         template <typename T1,typename T2,typename T3,typename T4>
         T * push(const T1 & t1,const T2 & t2,const T3 & t3,const T4 & t4)
         {
-          typename inpvec<item>::iterator ii(items_.end());
-          item * i = (items_.first_free(ii).set(t1,t2,t3,t4));
-          return append_item( i, ii );
+          T * ret = 0;
+          {
+            lock_helper l(this);
+            typename inpvec<item>::iterator ii(items_.end());
+            item * i = (items_.first_free(ii).set(t1,t2,t3,t4));
+            ret = append_item( i, ii );
+          }
+          on_new_item();
+          return ret;
         }
 
-        bool pop(handler & h)
-        {
-          ENTER_FUNCTION();
-          if( head_ )
-          {
-            CSL_DEBUGF(L"head_:%p tail_:%p n_items_:%lld size:%lld",head_,tail_,n_items_,size());
-            item * i = head_;
+        bool pop(handler & h);
+        uint64_t n_items();  ///<returns the number of active items
+        uint64_t size();     ///<returns the number of all allocated items
 
-            if( head_ == tail_ ) { head_ = tail_ = 0; } // last item
-            else
-            {
-              head_         = 0; // enforce error if failed
-              item * inext  = items_.get_ptr( i->next_ );
-
-              if( inext == NULL ) { THR(common::exc::rs_invalid_state,false); }
-              head_ = inext;
-            }
-            --n_items_;
-            h.set(this,i);
-            CSL_DEBUGF(L"head_:%p tail_:%p n_items_:%lld size:%lld",head_,tail_,n_items_,size());
-            RETURN_FUNCTION( true );
-          }
-          else
-          {
-            // error, no items in the queue
-            CSL_DEBUGF(L"no items in the queue: head_=NULL tail_:%p [n_items_:%lld] [size:%lld]",tail_,n_items_,size());
-            RETURN_FUNCTION( false );
-          }
-        }
-
-        uint64_t n_items() { return n_items_;            } ///<returns the number of active items
-        uint64_t size()    { return items_.n_items();    } ///<returns the number of all allocated items
-
-        /* event upcalls */
+        /** The purpose of new and del upcalls is to provide means for waitable queue.
+        *** A waitable queue may use nthread::event or other synchronization facilities depending on the
+        *** implementation. The base class however does not implement that for perforance reasons. Upcalls
+        *** should be implemented by subclassing this class.
+        ***/
         inline virtual void on_new_item() {} ///<event upcall: called when new item is placed into the list
         inline virtual void on_del_item() {} ///<event upcall: called when an item is removed from the active list
+
+        /** The purpose of the lock unlock upcalls is to provide means for a threadsafe version.
+        *** The threadsafe version should use a locking facility such as nthread::mutex to synchronize access
+        *** to the given class. Upcalls should be implemented by subclassing this class.
+        **/
+        inline virtual void on_lock_queue() {} ///<event upcall: called when a queue should be locked
+        inline virtual void on_unlock_queue() {} ///<event upcall: called when a queue should be unlocked
 
         CSL_OBJ(csl::common,queue);
         USE_EXC();
     };
   }
 }
-
 #endif /* __cplusplus */
+#include "queue_impl.hh"
 #endif /* _csl_common_queue_hh_included */
