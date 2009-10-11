@@ -166,6 +166,8 @@ ELSE(WIN32)
 
 ENDIF(WIN32)
 
+ADD_EXECUTABLE(t__read_res            t__read_res.cc)
+ADD_EXECUTABLE(t__rdbuf               t__rdbuf.cc)
 ADD_EXECUTABLE(t__bfd                 t__bfd.cc)
 ADD_EXECUTABLE(t__mt_udp              t__mt_udp.cc)
 ADD_EXECUTABLE(t__tcp_libev           t__tcp_libev.cc)

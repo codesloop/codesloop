@@ -57,7 +57,7 @@ namespace csl
         delete xdrbuf_;
     }
 
-    unsigned int arch::size() const
+    uint64_t arch::size() const
     {
       return pbuf_->size();
     }

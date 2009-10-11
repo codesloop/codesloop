@@ -60,8 +60,8 @@ namespace csl
           footer_sz = 8
         };
 
-        static inline unsigned int header_len() { return header_sz; }
-        static inline unsigned int footer_len() { return footer_sz; }
+        static inline uint64_t header_len() { return header_sz; }
+        static inline uint64_t footer_len() { return footer_sz; }
 
         bool encrypt( const saltbuf_t & salt,
                       const keybuf_t & key,

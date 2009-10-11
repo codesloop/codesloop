@@ -46,7 +46,7 @@ namespace csl
         buf << is_neg;
         /* should be 0 or 1 */
         if( is_neg != 0 && is_neg != 1 ) return false;
-        xdrbuf::bindata_t bin(data(),size());
+        xdrbuf::bindata_t bin( data(), size() );
         buf << bin;
       }
       catch( csl::common::exc e )
@@ -63,8 +63,8 @@ namespace csl
       {
         int32_t is_neg = 0;
         buf >> is_neg;
-        unsigned int allocated=0;
-        ret = buf.get_data( buf_,allocated,2048 );
+        uint64_t allocated=0;
+        ret = buf.get_data( buf_, allocated, 2048 );
         if( ret ) is_negative((is_neg == 0 ? false : true));
         else      return false;
       }
@@ -78,11 +78,11 @@ namespace csl
     void bignum::print() const
     {
       const unsigned char * d = data();
-      unsigned int len = size();
-      PRINTF(L"BIGNUM[%d bytes]: neg[%d]: ",len,is_negative());
-      for( unsigned int i=0;i<len;++i )
+      uint64_t len = size();
+      PRINTF(L"BIGNUM[%d bytes]: neg[%d]: ", len, is_negative() );
+      for( uint64_t i=0; i<len; ++i )
       {
-        PRINTF(L"%02x",d[i] );
+        PRINTF( L"%02x", d[i] );
       }
       PRINTF(L"\n");
     }

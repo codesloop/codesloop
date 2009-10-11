@@ -122,7 +122,7 @@ namespace test_int64 {
     long long l = 98765432LL;
     assert( v.from_integer(l) == true );
     assert( v.to_binary(o) == true ); /**/
-    assert( ::memcmp( o.value().data(),&l,o.value().size() ) == 0 );
+    assert( ::memcmp( o.value().data(), &l, static_cast<size_t>(o.value().size()) ) == 0 );
   }
 
   void to_binary_u()
@@ -130,12 +130,12 @@ namespace test_int64 {
     int64 v;
     long long o = 98765432LL;
     unsigned char l[sizeof(long long)];
-    size_t sz=0;
+    uint64_t sz=0;
 
     assert( v.from_string(L"98765432") == true );
     assert( v.to_binary(l,sz) == true ); /**/
     assert( sz == sizeof(long long) );
-    assert( ::memcmp( &o,l,sz ) == 0 );
+    assert( ::memcmp( &o, l, static_cast<size_t>(sz) ) == 0 );
   }
 
   void to_binary_v()
@@ -143,13 +143,13 @@ namespace test_int64 {
     int64 v;
     long long o = 98765432LL;
     unsigned char l[sizeof(long long)];
-    size_t sz=0;
+    uint64_t sz=0;
     void * vp = l;
 
     assert( v.from_string("98765432") == true );
     assert( v.to_binary(vp,sz) == true ); /**/
     assert( sz == sizeof(long long) );
-    assert( ::memcmp( &o,vp,sz ) == 0 );
+    assert( ::memcmp( &o, vp, static_cast<size_t>(sz) ) == 0 );
   }
 
   void to_xdr()
@@ -184,7 +184,7 @@ namespace test_int64 {
 
     long long ck;
     assert( vi.to_integer(ck) == true );
-    assert( ::memcmp( vb.value().data(), &ck, vb.value().size() ) == 0 );
+    assert( ::memcmp( vb.value().data(), &ck, static_cast<size_t>(vb.value().size()) ) == 0 );
   }
 
   void from_integer_o()
@@ -264,7 +264,7 @@ namespace test_int64 {
     long long l = 44337788LL;
     assert( o.from_integer(l) == true );
     unsigned char u[sizeof(long long)];
-    size_t sz = 0;
+    uint64_t sz = 0;
     assert( o.to_binary(u,sz) == true );
     assert( v.from_binary(u,sz) == true ); /**/
     assert( v.value() == l );
@@ -277,7 +277,7 @@ namespace test_int64 {
     long long l = 44337788LL;
     assert( o.from_integer(l) == true );
     unsigned char u[sizeof(long long)];
-    size_t sz = 0;
+    uint64_t sz = 0;
     void * vp = u;
     assert( o.to_binary(vp,sz) == true );
     assert( v.from_binary(vp,sz) == true ); /**/

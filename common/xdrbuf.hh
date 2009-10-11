@@ -81,7 +81,7 @@ namespace csl
         }
 
         /** @brief helper to pass a (ptr,size) pair to operators */
-        typedef std::pair<const unsigned char *,unsigned int> bindata_t;
+        typedef std::pair<const unsigned char *,uint64_t> bindata_t;
 
 
         /**
@@ -253,8 +253,8 @@ namespace csl
         @li then reads size bytes from the stream (asis)
         @li align internal pointer with 1-3 optional padding bytes
         */
-        unsigned int get_data( unsigned char * where,
-                               unsigned int size );
+        uint64_t get_data( unsigned char * where,
+                           uint64_t size );
 
         /**
         @brief deserialize data to 'where'
@@ -271,8 +271,8 @@ namespace csl
         @li puts the read size to 'size'
         */
         bool get_data( unsigned char * where,
-                       unsigned int & size,
-                       unsigned int max_size );
+                       uint64_t & size,
+                       uint64_t max_size );
 
         /**
         @brief deserialize data to 'where'
@@ -290,11 +290,11 @@ namespace csl
         */
         template <typename T>
         bool get_data( T & t,
-                       unsigned int & size,
-                       unsigned int max_size )
+                       uint64_t & size,
+                       uint64_t max_size )
         {
           pbuf::iterator oldit = it_;
-          unsigned int oldpos  = pos_;
+          uint64_t oldpos  = pos_;
           uint32_t sz;
           (*this) >> sz;
           it_  = oldit;
@@ -304,7 +304,7 @@ namespace csl
         }
 
         /** @brief steps forward in the stream by n bytes (plus padding) */
-        bool forward(unsigned int n);
+        bool forward(uint64_t n);
 
         /** @brief Specifies whether param should throw common::exc exceptions
             @param yesno is the desired value to be set
@@ -326,13 +326,13 @@ namespace csl
         void rewind();
 
         /** @brief returns the number of bytes consumed from the stream */
-        unsigned long position();
+        uint64_t position();
 
       private:
         bool use_exc_;
         pbuf * b_;
         pbuf::iterator it_;
-        unsigned int pos_;
+        uint64_t pos_;
 
         xdrbuf() : use_exc_(true), b_(0), it_(0,0), pos_(0) {}
     };

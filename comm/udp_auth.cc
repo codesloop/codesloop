@@ -41,14 +41,13 @@ namespace csl
 
   namespace
   {
-    static void print_hex(const wchar_t * prefix,const void * vp,size_t len)
+    static void print_hex(const wchar_t * prefix, const void * vp, uint64_t len)
     {
       const unsigned char * hx = reinterpret_cast<const unsigned char *>(vp);
       PRINTF(L"%ls [%04d] : ",prefix,len);
-      for(size_t i=0;i<len;++i) PRINTF(L"%.2X",hx[i]);
+      for( uint64_t i=0; i<len ;++i ) PRINTF(L"%.2X", hx[i]);
       PRINTF(L"\n");
     }
-
   }
 
   namespace comm
@@ -87,7 +86,7 @@ namespace csl
           if( peer_public_key.from_xdr(xbo) == false ) { THR(comm::exc::rs_xdr_error,false); }
 
           const unsigned char * ptrp = m.data_ + xbo.position();
-          unsigned int          lenp = m.size_ - xbo.position();
+          uint64_t              lenp = m.size_ - xbo.position();
 
           /* encrypted part */
 
@@ -133,9 +132,9 @@ namespace csl
           inner.append( data.data(), data.size() );
           xdrbuf xbi(inner);
 
-          unsigned int sz=0;
+          uint64_t sz=0;
 
-          if( xbi.get_data( slt,sz,salt_size_v ) == false )
+          if( xbi.get_data( slt, sz, salt_size_v ) == false )
           {
             THR(comm::exc::rs_xdr_error,false);
           }
@@ -224,13 +223,13 @@ namespace csl
 
           /* output packet */
           unsigned char * outputp = m.data_+outer.size();
-          unsigned int    retlen  = outer.size()+head.size()+data.size()+foot.size();
+          uint64_t        retlen  = outer.size()+head.size()+data.size()+foot.size();
 
           if( retlen > m.max_len() ) { THR(comm::exc::rs_too_big,false); }
 
-          memcpy( outputp, head.data(), head.size() ); outputp += head.size();
-          memcpy( outputp, data.data(), data.size() ); outputp += data.size();
-          memcpy( outputp, foot.data(), foot.size() ); outputp += foot.size();
+          ::memcpy( outputp, head.data(), static_cast<size_t>(head.size()) ); outputp += head.size();
+          ::memcpy( outputp, data.data(), static_cast<size_t>(data.size()) ); outputp += data.size();
+          ::memcpy( outputp, foot.data(), static_cast<size_t>(foot.size()) ); outputp += foot.size();
 
           if( debug() )
           {
@@ -242,7 +241,7 @@ namespace csl
           }
 
           /* return the data */
-          m.size_ = retlen;
+          m.size_ = static_cast<unsigned int>(retlen); // TODO : check size later
           return true;
         }
         catch( common::exc e )
@@ -372,7 +371,7 @@ namespace csl
         handler_.use_exc(uex);
 
         /* init receivers */
-        if( receiver_.start(min_threads_,max_threads_,timeout_ms_,retries_,handler_) == false ) 
+        if( receiver_.start(min_threads_,max_threads_,timeout_ms_,retries_,handler_) == false )
         {
           THR(exc::rs_thread_start,false);
         }
@@ -423,7 +422,7 @@ namespace csl
 
       auth_cli::auth_cli() : debug_(false), sock_(-1)
       {
-        memset( &addr_,0,sizeof(addr_) );
+        memset( &addr_, 0, sizeof(addr_) );
         addr_.sin_family        = AF_INET;
         addr_.sin_addr.s_addr   = htonl(INADDR_LOOPBACK);
       }
@@ -510,13 +509,13 @@ namespace csl
 
           /* output packet */
           unsigned char * outputp = m.data_+outer.size();
-          unsigned int retlen = outer.size()+head.size()+data.size()+foot.size();
+          uint64_t         retlen = outer.size()+head.size()+data.size()+foot.size();
 
           if( retlen > m.max_len() ) { THR(comm::exc::rs_too_big,false); }
 
-          memcpy( outputp, head.data(), head.size() ); outputp += head.size();
-          memcpy( outputp, data.data(), data.size() ); outputp += data.size();
-          memcpy( outputp, foot.data(), foot.size() ); outputp += foot.size();
+          ::memcpy( outputp, head.data(), static_cast<size_t>(head.size()) ); outputp += head.size();
+          ::memcpy( outputp, data.data(), static_cast<size_t>(data.size()) ); outputp += data.size();
+          ::memcpy( outputp, foot.data(), static_cast<size_t>(foot.size()) ); outputp += foot.size();
 
           if( debug() )
           {
@@ -528,7 +527,7 @@ namespace csl
           }
 
           /* return the data */
-          m.size_ = retlen;
+          m.size_ = static_cast<unsigned int>(retlen);
           return true;
         }
         catch( common::exc e )
@@ -561,7 +560,7 @@ namespace csl
           }
 
           const unsigned char * ptrp = m.data_ + xbo.position();
-          unsigned int          lenp = m.size_ - xbo.position();
+          uint64_t              lenp = m.size_ - xbo.position();
 
           /* encrypted part */
           if( debug() ) { PRINTF(L"  -- Session Key: '%s'\n",session_key_.c_str()); }
@@ -602,9 +601,9 @@ namespace csl
           inner.append( data.data(), data.size() );
           xdrbuf xbi(inner);
 
-          unsigned int sz=0;
+          uint64_t sz=0;
 
-          if( xbi.get_data( server_salt_,sz,saltbuf_t::preallocated_size ) == false )
+          if( xbi.get_data( server_salt_, sz, saltbuf_t::preallocated_size ) == false )
           {
             THR(comm::exc::rs_xdr_error,false);
           }

@@ -38,10 +38,10 @@ using csl::sec::crypt_buf;
 /** @brief contains tests related to crypt_buf */
 namespace test_crypt_buf {
 
-void print_hex(char * prefix,unsigned char * hx,size_t len)
+void print_hex(char * prefix, unsigned char * hx, uint64_t len)
 {
   printf("%s: ",prefix);
-  for(size_t i=0;i<len;++i) printf("%.2X",hx[i]);
+  for(uint64_t i=0; i<len; ++i) printf("%.2X",hx[i]);
   printf("\n");
 }
 
@@ -55,7 +55,7 @@ void print_hex(char * prefix,unsigned char * hx,size_t len)
 
    This test uses C string key.
 */
-void test_crypt(size_t * l)
+void test_crypt(uint64_t * l)
 {
   unsigned char plain[200];
   unsigned char cryp[200];
@@ -66,17 +66,18 @@ void test_crypt(size_t * l)
   const char * key = "adc83b19e793491b1c6ea0fd8b46cd9f32e592fc";
 
   memset( plain,0xCC,sizeof(plain) );
-  size_t * k = l;
+  uint64_t * k = l;
 
   crypt_buf cre;
 
-  size_t ml = cre.get_mac_len();
-  size_t hl = cre.get_header_len();
+  uint64_t ml = cre.get_mac_len();
+  uint64_t hl = cre.get_header_len();
 
   assert( cre.init_crypt(plain,key,true) == true );
   memcpy( cryp,plain,sizeof(plain) );
 
-  size_t off=hl;
+  uint64_t off=hl;
+
   while( *k && off < (sizeof(plain)-ml) )
   {
     assert( cre.add_data(cryp+off,*k,true) == true );
@@ -84,12 +85,12 @@ void test_crypt(size_t * l)
     ++k;
 
     crypt_buf crd;
-    memcpy( ck,cryp,off );
+    ::memcpy( ck, cryp, static_cast<size_t>(off) );
     assert( crd.init_crypt(ck,key,false) == true );
     assert( crd.add_data(ck+hl,off-hl,false) == true );
 
     /* check the buffer -minus the header */
-    assert( memcmp(ck+hl,plain+hl,off-hl)==0 );
+    assert( ::memcmp( ck+hl, plain+hl, static_cast<size_t>(off-hl) )==0 );
   }
 
   {
@@ -98,16 +99,15 @@ void test_crypt(size_t * l)
     assert( cre.finalize(mac0) == true );
 
     crypt_buf crd;
-    memcpy( ck,cryp,sizeof(cryp) );
-    assert( crd.init_crypt(ck,key,false) == true );
-    assert( crd.add_data(ck+hl,off-hl,false) == true );
+    ::memcpy( ck, cryp, sizeof(cryp) );
+    assert( crd.init_crypt( ck, key, false ) == true );
+    assert( crd.add_data( ck+hl, off-hl, false ) == true );
 
     assert( crd.finalize(mac1) == true );
 
     /* check the buffer -minus the header */
-    assert( memcmp(ck+hl,plain+hl,off-hl)==0 );
-
-    assert( memcmp(mac0,mac1,ml) == 0 );
+    assert( ::memcmp( ck+hl, plain+hl, static_cast<size_t>(off-hl) )==0 );
+    assert( ::memcmp( mac0, mac1, static_cast<size_t>(ml) ) == 0 );
   }
 
   {
@@ -116,7 +116,7 @@ void test_crypt(size_t * l)
     assert( cre.finalize(mac0) == true );
 
     crypt_buf crd;
-    memcpy( ck,cryp,sizeof(cryp) );
+    ::memcpy( ck,cryp,sizeof(cryp) );
 
     /* try to foul mac */
     ck[hl+2] = 1;
@@ -128,7 +128,7 @@ void test_crypt(size_t * l)
     assert( crd.finalize(mac1) == true );
 
     /* should NOT match */
-    assert( memcmp(mac0,mac1,ml) != 0 );
+    assert( ::memcmp( mac0, mac1, static_cast<size_t>(ml) ) != 0 );
   }
 }
 
@@ -200,7 +200,7 @@ void test_rn()
 
    This test uses memory buffer key.
 */
-void test_crypt2(size_t * l)
+void test_crypt2(uint64_t * l)
 {
   unsigned char plain[200];
   unsigned char cryp[200];
@@ -212,17 +212,17 @@ void test_crypt2(size_t * l)
   memset( key,0xbd,sizeof(key) );
   memset( plain,0xCC,sizeof(plain) );
 
-  size_t * k = l;
+  uint64_t * k = l;
 
   crypt_buf cre;
 
-  size_t ml = cre.get_mac_len();
-  size_t hl = cre.get_header_len();
+  uint64_t ml = cre.get_mac_len();
+  uint64_t hl = cre.get_header_len();
 
   assert( cre.init_crypt(plain,key,sizeof(key),true) == true );
   memcpy( cryp,plain,sizeof(plain) );
 
-  size_t off=hl;
+  uint64_t off=hl;
   while( *k && off < (sizeof(plain)-ml) )
   {
     assert( cre.add_data(cryp+off,*k,true) == true );
@@ -230,12 +230,12 @@ void test_crypt2(size_t * l)
     ++k;
 
     crypt_buf crd;
-    memcpy( ck,cryp,off );
-    assert( crd.init_crypt(ck,key,sizeof(key),false) == true );
-    assert( crd.add_data(ck+hl,off-hl,false) == true );
+    memcpy( ck, cryp, static_cast<size_t>(off) );
+    assert( crd.init_crypt( ck, key, sizeof(key), false ) == true );
+    assert( crd.add_data( ck+hl, off-hl, false ) == true );
 
     /* check the buffer -minus the header */
-    assert( memcmp(ck+hl,plain+hl,off-hl)==0 );
+    assert( ::memcmp( ck+hl, plain+hl, static_cast<size_t>(off-hl) )==0 );
   }
 
   {
@@ -251,9 +251,8 @@ void test_crypt2(size_t * l)
     assert( crd.finalize(mac1) == true );
 
     /* check the buffer -minus the header */
-    assert( memcmp(ck+hl,plain+hl,off-hl)==0 );
-
-    assert( memcmp(mac0,mac1,ml) == 0 );
+    assert( ::memcmp( ck+hl, plain+hl, static_cast<size_t>(off-hl) )==0 );
+    assert( ::memcmp( mac0, mac1, static_cast<size_t>(ml) ) == 0 );
   }
 
   {
@@ -274,24 +273,24 @@ void test_crypt2(size_t * l)
     assert( crd.finalize(mac1) == true );
 
     /* should NOT match */
-    assert( memcmp(mac0,mac1,ml) != 0 );
+    assert( ::memcmp( mac0, mac1, static_cast<size_t>(ml) ) != 0 );
   }
 }
 
 
-void t0() { size_t t[] = {5,0}; test_crypt( t ); }
-void t1() { size_t t[] = {4,4,4,4,4,4,4,4,4,4,4,4,4,0}; test_crypt( t ); }
-void t2() { size_t t[] = {8,8,8,8,8,8,8,8,8,8,8,8,8,0}; test_crypt( t ); }
-void t3() { size_t t[] = {11,11,11,11,11,11,11,11,11,11,0}; test_crypt( t ); }
-void t4() { size_t t[] = {19,19,19,19,19,19,19,19,19,19,0}; test_crypt( t ); }
-void t5() { size_t t[] = {140,0}; test_crypt( t ); }
+void t0() { uint64_t t[] = {5,0}; test_crypt( t ); }
+void t1() { uint64_t t[] = {4,4,4,4,4,4,4,4,4,4,4,4,4,0}; test_crypt( t ); }
+void t2() { uint64_t t[] = {8,8,8,8,8,8,8,8,8,8,8,8,8,0}; test_crypt( t ); }
+void t3() { uint64_t t[] = {11,11,11,11,11,11,11,11,11,11,0}; test_crypt( t ); }
+void t4() { uint64_t t[] = {19,19,19,19,19,19,19,19,19,19,0}; test_crypt( t ); }
+void t5() { uint64_t t[] = {140,0}; test_crypt( t ); }
 
-void z0() { size_t t[] = {5,0}; test_crypt2( t ); }
-void z1() { size_t t[] = {4,4,4,4,4,4,4,4,4,4,4,4,4,0}; test_crypt2( t ); }
-void z2() { size_t t[] = {8,8,8,8,8,8,8,8,8,8,8,8,8,0}; test_crypt2( t ); }
-void z3() { size_t t[] = {11,11,11,11,11,11,11,11,11,11,0}; test_crypt2( t ); }
-void z4() { size_t t[] = {19,19,19,19,19,19,19,19,19,19,0}; test_crypt2( t ); }
-void z5() { size_t t[] = {140,0}; test_crypt2( t ); }
+void z0() { uint64_t t[] = {5,0}; test_crypt2( t ); }
+void z1() { uint64_t t[] = {4,4,4,4,4,4,4,4,4,4,4,4,4,0}; test_crypt2( t ); }
+void z2() { uint64_t t[] = {8,8,8,8,8,8,8,8,8,8,8,8,8,0}; test_crypt2( t ); }
+void z3() { uint64_t t[] = {11,11,11,11,11,11,11,11,11,11,0}; test_crypt2( t ); }
+void z4() { uint64_t t[] = {19,19,19,19,19,19,19,19,19,19,0}; test_crypt2( t ); }
+void z5() { uint64_t t[] = {140,0}; test_crypt2( t ); }
 
 } // end of test_crypt_buf
 
@@ -299,8 +298,8 @@ using namespace test_crypt_buf;
 
 int main()
 {
-  size_t t01[] = {30,0};
-  size_t t02[] = {3,5,7,11,13,0};
+  uint64_t t01[] = {30,0};
+  uint64_t t02[] = {3,5,7,11,13,0};
   test_crypt( t01 );
   test_crypt( t02 );
 

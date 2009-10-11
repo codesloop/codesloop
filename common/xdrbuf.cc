@@ -44,24 +44,24 @@ namespace csl
 
   namespace
   {
-    void round_to_4(uint32_t sz,uint32_t & new_sz,uint32_t & pad)
+    void round_to_4(uint64_t sz,uint64_t & new_sz,uint64_t & pad)
     {
       new_sz = ((((sz) + 3) & (~3)));
       pad    = new_sz - sz;
     }
 
-    void size_and_buf_to_pbuf(common::pbuf * b, const void * p, unsigned int sz)
+    void size_and_buf_to_pbuf(common::pbuf * b, const void * p, uint64_t sz)
     {
       if( !b || !p || !sz )
       {
-        throw common::exc(exc::rs_cannot_append,L"",L"",L""__FILE__,__LINE__);        
+        throw common::exc(exc::rs_cannot_append,L"",L"",L""__FILE__,__LINE__);
         return;
       }
 
-      unsigned char pad[] = { 0, 0, 0, 0 };
-      uint32_t elen = htonl(sz);
+      unsigned char pad[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+      uint64_t elen = htonl( static_cast<uint32_t>(sz) ); // TODO : fix 64bit truncate here
 
-      uint32_t new_len, pad_size;
+      uint64_t new_len, pad_size;
       round_to_4( sz, new_len, pad_size );
 
       if( !b->append( reinterpret_cast<unsigned char *>(&elen),sizeof(elen)) )
@@ -70,7 +70,7 @@ namespace csl
         return;
       }
 
-      if( !b->append( reinterpret_cast<const unsigned char *>(p),sz) )
+      if( !b->append( reinterpret_cast<const unsigned char *>(p), sz ) )
       {
         throw common::exc(exc::rs_cannot_append,L"",L"",L""__FILE__,__LINE__);
         return;
@@ -151,12 +151,12 @@ namespace csl
 
     xdrbuf & xdrbuf::operator<<(const common::str & val)
     {
-      uint32_t sz = val.nbytes();
+      uint32_t sz = val.nbytes(); // TODO : 64bit length truncation
       if( sz )
       {
         try
         {
-          sz = val.size() * sizeof(wchar_t);
+          sz = val.size() * sizeof(wchar_t); // TODO : 64bit length truncation
 
           size_and_buf_to_pbuf( b_, val.data(), sz );
         }
@@ -174,7 +174,7 @@ namespace csl
 
     xdrbuf & xdrbuf::operator<<(const common::ustr & val)
     {
-      uint32_t sz = val.nbytes();
+      uint32_t sz = val.nbytes();  // TODO : 64bit length truncation
       if( sz )
       {
         try
@@ -195,7 +195,7 @@ namespace csl
 
     xdrbuf & xdrbuf::operator<<(const xdrbuf::bindata_t & val)
     {
-      uint32_t sz = val.second;
+      uint32_t sz = val.second; // TODO : check for 64bit truncation
       if( sz )
       {
         try
@@ -230,7 +230,7 @@ namespace csl
       }
 
       unsigned char pad[] = { 0, 0, 0, 0 };
-      uint32_t new_len, pad_size;
+      uint64_t new_len, pad_size;
       round_to_4( sz, new_len, pad_size );
 
       if( pad_size != 0 ) b_->append( pad, pad_size );
@@ -241,7 +241,7 @@ namespace csl
     xdrbuf & xdrbuf::operator>>(int32_t & val)
     {
       int32_t tmp;
-      unsigned int szrd=0;
+      uint64_t szrd=0;
 
       if( (szrd=get_data( reinterpret_cast<unsigned char *>(&tmp),sizeof(tmp))) == sizeof(tmp) )
       {
@@ -266,7 +266,7 @@ namespace csl
     xdrbuf & xdrbuf::operator>>(uint32_t & val)
     {
       uint32_t tmp;
-      unsigned int szrd=0;
+      uint64_t szrd=0;
 
       if( (szrd=get_data( reinterpret_cast<unsigned char *>(&tmp),sizeof(tmp))) == sizeof(tmp) )
       {
@@ -298,7 +298,7 @@ namespace csl
     {
       uint32_t sz = 0;
       (*this) >> sz;
-      unsigned int szrd=0;
+      uint64_t szrd=0;
 
       if( !sz ) { val.clear(); return *this; }
 
@@ -330,7 +330,7 @@ namespace csl
     {
       uint32_t sz = 0;
       (*this) >> sz;
-      unsigned int szrd=0;
+      uint64_t szrd=0;
 
       if( !sz ) { val.clear(); return *this; }
 
@@ -362,7 +362,7 @@ namespace csl
     {
       uint32_t size = 0;
       uint32_t saved_size = 0;
-      unsigned int szrd = 0;
+      uint64_t szrd = 0;
 
       if( it_ == b_->end() ) { goto bail; }
 
@@ -377,7 +377,7 @@ namespace csl
         if( it_ == b_->end() ) goto bail;
 
         pbuf::buf * bf = (*it_);
-        unsigned int ts = bf->size_-pos_;
+        uint64_t ts = bf->size_-pos_;
 
         /* have full size */
         if( ts >= size )
@@ -390,7 +390,7 @@ namespace csl
 
           {
             szrd += size;
-            uint32_t new_size,pad_size;
+            uint64_t new_size,pad_size;
             round_to_4( size, new_size, pad_size );
             pos_ += new_size;
           }
@@ -421,10 +421,10 @@ namespace csl
         return *this;
     }
 
-    bool xdrbuf::get_data(unsigned char * where, unsigned int & size,unsigned int max_size)
+    bool xdrbuf::get_data(unsigned char * where, uint64_t & size, uint64_t max_size)
     {
       pbuf::iterator oldit = it_;
-      unsigned int oldpos  = pos_;
+      uint64_t oldpos  = pos_;
 
       uint32_t sz = 0;
       (*this) >> sz;
@@ -437,7 +437,7 @@ namespace csl
         size = sz;
         return false;
       }
-      unsigned int szrd=get_data( where, sz );
+      uint64_t szrd=get_data( where, sz );
 
       if( szrd == sz ) return true;
       else
@@ -447,9 +447,9 @@ namespace csl
       }
     }
 
-    unsigned int xdrbuf::get_data(unsigned char * where, unsigned int size)
+    uint64_t xdrbuf::get_data(unsigned char * where, uint64_t size)
     {
-      unsigned int ret = 0;
+      uint64_t ret = 0;
       if( it_ == b_->end() ) return ret;
 
       /* need to step forward */
@@ -460,15 +460,15 @@ namespace csl
         if( it_ == b_->end() ) return ret;
 
         pbuf::buf * bf = (*it_);
-        unsigned int ts = bf->size_-pos_;
+        uint64_t ts = bf->size_-pos_;
 
         /* have full size */
         if( ts >= size )
         {
-          ::memcpy( where,bf->data_+pos_,size );
+          ::memcpy( where, bf->data_+pos_, static_cast<size_t>(size) );
           {
             ret += size;
-            uint32_t new_size,pad_size;
+            uint64_t new_size,pad_size;
             round_to_4( size, new_size, pad_size );
             pos_ += new_size;
           }
@@ -477,7 +477,7 @@ namespace csl
         }
         else if( ts > 0 )
         {
-          ::memcpy( where,bf->data_+pos_,ts );
+          ::memcpy( where, bf->data_+pos_, static_cast<size_t>(ts) );
           ret   += ts;
           size  -= ts;
           where += ts;
@@ -493,7 +493,7 @@ namespace csl
       return ret;
     }
 
-    bool xdrbuf::forward(unsigned int n)
+    bool xdrbuf::forward(uint64_t n)
     {
       if( it_ == b_->end() ) return false;
 
@@ -505,13 +505,13 @@ namespace csl
         if( it_ == b_->end() ) return false;
 
         pbuf::buf * bf = (*it_);
-        unsigned int ts = bf->size_-pos_;
+        uint64_t ts = bf->size_-pos_;
 
         /* have full size */
         if( ts >= n )
         {
           {
-            uint32_t new_n, pad_size;
+            uint64_t new_n, pad_size;
             round_to_4( n, new_n, pad_size );
             pos_ += new_n;
           }
@@ -540,9 +540,9 @@ namespace csl
       it_  = b_->begin();
     }
 
-    unsigned long xdrbuf::position()
+    uint64_t xdrbuf::position()
     {
-      unsigned long ret = 0;
+      uint64_t ret = 0;
       pbuf::iterator it = b_->begin();
 
       while( it != it_ )

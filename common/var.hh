@@ -101,10 +101,10 @@ namespace csl
         virtual bool to_binary(binry & v) const = 0;
 
         /** @brief abstract function: convert to (ptr+size) */
-        virtual bool to_binary(unsigned char * v, size_t & sz) const = 0;
+        virtual bool to_binary(unsigned char * v, uint64_t & sz) const = 0;
 
         /** @brief abstract function: convert to (ptr+size) */
-        virtual bool to_binary(void * v, size_t & sz) const = 0;
+        virtual bool to_binary(void * v, uint64_t & sz) const = 0;
 
         /** @brief abstract function: convert XDR */
         virtual bool to_xdr(xdrbuf & b) const = 0;
@@ -145,10 +145,10 @@ namespace csl
         virtual bool from_binary(const binry & v) = 0;
 
         /** @brief abstract function: convert from (ptr+size) */
-        virtual bool from_binary(const unsigned char * v,size_t sz) = 0;
+        virtual bool from_binary(const unsigned char * v,uint64_t sz) = 0;
 
         /** @brief abstract function: convert from (ptr+size) */
-        virtual bool from_binary(const void * v,size_t sz) = 0;
+        virtual bool from_binary(const void * v,uint64_t sz) = 0;
 
         /** @brief abstract function: convert from XDR */
         virtual bool from_xdr(xdrbuf & v) = 0;
@@ -157,7 +157,7 @@ namespace csl
         virtual bool from_var(const var & v) = 0;
 
         /** @brief returns the size of the variable data */
-        virtual size_t var_size() const = 0;
+        virtual uint64_t var_size() const = 0;
 
         /** @brief returns a const pointer to internal data */
         virtual const unsigned char * ucharp_data() const = 0;
@@ -206,7 +206,7 @@ namespace csl
         virtual inline bool set(double v) { return (this->from_double(v)); }
 
         /** @brief initialize from binary buffer */
-        virtual inline bool set(const unsigned char * ptr, size_t sz) { return (this->from_binary(ptr,sz)); }
+        virtual inline bool set(const unsigned char * ptr, uint64_t sz) { return (this->from_binary(ptr,sz)); }
 
         /** @brief returns the value as double */
         virtual inline double get_double() const { return static_cast<double>(*this); }

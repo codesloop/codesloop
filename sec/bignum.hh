@@ -83,13 +83,13 @@ namespace csl
 
         if sz fits in the preallocated space, it will return that
         */
-        inline unsigned char * allocate(unsigned int sz)
+        inline unsigned char * allocate(uint64_t sz)
         {
           return buf_.allocate(sz);
         }
 
         /** @brief set the bignumber data */
-        inline bool set(const unsigned char * dta,unsigned int sz)
+        inline bool set(const unsigned char * dta, uint64_t sz)
         {
           return buf_.set(dta,sz);
         }
@@ -126,7 +126,7 @@ namespace csl
         inline bool is_empty() const        { return buf_.is_empty(); }   ///<checks if empty
         inline bool has_data() const        { return buf_.has_data(); }   ///<checks if has_data
         inline bool is_static() const       { return buf_.is_static(); }  ///<checks if statically allocated
-        inline unsigned int size() const    { return buf_.size();; }      ///<returns the size of the allocated data
+        inline uint64_t size() const        { return buf_.size(); }       ///<returns the size of the allocated data
         inline void is_negative(bool yesno) { is_negative_ = yesno; }     ///<sets the negative flag
         inline bool is_negative() const     { return is_negative_; }      ///<gets the negative flag
 

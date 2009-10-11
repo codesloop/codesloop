@@ -42,7 +42,7 @@ namespace csl
   {
     binry::binry() : var() { }
 
-    binry::binry(const unsigned char * ptr,size_t sz) : var()
+    binry::binry(const unsigned char * ptr,uint64_t sz) : var()
     {
       if( ptr && sz ) value_.set( ptr,sz );
     }
@@ -86,7 +86,7 @@ namespace csl
       }
       else
       {
-        size_t sz = value_.size();
+        uint64_t sz = value_.size();
         if( value_.data()[sz-1] == 0 ) --sz;
         v.assign( reinterpret_cast<const char *>(value_.data()),
                   reinterpret_cast<const char *>(value_.data()+sz) );
@@ -94,18 +94,18 @@ namespace csl
       return true;
     }
 
-    bool binry::to_binary(unsigned char * v, size_t & sz) const
+    bool binry::to_binary(unsigned char * v, uint64_t & sz) const
     {
       if( !v ) return false;
-      ::memcpy( v,value_.data(),value_.size() );
+      ::memcpy( v,value_.data(),static_cast<size_t>(value_.size()) );
       sz = value_.size();
       return true;
     }
 
-    bool binry::to_binary(void * v, size_t & sz) const
+    bool binry::to_binary(void * v, uint64_t & sz) const
     {
       if( !v ) return false;
-      ::memcpy( v,value_.data(),value_.size() );
+      ::memcpy( v, value_.data(), static_cast<size_t>(value_.size()) );
       sz = value_.size();
       return true;
     }
@@ -114,7 +114,7 @@ namespace csl
     {
       try
       {
-        b << xdrbuf::bindata_t(value_.data(),value_.size());
+        b << xdrbuf::bindata_t( value_.data(), value_.size() );
         return true;
       }
       catch( exc & e )
@@ -175,14 +175,14 @@ namespace csl
       return true;
     }
 
-    bool binry::from_binary(const unsigned char * v,size_t sz)
+    bool binry::from_binary(const unsigned char * v,uint64_t sz)
     {
       if( !v ) return false;
       if( !sz ) { value_.reset(); return true; }
       return value_.set(v,sz);
     }
 
-    bool binry::from_binary(const void * v,size_t sz)
+    bool binry::from_binary(const void * v,uint64_t sz)
     {
       if( !v ) return false;
       if( !sz ) { value_.reset(); return true; }
@@ -193,8 +193,8 @@ namespace csl
     {
       try
       {
-        unsigned int sz=0,max=0x3fffffff;
-        bool r = v.get_data( value_,sz,max );
+        uint64_t sz=0,max=0x3fffffff;
+        bool r = v.get_data( value_, sz, max );
         if( sz == 0 ) value_.reset();
         else if( r == false ) return false;
         return true;

@@ -237,12 +237,12 @@ namespace test_xdrbuf {
     assert( ptr2 != 0 );
 
     xb.rewind();
-    unsigned int sz;
+    uint64_t sz;
     assert( xb.get_data(ptr2,sz,204808) == true );
     assert( xb.position() == 204804 );
     assert( sz == zf.get_size() );
     assert( sz == 204800 );
-    assert( ::memcmp(ptr,ptr2,sz) == 0 );
+    assert( ::memcmp( ptr, ptr2, static_cast<size_t>(sz) ) == 0 );
   }
 
   /** @test pbuf de/serialization */

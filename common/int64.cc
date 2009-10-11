@@ -67,13 +67,13 @@ namespace csl
       return v.from_integer(value_);
     }
 
-    bool int64::to_binary(unsigned char * v, size_t & sz) const
+    bool int64::to_binary(unsigned char * v, uint64_t & sz) const
     {
       binry b;
       return (b.from_integer(value_) && b.to_binary(v,sz));
     }
 
-    bool int64::to_binary(void * v, size_t & sz) const
+    bool int64::to_binary(void * v, uint64_t & sz) const
     {
       binry b;
       return (b.from_integer(value_) && b.to_binary(v,sz));
@@ -135,13 +135,13 @@ namespace csl
       return v.to_integer(value_);
     }
 
-    bool int64::from_binary(const unsigned char * v,size_t sz)
+    bool int64::from_binary(const unsigned char * v,uint64_t sz)
     {
       binry b;
       return (b.from_binary(v,sz) && b.to_integer(value_));
     }
 
-    bool int64::from_binary(const void * v,size_t sz)
+    bool int64::from_binary(const void * v,uint64_t sz)
     {
       binry b;
       return (b.from_binary(v,sz) && b.to_integer(value_));

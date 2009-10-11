@@ -102,7 +102,7 @@ namespace csl
           if( size_ == 0 )           return true;
           if( data_ == 0 )           return false;
           if( other.data_ == 0 )     return false;
-          return (::memcmp(other.data_,data_,size_) == 0);
+          return (::memcmp( other.data_, data_, static_cast<size_t>(size_) ) == 0);
         }
 
         /** @brief copy operator */
@@ -115,7 +115,7 @@ namespace csl
         /** @brief copy operator */
         inline tbuf & operator=(const pbuf & other)
         {
-          unsigned long sz = other.size();
+          uint64_t sz = other.size();
 
           /* quick return if empty */
           if( !sz ) { reset(); return *this; }
@@ -143,7 +143,7 @@ namespace csl
 
           if( tmp )
           {
-            ::memcpy( tmp, other.data_, other.size_ );
+            ::memcpy( tmp, other.data_, static_cast<size_t>(other.size_) );
           }
           return *this;
         }
@@ -163,12 +163,12 @@ namespace csl
         inline bool get(unsigned char * dta)
         {
           if( !dta || !size_ || !data_ ) { return false; }
-          ::memcpy( dta,data_,size_ );
+          ::memcpy( dta,data_,static_cast<size_t>(size_) );
           return true;
         }
 
         /** @brief sets the internal data from the given (ptr+size) */
-        inline bool set(const unsigned char * dta,unsigned int sz)
+        inline bool set(const unsigned char * dta,uint64_t sz)
         {
           /* if no data on the other side we are done */
           if( !sz )  { reset(); return true; }
@@ -179,7 +179,7 @@ namespace csl
           if( allocate(sz) )
           {
             /* copy in the data */
-            ::memcpy(data_,dta,sz);
+            ::memcpy( data_, dta, static_cast<size_t>(sz) );
             return true;
           }
           else
@@ -195,7 +195,7 @@ namespace csl
         if new buffer is allocated and the old buffer had data, then the new buffer is
         initialized with the old data
          */
-        inline unsigned char * allocate(unsigned int sz)
+        inline unsigned char * allocate(uint64_t sz)
         {
           if( !sz ) { reset(); return data_; }
 
@@ -214,14 +214,14 @@ namespace csl
           else
           {
             /* cannot use the preallocated space */
-            unsigned char * tmp = reinterpret_cast<unsigned char *>(::malloc(sz));
+            unsigned char * tmp = reinterpret_cast<unsigned char *>(::malloc( static_cast<size_t>(sz) ));
             if( !tmp ) return 0;
 
             /* already have data ? */
             if( size_ > 0 )
             {
-                ::memcpy(tmp,data_,size_);
-                if( data_ != preallocated_ ) ::free(data_);
+                ::memcpy( tmp, data_, static_cast<size_t>(size_) );
+                if( data_ != preallocated_ ) ::free( data_ );
             }
 
             data_ = tmp;
@@ -235,7 +235,7 @@ namespace csl
         @brief allocate the given amount of memory and return a pointer to it
         @todo test: allocate with existing data: should copy the old data!!!
          */
-        inline unsigned char * allocate_nocopy(unsigned int sz)
+        inline unsigned char * allocate_nocopy(uint64_t sz)
         {
           if( !sz ) { reset(); return data_; }
 
@@ -248,7 +248,7 @@ namespace csl
           else if( sz <= sizeof(preallocated_) )
           {
             /* data fits into preallocated size */
-            if( size_ > 0 && data_ != preallocated_ ) ::free(data_);
+            if( size_ > 0 && data_ != preallocated_ ) ::free( data_ );
 
             data_ = preallocated_;
             size_ = sz;
@@ -257,11 +257,13 @@ namespace csl
           else
           {
             /* cannot use the preallocated space */
-            unsigned char * tmp = reinterpret_cast<unsigned char *>(::malloc(sz));
+            unsigned char * tmp =
+              reinterpret_cast<unsigned char *>(::malloc( static_cast<size_t>(sz) ));
+
             if( !tmp ) return 0;
 
             /* already have data ? */
-            if( size_ > 0 && data_ != preallocated_ ) ::free(data_);
+            if( size_ > 0 && data_ != preallocated_ ) ::free( data_ );
 
             data_ = tmp;
             size_ = sz;
@@ -276,7 +278,7 @@ namespace csl
         }
 
         /** @brief append a memory region (ptr+size) to the internal buffer */
-        inline bool append(const unsigned char * dta,unsigned int sz)
+        inline bool append(const unsigned char * dta, uint64_t sz)
         {
           /* if no data on the other side we are done */
           if( !sz )  { return true; }
@@ -287,7 +289,7 @@ namespace csl
           if( allocate(size_+sz) )
           {
             /* copy in the data */
-            ::memcpy(data_+size_-sz,dta,sz);
+            ::memcpy( data_+size_-sz, dta, static_cast<size_t>(sz) );
             return true;
           }
           else
@@ -307,7 +309,7 @@ namespace csl
         @param pos is where to place the given character
         @param c is the character to be placed at pos
          */
-        inline void set_at(unsigned int pos,unsigned char c)
+        inline void set_at(uint64_t pos,unsigned char c)
         {
           unsigned char * t = data_;
           if( pos >= size_ ) t = allocate( pos+1 );
@@ -320,7 +322,7 @@ namespace csl
         inline bool is_static() const       { return (data_ == preallocated_); } ///<checks if statically allocated
 
         /** @brief returns the size of the allocated data */
-        inline unsigned int size() const    { return size_; }  ///<returns the used buffer size
+        inline uint64_t size() const    { return size_; }  ///<returns the used buffer size
 
         /** @brief return the allocated data */
         inline const unsigned char * data() const { return data_; } ///<returns a pointer to the internal buffer
@@ -329,9 +331,9 @@ namespace csl
         inline unsigned char * private_data() const { return data_; } ///<returns a non-const pointer to the internal buffer
 
       private:
-        unsigned char   preallocated_[SZ];   ///<the preallocated buffer
-        unsigned char * data_;               ///<the data
-        unsigned int    size_;               ///<the allocated size
+        unsigned char      preallocated_[SZ];   ///<the preallocated buffer
+        unsigned char *    data_;               ///<the data
+        uint64_t           size_;               ///<the allocated size
     };
   }
 }

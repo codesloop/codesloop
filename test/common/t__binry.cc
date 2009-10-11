@@ -129,7 +129,7 @@ namespace test_binry {
     binry v;
     unsigned char tmp[300];
     assert( v.from_string("árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP") == true );
-    size_t sz = 0;
+    uint64_t sz = 0;
     assert( v.to_binary(tmp,sz) == true );
     assert( sz > 10 );
     binry::buf_t bf;
@@ -143,7 +143,7 @@ namespace test_binry {
     unsigned char tmp[300];
     void * vp = tmp;
     assert( v.from_string("árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP") == true );
-    size_t sz = 0;
+    uint64_t sz = 0;
     assert( v.to_binary(vp,sz) == true );
     assert( sz > 10 );
     binry::buf_t bf;
@@ -213,7 +213,7 @@ namespace test_binry {
   {
     binry v;
     unsigned char o[300];
-    size_t sz;
+    uint64_t sz;
     ustr i("árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
     assert( v.from_string(i) == true );
     assert( v.to_binary(o,sz) == true );
@@ -228,7 +228,7 @@ namespace test_binry {
     binry v;
     unsigned char o[300];
     void * vp = o;
-    size_t sz;
+    uint64_t sz;
     str i(L"árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
     assert( v.from_string(i) == true );
     assert( v.to_binary(vp,sz) == true );

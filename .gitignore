@@ -115,3 +115,4 @@ TODO.tasks
 tags
 test/common/t__auto_cloce
 test/common/t__queue
+test/comm/t__rdbuf

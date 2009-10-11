@@ -71,24 +71,24 @@ namespace csl
           value_ = other.value_;
           return *this;
         }
-      
+
         /**
         @brief initializing constructor
         @param ptr is a memory location
         @param sz is the amount of memory to be copied in
         */
-        binry(const unsigned char * ptr,size_t sz);
+        binry(const unsigned char * ptr,uint64_t sz);
 
         virtual inline ~binry() {} ///<destructor
         inline value_t value() const { return value_; } ///<constant reference to the internal buffer
         inline int var_type() const { return var_type_v; } ///<value type helps distinguish from other var types
         inline void reset() { value_.reset(); } ///<reset the internal buffer
-        
+
         /** @brief returns a const pointer to internal data */
         inline const unsigned char * ucharp_data() const { return value_.data(); }
-        
+
         /** @brief returns the size of the variable data */
-        inline size_t var_size() const { return value_.size(); }
+        inline uint64_t var_size() const { return value_.size(); }
 
         /* conversions to other types */
         /**
@@ -176,7 +176,7 @@ namespace csl
         this function assumes that v has enough space. sz will be updated to indicate, how
         many bytes were stored
          */
-        bool to_binary(unsigned char * v, size_t & sz) const;
+        bool to_binary(unsigned char * v, uint64_t & sz) const;
 
         /**
         @brief convert to ptr,size
@@ -187,7 +187,7 @@ namespace csl
         this function assumes that v has enough space. sz will be updated to indicate, how
         many bytes were stored
          */
-        bool to_binary(void * v, size_t & sz) const;
+        bool to_binary(void * v, uint64_t & sz) const;
 
         /**
         @brief stores the content of this instance to an XDR stream
@@ -312,7 +312,7 @@ namespace csl
 
         the given memory region will be copied in
          */
-        bool from_binary(const unsigned char * v,size_t sz);
+        bool from_binary(const unsigned char * v,uint64_t sz);
 
         /**
         @brief convert a memory region
@@ -322,7 +322,7 @@ namespace csl
 
         the given memory region will be copied in
          */
-        bool from_binary(const void * v,size_t sz);
+        bool from_binary(const void * v,uint64_t sz);
 
         /**
         @brief read the content of this instance from an XDR stream

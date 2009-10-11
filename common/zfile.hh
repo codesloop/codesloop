@@ -112,7 +112,7 @@ namespace csl
          If only the compressed buffer has data then it gets uncompressed
          first.
       */
-      size_t get_size();
+      uint64_t get_size();
 
       /**
       @brief Returns the size of the uncompressed buffer
@@ -121,7 +121,7 @@ namespace csl
       Even if only the compressed buffer has data it will not uncompress it.
       If that is the case it returns 0.
        */
-      size_t get_size_const() const;
+      uint64_t get_size_const() const;
 
       /**
          @brief The data of the uncompressed buffers will be placed into dta
@@ -180,7 +180,7 @@ namespace csl
 
          If the buffers already have data then they will be discarded.
       */
-      bool put_data(const unsigned char * dta,size_t len);
+      bool put_data(const unsigned char * dta, uint64_t len);
 
       /**
          @brief Puts data into the uncompressed buffers
@@ -216,7 +216,7 @@ namespace csl
          If only the uncompressed buffer has data then it gets compressed
          first.
       */
-      size_t get_zsize();
+      uint64_t get_zsize();
 
       /**
       @brief Returns the compressed buffer size
@@ -225,7 +225,7 @@ namespace csl
       If there is no compressed data, then it will not compress the data.
       If that is the case it returns 0.
        */
-      size_t get_zsize_const() const;
+      uint64_t get_zsize_const() const;
 
       /**
          @brief The data of the compressed buffers will be placed into dta
@@ -284,7 +284,7 @@ namespace csl
 
          If the buffers already have data then they will be discarded.
       */
-      bool put_zdata(const unsigned char * dta,size_t len);
+      bool put_zdata(const unsigned char * dta, uint64_t len);
 
       /**
          @brief Puts data into the compressed buffers

@@ -307,7 +307,7 @@ namespace test_str {
     str b("árvíztűrő tükörfúrógép ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP");
     b.use_exc(true);
     unsigned char o[300];
-    size_t sz = 0;
+    uint64_t sz = 0;
     assert( b.to_binary(o,sz) == true );
     assert( sz == b.nbytes() );
     assert( sz > 10 );
@@ -320,7 +320,7 @@ namespace test_str {
     b.use_exc(true);
     unsigned char o[300];
     void * vp = o;
-    size_t sz = 0;
+    uint64_t sz = 0;
     assert( b.to_binary(vp,sz) == true );
     assert( sz == b.nbytes() );
     assert( sz > 10 );
