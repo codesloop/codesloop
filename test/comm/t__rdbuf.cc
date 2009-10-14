@@ -23,44 +23,50 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_comm_read_res_hh_included_
-#define _csl_comm_read_res_hh_included_
+/**
+   @file t__rdbuf.cc
+   @brief @todo
+ */
 
+//#if 0
+#ifndef DEBUG
+#define DEBUG
+#define DEBUG_ENABLE_INDENT
+//#define DEBUG_VERBOSE
+#endif /* DEBUG */
+//#endif
+
+#include "codesloop/comm/rdbuf.hh"
+#include "codesloop/common/logger.hh"
 #include "codesloop/common/common.h"
-#include "codesloop/common/obj.hh"
-#ifdef __cplusplus
+#include "codesloop/common/test_timer.h"
+#include <assert.h>
 
-namespace csl
+using namespace csl::comm;
+using namespace csl::common;
+//using namespace csl::nthread;
+
+/** @brief @todo */
+namespace test_rdbuf {
+
+  /*
+  ** DEBUG support --------------------------------------------------------------------
+  */
+  static inline const wchar_t * get_namespace()   { return L"test_rdbuf"; }
+  static inline const wchar_t * get_class_name()  { return L"test_rdbuf::noclass"; }
+  static inline const wchar_t * get_class_short() { return L"noclass"; }
+
+  void baseline() { rdbuf<> o; }
+
+} /* end of test_rdbuf */
+
+using namespace test_rdbuf;
+
+int main()
 {
-  namespace comm
-  {
-    class read_res
-    {
-      private:
-        uint8_t *  data_;
-        uint64_t   bytes_;
-        bool       timed_out_;
-        bool       failed_;
-
-      public:
-        read_res();
-
-        void reset();
-
-        uint8_t * data() const;
-        uint64_t bytes() const;
-        bool timed_out() const;
-        bool failed() const;
-
-        void data(uint8_t * d);
-        void bytes(uint64_t b);
-        void timed_out(bool to);
-        void failed(bool fd);
-
-        CSL_OBJ(csl::comm, read_res);
-    };
-  }
+  csl_common_print_results( "baseline          ", csl_common_test_timer_v0(baseline),"" );
+  return 0;
 }
 
-#endif /* __cplusplus */
-#endif /* _csl_comm_read_res_hh_included_ */
+/* EOF */
+

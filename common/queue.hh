@@ -203,5 +203,5 @@ namespace csl
   }
 }
 #endif /* __cplusplus */
-#include "queue_impl.hh"
+#include "codesloop/common/queue_impl.hh"
 #endif /* _csl_common_queue_hh_included */

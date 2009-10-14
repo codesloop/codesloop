@@ -31,6 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief buffered file descriptor (fd)
  */
 
+#include "codesloop/common/tbuf.hh"
 #include "codesloop/comm/sai.hh"
 #include "codesloop/comm/read_res.hh"
 #include "codesloop/common/common.h"
@@ -44,7 +45,7 @@ namespace csl
     /**
     This is a generic class that buffers read, recv and recvfrom operations on a given fd.
 
-    It tries to read as many bytes possible to fill the internal 64k buffer. The read-like operations
+    It tries to read as many bytes possible to fill the internal buffer. The read-like operations
     may or may not read from the fd depending on the given function. For some it is feasible to return
     a buffer without touching the network.
 
@@ -57,6 +58,8 @@ namespace csl
     have a limited buffer space, so care must be taken.
 
     The write-like operations are not buffered at all.
+
+    The internal buffer space is initially 1k, this may grow dynamically up to 256k.
     */
     class bfd
     {
@@ -76,7 +79,7 @@ namespace csl
 
         this function first checks wether there is data in the buffer. if so it returns that
         without trying to read from the network even if its size is smaller than the required amount.
-        if no data is in the buffer then it tries to read big (sizeof(buf_)) to fill the buffer.
+        if no data is in the buffer then it tries to read big to fill the buffer.
 
         to enforce reading from the network use the read_some() family, and check the size() in the buffer.
 
@@ -106,10 +109,12 @@ namespace csl
         static const int not_initialized_   = -2;
         static const int closed_            = -3;
         static const int fd_error_          = -4;
+        static const int max_size_          = 256*1024;
 
         int state() const;         ///<returns the fd state
         uint32_t size() const;     ///<returns the available data size
-        uint32_t n_free() const;   ///<returns how many bytes free in the buffer
+        uint32_t n_free() const { return 0; }   ///<returns how many bytes free in the buffer
+        // uint32_t remain() const;  ///<returns how many bytes can be placed into the buffer
 
         bool can_read(uint32_t timeout_ms);          ///<checks wether data is available on the fd
         bool read_buf(read_res & res, uint32_t sz);  ///<reads from the buffer (no network operations)
@@ -118,11 +123,16 @@ namespace csl
 
       private:
         int        fd_;
-        uint16_t   start_;
-        uint16_t   len_;
-        uint8_t    buf_[65536]; // 64k
+        uint32_t   start_;
+        uint32_t   read_size_;
+        uint32_t   len_;
+        uint8_t    buf_[65536];
+        common::tbuf<1024> tbuf_;
+
+        unsigned char * allocate(uint32_t len);
 
         CSL_OBJ(csl::comm,bfd);
+        USE_EXC();
     };
   }
 }

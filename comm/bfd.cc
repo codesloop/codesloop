@@ -42,7 +42,7 @@ namespace csl
 {
   namespace comm
   {
-    bfd::bfd() : fd_(bfd::not_initialized_), start_(0), len_(0) { }
+    bfd::bfd() : fd_(bfd::not_initialized_), start_(0), len_(0), use_exc_(true) { }
     bfd::bfd(int fd) : fd_(fd), start_(0), len_(0) { }
 
     bfd::~bfd()
@@ -260,22 +260,22 @@ namespace csl
       }
       else
       {
-        ret.timed_out_=true;
+        // TODO : ret.timed_out_=true;
         CSL_DEBUGF( L"timed out: timeout:%d",timeout_ms );
         goto return_ok;
       }
 
     return_failed:
-      ret.failed_ = true;
+      // TODO : ret.failed_ = true;
 
     return_ok:
-      CSL_DEBUGF( L"read(sz:%d, timeout_ms:%d) => res{ bytes_:%lld data_:%p%s%s }",
+      /* TODO :  CSL_DEBUGF( L"read(sz:%d, timeout_ms:%d) => res{ bytes_:%lld data_:%p%s%s }",
                   sz,
                   timeout_ms,
                   ret.bytes_,
                   ret.data_,
                   (ret.failed_==true?" failed_:TRUE":""),
-                  (ret.timed_out_==true?" timed_out_:TRUE":"") );
+                  (ret.timed_out_==true?" timed_out_:TRUE":"") ); */
 
       RETURN_FUNCTION( ret );
     }
@@ -336,22 +336,22 @@ namespace csl
       }
       else
       {
-        ret.timed_out_=true;
+        // TODO : ret.timed_out_=true;
         CSL_DEBUGF( L"timed out: timeout:%d",timeout_ms );
         goto return_ok;
       }
 
       return_failed:
-      ret.failed_ = true;
+      // TODO : ret.failed_ = true;
 
       return_ok:
-      CSL_DEBUGF( L"recv(sz:%d, timeout_ms:%d) => res{ bytes_:%lld data_:%p%s%s }",
+      /* TODO : CSL_DEBUGF( L"recv(sz:%d, timeout_ms:%d) => res{ bytes_:%lld data_:%p%s%s }",
                          sz,
                          timeout_ms,
                          ret.bytes_,
                          ret.data_,
                          (ret.failed_==true?" failed_:TRUE":""),
-                         (ret.timed_out_==true?" timed_out_:TRUE":"") );
+                         (ret.timed_out_==true?" timed_out_:TRUE":"") ); */
 
        RETURN_FUNCTION( ret );
     }
@@ -416,22 +416,22 @@ namespace csl
       }
       else
       {
-        ret.timed_out_=true;
+        // TODO : ret.timed_out_=true;
         CSL_DEBUGF( L"timed out: timeout:%d",timeout_ms );
         goto return_ok;
       }
 
       return_failed:
-      ret.failed_ = true;
+      // TODO : ret.failed_ = true;
 
     return_ok:
-      CSL_DEBUGF( L"recvfrom(sz:%d, timeout_ms:%d) => res{ bytes_:%lld data_:%p%s%s }",
+      /* TODO : CSL_DEBUGF( L"recvfrom(sz:%d, timeout_ms:%d) => res{ bytes_:%lld data_:%p%s%s }",
                   sz,
                   timeout_ms,
                   ret.bytes_,
                   ret.data_,
                   (ret.failed_==true?" failed_:TRUE":""),
-                  (ret.timed_out_==true?" timed_out_:TRUE":"") );
+                  (ret.timed_out_==true?" timed_out_:TRUE":"") ); */
 
       RETURN_FUNCTION( ret );
     }
@@ -621,29 +621,34 @@ namespace csl
 
     uint32_t bfd::size() const
     {
-      return len_;
+      return tbuf_.size();
     }
 
-    uint32_t bfd::n_free() const
+    unsigned char * bfd::allocate(uint32_t len)
     {
-      return (sizeof(buf_)-(len_+start_));
+      uint32_t previous_size = tbuf_.size();
+      unsigned char * ret = tbuf_.allocate( previous_size + len );
+      return (ret+previous_size);
     }
 
     bool bfd::read_buf(read_res & res, uint32_t sz)
     {
       ENTER_FUNCTION();
-      CSL_DEBUGF( L"read_buf(res,sz:%d) [len_:%d start_:%d fd_:%d]",sz,len_,start_,fd_ );
+      CSL_DEBUGF( L"read_buf(res,sz:%d) [size:%ld start_:%d fd_:%d]",sz,tbuf_.size(),start_,fd_ );
 
-      if( len_ > 0 )
+      uint32_t tsz = tbuf_.size();
+
+      if( tsz > 0 )
       {
         // fill res members
-        res.bytes_      = (sz < len_ ? sz : len_);
-        res.data_       = buf_+start_;
+        /* TODO :
+        res.bytes_      = (sz < tsz ? sz : tsz);
+        res.data_       = tbuf_.private_data()+start_;
         res.failed_     = false;
         res.timed_out_  = false;
 
+
         // fill own members
-        len_   -= static_cast<uint16_t>(res.bytes_);
         start_ += static_cast<uint16_t>(res.bytes_);
 
         CSL_DEBUGF( L"read_buf(res,sz:%d) => TRUE res{ bytes_:%lld data_:%p%s%s }",
@@ -651,7 +656,7 @@ namespace csl
                     res.bytes_,
                     res.data_,
                     (res.failed_==true?" failed_:TRUE":""),
-                    (res.timed_out_==true?" timed_out_:TRUE":"") );
+                    (res.timed_out_==true?" timed_out_:TRUE":"") ); */
 
                     RETURN_FUNCTION( true );
       }

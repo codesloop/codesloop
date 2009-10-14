@@ -475,5 +475,5 @@ namespace csl
   } /* end of ns:common */
 } /* end of ns:csl */
 #endif /* __cplusplus */
-#include "inpvec_impl.hh"
+#include "codesloop/common/inpvec_impl.hh"
 #endif /* _csl_common_inpvec_hh_included_ */
