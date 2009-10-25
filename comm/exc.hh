@@ -79,6 +79,8 @@ namespace csl
           rs_salt_size,           ///<invalid salt size
           rs_not_implemented,     ///<Function is not implemented
           rs_setsockopt,          ///<setsockopt failed
+          rs_assert,              ///<assert failed
+          rs_unknown_op,          ///<uknown op
         };
 
         /** @brief converts reason code to string */

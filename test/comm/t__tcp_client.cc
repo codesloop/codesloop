@@ -78,7 +78,10 @@ namespace test_tcp_client {
 
     CSL_DEBUGF( L"c.init() returned %s", (iret==true?"TRUE":"FALSE") );
 
-    read_res rr = c.read(80000,9000);
+
+    read_res rr;
+    uint32_t timeout_ms = 9000;
+    c.read(80000,timeout_ms,rr);
 
     LEAVE_FUNCTION();
   }

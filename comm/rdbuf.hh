@@ -27,6 +27,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _csl_comm_rdbuf_hh_included_
 
 #include "codesloop/comm/read_res.hh"
+#include "codesloop/comm/exc.hh"
 #include "codesloop/common/tbuf.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/logger.hh"
@@ -43,7 +44,7 @@ namespace csl
     {
 #ifndef RDBUF_DEBUG_STATE
 #define RDBUF_DEBUG_STATE(WHICH) \
-  CSL_DEBUGF(L"%s : [PreAll:%d Max:%d start_:%lld len_:%lld buf_.size():%lld]", \
+  CSL_DEBUGF(L"%s : [PreAll:%lld Max:%lld start_:%lld len_:%lld buf_.size():%lld]", \
              WHICH, \
              Preallocated, \
              MaxSize, \
@@ -54,7 +55,8 @@ namespace csl
 
 #ifndef RDBUF_DEBUG_STATE_RR
 #define RDBUF_DEBUG_STATE_RR(WHICH,RR) \
-  CSL_DEBUGF(L"%s : [PreAll:%d Max:%d start_:%lld len_:%lld buf_.size():%lld |RR data:%p bytes:%lld timed_out:%s failed:%s]", \
+  CSL_DEBUGF(L"%s : [PreAll:%lld Max:%lld start_:%lld len_:%lld buf_.size():%lld " \
+              "|RR data:%p bytes:%lld timed_out:%s failed:%s]", \
              WHICH, \
              Preallocated, \
              MaxSize, \
@@ -68,8 +70,22 @@ namespace csl
              );
 #endif /*RDBUF_DEBUG_STATE_RR*/
 
+#ifndef RDBUF_DEBUG_ASSERT
+# ifndef RDBUF_ASSERT_TESTING
+#  define RDBUF_DEBUG_ASSERT( COND, RETVAL ) CSL_DEBUG_ASSERT( COND )
+# else /* */
+#  define RDBUF_DEBUG_ASSERT( COND, RETVAL ) \
+     if( !(COND) ) \
+     { \
+       THRR( csl::comm::exc::rs_assert,L"assert failed: "#COND,RETVAL ); \
+     }
+# endif
+#endif
 
       public:
+        static const uint64_t preallocated_size_ = Preallocated;
+        static const uint64_t max_size_          = MaxSize;
+
         read_res & get( uint64_t sz, read_res & rr )
         {
           ENTER_FUNCTION();
@@ -85,7 +101,7 @@ namespace csl
           else if( len_ > 0 )
           {
             uint64_t ret_size = (len_ > sz ? sz : len_);
-            rr.data( buf_.get_private_data() + start_ );
+            rr.data( buf_.private_data() + start_ );
             rr.bytes( ret_size );
             start_ += ret_size;
             len_   -= ret_size;
@@ -115,30 +131,36 @@ namespace csl
           uint64_t new_len = start_ + len_ + sz;
           if( new_len > MaxSize )
           {
-            CSL_DEBUGF("cannot allocate %lld bytes",sz);
+            CSL_DEBUGF(L"cannot allocate %lld bytes",sz);
             if( start_ + len_ < MaxSize )
             {
-              CSL_DEBUGF("allocate additional %lld bytes instead of the requested %lld bytes [max:%lld-start_:%lld-len_:%lld]",
-                         MaxSize-start_-len_,
+              CSL_DEBUGF(L"allocate additional %lld bytes instead of the "
+                         "requested %lld bytes [max:%lld-start_:%lld-len_:%lld]",
+                         n_free(),
                          sz,
                          start_,
                          len_);
               uint8_t * ptr = buf_.allocate( MaxSize );
               rr.data( ptr + start_ + len_ );
-              rr.bytes( MaxSize - start_ - len_ );
+              rr.bytes( n_free() );
               len_ = MaxSize - start_;
             }
             else
             {
               // we are at maximum capacity already: this is an error
-              CSL_DEBUGF("cannot allocate more data");
+              CSL_DEBUGF(L"cannot allocate more data");
               rr.failed( true );
             }
           }
+          else if( sz == 0 )
+          {
+            CSL_DEBUGF(L"not allocating");
+            rr.reset(); // this is to enforce errors
+          }
           else
           {
-            CSL_DEBUGF("allocating %lld bytes",sz);
-            uint8_t * ptr = buf_.allocate( MaxSize );
+            CSL_DEBUGF(L"allocating %lld bytes",sz);
+            uint8_t * ptr = buf_.allocate( len_+sz );
             rr.data( ptr + start_ + len_ );
             rr.bytes( sz );
             len_ += sz;
@@ -152,9 +174,60 @@ namespace csl
           ENTER_FUNCTION();
           CSL_DEBUGF(L"adjust(rr,n_succeed:%lld)",n_succeed);
           RDBUF_DEBUG_STATE_RR("old state",rr);
+
+          uint64_t start_offset = 0;
+          uint64_t adjust_len   = 0;
+
+          start_offset = rr.data() - buf_.private_data();
+
+          // sanity checks
+          RDBUF_DEBUG_ASSERT( (rr.bytes() >= n_succeed), rr );
+          RDBUF_DEBUG_ASSERT( (rr.data() != NULL), rr );
+          RDBUF_DEBUG_ASSERT( (start_offset == (start_+len_-rr.bytes())), rr );
+          RDBUF_DEBUG_ASSERT( (len_ >= rr.bytes()), rr );
+          RDBUF_DEBUG_ASSERT( (rr.failed() == false), rr );
+          RDBUF_DEBUG_ASSERT( (rr.timed_out() == false), rr );
+
+          if( rr.bytes() < n_succeed ||
+              rr.data() == NULL      ||
+              rr.failed() == true    ||
+              len_ < rr.bytes()      ||
+              start_offset !=  (start_+len_-rr.bytes()) )
+          {
+            CSL_DEBUGF(L"invalid param received");
+            goto bail;
+          }
+
+          {
+            // set rr
+            adjust_len = rr.bytes() - n_succeed;
+            rr.bytes( n_succeed );
+            if( !n_succeed ) rr.data( NULL );
+          }
+
+          {
+            // set internal data
+            len_ -= adjust_len;
+            if( len_ == 0 )           { start_ = 0; buf_.allocate(0); }
+            else if( adjust_len > 0 )
+            {
+              uint8_t * p = buf_.allocate( len_ + start_ );
+              if( n_succeed > 0 ) { rr.data( p + start_offset ); }
+            }
+          }
+
+          CSL_DEBUGF(L"length decreased by: %lld bytes",adjust_len);
           RDBUF_DEBUG_STATE_RR("new state",rr);
+        bail:
           RETURN_FUNCTION( rr );
         }
+
+        uint64_t start()  const { return start_;      }
+        uint64_t len()    const { return len_;        }
+        uint64_t buflen() const { return buf_.size(); }
+        uint64_t n_free() const { return (MaxSize-len_-start_); }
+
+        rdbuf() : start_(0), len_(0), use_exc_(true) {}
 
       private:
         common::tbuf<Preallocated> buf_;

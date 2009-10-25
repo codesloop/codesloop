@@ -31,7 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief buffered file descriptor (fd)
  */
 
-#include "codesloop/common/tbuf.hh"
+#include "codesloop/comm/rdbuf.hh"
 #include "codesloop/comm/sai.hh"
 #include "codesloop/comm/read_res.hh"
 #include "codesloop/common/common.h"
@@ -82,54 +82,55 @@ namespace csl
         if no data is in the buffer then it tries to read big to fill the buffer.
 
         to enforce reading from the network use the read_some() family, and check the size() in the buffer.
-
-        this function returns a copy of the buffer descritor. this is cheap becuase it only has a few elements
-        and it is a POD. many compilers optimize this pretty well. for time critical functions a variation is
-        provided that returns a reference.
-
         */
-        read_res read(uint32_t sz, uint32_t timeout_ms);
-        read_res recv(uint32_t sz, uint32_t timeout_ms);                  ///<same as read() but uses recv()
-        read_res recvfrom(uint32_t sz, SAI & from, uint32_t timeout_ms);  ///<same as read() but uses recvfrom()
+        read_res & read(uint64_t sz, uint32_t & timeout_ms, read_res & rr);
+        read_res & recv(uint64_t sz, uint32_t & timeout_ms, read_res & rr); ///<same as read()
+        read_res & recvfrom(uint64_t sz, SAI & from, uint32_t & timeout_ms, read_res & rr); ///<same as read()
 
-        read_res & read(uint32_t sz, uint32_t timeout_ms, read_res & rr); ///<same as read() but uses the reference provided
-        read_res & recv(uint32_t sz, uint32_t timeout_ms, read_res & rr); ///<same as read() but uses the reference provided and recv()
-        read_res & recvfrom(uint32_t sz, SAI & from, uint32_t timeout_ms, read_res & rr); ///<same as read() but uses the reference provided and recvfrom()
+        uint64_t read_some(uint32_t & timeout_ms);  ///<try to read, and return the number of bytes read
+        uint64_t recv_some(uint32_t & timeout_ms);  ///<try to recv, and return the number of bytes recv'd
+        uint64_t recvfrom_some(SAI & from, uint32_t & timeout_ms); ///<try to recvfrom, and return the number of bytes recv'd
 
-        uint32_t read_some(uint32_t timeout_ms);  ///<try to read, and return the number of bytes in the buffer
-        uint32_t recv_some(uint32_t timeout_ms);  ///<try to recv, and return the number of bytes in the buffer
-        uint32_t recvfrom_some(SAI & from, uint32_t timeout_ms); ///<try to recvfrom, and return the number of bytes in the buffer
-
-        bool write(uint8_t * data, uint32_t sz);  ///<write() to fd_ without buffering
-        bool send(uint8_t * data, uint32_t sz);   ///<send() to fd_ without buffering
-        bool sendto(uint8_t * data, uint32_t sz,const SAI & to); ///<sendto() on fd_ without buffering
+        bool write(uint8_t * data, uint64_t sz);  ///<write() to fd_ without buffering
+        bool send(uint8_t * data, uint64_t sz);   ///<send() to fd_ without buffering
+        bool sendto(uint8_t * data, uint64_t sz,const SAI & to); ///<sendto() on fd_ without buffering
 
         static const int ok_                =  0;
         static const int unknonwn_error_    = -1;
         static const int not_initialized_   = -2;
         static const int closed_            = -3;
         static const int fd_error_          = -4;
-        static const int max_size_          = 256*1024;
+        static const uint64_t max_size_     = 256*1024;
 
         int state() const;         ///<returns the fd state
-        uint32_t size() const;     ///<returns the available data size
-        uint32_t n_free() const { return 0; }   ///<returns how many bytes free in the buffer
-        // uint32_t remain() const;  ///<returns how many bytes can be placed into the buffer
+        uint64_t size() const;     ///<returns the available data size
+        uint64_t n_free() const;   ///<returns how many bytes free in the buffer
 
-        bool can_read(uint32_t timeout_ms);          ///<checks wether data is available on the fd
-        bool read_buf(read_res & res, uint32_t sz);  ///<reads from the buffer (no network operations)
+        /**
+        @brief checks wether data is available on the fd
+        @return true if available
+        @param timeout_ms tells how many milliseconds to wait for data
+
+        timeout_ms will be modified to tell how many milliseconds left from the
+        given timeout
+        */
+        bool can_read(uint32_t & timeout_ms);
+        bool read_buf(read_res & res, uint64_t sz);  ///<reads from the buffer (no network operations)
         void shutdown();                             ///<shuts down the fd (only makes sense on sockets)
         void close();                                ///<closes the fd
 
       private:
-        int        fd_;
-        uint32_t   start_;
-        uint32_t   read_size_;
-        uint32_t   len_;
-        uint8_t    buf_[65536];
-        common::tbuf<1024> tbuf_;
+        typedef rdbuf<512,max_size_> buf_t;
 
-        unsigned char * allocate(uint32_t len);
+        static const int read_op_      = 1;
+        static const int recv_op_      = 2;
+        static const int recvfrom_op_  = 3;
+
+        uint64_t internal_read( int op_type,
+                                SAI & from,
+                                uint32_t & timeout_ms );
+        int        fd_;
+        buf_t      buf_;
 
         CSL_OBJ(csl::comm,bfd);
         USE_EXC();

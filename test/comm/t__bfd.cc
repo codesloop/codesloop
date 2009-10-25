@@ -81,7 +81,9 @@ namespace test_bfd {
     {
       bfd bf;
       bf.init( sock );
-      read_res rr = bf.read(80000,9000);
+      read_res rr;
+      uint32_t timeout_ms = 9000;
+      read_res & rf(bf.read(80000,timeout_ms,rr));
     }
 
     LEAVE_FUNCTION();
