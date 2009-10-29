@@ -371,6 +371,24 @@ namespace test_inpvec {
     }
   }
 
+  void test_alloc_1000()
+  {
+    typedef inpvec<uint64_t> ivec_t;
+    ivec_t vec;
+    uint64_t i=0;
+    ivec_t::iterator ii = vec.begin();
+
+    for( i=0;i<1000;++i )
+    {
+      assert( vec.first_free(ii).get_pos() == i );
+      assert( ii.is_empty() == true );
+      assert( vec.is_free_at(i) == true );
+      ii.set( i );
+      assert( ii.is_empty() == false );
+      assert( vec.is_free_at(i) == false );
+    }
+  }
+
 } // end of test_inpvec
 
 using namespace test_inpvec;
@@ -382,6 +400,7 @@ int main()
   fun_get_set();
 #else
   fun_get_set();
+  csl_common_print_results( "test_alloc_1000     ", csl_common_test_timer_v0(test_alloc_1000),"" );
   csl_common_print_results( "test_first_free     ", csl_common_test_timer_v0(test_first_free),"" );
   csl_common_print_results( "fun_get_set         ", csl_common_test_timer_v0(fun_get_set),"" );
   csl_common_print_results( "push_back           ", csl_common_test_timer_v0(fun_push_back),"" );

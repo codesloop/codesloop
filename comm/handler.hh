@@ -32,6 +32,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "codesloop/comm/connid.hh"
+#include "codesloop/comm/sai.hh"
+#include "codesloop/comm/bfd.hh"
 #include "codesloop/common/common.h"
 #ifdef __cplusplus
 
@@ -42,9 +44,26 @@ namespace csl
     class handler
     {
       public:
-        virtual bool on_connected(connid_t id)       { return false; }
-        virtual bool on_data_arrival(connid_t id)    { return false; }
-        virtual void on_disconnected(connid_t id)    { return; }
+        virtual bool on_connected( connid_t id,
+                                   const SAI & sai,
+                                   bfd & buf_fd )
+        {
+          return true;
+        }
+
+        virtual bool on_data_arrival( connid_t id,
+                                      const SAI & sai,
+                                      bfd & buf_fd )
+        {
+          return true;
+        }
+
+        virtual void on_disconnected( connid_t id,
+                                      const SAI & sai )
+        {
+          return;
+        }
+
         virtual ~handler() {}
     };
   }

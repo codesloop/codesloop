@@ -38,7 +38,7 @@ namespace csl
 {
   namespace comm
   {
-    typedef uint32_t connid_t;
+    typedef uint64_t connid_t;
   }
 }
 

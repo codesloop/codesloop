@@ -55,8 +55,15 @@ namespace csl
           bool init(SAI address);
 
           /* network ops */
-          read_res & read(uint64_t sz, uint32_t timeout_ms, read_res & rr) { return bfd_.recv(sz, timeout_ms, rr); }
-          bool write(uint8_t * data, uint64_t sz)                          { return bfd_.write(data, sz);          }
+          read_res & read(uint64_t sz, uint32_t timeout_ms, read_res & rr)
+          {
+            return bfd_.recv(sz, timeout_ms, rr);
+          }
+
+          bool write(const uint8_t * data, uint64_t sz)
+          {
+            return bfd_.send(data, sz);
+          }
 
           /* address, to be setup during initialization */
           const SAI & peer_addr() const { return peer_addr_; }

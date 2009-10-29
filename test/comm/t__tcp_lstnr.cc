@@ -64,21 +64,38 @@ namespace test_tcp_lstnr {
   class my_tcp_handler : public csl::comm::handler
   {
     public:
-      virtual bool on_connected(connid_t id)
+      virtual bool on_connected( connid_t id,
+                                 const SAI & sai,
+                                 bfd & buf_fd )
       {
         ENTER_FUNCTION();
+        CSL_DEBUGF( L"on_connected(id:%lld, sai:(%s:%d), bfd)",
+                     id,
+                     inet_ntoa(sai.sin_addr),
+                     ntohs(sai.sin_port) );
+        RETURN_FUNCTION(true);
+      }
+
+      virtual bool on_data_arrival( connid_t id,
+                                    const SAI & sai,
+                                    bfd & buf_fd )
+      {
+        ENTER_FUNCTION();
+        CSL_DEBUGF( L"on_data_arrival(id:%lld, sai:(%s:%d), bfd)",
+                     id,
+                     inet_ntoa(sai.sin_addr),
+                     ntohs(sai.sin_port) );
         RETURN_FUNCTION(false);
       }
 
-      virtual bool on_data_arrival(connid_t id)
+      virtual void on_disconnected( connid_t id,
+                                    const SAI & sai )
       {
         ENTER_FUNCTION();
-        RETURN_FUNCTION(false);
-      }
-
-      virtual void on_disconnected(connid_t id)
-      {
-        ENTER_FUNCTION();
+        CSL_DEBUGF( L"on_disconnected(id:%lld, sai:(%s:%d))",
+                     id,
+                     inet_ntoa(sai.sin_addr),
+                     ntohs(sai.sin_port) );
         LEAVE_FUNCTION();
       }
 

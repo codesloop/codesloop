@@ -40,13 +40,14 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/comm/tcp_client.hh"
 #include "codesloop/comm/initcomm.hh"
 #include "codesloop/common/logger.hh"
+#include "codesloop/common/ustr.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/test_timer.h"
 #include <assert.h>
 
 using namespace csl::comm;
 using namespace csl::comm::tcp;
-//using namespace csl::common;
+using namespace csl::common;
 //using namespace csl::nthread;
 
 /** @brief @todo */
@@ -71,13 +72,15 @@ namespace test_tcp_client {
     ::memcpy( &(peer.sin_addr),&saddr,sizeof(saddr) );
 
     peer.sin_family  = AF_INET;
-    peer.sin_port = htons( 19026 );
+    peer.sin_port = htons( 631 );
 
     client c;
     bool iret = c.init( peer );
 
     CSL_DEBUGF( L"c.init() returned %s", (iret==true?"TRUE":"FALSE") );
 
+    ustr req("GET / HTTP/1.0\r\n\r\n");
+    c.write(reinterpret_cast<const uint8_t *>(req.data()),req.size());
 
     read_res rr;
     uint32_t timeout_ms = 9000;
@@ -94,7 +97,7 @@ int main()
 {
   initcomm w;
   conn();
-  csl_common_print_results( "baseline          ", csl_common_test_timer_v0(baseline),"" );
+  // csl_common_print_results( "baseline          ", csl_common_test_timer_v0(baseline),"" );
   return 0;
 }
 

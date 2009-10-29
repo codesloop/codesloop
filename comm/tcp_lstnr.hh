@@ -66,14 +66,6 @@ namespace csl
           pevent & start_event();
           pevent & exit_event();
 
-          /* network ops */
-          read_res read(connid_t id, size_t sz, uint32_t timeout_ms);
-          read_res & read(connid_t id, size_t sz, uint32_t timeout_ms, read_res & rr);
-          bool write(connid_t id, uint8_t * data, size_t sz);
-
-          /* info ops */
-          const SAI & peer_addr(connid_t id) const;
-
           struct impl;
         private:
           /* private implementation */

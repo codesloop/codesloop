@@ -74,8 +74,19 @@ namespace csl
   namespace comm
   {
     bfd::bfd() : fd_(bfd::not_initialized_), use_exc_(true) { }
-    bfd::bfd(int fd) : fd_(fd), use_exc_(true) { }
-    bfd::~bfd() { this->close(); }
+
+    bfd::bfd(int fd) : fd_(fd), use_exc_(true)
+    {
+      ENTER_FUNCTION();
+      CSL_DEBUGF( L"bfd(fd:%d)",fd );
+      CSL_DEBUG_ASSERT( fd > 0 );
+      LEAVE_FUNCTION();
+    }
+
+    bfd::~bfd()
+    {
+      this->close();
+    }
 
     uint64_t bfd::internal_read( int op_type,
                                  SAI & from,
@@ -91,7 +102,18 @@ namespace csl
       if( fd_ <= 0 ) { CSL_DEBUGF(L"invalid fd:%d",fd_); }
       else
       {
-        uint32_t read_amount = buf_t::preallocated_size_;
+        uint64_t read_amount = buf_t::preallocated_size_;
+
+        // check if we can still fit into the preallocated space
+        if( buf_.buflen() < buf_t::preallocated_size_ )
+        {
+          read_amount = buf_t::preallocated_size_ - buf_.buflen();
+        }
+        else if( buf_.buflen() >= buf_t::preallocated_size_ )
+        {
+          read_amount = ((buf_.buflen()/buf_t::preallocated_size_)+4) *
+                         buf_t::preallocated_size_;
+        }
 
         while( true )
         {
@@ -305,10 +327,6 @@ namespace csl
       RETURN_FUNCTION( ret );
     }
 
-    /*****************************************************
-    ******************************************************
-    *****************************************************/
-
     bool bfd::can_read(uint32_t & timeout_ms)
     {
       ENTER_FUNCTION();
@@ -412,7 +430,7 @@ namespace csl
       else          return fd_;
     }
 
-    bool bfd::write(uint8_t * data, uint64_t sz)
+    bool bfd::write(const uint8_t * data, uint64_t sz)
     {
       ENTER_FUNCTION();
       int32_t err = 0;
@@ -446,7 +464,7 @@ namespace csl
       RETURN_FUNCTION( ret );
     }
 
-    bool bfd::send(uint8_t * data, uint64_t sz)
+    bool bfd::send(const uint8_t * data, uint64_t sz)
     {
       ENTER_FUNCTION();
       int32_t err = 0;
@@ -480,7 +498,7 @@ namespace csl
       RETURN_FUNCTION( ret );
     }
 
-    bool bfd::sendto(uint8_t * data, uint64_t sz,const SAI & to)
+    bool bfd::sendto(const uint8_t * data, uint64_t sz,const SAI & to)
     {
       ENTER_FUNCTION();
       int32_t   err  = 0;

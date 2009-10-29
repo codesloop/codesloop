@@ -39,13 +39,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/comm/bfd.hh"
 #include "codesloop/comm/initcomm.hh"
 #include "codesloop/common/logger.hh"
+#include "codesloop/common/ustr.hh"
+#include "codesloop/common/zfile.hh"
 #include "codesloop/common/auto_close.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/test_timer.h"
 #include <assert.h>
 
 using namespace csl::comm;
-//using namespace csl::common;
+using namespace csl::common;
 //using namespace csl::nthread;
 
 /** @brief @todo */
@@ -71,7 +73,7 @@ namespace test_bfd {
     ::memcpy( &(peer.sin_addr),&saddr,sizeof(saddr) );
 
     peer.sin_family  = AF_INET;
-    peer.sin_port = htons( 19026 );
+    peer.sin_port = htons( 631 );
 
     int err = ::connect( sock, reinterpret_cast<struct sockaddr *>(&peer), sizeof(SAI) );
 
@@ -83,7 +85,19 @@ namespace test_bfd {
       bf.init( sock );
       read_res rr;
       uint32_t timeout_ms = 9000;
+      ustr req("GET / HTTP/1.0\r\n\r\n");
+      bf.write(reinterpret_cast<const uint8_t *>(req.data()),req.size());
       read_res & rf(bf.read(80000,timeout_ms,rr));
+      assert( rf.bytes() > 0 );
+      assert( rf.data() != NULL );
+      assert( rf.failed() == false );
+      assert( rf.timed_out() == false );
+      CSL_DEBUGF(L"received %lld bytes\n%s",
+                  rf.bytes(),
+                  reinterpret_cast<const char *>(rf.data()));
+      // zfile zf;
+      // zf.put_data( rf.data(), rf.bytes() );
+      // zf.write_file( "test.out" );
     }
 
     LEAVE_FUNCTION();
@@ -97,7 +111,7 @@ int main()
 {
   initcomm w;
   conn();
-  csl_common_print_results( "baseline          ", csl_common_test_timer_v0(baseline),"" );
+  //csl_common_print_results( "baseline          ", csl_common_test_timer_v0(baseline),"" );
   return 0;
 }
 

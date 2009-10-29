@@ -91,9 +91,9 @@ namespace csl
         uint64_t recv_some(uint32_t & timeout_ms);  ///<try to recv, and return the number of bytes recv'd
         uint64_t recvfrom_some(SAI & from, uint32_t & timeout_ms); ///<try to recvfrom, and return the number of bytes recv'd
 
-        bool write(uint8_t * data, uint64_t sz);  ///<write() to fd_ without buffering
-        bool send(uint8_t * data, uint64_t sz);   ///<send() to fd_ without buffering
-        bool sendto(uint8_t * data, uint64_t sz,const SAI & to); ///<sendto() on fd_ without buffering
+        bool write(const uint8_t * data, uint64_t sz);  ///<write() to fd_ without buffering
+        bool send(const uint8_t * data, uint64_t sz);   ///<send() to fd_ without buffering
+        bool sendto(const uint8_t * data, uint64_t sz,const SAI & to); ///<sendto() on fd_ without buffering
 
         static const int ok_                =  0;
         static const int unknonwn_error_    = -1;
@@ -118,6 +118,8 @@ namespace csl
         bool read_buf(read_res & res, uint64_t sz);  ///<reads from the buffer (no network operations)
         void shutdown();                             ///<shuts down the fd (only makes sense on sockets)
         void close();                                ///<closes the fd
+
+        int file_descriptor() const { return fd_; }
 
       private:
         typedef rdbuf<512,max_size_> buf_t;

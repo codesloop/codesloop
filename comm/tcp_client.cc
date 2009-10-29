@@ -63,6 +63,7 @@ namespace csl
 
         int err = ::connect( sock, reinterpret_cast<struct sockaddr *>(&address), sizeof(SAI) );
         if( err < 0 ) { CloseSocket(sock); THRC(exc::rs_connect_failed,false); }
+        CSL_DEBUGF( L"connected to (%s:%d)",inet_ntoa(address.sin_addr),ntohs(address.sin_port));
 
         socklen_t slen = sizeof(SAI);
         err = getsockname( sock, reinterpret_cast<struct sockaddr *>(&own_addr_), &slen );
@@ -72,7 +73,7 @@ namespace csl
 
         peer_addr_ = address;
 
-        this->bfd_.init( sock );
+        bfd_.init( sock );
         RETURN_FUNCTION( true );
       }
     }

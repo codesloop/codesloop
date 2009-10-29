@@ -37,6 +37,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/common/inpvec.hh"
 #include "codesloop/common/libev/evwrap.h"
 #include "codesloop/common/auto_close.hh"
+#include "codesloop/common/queue.hh"
 #include "codesloop/common/logger.hh"
 #include "codesloop/comm/exc.hh"
 #include "codesloop/comm/tcp_lstnr.hh"
@@ -45,6 +46,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/nthread/mutex.hh"
 #include "codesloop/nthread/thread.hh"
 #include "codesloop/nthread/thrpool.hh"
+#include "codesloop/nthread/event.hh"
 
 namespace csl
 {
@@ -62,6 +64,10 @@ namespace csl
           bfd                bfd_;
           SAI                peer_addr_;
 
+          tcp_conn( int fd,
+                    const SAI & peer_addr)
+            : bfd_(fd), peer_addr_(peer_addr) { }
+
           ~tcp_conn() { bfd_.shutdown(); }
         };
 
@@ -71,13 +77,70 @@ namespace csl
           struct ev_loop *   loop_;
           tcp_conn *         conn_;
           connid_t           id_;
-          bool               is_active_;
+          uint64_t           pos_;
           mutex              mtx_;
+          bool               unqueued_;
+
+          ev_data(const ev_data & other) : use_exc_(true)
+          {
+            ENTER_FUNCTION();
+            THRNORET(exc::rs_not_implemented);
+            LEAVE_FUNCTION();
+          }
+
+          ev_data & operator=(const ev_data & other)
+          {
+            ENTER_FUNCTION();
+            THR(exc::rs_not_implemented,*this);
+            RETURN_FUNCTION(*this);
+          }
+
+          ev_data( struct ev_loop * loop,
+                   tcp_conn * cn,
+                   connid_t id,
+                   uint64_t pos )
+            : loop_(loop),
+              conn_(cn),
+              id_(id),
+              pos_(pos),
+              unqueued_(false),
+              use_exc_(true) { }
+
+          CSL_OBJ(csl::comm::anonymous,ev_data);
+          USE_EXC();
         };
 
         void lstnr_accept_cb( struct ev_loop *loop, struct ev_io *w, int revents );
         void lstnr_wakeup_cb( struct ev_loop *loop, struct ev_async *w, int revents );
         void lstnr_timer_cb( struct ev_loop *loop, struct ev_timer *w, int revents );
+        void lstnr_new_data_cb( struct ev_loop *loop, ev_io *w, int revents );
+
+        class conn_queue : public csl::common::queue<ev_data *>
+        {
+          private:
+            mutex mtx_;
+            event evt_;
+
+          public:
+            void on_new_item()       { evt_.notify(); }
+            void on_lock_queue()     { mtx_.lock();   }
+            void on_unlock_queue()   { mtx_.unlock(); }
+            event & new_item_event() { return evt_;   }
+        };
+
+        class data_handler : public thread::callback
+        {
+          private:
+            lstnr::impl * lstnr_;
+            conn_queue  * queue_;
+          public:
+            data_handler(lstnr::impl * l, conn_queue  * q)
+              : lstnr_(l),
+                queue_(q)  { }
+
+            virtual void operator()(void);
+            virtual ~data_handler() { }
+        };
       };
 
       struct lstnr::impl
@@ -91,21 +154,33 @@ namespace csl
             virtual void operator()(void) { impl_->listener_entry_cb(); }
         };
 
-        SAI                  addr_;
-        inpvec<ev_data>      ev_pool_;
-        inpvec<tcp_conn>     conn_pool_;
-        inpvec<ev_data *>    unqueued_;
-        auto_close_socket    listener_;
-        struct ev_loop *     loop_;
-        ev_io                accept_watcher_;
-        ev_async             wakeup_watcher_;
-        ev_timer             periodic_watcher_;
-        listener_entry       entry_;
-        thread               listener_thread_;
-        bool                 stop_me_;
-        mutex                mtx_;
+        typedef inpvec<ev_data>     ev_data_vec_t;
+        typedef inpvec<tcp_conn>    tcp_conn_vec_t;
+        typedef inpvec<ev_data *>   ev_data_ptr_vec_t;
 
-        impl() : entry_(this), stop_me_(false), use_exc_(false)
+        SAI                  addr_;                        // OK
+        auto_close_socket    listener_;                    // OK
+        struct ev_loop *     loop_;                        // OK
+        ev_io                accept_watcher_;              // OK
+        ev_async             wakeup_watcher_;              // OK
+        ev_timer             periodic_watcher_;            // OK
+        listener_entry       entry_;                       // OK
+        thread               listener_thread_;             // OK
+        bool                 stop_me_;            // -----------
+        mutex                mtx_;
+        handler *            handler_;
+        ev_data_vec_t        ev_pool_;
+        tcp_conn_vec_t       conn_pool_;
+
+        //
+        conn_queue           new_data_queue_;
+        data_handler         new_data_handler_;
+
+        impl() : entry_(this),
+                 stop_me_(false),
+                 handler_(0),
+                 new_data_handler_(this, &new_data_queue_),
+                 use_exc_(false)
         {
           // create loop object
           loop_ = ev_loop_new( EVFLAG_AUTO );
@@ -140,14 +215,37 @@ namespace csl
           //  listener socket and co. init
           int sock = ::socket( AF_INET, SOCK_STREAM, 0 );
           if( sock < 0 ) { THRC(exc::rs_socket_failed,false); }
+          CSL_DEBUGF(L"listener socket:%d created for (%s:%d)",
+                      sock,
+                      inet_ntoa(address.sin_addr),
+                      ntohs(address.sin_port) );
 
           // this ensures that the listener socket will be closed
           listener_.init(sock);
 
           int on = 1;
-          if( ::setsockopt( sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on) ) < 0 )    { THRC(exc::rs_setsockopt,false); }
-          if( ::bind( sock, (const struct sockaddr *)&address, sizeof(address) ) < 0 ) { THRC(exc::rs_bind_failed,false); }
-          if( ::listen( sock, backlog ) < 0 )                                          { THRC(exc::rs_listen_failed,false); }
+          if( ::setsockopt( sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on) ) < 0 )
+            THRC(exc::rs_setsockopt,false);
+
+          CSL_DEBUGF(L"setsockopt has set SO_REUSEADDR on %d",sock);
+
+          if( ::bind( sock,
+                      reinterpret_cast<const struct sockaddr *>(&address),
+                      sizeof(address) ) < 0 )
+            THRC(exc::rs_bind_failed,false);
+
+          CSL_DEBUGF(L"socket %d bound to (%s:%d)",
+                      sock,
+                      inet_ntoa(address.sin_addr),
+                      ntohs(address.sin_port));
+
+          if( ::listen( sock, backlog ) < 0 )
+            THRC(exc::rs_listen_failed,false);
+
+          CSL_DEBUGF(L"listen(sock:%d,backlog:%d) succeeded",sock,backlog);
+
+          // set handler
+          handler_ = &h;
 
           // save the listener address
           addr_ = address;
@@ -162,45 +260,203 @@ namespace csl
           RETURN_FUNCTION(true);
         }
 
-        /* network ops */
-        read_res read(connid_t id, size_t sz, uint32_t timeout_ms) { read_res rr; return rr; } // TODO
-        read_res & read(connid_t id, size_t sz, uint32_t timeout_ms, read_res & rr) { return rr; } // TODO
-        bool write(connid_t id, uint8_t * data, size_t sz) { return false; } // TODO
+        void wakeup_cb( struct ev_async *w, int revents ) // TODO
+        {
+          ENTER_FUNCTION();
+          LEAVE_FUNCTION();
+        }
 
-        /* info ops */
-        const SAI & peer_addr(connid_t id) const { return addr_; } // TODO
+        void timer_cb( struct ev_timer *w, int revents ) // TODO
+        {
+          ENTER_FUNCTION();
+          LEAVE_FUNCTION();
+        }
 
         void accept_cb( struct ev_io *w, int revents )
         {
           ENTER_FUNCTION();
-          CSL_DEBUGF(L"accept conn: fd:%d w->events:%d revents:%d",w->fd,w->events,revents);
+
+          CSL_DEBUGF( L"accept conn: fd:%d w->events:%d revents:%d",
+                       w->fd,
+                       w->events,
+                       revents );
+
           SAI addr;
           socklen_t sz = sizeof(addr);
-          int conn_fd = ::accept( w->fd,reinterpret_cast<struct sockaddr *>(&addr),&sz );
-          CSL_DEBUGF(L"accepted conn: %d from %s:%d",conn_fd,inet_ntoa(addr.sin_addr),ntohs(addr.sin_port));
-          CSL_DEBUGF(L"closing socket");
-          ShutdownCloseSocket( conn_fd );
+          int conn_fd = ::accept( w->fd,
+                                  reinterpret_cast<struct sockaddr *>(&addr),
+                                  &sz );
+
+          if( conn_fd > 0 )
+          {
+            CSL_DEBUGF( L"accepted conn: %d from %s:%d",
+                         conn_fd,inet_ntoa(addr.sin_addr),
+                         ntohs(addr.sin_port) );
+
+            // initialize iterators
+            tcp_conn_vec_t::iterator tc_it( conn_pool_.begin() );
+            ev_data_vec_t::iterator  ev_it( ev_pool_.begin() );
+
+            // find the first free position for both arrays
+            tcp_conn_vec_t::iterator & tc_it_ref( conn_pool_.first_free(tc_it) );
+            ev_data_vec_t::iterator  & ev_it_ref( ev_pool_.first_free(ev_it) );
+
+            // create the items
+            tcp_conn * cn = tc_it_ref.set( conn_fd, addr );
+            ev_data  * ed = ev_it_ref.set( loop_,
+                                           cn,
+                                           tc_it_ref.get_pos(),
+                                           ev_it_ref.get_pos() );
+
+            CSL_DEBUG_ASSERT( cn != NULL );
+            CSL_DEBUG_ASSERT( ed != NULL );
+
+            // signal connection startup
+            bool cres = handler_->on_connected( ed->id_, addr, cn->bfd_ );
+
+            if( cres == false )
+            {
+              CSL_DEBUG(L"handler returned FALSE, this tells to close the connection");
+              tc_it_ref.free();
+              ev_it_ref.free();
+            }
+            else
+            {
+              CSL_DEBUG(L"handler returned TRUE for connection startup");
+              // initialize connection watcher
+              ev_init( &(ed->watcher_), lstnr_new_data_cb );
+              ed->watcher_.data = this;
+              ev_io_set( &(ed->watcher_), conn_fd, EV_READ  );
+              ev_io_start( loop_, &(ed->watcher_) );
+            }
+          }
+          else
+          {
+            CSL_DEBUGF( L"accept failed" );
+          }
+
           LEAVE_FUNCTION();
         }
 
-        void wakeup_cb( struct ev_async *w, int revents )
+        void process_data_cb( ev_data * dta )
         {
           ENTER_FUNCTION();
+
+          bool hres = handler_->on_data_arrival( dta->id_,
+                                                 dta->conn_->peer_addr_,
+                                                 dta->conn_->bfd_ );
+
+          // TODO XXX TODO
+          // ?? unqueued ??
+          // ?? failed ??
+          // ?? to be removed ??
+          // ?? need requeue ??
+          //
+          if( hres == false )
+          {
+            CSL_DEBUGF( L"handler returned FALSE, this tells to "
+                         "remove at pos:%lld conn_id:%lld",
+                         dta->pos_,
+                         dta->id_ );
+          }
+          else
+          {
+            CSL_DEBUGF( L"XXX" );
+          }
+
           LEAVE_FUNCTION();
         }
 
-        void timer_cb( struct ev_timer *w, int revents )
+        void new_data_cb( struct ev_io *w, int revents )
         {
           ENTER_FUNCTION();
+
+          ev_data * dta = reinterpret_cast<ev_data *>(w);
+
+          CSL_DEBUG_ASSERT( dta->conn_ != NULL );
+
+          int fd = dta->conn_->bfd_.file_descriptor();
+
+          CSL_DEBUGF( L"data arrived on fd:%d conn_id:%lld",
+                       fd,
+                       dta->id_ );
+
+          uint32_t timeout_ms = 0;
+          uint64_t res = dta->conn_->bfd_.recv_some( timeout_ms );
+
+          // check for errors
+          if( dta->conn_->bfd_.state() != bfd::ok_ )
+          {
+            CSL_DEBUGF( L"error during read on fd:%d conn_id:%lld",fd, dta->id_ );
+            CSL_DEBUGF( L"remove watcher conn_id:%lld from the loop", dta->id_ );
+            ev_io_stop( loop_, w );
+            dta->unqueued_ = true;
+
+            // signal connection close
+            handler_->on_disconnected( dta->id_, dta->conn_->peer_addr_ );
+
+            if( dta->conn_->bfd_.size() == 0 )
+            {
+              CSL_DEBUGF( L"no data in bfd. safe to remove conn_id:%lld", dta->id_ );
+              remove_connection( dta->id_ );
+              LEAVE_FUNCTION();
+            }
+          }
+
+          // TODO XXX TODO XXX
+          // there is data to be processed
+          if( res > 0 ) // XXX may be bfd_.size() ???
+          {
+            if( dta->conn_->bfd_.n_free() == 0 )
+            {
+              dta->unqueued_ = true;
+              ev_io_stop( loop_, w );
+            }
+            new_data_queue_.push( dta );
+          }
+
+          LEAVE_FUNCTION();
+        }
+
+        void remove_connection(connid_t id)
+        {
+          ENTER_FUNCTION();
+          CSL_DEBUGF(L"remove_connection(id:%lld)",id);
           LEAVE_FUNCTION();
         }
 
         void listener_entry_cb( )
         {
-          CSL_DEBUGF(L"launch loop: %p",loop_);
-          ev_loop( loop_, 0 );
-          CSL_DEBUGF(L"loop has been stopped: %p",loop_);
-          ev_loop_destroy( loop_ );
+          thrpool              tpool;
+          // TODO : make these configurable
+          unsigned int         min_threads = 1;
+          unsigned int         max_threads = 4;
+          unsigned int         timeout_ms  = 1000;
+          unsigned int         attempts    = 3;
+
+          if( tpool.init( min_threads,
+                          max_threads,
+                          timeout_ms,
+                          attempts,
+                          new_data_queue_.new_item_event(),
+                          new_data_handler_ ) )
+          {
+            CSL_DEBUGF(L"thread pool started (min:%d max:%d timeout:%d attempts:%d)",
+                        min_threads,
+                        max_threads,
+                        timeout_ms,
+                        attempts);
+
+            CSL_DEBUGF(L"launch loop: %p",loop_);
+            ev_loop( loop_, 0 );
+            CSL_DEBUGF(L"loop has been stopped: %p",loop_);
+            ev_loop_destroy( loop_ );
+            loop_ = 0;
+          }
+          else
+          {
+            CSL_DEBUGF(L"not launching loop as the thread pool failed to be started");
+          }
           CSL_DEBUGF(L"exiting listener thread");
         }
 
@@ -265,10 +521,26 @@ namespace csl
           lstnr::impl * this_ptr = reinterpret_cast<lstnr::impl *>(w->data);
           this_ptr->timer_cb(w, revents);
         }
+
+        void lstnr_new_data_cb( struct ev_loop *loop, ev_io *w, int revents )
+        {
+          lstnr::impl * this_ptr = reinterpret_cast<lstnr::impl *>(w->data);
+          this_ptr->new_data_cb(w, revents);
+        }
+
+        void data_handler::operator()(void)
+        {
+          conn_queue::handler h;
+
+          if( queue_->pop(h) )
+          {
+            ev_data * dta = *(h.get());
+            lstnr_->process_data_cb( dta );
+          }
+        }
       }
 
       /* forwarding functions */
-      const SAI & lstnr::peer_addr(connid_t id) const { return impl_->peer_addr(id); }
       const SAI & lstnr::own_addr() const             { return impl_->addr_;         }
 
       bool lstnr::init(handler & h, SAI address, int backlog)
@@ -281,21 +553,6 @@ namespace csl
 
       pevent & lstnr::start_event() { return impl_->start_event(); }
       pevent & lstnr::exit_event()  { return impl_->exit_event();  }
-
-      read_res lstnr::read(connid_t id, size_t sz, uint32_t timeout_ms)
-      {
-        return impl_->read(id,sz,timeout_ms);
-      }
-
-      read_res & lstnr::read(connid_t id, size_t sz, uint32_t timeout_ms, read_res & rr)
-      {
-        return impl_->read(id, sz, timeout_ms, rr);
-      }
-
-      bool lstnr::write(connid_t id, uint8_t * data, size_t sz)
-      {
-        return impl_->write(id, data, sz);
-      }
 
       /* default constructor, destructor */
       lstnr::lstnr() : impl_(new impl()) { }

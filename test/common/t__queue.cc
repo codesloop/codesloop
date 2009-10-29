@@ -102,6 +102,24 @@ namespace test_queue {
     assert( q.size() == 0 );
   }
 
+  void queue_pop_test()
+  {
+    queue<uint64_t> q;
+    for( uint64_t i=0;i<200;++i )
+    {
+      assert( q.n_items() == i );
+      q.push( i );
+    }
+    uint64_t j=0;
+    queue<uint64_t>::handler h;
+    while( q.pop(h) == true )
+    {
+      assert( *(h.get()) == j );
+      ++j;
+    }
+    assert( j == 200 );
+  }
+
   void queue_pushpopB()
   {
     queue<uint64_t> q;
@@ -253,6 +271,7 @@ using namespace test_queue;
 
 int main()
 {
+  csl_common_print_results( "queue_pop_test    ", csl_common_test_timer_v0(queue_pop_test),"" );
   csl_common_print_results( "baseline_queue    ", csl_common_test_timer_v0(baseline_queue),"" );
   csl_common_print_results( "baseline_stdlist  ", csl_common_test_timer_v0(baseline_stdlist),"" );
   csl_common_print_results( "baseline_queue2   ", csl_common_test_timer_v0(baseline_queue2),"" );
