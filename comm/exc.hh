@@ -81,6 +81,7 @@ namespace csl
           rs_setsockopt,          ///<setsockopt failed
           rs_assert,              ///<assert failed
           rs_unknown_op,          ///<uknown op
+          rs_internal_state,      ///<internal state is bad
         };
 
         /** @brief converts reason code to string */

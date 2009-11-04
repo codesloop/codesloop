@@ -85,7 +85,7 @@ namespace test_tcp_lstnr {
                      id,
                      inet_ntoa(sai.sin_addr),
                      ntohs(sai.sin_port) );
-        RETURN_FUNCTION(false);
+        RETURN_FUNCTION(true);
       }
 
       virtual void on_disconnected( connid_t id,

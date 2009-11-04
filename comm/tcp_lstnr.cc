@@ -59,27 +59,14 @@ namespace csl
     {
       namespace
       {
-        struct tcp_conn
-        {
-          bfd                bfd_;
-          SAI                peer_addr_;
-
-          tcp_conn( int fd,
-                    const SAI & peer_addr)
-            : bfd_(fd), peer_addr_(peer_addr) { }
-
-          ~tcp_conn() { bfd_.shutdown(); }
-        };
-
         struct ev_data
         {
           ev_io              watcher_;
           struct ev_loop *   loop_;
-          tcp_conn *         conn_;
           connid_t           id_;
-          uint64_t           pos_;
           mutex              mtx_;
-          bool               unqueued_;
+          bfd                bfd_;
+          SAI                peer_addr_;
 
           ev_data(const ev_data & other) : use_exc_(true)
           {
@@ -96,14 +83,13 @@ namespace csl
           }
 
           ev_data( struct ev_loop * loop,
-                   tcp_conn * cn,
-                   connid_t id,
-                   uint64_t pos )
+                   int fd,
+                   const SAI & sai,
+                   connid_t id )
             : loop_(loop),
-              conn_(cn),
               id_(id),
-              pos_(pos),
-              unqueued_(false),
+              bfd_(fd),
+              peer_addr_(sai),
               use_exc_(true) { }
 
           CSL_OBJ(csl::comm::anonymous,ev_data);
@@ -155,7 +141,6 @@ namespace csl
         };
 
         typedef inpvec<ev_data>     ev_data_vec_t;
-        typedef inpvec<tcp_conn>    tcp_conn_vec_t;
         typedef inpvec<ev_data *>   ev_data_ptr_vec_t;
 
         SAI                  addr_;                        // OK
@@ -170,11 +155,11 @@ namespace csl
         mutex                mtx_;
         handler *            handler_;
         ev_data_vec_t        ev_pool_;
-        tcp_conn_vec_t       conn_pool_;
 
         //
         conn_queue           new_data_queue_;
         data_handler         new_data_handler_;
+        conn_queue           idle_data_queue_;
 
         impl() : entry_(this),
                  stop_me_(false),
@@ -260,9 +245,28 @@ namespace csl
           RETURN_FUNCTION(true);
         }
 
-        void wakeup_cb( struct ev_async *w, int revents ) // TODO
+        void wakeup_cb( struct ev_async *w, int revents )
         {
           ENTER_FUNCTION();
+          CSL_DEBUGF( L"wakeup_cb(w,revents:%d)",revents );
+
+          conn_queue::handler h;
+
+          while( idle_data_queue_.pop(h) )
+          {
+            ev_data * dta = *(h.get());
+            CSL_DEBUGF( L"popped conn_id:%lld from idle connections "
+                         "now requeueing it", dta->id_ );
+
+            ev_io_start( loop_, &(dta->watcher_) );
+
+            if( idle_data_queue_.new_item_event().wait_nb() != true )
+            {
+              // this should not happen, this shows inconsystency
+              // which should be ironed out of the software
+              THRNORET( exc::rs_internal_state );
+            }
+          }
           LEAVE_FUNCTION();
         }
 
@@ -293,31 +297,26 @@ namespace csl
                          conn_fd,inet_ntoa(addr.sin_addr),
                          ntohs(addr.sin_port) );
 
-            // initialize iterators
-            tcp_conn_vec_t::iterator tc_it( conn_pool_.begin() );
+            // initialize iterator
             ev_data_vec_t::iterator  ev_it( ev_pool_.begin() );
 
-            // find the first free position for both arrays
-            tcp_conn_vec_t::iterator & tc_it_ref( conn_pool_.first_free(tc_it) );
+            // find the first free position
             ev_data_vec_t::iterator  & ev_it_ref( ev_pool_.first_free(ev_it) );
 
             // create the items
-            tcp_conn * cn = tc_it_ref.set( conn_fd, addr );
             ev_data  * ed = ev_it_ref.set( loop_,
-                                           cn,
-                                           tc_it_ref.get_pos(),
+                                           conn_fd,
+                                           addr,
                                            ev_it_ref.get_pos() );
 
-            CSL_DEBUG_ASSERT( cn != NULL );
             CSL_DEBUG_ASSERT( ed != NULL );
 
             // signal connection startup
-            bool cres = handler_->on_connected( ed->id_, addr, cn->bfd_ );
+            bool cres = handler_->on_connected( ed->id_, addr, ed->bfd_ );
 
             if( cres == false )
             {
               CSL_DEBUG(L"handler returned FALSE, this tells to close the connection");
-              tc_it_ref.free();
               ev_it_ref.free();
             }
             else
@@ -343,25 +342,39 @@ namespace csl
           ENTER_FUNCTION();
 
           bool hres = handler_->on_data_arrival( dta->id_,
-                                                 dta->conn_->peer_addr_,
-                                                 dta->conn_->bfd_ );
-
-          // TODO XXX TODO
-          // ?? unqueued ??
-          // ?? failed ??
-          // ?? to be removed ??
-          // ?? need requeue ??
+                                                 dta->peer_addr_,
+                                                 dta->bfd_ );
           //
           if( hres == false )
           {
             CSL_DEBUGF( L"handler returned FALSE, this tells to "
-                         "remove at pos:%lld conn_id:%lld",
-                         dta->pos_,
-                         dta->id_ );
+                         "remove conn_id:%lld fd:%d",
+                         dta->id_,
+                         dta->bfd_.file_descriptor() );
+
+            remove_connection( dta );
           }
           else
           {
-            CSL_DEBUGF( L"XXX" );
+            CSL_DEBUGF( L"handler returned TRUE, this tells us to put back"
+                         "conn_id:%lld fd:%d into the idle watchers",
+                         dta->id_,
+                         dta->bfd_.file_descriptor() );
+
+            if( dta->bfd_.state() != bfd::ok_ )
+            {
+              CSL_DEBUGF( L"will not push back conn_id:%lld to idle watchers as "
+                           "its state is bad", dta->id_ );
+              remove_connection( dta );
+            }
+            else
+            {
+              CSL_DEBUGF( L"pushed conn_id:%lld into the idle watchers queue", dta->id_ );
+              idle_data_queue_.push( dta );
+
+              CSL_DEBUGF( L"waking up the event loop" );
+              ev_async_send( loop_, &wakeup_watcher_ );
+            }
           }
 
           LEAVE_FUNCTION();
@@ -373,55 +386,47 @@ namespace csl
 
           ev_data * dta = reinterpret_cast<ev_data *>(w);
 
-          CSL_DEBUG_ASSERT( dta->conn_ != NULL );
+          int fd = dta->bfd_.file_descriptor();
 
-          int fd = dta->conn_->bfd_.file_descriptor();
-
-          CSL_DEBUGF( L"data arrived on fd:%d conn_id:%lld",
+          CSL_DEBUGF( L"data arrived on fd:%d conn_id:%lld revents:%d bfd_state:%d",
                        fd,
-                       dta->id_ );
+                       dta->id_,
+                       revents,
+                       dta->bfd_.state() );
 
+          // remove watcher from the loop
+          ev_io_stop( loop_, w );
+
+          // try to read data
           uint32_t timeout_ms = 0;
-          uint64_t res = dta->conn_->bfd_.recv_some( timeout_ms );
+          uint64_t res = dta->bfd_.recv_some( timeout_ms );
 
           // check for errors
-          if( dta->conn_->bfd_.state() != bfd::ok_ )
+          if( dta->bfd_.state() != bfd::ok_ )
           {
             CSL_DEBUGF( L"error during read on fd:%d conn_id:%lld",fd, dta->id_ );
             CSL_DEBUGF( L"remove watcher conn_id:%lld from the loop", dta->id_ );
-            ev_io_stop( loop_, w );
-            dta->unqueued_ = true;
 
             // signal connection close
-            handler_->on_disconnected( dta->id_, dta->conn_->peer_addr_ );
+            handler_->on_disconnected( dta->id_, dta->peer_addr_ );
 
-            if( dta->conn_->bfd_.size() == 0 )
-            {
-              CSL_DEBUGF( L"no data in bfd. safe to remove conn_id:%lld", dta->id_ );
-              remove_connection( dta->id_ );
-              LEAVE_FUNCTION();
-            }
+            // free connection
+            remove_connection( dta );
           }
-
-          // TODO XXX TODO XXX
-          // there is data to be processed
-          if( res > 0 ) // XXX may be bfd_.size() ???
+          else
           {
-            if( dta->conn_->bfd_.n_free() == 0 )
-            {
-              dta->unqueued_ = true;
-              ev_io_stop( loop_, w );
-            }
+            // hand over the connection to the data handler
             new_data_queue_.push( dta );
           }
-
           LEAVE_FUNCTION();
         }
 
-        void remove_connection(connid_t id)
+        void remove_connection(ev_data * dta)
         {
           ENTER_FUNCTION();
-          CSL_DEBUGF(L"remove_connection(id:%lld)",id);
+          CSL_DEBUG_ASSERT( dta != NULL );
+          CSL_DEBUGF(L"remove_connection(dta[id:%lld])",dta->id_);
+          ev_pool_.free_at( dta->id_ );
           LEAVE_FUNCTION();
         }
 
