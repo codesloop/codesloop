@@ -23,6 +23,14 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#if 0
+#ifndef DEBUG
+#define DEBUG
+#define DEBUG_ENABLE_INDENT
+//#define DEBUG_VERBOSE
+#endif /* DEBUG */
+#endif //0
+
 #include "codesloop/nthread/exc.hh"
 #include "codesloop/nthread/thread.hh"
 #include "codesloop/common/common.h"

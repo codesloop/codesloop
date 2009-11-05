@@ -126,6 +126,27 @@ namespace test_tcp_lstnr {
     LEAVE_FUNCTION();
   }
 
+  void start_stop()
+  {
+    ENTER_FUNCTION();
+    in_addr_t   saddr = inet_addr("127.0.0.1");
+    SAI         addr;
+
+    ::memset( &addr,0,sizeof(addr) );
+    ::memcpy( &(addr.sin_addr),&saddr,sizeof(saddr) );
+
+    addr.sin_family  = AF_INET;
+    addr.sin_port    = htons(49912);
+
+    lstnr l;
+    my_tcp_handler h;
+    l.init(h, addr);
+    l.start();
+    l.stop();
+    assert( l.exit_event().wait(7000) == true );
+    LEAVE_FUNCTION();
+  }
+
 } /* end of test_tcp_lstnr */
 
 using namespace test_tcp_lstnr;
@@ -133,9 +154,9 @@ using namespace test_tcp_lstnr;
 int main()
 {
   initcomm w;
-
-  csl_common_print_results( "baseline          ", csl_common_test_timer_v0(baseline),"" );
-  conn();
+  // csl_common_print_results( "baseline          ", csl_common_test_timer_v0(baseline),"" );
+  csl_common_print_results( "start_stop        ", csl_common_test_timer_v0(start_stop),"" );
+  // conn();
   return 0;
 }
 

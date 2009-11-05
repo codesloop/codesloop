@@ -590,6 +590,8 @@ namespace csl
             ev_timer_stop( loop_, &periodic_watcher_ );
           }
 
+          CSL_DEBUGF( L"check if listener_thread_ has exited. if not wait 5 secs" );
+
           if( listener_thread_.exit_event().wait(5000) == false )
           {
             // still running, need insist a bit more
@@ -608,6 +610,10 @@ namespace csl
                 listener_thread_.stop();
               }
             }
+          }
+          else
+          {
+            CSL_DEBUGF( L"listener exited within 5 secs" );
           }
 
           RETURN_FUNCTION(ret);

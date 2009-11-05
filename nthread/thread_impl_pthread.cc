@@ -23,9 +23,19 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+
+#if 0
+#ifndef DEBUG
+#define DEBUG
+#define DEBUG_ENABLE_INDENT
+//#define DEBUG_VERBOSE
+#endif /* DEBUG */
+#endif //0
+
 #include "codesloop/nthread/thread.hh"
 #include "codesloop/nthread/mutex.hh"
 #include "codesloop/common/common.h"
+#include "codesloop/common/logger.hh"
 #include <pthread.h>
 
 /**
@@ -52,6 +62,8 @@ namespace csl
 
     struct thread::impl
     {
+      CSL_OBJ(csl::nthread,thread::impl);
+
       pevent start_evt_;
       pevent exit_evt_;
       mutex  mtx_;
@@ -76,67 +88,102 @@ namespace csl
 
       void set_entry(callback & entry)
       {
+        ENTER_FUNCTION();
         scoped_mutex m(mtx_);
         start_routine_ = &entry;
+        LEAVE_FUNCTION();
       }
 
       void set_stack_size(unsigned long sz)
       {
+        ENTER_FUNCTION();
+        CSL_DEBUGF( L"set_stack_size(sz:%ld)",sz );
         scoped_mutex m(mtx_);
         stack_size_ = sz;
+        LEAVE_FUNCTION();
       }
 
       unsigned long get_stack_size()
       {
+        ENTER_FUNCTION();
         unsigned long ret = 0;
         {
           scoped_mutex m(mtx_);
           ret = stack_size_;
         }
-        return ret;
+        CSL_DEBUGF( L"get_stack_size() => %ld",ret );
+        RETURN_FUNCTION( ret );
       }
 
       bool start()
       {
+        ENTER_FUNCTION();
         scoped_mutex m(mtx_);
-        if( start_routine_ == &dummy_callback_ ) return false;
-        if( is_started() || is_exited() ) return false;
+
+        if( start_routine_ == &dummy_callback_ )
+        {
+          RETURN_FUNCTION( false );
+        }
+
+        if( is_started() || is_exited() )
+        {
+          RETURN_FUNCTION( false );
+        }
 
         if( stack_size_ ) pthread_attr_setstacksize(&attr_, stack_size_);
 
         if( pthread_create( &tid_, &attr_, thread_entry_, this ) )
         {
           // error
-          return false;
+          RETURN_FUNCTION( false );
         }
         else
         {
-          return true;
+          RETURN_FUNCTION( true );
         }
       }
 
       bool stop()
       {
-        if( !is_started() ) return false;
-        if( is_exited() )   return false;
+        ENTER_FUNCTION();
+
+        if( !is_started() ) RETURN_FUNCTION( false );
+        if( is_exited() )   RETURN_FUNCTION( false );
 
         {
           scoped_mutex m(mtx_);
           pthread_cancel( tid_ );
         }
-        return exit_evt_.wait(50);
+        bool ret = exit_evt_.wait(50);
+        CSL_DEBUGF( L"stop() => %s", (ret==true?"TRUE":"FALSE") );
+        RETURN_FUNCTION( ret );
       }
 
       pevent & start_event() { return start_evt_; }
       pevent & exit_event()  { return exit_evt_;  }
 
-      bool is_started()  { return start_evt_.is_permanent(); }
-      bool is_exited()   { return exit_evt_.is_permanent();  }
+      bool is_started()
+      {
+        ENTER_FUNCTION();
+        bool ret = start_evt_.is_permanent();
+        CSL_DEBUGF( L"is_started() => %s",(ret==true?"TRUE":"FALSE") );
+        RETURN_FUNCTION( ret );
+      }
+
+      bool is_exited()
+      {
+        ENTER_FUNCTION();
+        bool ret = exit_evt_.is_permanent();
+        CSL_DEBUGF( L"is_exited() => %s",(ret==true?"TRUE":"FALSE") );
+        RETURN_FUNCTION( ret );
+      }
 
       bool is_running()
       {
-        return (is_started()==true &&
-                is_exited()==false);
+        ENTER_FUNCTION();
+        bool ret = (is_started()==true && is_exited()==false);
+        CSL_DEBUGF( L"is_running() => %s", (ret==true?"TRUE":"FALSE") );
+        RETURN_FUNCTION( ret );
       }
     };
 
