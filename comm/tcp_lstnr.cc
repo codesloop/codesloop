@@ -28,11 +28,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   @brief TODO: complete description
 */
 
+#if 0
 #ifndef DEBUG
 #define DEBUG
 #define DEBUG_ENABLE_INDENT
 //#define DEBUG_VERBOSE
 #endif /* DEBUG */
+#endif //0
 
 #include "codesloop/common/inpvec.hh"
 #include "codesloop/common/libev/evwrap.h"
@@ -143,23 +145,37 @@ namespace csl
         typedef inpvec<ev_data>     ev_data_vec_t;
         typedef inpvec<ev_data *>   ev_data_ptr_vec_t;
 
-        SAI                  addr_;                        // OK
-        auto_close_socket    listener_;                    // OK
-        struct ev_loop *     loop_;                        // OK
-        ev_io                accept_watcher_;              // OK
-        ev_async             wakeup_watcher_;              // OK
-        ev_timer             periodic_watcher_;            // OK
-        listener_entry       entry_;                       // OK
-        thread               listener_thread_;             // OK
-        bool                 stop_me_;            // -----------
+        SAI                  addr_;
+        auto_close_socket    listener_;
+        struct ev_loop *     loop_;
+        ev_io                accept_watcher_;
+        ev_async             wakeup_watcher_;
+        ev_timer             periodic_watcher_;
+        listener_entry       entry_;
+        thread               listener_thread_;
+        bool                 stop_me_;
         mutex                mtx_;
         handler *            handler_;
         ev_data_vec_t        ev_pool_;
-
-        //
         conn_queue           new_data_queue_;
         data_handler         new_data_handler_;
         conn_queue           idle_data_queue_;
+
+        bool stop_me()
+        {
+          bool ret = false;
+          {
+            scoped_mutex m(mtx_);
+            ret = stop_me_;
+          }
+          return ret;
+        }
+
+        void stop_me(bool yesno)
+        {
+          scoped_mutex m(mtx_);
+          stop_me_ = yesno;
+        }
 
         impl() : entry_(this),
                  stop_me_(false),
@@ -196,52 +212,54 @@ namespace csl
         bool init(handler & h, SAI address, int backlog)
         {
           ENTER_FUNCTION();
+          {
+            scoped_mutex m(mtx_);
 
-          //  listener socket and co. init
-          int sock = ::socket( AF_INET, SOCK_STREAM, 0 );
-          if( sock < 0 ) { THRC(exc::rs_socket_failed,false); }
-          CSL_DEBUGF(L"listener socket:%d created for (%s:%d)",
-                      sock,
-                      inet_ntoa(address.sin_addr),
-                      ntohs(address.sin_port) );
+            //  listener socket and co. init
+            int sock = ::socket( AF_INET, SOCK_STREAM, 0 );
+            if( sock < 0 ) { THRC(exc::rs_socket_failed,false); }
+            CSL_DEBUGF(L"listener socket:%d created for (%s:%d)",
+                        sock,
+                        inet_ntoa(address.sin_addr),
+                        ntohs(address.sin_port) );
 
-          // this ensures that the listener socket will be closed
-          listener_.init(sock);
+            // this ensures that the listener socket will be closed
+            listener_.init(sock);
 
-          int on = 1;
-          if( ::setsockopt( sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on) ) < 0 )
-            THRC(exc::rs_setsockopt,false);
+            int on = 1;
+            if( ::setsockopt( sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on) ) < 0 )
+              THRC(exc::rs_setsockopt,false);
 
-          CSL_DEBUGF(L"setsockopt has set SO_REUSEADDR on %d",sock);
+            CSL_DEBUGF(L"setsockopt has set SO_REUSEADDR on %d",sock);
 
-          if( ::bind( sock,
-                      reinterpret_cast<const struct sockaddr *>(&address),
-                      sizeof(address) ) < 0 )
-            THRC(exc::rs_bind_failed,false);
+            if( ::bind( sock,
+                        reinterpret_cast<const struct sockaddr *>(&address),
+                        sizeof(address) ) < 0 )
+              THRC(exc::rs_bind_failed,false);
 
-          CSL_DEBUGF(L"socket %d bound to (%s:%d)",
-                      sock,
-                      inet_ntoa(address.sin_addr),
-                      ntohs(address.sin_port));
+            CSL_DEBUGF(L"socket %d bound to (%s:%d)",
+                        sock,
+                        inet_ntoa(address.sin_addr),
+                        ntohs(address.sin_port));
 
-          if( ::listen( sock, backlog ) < 0 )
-            THRC(exc::rs_listen_failed,false);
+            if( ::listen( sock, backlog ) < 0 )
+              THRC(exc::rs_listen_failed,false);
 
-          CSL_DEBUGF(L"listen(sock:%d,backlog:%d) succeeded",sock,backlog);
+            CSL_DEBUGF(L"listen(sock:%d,backlog:%d) succeeded",sock,backlog);
 
-          // set handler
-          handler_ = &h;
+            // set handler
+            handler_ = &h;
 
-          // save the listener address
-          addr_ = address;
+            // save the listener address
+            addr_ = address;
 
-          //  - register async notifier
-          ev_async_start( loop_, &wakeup_watcher_ );
+            //  - register async notifier
+            ev_async_start( loop_, &wakeup_watcher_ );
 
-          //  - register accept watcher
-          ev_io_set( &accept_watcher_, sock, EV_READ  );
-          ev_io_start( loop_, &accept_watcher_ );
-
+            //  - register accept watcher
+            ev_io_set( &accept_watcher_, sock, EV_READ  );
+            ev_io_start( loop_, &accept_watcher_ );
+          }
           RETURN_FUNCTION(true);
         }
 
@@ -250,21 +268,37 @@ namespace csl
           ENTER_FUNCTION();
           CSL_DEBUGF( L"wakeup_cb(w,revents:%d)",revents );
 
-          conn_queue::handler h;
-
-          while( idle_data_queue_.pop(h) )
+          // check for stop event
+          if( stop_me() )
           {
-            ev_data * dta = *(h.get());
-            CSL_DEBUGF( L"popped conn_id:%lld from idle connections "
-                         "now requeueing it", dta->id_ );
+            CSL_DEBUGF( L"stop request received" );
 
-            ev_io_start( loop_, &(dta->watcher_) );
+            remove_all_connections();
 
-            if( idle_data_queue_.new_item_event().wait_nb() != true )
+            // unqueue all event watchers
+            ev_unloop( loop_, EVUNLOOP_ALL );
+          }
+          else
+          {
+            conn_queue::handler h;
+
+            // no need to lock internal data here
+            // idle_data_queue_ should be locked by itself
+
+            while( idle_data_queue_.pop(h) )
             {
-              // this should not happen, this shows inconsystency
-              // which should be ironed out of the software
-              THRNORET( exc::rs_internal_state );
+              ev_data * dta = *(h.get());
+              CSL_DEBUGF( L"popped conn_id:%lld from idle connections "
+                           "now requeueing it", dta->id_ );
+
+              ev_io_start( loop_, &(dta->watcher_) );
+
+              if( idle_data_queue_.new_item_event().wait_nb() != true )
+              {
+                // this should not happen, this shows inconsystency
+                // which should be ironed out of the software
+                THRNORET( exc::rs_internal_state );
+              }
             }
           }
           LEAVE_FUNCTION();
@@ -293,35 +327,56 @@ namespace csl
 
           if( conn_fd > 0 )
           {
-            CSL_DEBUGF( L"accepted conn: %d from %s:%d",
-                         conn_fd,inet_ntoa(addr.sin_addr),
-                         ntohs(addr.sin_port) );
+            ev_data * ed = 0;
+            ev_data_vec_t::iterator * evit_ptr = 0;
 
-            // initialize iterator
-            ev_data_vec_t::iterator  ev_it( ev_pool_.begin() );
+            {
+              scoped_mutex m(mtx_);
 
-            // find the first free position
-            ev_data_vec_t::iterator  & ev_it_ref( ev_pool_.first_free(ev_it) );
+              CSL_DEBUGF( L"accepted conn: %d from %s:%d",
+                           conn_fd,inet_ntoa(addr.sin_addr),
+                           ntohs(addr.sin_port) );
 
-            // create the items
-            ev_data  * ed = ev_it_ref.set( loop_,
-                                           conn_fd,
-                                           addr,
-                                           ev_it_ref.get_pos() );
+              // initialize iterator
+              ev_data_vec_t::iterator ev_it( ev_pool_.begin() );
 
-            CSL_DEBUG_ASSERT( ed != NULL );
+              // find the first free position
+              ev_data_vec_t::iterator & ev_it_ref( ev_pool_.first_free(ev_it) );
+
+              // create the items
+              ed = ev_it_ref.set(  loop_,
+                                   conn_fd,
+                                   addr,
+                                   ev_it_ref.get_pos() );
+
+              CSL_DEBUG_ASSERT( ed != NULL );
+
+              evit_ptr = &ev_it;
+            }
 
             // signal connection startup
-            bool cres = handler_->on_connected( ed->id_, addr, ed->bfd_ );
+            bool cres = false;
 
-            if( cres == false )
+            {
+              scoped_mutex m(ed->mtx_);
+              cres = handler_->on_connected( ed->id_, addr, ed->bfd_ );
+            }
+
+            CSL_DEBUG_ASSERT( evit_ptr != 0 );
+
+            if( evit_ptr == 0 ) { THRRNORET( exc::rs_internal_state,L"evit_ptr is null" ); }
+            else if( cres == false )
             {
               CSL_DEBUG(L"handler returned FALSE, this tells to close the connection");
-              ev_it_ref.free();
+              scoped_mutex m(mtx_);
+              evit_ptr->free();
             }
             else
             {
               CSL_DEBUG(L"handler returned TRUE for connection startup");
+
+              // the lock may not neccessary here as libev claims to be threadsafe
+              scoped_mutex m(mtx_);
               // initialize connection watcher
               ev_init( &(ed->watcher_), lstnr_new_data_cb );
               ed->watcher_.data = this;
@@ -341,9 +396,15 @@ namespace csl
         {
           ENTER_FUNCTION();
 
-          bool hres = handler_->on_data_arrival( dta->id_,
-                                                 dta->peer_addr_,
-                                                 dta->bfd_ );
+          bool hres = false;
+
+          {
+            scoped_mutex m(dta->mtx_);
+            hres = handler_->on_data_arrival( dta->id_,
+                                              dta->peer_addr_,
+                                              dta->bfd_ );
+          }
+
           //
           if( hres == false )
           {
@@ -426,7 +487,41 @@ namespace csl
           ENTER_FUNCTION();
           CSL_DEBUG_ASSERT( dta != NULL );
           CSL_DEBUGF(L"remove_connection(dta[id:%lld])",dta->id_);
-          ev_pool_.free_at( dta->id_ );
+
+          scoped_mutex m(mtx_);
+          {
+            dta->mtx_.lock();
+            ev_pool_.free_at( dta->id_ );
+          }
+          LEAVE_FUNCTION();
+        }
+
+        void remove_all_connections()
+        {
+          ENTER_FUNCTION();
+
+          conn_queue::handler h;
+
+          // remove all idle data here
+          //
+          while( idle_data_queue_.pop(h) )
+          {
+            ev_data * dta = *(h.get());
+            CSL_DEBUGF( L"removing idle conn_id:%lld",dta->id_ );
+            remove_connection( dta );
+          }
+
+          // loop through all active connections and remove them
+          {
+            scoped_mutex m(mtx_);
+            ev_data_vec_t::iterator it = ev_pool_.begin();
+            ev_data * dta = 0;
+            while( (dta=it.next_used()) != 0 )
+            {
+              CSL_DEBUGF( L"removing active conn_id:%lld",dta->id_ );
+              remove_connection( dta );
+            }
+          }
           LEAVE_FUNCTION();
         }
 
@@ -483,11 +578,39 @@ namespace csl
 
         bool stop()
         {
-          // TODO
-          // - set stop flag
-          // - stop loop
-          // - stop listener thread
-          return false;
+          ENTER_FUNCTION();
+          bool ret = false;
+
+          // send a wakeup event if not sent before
+          if( stop_me() == false )
+          {
+            CSL_DEBUGF( L"waking up the event loop" );
+            stop_me( true );
+            ev_async_send( loop_, &wakeup_watcher_ );
+            ev_timer_stop( loop_, &periodic_watcher_ );
+          }
+
+          if( listener_thread_.exit_event().wait(5000) == false )
+          {
+            // still running, need insist a bit more
+            CSL_DEBUGF( L"listener thread still running (5s), now shut down the loop" );
+            ev_unloop( loop_, EVUNLOOP_ALL );
+
+            if( listener_thread_.exit_event().wait(3000) == false )
+            {
+              // listener thread is still running, now close all fds
+              CSL_DEBUGF( L"listener thread still running (8s), now close all connections" );
+              remove_all_connections( );
+
+              if( listener_thread_.exit_event().wait(2000) == false )
+              {
+                CSL_DEBUGF( L"listener thread still running (10s) kill the thread" );
+                listener_thread_.stop();
+              }
+            }
+          }
+
+          RETURN_FUNCTION(ret);
         }
 
         pevent & start_event()

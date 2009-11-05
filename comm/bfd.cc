@@ -28,13 +28,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief buffered file descriptor (fd)
  */
 
-//#if 0
+#if 0
 #ifndef DEBUG
 #define DEBUG
 #define DEBUG_ENABLE_INDENT
 //#define DEBUG_VERBOSE
 #endif /* DEBUG */
-//#endif /* 0 */
+#endif /* 0 */
 
 #include "codesloop/comm/bfd.hh"
 #include "codesloop/common/libev/evwrap.h"

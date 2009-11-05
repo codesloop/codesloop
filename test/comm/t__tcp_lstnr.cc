@@ -28,13 +28,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   @brief @todo
 */
 
-//#if 0
+#if 0
 #ifndef DEBUG
 #define DEBUG
 #define DEBUG_ENABLE_INDENT
 //#define DEBUG_VERBOSE
 #endif /* DEBUG */
-//#endif
+#endif
 
 #include "codesloop/comm/bfd.hh"
 #include "codesloop/comm/tcp_lstnr.hh"
@@ -118,7 +118,11 @@ namespace test_tcp_lstnr {
     my_tcp_handler h;
     l.init(h, addr);
     l.start();
-    l.exit_event().wait();
+    CSL_DEBUGF( L"the listener has been started. wait 7 secs for connections" );
+    assert( l.exit_event().wait(7000) == false );
+    CSL_DEBUGF( L"the listener will be stopped on purpose after 7 seconds" );
+    l.stop();
+    assert( l.exit_event().wait(7000) == true );
     LEAVE_FUNCTION();
   }
 
@@ -129,8 +133,9 @@ using namespace test_tcp_lstnr;
 int main()
 {
   initcomm w;
+
+  csl_common_print_results( "baseline          ", csl_common_test_timer_v0(baseline),"" );
   conn();
-  //csl_common_print_results( "baseline          ", csl_common_test_timer_v0(baseline),"" );
   return 0;
 }
 
