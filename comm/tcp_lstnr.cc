@@ -417,7 +417,7 @@ namespace csl
           }
           else
           {
-            CSL_DEBUGF( L"handler returned TRUE, this tells us to put back"
+            CSL_DEBUGF( L"handler returned TRUE, this tells us to put back "
                          "conn_id:%lld fd:%d into the idle watchers",
                          dta->id_,
                          dta->bfd_.file_descriptor() );

@@ -36,6 +36,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/common/common.h"
 #include "codesloop/common/str.hh"
 #include "codesloop/common/logger.hh"
+#include <assert.h>
 
 /**
   @file thrpool.cc
@@ -300,6 +301,8 @@ namespace csl
     bool thrpool::graceful_stop()
     {
       ENTER_FUNCTION();
+      bool ret = false;
+
       unsigned int i = 0;
       {
         scoped_mutex m(mtx_);
@@ -318,6 +321,8 @@ namespace csl
         ev_->notify( i );
       }
 
+      unsigned int failed_count = 0;
+
       for( unsigned int j=0; j<i; ++j )
       {
         CSL_DEBUGF( L"wait thread %d/%d available:%d waiting:%d",
@@ -328,13 +333,33 @@ namespace csl
 
         if( exit_event_.wait(timeout_*3) == false )
         {
-          RETURN_FUNCTION( false );
+          ++failed_count;
         }
       }
 
       cleanup();
+
+      if( count() > 0 && failed_count > 0 )
+      {
+        CSL_DEBUGF( L"do a second pass cleanup.... [failed:%d]",failed_count );
+        ev_->notify( failed_count );
+
+        for( unsigned int j=0; j<failed_count; ++j )
+        {
+          CSL_DEBUGF( L"wait thread %d/%d available:%d waiting:%d",
+                       j,
+                       failed_count,
+                       exit_event_.available_count(),
+                       exit_event_.waiting_count() );
+
+          exit_event_.wait(timeout_*5);
+        }
+      }
+
+      ret = (count() == 0);
       exit_event_.clear_available();
-      RETURN_FUNCTION (count() == 0);
+
+      RETURN_FUNCTION( ret );
     }
 
     bool thrpool::unpolite_stop()
