@@ -116,6 +116,7 @@ ADD_EXECUTABLE( t__hash          t__hash.cc )
 ADD_EXECUTABLE( t__hash_helpers  t__hash_helpers.cc )
 ADD_EXECUTABLE( t__hash_exp      t__hash_exp.cc )
 ADD_EXECUTABLE( t__auto_cloce    t__auto_close.cc )
+ADD_EXECUTABLE( t__rdbuf          t__rdbuf.cc )
 
 #ADD_EXECUTABLE( t__hash_macros   t__hash_macros.cc )
 #SET_TARGET_PROPERTIES( t__hash PROPERTIES LINK_FLAGS -pg )
