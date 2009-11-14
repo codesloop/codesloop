@@ -23,8 +23,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_comm_rdbuf_hh_included_
-#define _csl_comm_rdbuf_hh_included_
+#ifndef _csl_common_rdbuf_hh_included_
+#define _csl_common_rdbuf_hh_included_
 
 #include "codesloop/comm/read_res.hh"
 #include "codesloop/comm/exc.hh"
