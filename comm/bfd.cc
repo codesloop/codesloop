@@ -36,6 +36,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif /* DEBUG */
 #endif /* 0 */
 
+#include "codesloop/comm/exc.hh"
 #include "codesloop/comm/bfd.hh"
 #include "codesloop/common/libev/evwrap.h"
 #include "codesloop/common/logger.hh"
@@ -169,7 +170,7 @@ namespace csl
 
               default:
               {
-                THR(exc::rs_unknown_op,ret);
+                THR(comm::exc::rs_unknown_op,ret);
               }
             };
 

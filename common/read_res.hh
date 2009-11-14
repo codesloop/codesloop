@@ -23,8 +23,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_comm_read_res_hh_included_
-#define _csl_comm_read_res_hh_included_
+#ifndef _csl_common_read_res_hh_included_
+#define _csl_common_read_res_hh_included_
 
 #include "codesloop/common/common.h"
 #include "codesloop/common/obj.hh"
@@ -32,7 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace csl
 {
-  namespace comm
+  namespace common
   {
     class read_res
     {
@@ -57,10 +57,10 @@ namespace csl
         void timed_out(bool to);
         void failed(bool fd);
 
-        CSL_OBJ(csl::comm, read_res);
+        CSL_OBJ(csl::common, read_res);
     };
   }
 }
 
 #endif /* __cplusplus */
-#endif /* _csl_comm_read_res_hh_included_ */
+#endif /* _csl_common_read_res_hh_included_ */

@@ -36,14 +36,14 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif /* DEBUG */
 #endif
 
-#include "codesloop/comm/read_res.hh"
+#include "codesloop/common/read_res.hh"
 #include "codesloop/common/logger.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/test_timer.h"
 #include <assert.h>
 
-using namespace csl::comm;
-//using namespace csl::common;
+//using namespace csl::comm;
+using namespace csl::common;
 //using namespace csl::nthread;
 
 /** @brief @todo */

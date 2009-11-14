@@ -94,6 +94,7 @@ ADD_LIBRARY( csl_common STATIC
              hash.cc       hash.hh
              hash_helpers.hh
              auto_close.hh
+             read_res.cc   read_res.hh
              var.hh
              int64.cc      int64.hh
              dbl.cc        dbl.hh

@@ -33,8 +33,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "codesloop/comm/sai.hh"
-#include "codesloop/comm/read_res.hh"
 #include "codesloop/comm/bfd.hh"
+#include "codesloop/common/read_res.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/obj.hh"
 #ifdef __cplusplus
@@ -42,6 +42,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace csl
 {
+  using common::read_res;
+
   namespace comm
   {
     namespace tcp

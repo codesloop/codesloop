@@ -26,8 +26,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_common_rdbuf_hh_included_
 #define _csl_common_rdbuf_hh_included_
 
-#include "codesloop/comm/read_res.hh"
-#include "codesloop/comm/exc.hh"
+#include "codesloop/common/read_res.hh"
+#include "codesloop/common/exc.hh"
 #include "codesloop/common/tbuf.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/logger.hh"
@@ -37,7 +37,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace csl
 {
-  namespace comm
+  namespace common
   {
     template <uint64_t Preallocated=1024,uint64_t MaxSize=256*1024>
     class rdbuf
@@ -77,7 +77,7 @@ namespace csl
 #  define RDBUF_DEBUG_ASSERT( COND, RETVAL ) \
      if( !(COND) ) \
      { \
-       THRR( csl::comm::exc::rs_assert,L"assert failed: "#COND,RETVAL ); \
+       THRR( csl::common::exc::rs_assert,L"assert failed: "#COND,RETVAL ); \
      }
 # endif
 #endif
@@ -234,11 +234,11 @@ namespace csl
         uint64_t start_;
         uint64_t len_;
 
-        CSL_OBJ(csl::comm,rdbuf);
+        CSL_OBJ(csl::common,rdbuf);
         USE_EXC();
     };
-  } /* end of ns:csl:comm */
+  } /* end of ns:csl:common */
 } /* end of ns:csl */
 
 #endif /* __cplusplus */
-#endif /* _csl_comm_rdbuf_hh_included_ */
+#endif /* _csl_common_rdbuf_hh_included_ */

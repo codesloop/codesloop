@@ -39,13 +39,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif /* DEBUG */
 #endif
 
-#include "codesloop/comm/rdbuf.hh"
+#include "codesloop/common/rdbuf.hh"
 #include "codesloop/common/logger.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/test_timer.h"
 #include <assert.h>
 
-using namespace csl::comm;
+//using namespace csl::comm;
 using namespace csl::common;
 //using namespace csl::nthread;
 
@@ -239,7 +239,7 @@ namespace test_rdbuf {
 
     // this should throw an exception
     try { o.adjust(rr,1); }
-    catch( csl::comm::exc e ) { caught = 1; }
+    catch( csl::common::exc e ) { caught = 1; }
     assert( caught == 1 );
 
     rr.data( rr2.data() );                         // fix pointer
@@ -247,7 +247,7 @@ namespace test_rdbuf {
 
     // this should throw an exception
     try { o.adjust(rr,1); }
-    catch( csl::comm::exc e ) { caught = 2; }
+    catch( csl::common::exc e ) { caught = 2; }
     assert( caught == 2 );
 
     rr.bytes( rr2.bytes() );                       // fix size
@@ -255,7 +255,7 @@ namespace test_rdbuf {
 
     // this should throw an exception
     try { o.adjust(rr,1); }
-    catch( csl::comm::exc e ) { caught = 3; }
+    catch( csl::common::exc e ) { caught = 3; }
     assert( caught == 3 );
 
     rr.failed( false );                             // fix fail status
@@ -263,7 +263,7 @@ namespace test_rdbuf {
 
     // this should throw an exception
     try { o.adjust(rr,1); }
-    catch( csl::comm::exc e ) { caught = 4; }
+    catch( csl::common::exc e ) { caught = 4; }
     assert( caught == 4 );
   }
 

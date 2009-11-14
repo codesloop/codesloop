@@ -23,11 +23,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/**
-   @file bfd.cc
-   @brief buffered file descriptor (fd)
- */
-
 #if 0
 #ifndef DEBUG
 #define DEBUG
@@ -36,12 +31,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif /* DEBUG */
 #endif /* 0 */
 
-#include "codesloop/comm/read_res.hh"
+#include "codesloop/common/read_res.hh"
 #include "codesloop/common/logger.hh"
 
 namespace csl
 {
-  namespace comm
+  namespace common
   {
 #ifndef READ_RES_DEBUG_STATE
 #define READ_RES_DEBUG_STATE(WHICH) \
@@ -135,7 +130,7 @@ namespace csl
       READ_RES_DEBUG_STATE("new");
       LEAVE_FUNCTION();
     }
-  } /* end of ns: csl::comm */
+  } /* end of ns: csl::common */
 } /* end of ns: csl */
 
 /* EOF */

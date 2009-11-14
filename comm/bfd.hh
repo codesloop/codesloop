@@ -31,15 +31,18 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief buffered file descriptor (fd)
  */
 
-#include "codesloop/comm/rdbuf.hh"
 #include "codesloop/comm/sai.hh"
-#include "codesloop/comm/read_res.hh"
+#include "codesloop/common/rdbuf.hh"
+#include "codesloop/common/read_res.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/obj.hh"
 #ifdef __cplusplus
 
 namespace csl
 {
+  using common::rdbuf;
+  using common::read_res;
+
   namespace comm
   {
     /**
