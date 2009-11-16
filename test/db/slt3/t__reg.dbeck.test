@@ -1,0 +1,5 @@
+baseline              2874.689 ms, 33554430 calls,   0.000086 ms/call,   11672368.732757 calls/sec   
+usage1                1857.460 ms,     2046 calls,   0.907849 ms/call,   1101.504205 calls/sec   
+usage2                3105.470 ms,     8190 calls,   0.379178 ms/call,   2637.281957 calls/sec   
+usage3                1991.790 ms,     2046 calls,   0.973504 ms/call,   1027.216725 calls/sec   
+usage4                2939.138 ms,     4094 calls,   0.717914 ms/call,   1392.925409 calls/sec   

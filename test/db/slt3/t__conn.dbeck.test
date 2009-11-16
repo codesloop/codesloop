@@ -1,0 +1,5 @@
+Must get an error message here:
+Exception(/home/dbeck/codesloop/db/_shared_impl.cc:132): [Readonly] : Failed to open DB
+baseline         2263.989 ms,  8388606 calls,   0.000270 ms/call,   3705232.666766 calls/sec   
+open_close       2805.895 ms,    65534 calls,   0.042816 ms/call,   23355.827641 calls/sec   
+set_exc          2802.990 ms,  8388606 calls,   0.000334 ms/call,   2992734.900945 calls/sec   

@@ -1,0 +1,10 @@
+test_params       2157.542 ms,      126 calls,   17.123349 ms/call,   58.399790 calls/sec   
+int_param         2244.615 ms,      126 calls,   17.814405 ms/call,   56.134348 calls/sec   
+double_param      2231.988 ms,      126 calls,   17.714190 ms/call,   56.451916 calls/sec   
+string_param      2057.410 ms,      126 calls,   16.328651 ms/call,   61.242047 calls/sec   
+blob_param        2225.768 ms,      126 calls,   17.664825 ms/call,   56.609674 calls/sec   
+open_close        2739.887 ms,    65534 calls,   0.041809 ms/call,   23918.504668 calls/sec   
+conn_baseline     2797.675 ms,    65534 calls,   0.042690 ms/call,   23424.450660 calls/sec   
+tran_query        2823.828 ms,    65534 calls,   0.043090 ms/call,   23207.504140 calls/sec   
+crdrp_table       1922.712 ms,      126 calls,   15.259619 ms/call,   65.532435 calls/sec   
+single_return     1926.180 ms,      126 calls,   15.287143 ms/call,   65.414447 calls/sec   
