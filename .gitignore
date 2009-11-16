@@ -126,3 +126,5 @@ test/db/slt3/t__sql_helper
 test/db/slt3/t__sqlite
 test/db/slt3/t__tran
 test/db/slt3/t__var
+test/db/slt3/t__query_mem
+test/db/slt3/t__var_mem

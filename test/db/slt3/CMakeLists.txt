@@ -105,5 +105,7 @@ ADD_EXECUTABLE( t__query        t__query.cc )
 ADD_EXECUTABLE( t__reg          t__reg.cc )
 ADD_EXECUTABLE( t__var          t__var.cc )
 ADD_EXECUTABLE( t__sql_helper   t__sql_helper.cc )
+ADD_EXECUTABLE( t__var_mem      t__var_mem.cc )
+ADD_EXECUTABLE( t__query_mem    t__query_mem.cc )
 
 # -- EOF --
