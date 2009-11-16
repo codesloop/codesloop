@@ -23,8 +23,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_slt3_conn_hh_included_
-#define _csl_slt3_conn_hh_included_
+#ifndef _csl_db_conn_hh_included_
+#define _csl_db_conn_hh_included_
 
 /**
    @file conn.hh
@@ -39,105 +39,109 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace csl
 {
-  namespace slt3
+  namespace db
   {
-    class tran;
-
-    /**
-    @brief sqlite3 connection object
-
-    The conn class represents a SQLite3 connection. This is not to be confused
-    w/ a database. Connection is a main database and possibly attached databases.
-
-    conn may throw slt3::exc exceptions, depending on the setting of use_exc
-
-    if use_exc is true it throws exception on error, it it is false it sends
-    an error message to stderr
-
-    derived objects like slt3::tran inherits the current value of use_exc()
-
-    to query the database you need a tran (transaction object) and a synqry (query object as well)
-    */
-    class conn
+    namespace slt3
     {
-      public:
+      class tran;
 
-        conn();
-        ~conn();
+      /**
+      @brief sqlite3 connection object
 
-        /**
-        @brief Opens an SQLite3 (main) database
-        @param db is the filename of the database
-        @return true if successful
-        @throw slt3::exc error description
+      The conn class represents a SQLite3 connection. This is not to be confused
+      w/ a database. Connection is a main database and possibly attached databases.
 
-        depending on the use_exc() value it may throw an slt3::exc exception
+      conn may throw slt3::exc exceptions, depending on the setting of use_exc
 
-        if use_exc is true it throws otherwise it displays an error message on stderr 
-         */
-        bool open(const char * db);
+      if use_exc is true it throws exception on error, it it is false it sends
+      an error message to stderr
 
-        /**
-        @brief Returns the name used for opening the database
-        @return the pathname of the database opened 
+      derived objects like slt3::tran inherits the current value of use_exc()
 
-        if the open() was not successful than name().empty() == true 
-         */
-        const common::ustr & name() const;
+      to query the database you need a tran (transaction object) and a synqry (query object as well)
+      */
+      class conn
+      {
+        public:
 
-        /**
-        @brief Closes an SQLite3 connection
-        @return true if successful
-        @throw slt3::exc error description
+          conn();
+          ~conn();
 
-        depending on the use_exc() value it may throw an slt3::exc exception
+          /**
+          @brief Opens an SQLite3 (main) database
+          @param db is the filename of the database
+          @return true if successful
+          @throw slt3::exc error description
 
-        if use_exc is true it throws otherwise it displays an error message on stderr 
-         */
-        bool close();
+          depending on the use_exc() value it may throw an slt3::exc exception
 
-        /**
-        @brief returns the last insert rowid of the last insert query
-        @return the insert id or -1 on error
-        @throw slt3::exc 
-         */
-        long long last_insert_id();
+          if use_exc is true it throws otherwise it displays an error message on stderr
+           */
+          bool open(const char * db);
 
-        /**
-        @brief returns the number of changed rows of the last query
-        @return the number or -1 on error 
-        @throw slt3::exc 
-         */
-        long long change_count();
+          /**
+          @brief Returns the name used for opening the database
+          @return the pathname of the database opened
 
-        /**
-        @brief Specifies whether conn should throw slt3::exc exceptions
-        @param yesno is the desired value to be set
+          if the open() was not successful than name().empty() == true
+           */
+          const common::ustr & name() const;
 
-        the default value for use_exc() is true, so it throws exceptions by default 
-         */
-        void use_exc(bool yesno);
+          /**
+          @brief Closes an SQLite3 connection
+          @return true if successful
+          @throw slt3::exc error description
 
-        /** 
-        @brief Returns the current value of use_exc
-        @return true if exc exceptions are used 
-        */
-        bool use_exc();
+          depending on the use_exc() value it may throw an slt3::exc exception
 
-        /* types */
-        struct impl;
-        typedef std::auto_ptr<impl> impl_t;
+          if use_exc is true it throws otherwise it displays an error message on stderr
+           */
+          bool close();
 
-      private:
-        /* private data */
-        friend class tran;
-        impl_t impl_;
-        /* copying not allowed */
-        conn(const conn & other);
-        conn & operator=(const conn & other);
-    };
-  }
-}
+          /**
+          @brief returns the last insert rowid of the last insert query
+          @return the insert id or -1 on error
+          @throw slt3::exc
+           */
+          long long last_insert_id();
+
+          /**
+          @brief returns the number of changed rows of the last query
+          @return the number or -1 on error
+          @throw slt3::exc
+           */
+          long long change_count();
+
+          /**
+          @brief Specifies whether conn should throw slt3::exc exceptions
+          @param yesno is the desired value to be set
+
+          the default value for use_exc() is true, so it throws exceptions by default
+           */
+          void use_exc(bool yesno);
+
+          /**
+          @brief Returns the current value of use_exc
+          @return true if exc exceptions are used
+          */
+          bool use_exc();
+
+          /* types */
+          struct impl;
+          typedef std::auto_ptr<impl> impl_t;
+
+        private:
+          /* private data */
+          friend class tran;
+          impl_t impl_;
+          /* copying not allowed */
+          conn(const conn & other);
+          conn & operator=(const conn & other);
+      };
+    } /* end of ns: csl::db::slt3 */
+  } /* end of ns: csl::db */
+} /* end of ns: csl */
+
 
 #endif /* __cplusplus */
-#endif /* _csl_slt3_conn_hh_included_ */
+#endif /* _csl_db_conn_hh_included_ */

@@ -39,95 +39,96 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace csl
 {
-  namespace slt3
+  namespace db
   {
-    class conn;
-    class synqry;
-    class asynqry;
-
-    /**
-    @brief sqlite3 transaction object
-
-    the pupose of this class is to enforce transaction usage and also help managing them.
-    it supports nested transactions that are implemented as SQLite3 savepoints.
-
-    transaction objects may automatically commit or rollback transactions at destruction.
-    the default is to commit started transaction on destruction. This may be changed.
-
-    tran object is used with synqry objects to start user specified queries.
-
-    tran object copies the use_exc value of the parent object at construction time
-    use_exc tells wether to throw slt3::exc exceptions on errors. if they are not used
-    then the return value of the given function tells that it is failed. the error message
-    is sent to stderr.
-     */
-    class tran
+    namespace slt3
     {
-    public:
-      /**
-      @brief this constructor starts a main transaction
-      @param c is the database connection 
-        */
-      tran(conn & c);
+      class conn;
 
       /**
-      @brief this constructor starts a nested transaction of t
-      @param t is the parent transaction 
-        */
-      tran(tran & t);
+      @brief sqlite3 transaction object
 
-      ~tran();
-    
-      /**
-      @brief sets the destructor behaviour
-      @param yesno tells wether to commit on destruction 
-        */
-      void commit_on_destruct(bool yesno=true);
+      the pupose of this class is to enforce transaction usage and also help managing them.
+      it supports nested transactions that are implemented as SQLite3 savepoints.
 
-      /**
-      @brief sets the destructor behaviour
-      @param yesno tells wether to rollback on destruction 
-        */
-      void rollback_on_destruct(bool yesno=true);
+      transaction objects may automatically commit or rollback transactions at destruction.
+      the default is to commit started transaction on destruction. This may be changed.
 
-      /** @brief commit the current transaction */
-      void commit();
+      tran object is used with synqry objects to start user specified queries.
 
-      /** @brief rollback the current transaction */
-      void rollback();
-
-      /**
-      @brief Specifies whether tran should throw slt3::exc exceptions
-      @param yesno is the desired value to be set
-
-      the default value for use_exc() is true, so it throws exceptions by default 
+      tran object copies the use_exc value of the parent object at construction time
+      use_exc tells wether to throw slt3::exc exceptions on errors. if they are not used
+      then the return value of the given function tells that it is failed. the error message
+      is sent to stderr.
        */
-      void use_exc(bool yesno);
+      class tran
+      {
+      public:
+        /**
+        @brief this constructor starts a main transaction
+        @param c is the database connection
+          */
+        tran(conn & c);
 
-      /**
-      @brief Returns the current value of use_exc
-      @return true if exc exceptions are used 
-       */
-      bool use_exc();
+        /**
+        @brief this constructor starts a nested transaction of t
+        @param t is the parent transaction
+          */
+        tran(tran & t);
 
-      /* private implementation hidden in impl */
-      struct impl;
-      typedef std::auto_ptr<impl> impl_t;
+        ~tran();
 
-    private:
+        /**
+        @brief sets the destructor behaviour
+        @param yesno tells wether to commit on destruction
+          */
+        void commit_on_destruct(bool yesno=true);
 
-      friend class query;
-      /* private data */
-      impl_t impl_;
+        /**
+        @brief sets the destructor behaviour
+        @param yesno tells wether to rollback on destruction
+          */
+        void rollback_on_destruct(bool yesno=true);
 
-      /* copying not allowed */
-      tran & operator=(const tran & other);
+        /** @brief commit the current transaction */
+        void commit();
 
-      /* transactions should only be created in conn, or tran context */
-      tran();
-    };
-  }
-}
+        /** @brief rollback the current transaction */
+        void rollback();
+
+        /**
+        @brief Specifies whether tran should throw slt3::exc exceptions
+        @param yesno is the desired value to be set
+
+        the default value for use_exc() is true, so it throws exceptions by default
+         */
+        void use_exc(bool yesno);
+
+        /**
+        @brief Returns the current value of use_exc
+        @return true if exc exceptions are used
+         */
+        bool use_exc();
+
+        /* private implementation hidden in impl */
+        struct impl;
+        typedef std::auto_ptr<impl> impl_t;
+
+      private:
+
+        friend class query;
+        /* private data */
+        impl_t impl_;
+
+        /* copying not allowed */
+        tran & operator=(const tran & other);
+
+        /* transactions should only be created in conn, or tran context */
+        tran();
+      };
+    } /* end of ns: csl::db::slt3 */
+  } /* end of ns: csl::db */
+} /* end of ns: csl */
 
 #endif /* __cplusplus */
 #endif /* _csl_slt3_tran_hh_included_ */

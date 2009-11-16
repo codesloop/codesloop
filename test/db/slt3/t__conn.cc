@@ -30,12 +30,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "codesloop/common/test_timer.h"
 #include "codesloop/db/conn.hh"
-#include "exc.hh"
+#include "codesloop/db/exc.hh"
 #include "codesloop/common/common.h"
 #include <assert.h>
 #include <stdlib.h>
 
-using namespace csl::slt3;
+using namespace csl::db;
 
 /** @brief contains tests related to slt3::conn */
 namespace test_conn {
@@ -43,7 +43,7 @@ namespace test_conn {
   /** @test open invalid file w/o throwing exception */
   void open_fail_nothrow()
   {
-    conn c;
+    slt3::conn c;
     c.use_exc(false);
     FPRINTF(stderr,L"Must get an error message here:\n");
     assert( c.open(".") == false );
@@ -54,7 +54,7 @@ namespace test_conn {
   void open_fail_throw()
   {
     bool thrown = false;
-    conn c;
+    slt3::conn c;
     c.use_exc(true);
 
     try
@@ -73,7 +73,7 @@ namespace test_conn {
   /** @test open and close db */
   void open_close()
   {
-    conn c;
+    slt3::conn c;
     assert( c.close() == false );
     assert( c.open("test.db") == true );
     assert( c.close() == true );
@@ -83,7 +83,7 @@ namespace test_conn {
   /** @test set and check use_exc */
   void set_exc()
   {
-    conn c;
+    slt3::conn c;
     c.use_exc(true);
     assert( c.use_exc() == true );
     c.use_exc(false);
@@ -93,7 +93,7 @@ namespace test_conn {
   /** @test baseline for performance comparison */
   void baseline()
   {
-    conn c;
+    slt3::conn c;
   }
 
 } // end of test_conn

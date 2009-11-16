@@ -23,8 +23,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_slt3_sql_hh_included_
-#define _csl_slt3_sql_hh_included_
+#ifndef _csl_db_sql_hh_included_
+#define _csl_db_sql_hh_included_
 
 /**
   @file sql.hh
@@ -40,87 +40,90 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace csl
 {
-  namespace slt3
+  namespace db
   {
-    class obj;
-
-    /** @brief only a container of the sql::helper class */
-    class sql
+    namespace slt3
     {
-      public:
+      class obj;
 
-        /** @brief sql::helper is used for generating ORM related SQL queries */
-        class helper
-        {
-          public:
-            
-            /** @brief helper::data contains descriptions of ORM fields */
-            struct data
-            {
-              const char * name_;  ///<the column name
-              const char * type_;  ///<the column type (INTEGER,BLOB,TEXT,etc...)
-              const char * flags_; ///<misc flags like (AUTOINCREMENT, UNIQUE, PRIMARY KEY, etc...)
+      /** @brief only a container of the sql::helper class */
+      class sql
+      {
+        public:
 
-              /** @brief initializing constructor */
-              data(const char * name, const char * typ,const char * flags)
-                : name_(name), type_(typ), flags_(flags) {}
-            };
+          /** @brief sql::helper is used for generating ORM related SQL queries */
+          class helper
+          {
+            public:
 
-            typedef common::ustr buf_t;
-            typedef common::pvlist< 32,data,common::delete_destructor<data> > fieldlist_t;
+              /** @brief helper::data contains descriptions of ORM fields */
+              struct data
+              {
+                const char * name_;  ///<the column name
+                const char * type_;  ///<the column type (INTEGER,BLOB,TEXT,etc...)
+                const char * flags_; ///<misc flags like (AUTOINCREMENT, UNIQUE, PRIMARY KEY, etc...)
 
-            inline const char * table_name() { return table_name_; }
+                /** @brief initializing constructor */
+                data(const char * name, const char * typ,const char * flags)
+                  : name_(name), type_(typ), flags_(flags) {}
+              };
 
-            /**
-            @brief initializing constructor
-            @param tablename is the database table name associated with the class
-             */
-            helper(const char * tablename);
-            
-            /**
-            @brief registers a database field with the SQL helper
-            @param name is the column name
-            @param typ is the column type like (INTEGER, BLOB, REAL, etc...)
-            @param flags is the database column flags like (PRIMARY KEY, DEFAULT value, UNIQUE, etc...)
-            
-            registers the database field within the internal structure of the SQL helper
-             */
-            bool add_field(const char * name,const char * typ, const char * flags="");
+              typedef common::ustr buf_t;
+              typedef common::pvlist< 32,data,common::delete_destructor<data> > fieldlist_t;
 
-            const char * init_sql();     ///<returns: CREATE TABLE...
-            const char * create_sql();   ///<returns: INSERT INTO...
-            const char * save_sql();     ///<returns: UPDATE ....
-            const char * remove_sql();   ///<returns: DELETE FROM ...
-            const char * find_by_id_sql();
-            const char * find_by(int field1,
-                                    int field2=-1,
-                                    int field3=-1,
-                                    int field4=-1,
-                                    int field5=-1); ///<returns: SELECT... WHERE ...
+              inline const char * table_name() { return table_name_; }
 
-            inline void use_exc(bool yesno) { use_exc_ = yesno; }  ///<sets exception usage
-            inline bool use_exc() const     { return use_exc_; }  ///<should throw exceptions?
+              /**
+              @brief initializing constructor
+              @param tablename is the database table name associated with the class
+               */
+              helper(const char * tablename);
 
-          private:
-            helper() {} ///<destructor
+              /**
+              @brief registers a database field with the SQL helper
+              @param name is the column name
+              @param typ is the column type like (INTEGER, BLOB, REAL, etc...)
+              @param flags is the database column flags like (PRIMARY KEY, DEFAULT value, UNIQUE, etc...)
 
-            const char * table_name_;
-            bool         done_;
-            fieldlist_t  fields_;
+              registers the database field within the internal structure of the SQL helper
+               */
+              bool add_field(const char * name,const char * typ, const char * flags="");
 
-            /**/
-            buf_t  init_sql_;
-            buf_t  create_sql_;
-            buf_t  save_sql_;
-            buf_t  remove_sql_;
-            buf_t  find_by_id_sql_;
-            buf_t  find_by_sql_;
-            int    find_by_fields_[5];
-            bool   use_exc_;
-        };
-    };
-  }
-}
+              const char * init_sql();     ///<returns: CREATE TABLE...
+              const char * create_sql();   ///<returns: INSERT INTO...
+              const char * save_sql();     ///<returns: UPDATE ....
+              const char * remove_sql();   ///<returns: DELETE FROM ...
+              const char * find_by_id_sql();
+              const char * find_by(int field1,
+                                      int field2=-1,
+                                      int field3=-1,
+                                      int field4=-1,
+                                      int field5=-1); ///<returns: SELECT... WHERE ...
+
+              inline void use_exc(bool yesno) { use_exc_ = yesno; }  ///<sets exception usage
+              inline bool use_exc() const     { return use_exc_; }  ///<should throw exceptions?
+
+            private:
+              helper() {} ///<destructor
+
+              const char * table_name_;
+              bool         done_;
+              fieldlist_t  fields_;
+
+              /**/
+              buf_t  init_sql_;
+              buf_t  create_sql_;
+              buf_t  save_sql_;
+              buf_t  remove_sql_;
+              buf_t  find_by_id_sql_;
+              buf_t  find_by_sql_;
+              int    find_by_fields_[5];
+              bool   use_exc_;
+          };
+      };
+    }; /* end of csl::db::slt3 namespace */
+  }; /* end of csl::db namespace */
+}; /* end of csl namespace */
 
 #endif /* __cplusplus */
-#endif /* _csl_slt3_sql_hh_included_ */
+#endif /* _csl_db_sql_hh_included_ */

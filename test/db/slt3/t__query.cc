@@ -32,12 +32,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/db/query.hh"
 #include "codesloop/db/tran.hh"
 #include "codesloop/db/conn.hh"
-#include "exc.hh"
+#include "codesloop/db/exc.hh"
 #include "codesloop/common/str.hh"
 #include "codesloop/common/common.h"
 #include <assert.h>
 
-using namespace csl::slt3;
+using namespace csl::db;
+
 using csl::common::str;
 using csl::common::ustr;
 using csl::common::int64;
@@ -50,10 +51,10 @@ namespace test_query {
   /** @test baseline for performance comparison */
   void baseline()
   {
-    conn c;
+    slt3::conn c;
     c.use_exc(false);
-    tran t(c);
-    query q(t);
+    slt3::tran t(c);
+    slt3::query q(t);
 
     assert( c.use_exc() == false );
     assert( t.use_exc() == false );
@@ -63,10 +64,10 @@ namespace test_query {
   /** @test querying a database that was not opened w/o throwing exception */
   void noopen_nothrow()
   {
-    conn c;
+    slt3::conn c;
     c.use_exc(false);
-    tran t(c);
-    query q(t);
+    slt3::tran t(c);
+    slt3::query q(t);
     FPRINTF(stderr,L"Error message should follow here:\n");
     assert( q.execute("CREATE TABLE nothrow (i INT);") == false );
   }
@@ -75,12 +76,12 @@ namespace test_query {
   void noopen_throw()
   {
     bool caught = false;
-    conn c;
+    slt3::conn c;
     c.use_exc(true);
     try
     {
-      tran t(c);
-      query q(t);
+      slt3::tran t(c);
+      slt3::query q(t);
       assert( q.execute("CREATE TABLE nothrow (i INT);") == false );
     }
     catch( exc e )
@@ -91,15 +92,15 @@ namespace test_query {
   }
 
   /** @test declare colhead */
-  void test_colhead() { query::colhead ch; }
+  void test_colhead() { slt3::query::colhead ch; }
 
   /** @test parameter handling */
   void test_param()
   {
-    conn c;
+    slt3::conn c;
     c.use_exc(false);
-    tran t(c);
-    query q(t);
+    slt3::tran t(c);
+    slt3::query q(t);
 
     dbl & pa1(q.dbl_param(1));
     ustr & pa2(q.ustr_param(2));
@@ -162,12 +163,12 @@ namespace test_query {
   /** @test iterative query w/o retval (no automatic reset) */
   void stepw_noret_noaut()
   {
-    conn c;
+    slt3::conn c;
     assert( c.open("test.db") == true );
     try
     {
-      tran t(c);
-      query q(t);
+      slt3::tran t(c);
+      slt3::query q(t);
       q.autoreset_data(false);
       assert( q.execute("CREATE TABLE stepw_noret_noaut (o string);") == true );
       ustr & p(q.ustr_param(1));
@@ -196,12 +197,12 @@ namespace test_query {
   /** @test iterative query w/o retval (automatic reset) */
   void stepw_noret_aut()
   {
-    conn c;
+    slt3::conn c;
     assert( c.open("test.db") == true );
     try
     {
-      tran t(c);
-      query q(t);
+      slt3::tran t(c);
+      slt3::query q(t);
       q.autoreset_data(true);
       assert( q.execute("CREATE TABLE stepw_noret_aut (o string);") == true );
       ustr & p(q.ustr_param(1));
@@ -225,12 +226,12 @@ namespace test_query {
   /** @test iterative query w/ retval (automatic reset) */
   void stepw_ret_noaut()
   {
-    conn c;
+    slt3::conn c;
     assert( c.open("test.db") == true );
     try
     {
-      tran t(c);
-      query q(t);
+      slt3::tran t(c);
+      slt3::query q(t);
       q.autoreset_data(false);
       assert( q.execute("CREATE TABLE stepw_ret_noaut (o string);") == true );
       assert( q.execute("INSERT INTO stepw_ret_noaut (o) VALUES ('Hello');") == true );
@@ -238,8 +239,8 @@ namespace test_query {
       ustr & p(q.ustr_param(1));
       assert( q.prepare("SELECT o FROM stepw_ret_noaut WHERE o=?;") == true );
 
-      query::columns_t ch;
-      query::fields_t  fd;
+      slt3::query::columns_t ch;
+      slt3::query::fields_t  fd;
 
       for( unsigned int i=0;i<100;++i )
       {
@@ -263,12 +264,12 @@ namespace test_query {
   /** @test iterative query w/ retval (automatic reset) */
   void stepw_ret_aut()
   {
-    conn c;
+    slt3::conn c;
     assert( c.open("test.db") == true );
     try
     {
-      tran t(c);
-      query q(t);
+      slt3::tran t(c);
+      slt3::query q(t);
       q.autoreset_data(true);
       assert( q.execute("CREATE TABLE stepw_ret_aut (o string);") == true );
       assert( q.execute("INSERT INTO stepw_ret_aut (o) VALUES ('Hello');") == true );
@@ -277,8 +278,8 @@ namespace test_query {
       ustr & p(q.ustr_param(1));
       assert( q.prepare("SELECT o FROM stepw_ret_aut WHERE o=?;") == true );
 
-      query::columns_t ch;
-      query::fields_t  fd;
+      slt3::query::columns_t ch;
+      slt3::query::fields_t  fd;
 
       for( unsigned int i=0;i<100;++i )
       {
@@ -302,12 +303,12 @@ namespace test_query {
   /** @test onestep query w/o retval (no automatic reset) */
   void onesht_noret_noaut()
   {
-    conn c;
+    slt3::conn c;
     assert( c.open("test.db") == true );
     try
     {
-      tran t(c);
-      query q(t);
+      slt3::tran t(c);
+      slt3::query q(t);
       q.autoreset_data(false);
       assert( q.execute("CREATE TABLE onesht_noret_noaut (o string);") == true );
       assert( q.execute("INSERT INTO onesht_noret_noaut (o) VALUES ('Hello');") == true );
@@ -324,12 +325,12 @@ namespace test_query {
   /** @test onestep query w/o retval (automatic reset) */
   void onesht_noret_aut()
   {
-    conn c;
+    slt3::conn c;
     assert( c.open("test.db") == true );
     try
     {
-      tran t(c);
-      query q(t);
+      slt3::tran t(c);
+      slt3::query q(t);
       q.autoreset_data(true);
       assert( q.execute("CREATE TABLE onesht_noret_aut (o string);") == true );
       assert( q.execute("INSERT INTO onesht_noret_aut (o) VALUES ('Hello');") == true );
@@ -346,12 +347,12 @@ namespace test_query {
   /** @test onestep query w/ retval (no automatic reset) */
   void onesht_ret_noaut()
   {
-    conn c;
+    slt3::conn c;
     assert( c.open("test.db") == true );
     try
     {
-      tran t(c);
-      query q(t);
+      slt3::tran t(c);
+      slt3::query q(t);
       q.autoreset_data(false);
       assert( q.execute("CREATE TABLE onesht_ret_noaut (o string);") == true );
       assert( q.execute("INSERT INTO onesht_ret_noaut (o) VALUES ('Hello');") == true );
@@ -370,12 +371,12 @@ namespace test_query {
   /** @test onestep query w/ retval (utomatic reset) */
   void onesht_ret_aut()
   {
-    conn c;
+    slt3::conn c;
     assert( c.open("test.db") == true );
     try
     {
-      tran t(c);
-      query q(t);
+      slt3::tran t(c);
+      slt3::query q(t);
       q.autoreset_data(true);
       assert( q.execute("CREATE TABLE onesht_ret_aut (o string);") == true );
       assert( q.execute("INSERT INTO onesht_ret_aut (o) VALUES ('Hello');") == true );
@@ -391,14 +392,14 @@ namespace test_query {
     }
   }
 
-  static conn * perf_conn_ = 0;
-  static tran * perf_tran_ = 0;
+  static slt3::conn * perf_conn_ = 0;
+  static slt3::tran * perf_tran_ = 0;
 
   /** @test insert and delete integer */
   void ins_del_int()
   {
-    tran t(*perf_conn_);
-    query q(t);
+    slt3::tran t(*perf_conn_);
+    slt3::query q(t);
     assert( q.execute("INSERT INTO perftest (i) VALUES(1);") == true );
     assert( q.last_insert_id() > 0 );
     assert( q.execute("DELETE FROM perftest WHERE i=1;") == true );
@@ -407,8 +408,8 @@ namespace test_query {
   /** @test insert and delete double */
   void ins_del_double()
   {
-    tran t(*perf_conn_);
-    query q(t);
+    slt3::tran t(*perf_conn_);
+    slt3::query q(t);
     assert( q.execute("INSERT INTO perftest (d) VALUES('3.14123');") == true );
     assert( q.last_insert_id() > 0 );
     assert( q.execute("DELETE FROM perftest WHERE d='3.14123';") == true );
@@ -417,8 +418,8 @@ namespace test_query {
   /** @test insert and delete string */
   void ins_del_str()
   {
-    tran t(*perf_conn_);
-    query q(t);
+    slt3::tran t(*perf_conn_);
+    slt3::query q(t);
     assert( q.execute("INSERT INTO perftest (s) VALUES('3.14123');") == true );
     assert( q.last_insert_id() > 0 );
     assert( q.execute("DELETE FROM perftest WHERE s='3.14123';") == true );
@@ -427,8 +428,8 @@ namespace test_query {
   /** @test insert and delete blob */
   void ins_del_blob()
   {
-    tran t(*perf_conn_);
-    query q(t);
+    slt3::tran t(*perf_conn_);
+    slt3::query q(t);
     assert( q.execute("INSERT INTO perftest (b) VALUES('3.14123');") == true );
     assert( q.last_insert_id() > 0 );
     assert( q.execute("DELETE FROM perftest WHERE b='3.14123';") == true );
@@ -437,7 +438,7 @@ namespace test_query {
   /** @test insert and delete integer */
   void insdel_int_notran()
   {
-    query q(*perf_tran_);
+    slt3::query q(*perf_tran_);
     assert( q.execute("INSERT INTO perftest (i) VALUES(1);") == true );
     assert( q.last_insert_id() > 0 );
     assert( q.execute("DELETE FROM perftest WHERE i=1;") == true );
@@ -468,11 +469,12 @@ int main()
 
   UNLINK( "test2.db" );
   {
-    conn c;
+    slt3::conn c;
     perf_conn_ = &c;
     assert( c.open("test2.db") == true );
     {
-      tran t(c); query q(t);
+      slt3::tran t(c);
+      slt3::query q(t);
       assert( q.execute("CREATE TABLE perftest (i int, d real, s string, b blob);") == true );
     }
     csl_common_print_results( "ins_del_int        ", csl_common_test_timer_v0(ins_del_int),"" );
@@ -480,7 +482,7 @@ int main()
     csl_common_print_results( "ins_del_str        ", csl_common_test_timer_v0(ins_del_str),"" );
     csl_common_print_results( "ins_del_blob       ", csl_common_test_timer_v0(ins_del_blob),"" );
     {
-      tran t(c);
+      slt3::tran t(c);
       perf_tran_ = &t;
       csl_common_print_results( "insdel_int_notran  ", csl_common_test_timer_v0(insdel_int_notran),"" );
     }

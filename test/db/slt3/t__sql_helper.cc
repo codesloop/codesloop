@@ -31,6 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/common/test_timer.h"
 #include "codesloop/db/sql.hh"
 #include "codesloop/common/obj.hh"
+#include "codesloop/db/obj.hh"
 #include "codesloop/db/reg.hh"
 #include "codesloop/db/tran.hh"
 #include "codesloop/common/common.h"
@@ -38,7 +39,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <assert.h>
 #include <stdlib.h>
 
-using namespace csl::slt3;
+using namespace csl::db;
 
 /** @brief contains tests related to slt3::sql::helper */
 namespace test_sql_helper {
@@ -46,32 +47,32 @@ namespace test_sql_helper {
   /** @test baseline for comparison */
   void baseline()
   {
-    sql::helper h("xtable");
+    slt3::sql::helper h("xtable");
     (void)h.init_sql();
   }
 
   /** tester class for basic ORM functionality */
-  class X : public obj
+  class X : public slt3::obj
   {
     public:
       virtual ~X() {}
       X() : id_("id",*this,"PRIMARY KEY ASC AUTOINCREMENT"), name_("name",*this,"NOT NULL"),
         height_("height",*this,"DEFAULT (0.1)"), pk_("pk",*this) {}
 
-      virtual conn & db() { return reg_.db(); }
-      virtual sql::helper & sql_helper() const { return sql_helper_; }
+      virtual slt3::conn & db() { return reg_.db(); }
+      virtual slt3::sql::helper & sql_helper() const { return sql_helper_; }
 
-      static sql::helper  sql_helper_;
-      static reg::helper  reg_;
+      static slt3::sql::helper  sql_helper_;
+      static slt3::reg::helper  reg_;
 
-      intvar      id_;
-      strvar      name_;
-      doublevar   height_;
-      blobvar     pk_;
+      slt3::intvar      id_;
+      slt3::strvar      name_;
+      slt3::doublevar   height_;
+      slt3::blobvar     pk_;
   };
 
-  sql::helper X::sql_helper_("Xtable");
-  reg::helper X::reg_("test_mapper","test_mapper.db");
+  slt3::sql::helper X::sql_helper_("Xtable");
+  slt3::reg::helper X::reg_("test_mapper","test_mapper.db");
 
   /** @test calls init_sql() */
   void usage1()
@@ -85,9 +86,9 @@ namespace test_sql_helper {
   {
     X x,x2,x3;
 
-    conn & db(x.db());
+    slt3::conn & db(x.db());
     {
-      tran t(db);
+      slt3::tran t(db);
       x.init(t);
       assert( x.create(t) == true );
       x.height_ = 3.14;
@@ -120,9 +121,9 @@ namespace test_sql_helper {
   {
     X x;
 
-    conn & db(x.db());
+    slt3::conn & db(x.db());
     {
-      tran t(db);
+      slt3::tran t(db);
       t.rollback_on_destruct(true);
       t.commit_on_destruct(false);
       assert( x.create(t) == true );

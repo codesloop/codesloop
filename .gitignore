@@ -119,3 +119,10 @@ test/comm/t__rdbuf
 test/comm/t__read_res
 test/common/t__rdbuf
 test/common/t__read_res
+test/db/slt3/t__conn
+test/db/slt3/t__query
+test/db/slt3/t__reg
+test/db/slt3/t__sql_helper
+test/db/slt3/t__sqlite
+test/db/slt3/t__tran
+test/db/slt3/t__var

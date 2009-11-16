@@ -65,739 +65,742 @@ using csl::common::binry;
 
 namespace csl
 {
-  namespace slt3
+  namespace db
   {
-    namespace
+    namespace slt3
     {
-      struct auto_free
+      namespace
       {
-        void * p_;
-        auto_free(void * p) : p_(p) { }
-        ~auto_free()
+        struct auto_free
         {
-          if(p_) sqlite3_free(p_);
-          p_ = 0;
-        }
+          void * p_;
+          auto_free(void * p) : p_(p) { }
+          ~auto_free()
+          {
+            if(p_) sqlite3_free(p_);
+            p_ = 0;
+          }
+        };
       };
-    };
 
-    /* conn */
-    conn::impl::impl()
-      : db_(0), tran_id_(0), use_exc_(true) { }
+      /* conn */
+      conn::impl::impl()
+        : db_(0), tran_id_(0), use_exc_(true) { }
 
-    unsigned long long conn::impl::new_tran_id()
-    {
-      ++tran_id_;
-      return tran_id_;
-    }
-
-    long long conn::impl::last_insert_id()
-    {
-      long long ret = -1;
-      if( !db_ ) THR(exc::rs_notopened,-1);
+      unsigned long long conn::impl::new_tran_id()
       {
-        ret = sqlite3_last_insert_rowid(db_);
-        if( !ret ) ret = -1;
+        ++tran_id_;
+        return tran_id_;
       }
-      return ret;
-    }
 
-    long long conn::impl::change_count()
-    {
-      long long ret = -1;
-      if( !db_ ) THR(exc::rs_notopened,-1);
+      long long conn::impl::last_insert_id()
       {
-        ret = sqlite3_changes(db_);
-        if( !ret ) ret = -1;
-      }
-      return ret;
-    }
-
-    bool conn::impl::open(const char * db)
-    {
-      sqlite3 * td = 0;
-      int rc = 0;
-      if( !db ) { return false; }
-      else if( (rc=sqlite3_open( db, &td )) == SQLITE_OK )
-      {
-        name_ = db;
-        db_ = td;
-        sqlite3_busy_timeout(db_,10000);
-        return true;
-      }
-      else
-      {
-        THRE(create_exc,rc,L"Failed to open DB",false);
-      }
-    }
-
-    bool conn::impl::valid_db_ptr()
-    {
-      bool ret = false;
-      {
-        ret = (db_ == 0 ? false : true);
-      }
-      return ret;
-    }
-
-    bool conn::impl::close()
-    {
-      if( !db_ ) { return false; }
-      else       { sqlite3_busy_timeout(db_,1000); }
-      //
-      int rc = 0;
-      if( (rc=sqlite3_close(db_)) != SQLITE_OK )
-      {
-        db_ = 0;
-        name_.clear();
-        THRE(create_exc,rc,sqlite3_errmsg(db_),false);
-      }
-      else
-      {
-        db_ = 0;
-        name_.clear();
-        return true;
-      }
-    }
-
-    exc conn::impl::create_exc(int rc, const wchar_t * component, const char * s)
-    {
-      return create_exc(rc,component,str(s));
-    }
-
-    exc conn::impl::create_exc(int rc, const wchar_t * component, const wchar_t * s)
-    {
-      return create_exc(rc,component,str(s));
-    }
-
-    exc conn::impl::create_exc(int rc, const wchar_t * component, const str & s)
-    {
-      exc e(component);
-      if( s.size() > 0 ) e.text_ = s;
-      switch( rc )
-      {
-        case SQLITE_INTERNAL:   e.reason_ = exc::rs_internal;   break;
-        case SQLITE_PERM:       e.reason_ = exc::rs_permission; break;
-        case SQLITE_ABORT:      e.reason_ = exc::rs_abort;      break;
-        case SQLITE_BUSY:       e.reason_ = exc::rs_busy;       break;
-        case SQLITE_LOCKED:     e.reason_ = exc::rs_locked;     break;
-        case SQLITE_NOMEM:      e.reason_ = exc::rs_nomem;      break;
-        case SQLITE_READONLY:   e.reason_ = exc::rs_readonly;   break;
-        case SQLITE_IOERR:      e.reason_ = exc::rs_ioerr;      break;
-        case SQLITE_CORRUPT:    e.reason_ = exc::rs_corrupt;    break;
-        case SQLITE_NOTFOUND:   e.reason_ = exc::rs_notfound;   break;
-        case SQLITE_FULL:       e.reason_ = exc::rs_full;       break;
-        case SQLITE_CANTOPEN:   e.reason_ = exc::rs_cantopen;   break;
-        case SQLITE_PROTOCOL:   e.reason_ = exc::rs_protocol;   break;
-        case SQLITE_EMPTY:      e.reason_ = exc::rs_empty;      break;
-        case SQLITE_SCHEMA:     e.reason_ = exc::rs_schema;     break;
-        case SQLITE_TOOBIG:     e.reason_ = exc::rs_toobig;     break;
-        case SQLITE_CONSTRAINT: e.reason_ = exc::rs_constraint; break;
-        case SQLITE_MISMATCH:   e.reason_ = exc::rs_mismatch;   break;
-        case SQLITE_MISUSE:     e.reason_ = exc::rs_misuse;     break;
-        case SQLITE_AUTH:       e.reason_ = exc::rs_auth;       break;
-        case SQLITE_FORMAT:     e.reason_ = exc::rs_format;     break;
-        case SQLITE_RANGE:      e.reason_ = exc::rs_range;      break;
-        case SQLITE_NOTADB:     e.reason_ = exc::rs_notadb;     break;
-        default:                e.reason_ = exc::rs_unknown;    break;
-      };
-      return e;
-    }
-
-    bool conn::impl::exec_noret(const char * sql)
-    {
-      char * zErr = 0;
-      if( !db_ ) THR(exc::rs_notopened,false);
-      if( !sql ) THR(exc::rs_nullparam,false);
-
-      int rc = sqlite3_exec( db_, sql, NULL, NULL, &zErr );
-
-      if( rc == SQLITE_OK || rc == SQLITE_ROW || rc == SQLITE_DONE )
-      {
-        ; // OK
-      }
-      else
-      {
-        str s;
-        if( zErr ) { s = zErr; sqlite3_free( zErr ); }
-        THRE(create_exc,rc,s.c_str(),false);
-      }
-      return true;
-    }
-
-    bool conn::impl::exec(const char * sql,common::ustr & res)
-    {
-      char * zErr = 0;
-      if( !db_ ) THR(exc::rs_notopened,false);
-      if( !sql ) THR(exc::rs_nullparam,false);
-
-      char    **   rset = NULL;
-      int          nrow = 0;
-      int          ncol = 0;
-
-      int rc = sqlite3_get_table( db_,
-                                  sql,
-                                  &rset,
-                                  &nrow,
-                                  &ncol,
-                                  &zErr );
-
-
-      if( rc == SQLITE_OK || rc == SQLITE_ROW || rc == SQLITE_DONE )
-      {
-        if( ncol > 0 && nrow > 0 && rset[ncol] )
+        long long ret = -1;
+        if( !db_ ) THR(exc::rs_notopened,-1);
         {
-          res = rset[ncol];
+          ret = sqlite3_last_insert_rowid(db_);
+          if( !ret ) ret = -1;
         }
-      }
-      else
-      {
-        if( rset ) sqlite3_free_table( rset );
-        rset = 0;
-        str s;
-        if( zErr ) { s = zErr; sqlite3_free( zErr ); }
-        THRE(create_exc,rc,s.c_str(),false);
+        return ret;
       }
 
-      if( rset ) sqlite3_free_table( rset );
-      return true;
-    }
-
-    conn::impl::~impl()
-    {
-      close();
-    }
-
-    /* tran */
-    tran::impl::impl(conn::impl_t & c)
-      : cn_(&(*c)), tr_(0), tran_id_(cn_->new_tran_id()),
-               do_rollback_(false), do_commit_(true), use_exc_(c->use_exc_),
-                            started_(false) { }
-
-    tran::impl::impl(tran::impl_t & t)
-      : cn_(t->cn_), tr_(&(*t)), tran_id_(t->cn_->new_tran_id()),
-            do_rollback_(false), do_commit_(true), use_exc_(t->use_exc_),
-                         started_(false) { }
-
-    void tran::impl::start()
-    {
-      if( !started_ )
+      long long conn::impl::change_count()
       {
-        if( tr_ )
+        long long ret = -1;
+        if( !db_ ) THR(exc::rs_notopened,-1);
         {
-          char * sql = sqlite3_mprintf("SAVEPOINT SP%lld;",tran_id_);
-          auto_free fr(sql);
-          cn_->exec_noret(sql);
+          ret = sqlite3_changes(db_);
+          if( !ret ) ret = -1;
+        }
+        return ret;
+      }
+
+      bool conn::impl::open(const char * db)
+      {
+        sqlite3 * td = 0;
+        int rc = 0;
+        if( !db ) { return false; }
+        else if( (rc=sqlite3_open( db, &td )) == SQLITE_OK )
+        {
+          name_ = db;
+          db_ = td;
+          sqlite3_busy_timeout(db_,10000);
+          return true;
         }
         else
         {
-          cn_->exec_noret("BEGIN DEFERRED TRANSACTION;");
+          THRE(create_exc,rc,L"Failed to open DB",false);
         }
-        started_ = true;
       }
-    }
 
-    tran::impl::~impl()
-    {
-      try
+      bool conn::impl::valid_db_ptr()
+      {
+        bool ret = false;
+        {
+          ret = (db_ == 0 ? false : true);
+        }
+        return ret;
+      }
+
+      bool conn::impl::close()
+      {
+        if( !db_ ) { return false; }
+        else       { sqlite3_busy_timeout(db_,1000); }
+        //
+        int rc = 0;
+        if( (rc=sqlite3_close(db_)) != SQLITE_OK )
+        {
+          db_ = 0;
+          name_.clear();
+          THRE(create_exc,rc,sqlite3_errmsg(db_),false);
+        }
+        else
+        {
+          db_ = 0;
+          name_.clear();
+          return true;
+        }
+      }
+
+      exc conn::impl::create_exc(int rc, const wchar_t * component, const char * s)
+      {
+        return create_exc(rc,component,str(s));
+      }
+
+      exc conn::impl::create_exc(int rc, const wchar_t * component, const wchar_t * s)
+      {
+        return create_exc(rc,component,str(s));
+      }
+
+      exc conn::impl::create_exc(int rc, const wchar_t * component, const str & s)
+      {
+        exc e(component);
+        if( s.size() > 0 ) e.text_ = s;
+        switch( rc )
+        {
+          case SQLITE_INTERNAL:   e.reason_ = exc::rs_internal;   break;
+          case SQLITE_PERM:       e.reason_ = exc::rs_permission; break;
+          case SQLITE_ABORT:      e.reason_ = exc::rs_abort;      break;
+          case SQLITE_BUSY:       e.reason_ = exc::rs_busy;       break;
+          case SQLITE_LOCKED:     e.reason_ = exc::rs_locked;     break;
+          case SQLITE_NOMEM:      e.reason_ = exc::rs_nomem;      break;
+          case SQLITE_READONLY:   e.reason_ = exc::rs_readonly;   break;
+          case SQLITE_IOERR:      e.reason_ = exc::rs_ioerr;      break;
+          case SQLITE_CORRUPT:    e.reason_ = exc::rs_corrupt;    break;
+          case SQLITE_NOTFOUND:   e.reason_ = exc::rs_notfound;   break;
+          case SQLITE_FULL:       e.reason_ = exc::rs_full;       break;
+          case SQLITE_CANTOPEN:   e.reason_ = exc::rs_cantopen;   break;
+          case SQLITE_PROTOCOL:   e.reason_ = exc::rs_protocol;   break;
+          case SQLITE_EMPTY:      e.reason_ = exc::rs_empty;      break;
+          case SQLITE_SCHEMA:     e.reason_ = exc::rs_schema;     break;
+          case SQLITE_TOOBIG:     e.reason_ = exc::rs_toobig;     break;
+          case SQLITE_CONSTRAINT: e.reason_ = exc::rs_constraint; break;
+          case SQLITE_MISMATCH:   e.reason_ = exc::rs_mismatch;   break;
+          case SQLITE_MISUSE:     e.reason_ = exc::rs_misuse;     break;
+          case SQLITE_AUTH:       e.reason_ = exc::rs_auth;       break;
+          case SQLITE_FORMAT:     e.reason_ = exc::rs_format;     break;
+          case SQLITE_RANGE:      e.reason_ = exc::rs_range;      break;
+          case SQLITE_NOTADB:     e.reason_ = exc::rs_notadb;     break;
+          default:                e.reason_ = exc::rs_unknown;    break;
+        };
+        return e;
+      }
+
+      bool conn::impl::exec_noret(const char * sql)
+      {
+        char * zErr = 0;
+        if( !db_ ) THR(exc::rs_notopened,false);
+        if( !sql ) THR(exc::rs_nullparam,false);
+
+        int rc = sqlite3_exec( db_, sql, NULL, NULL, &zErr );
+
+        if( rc == SQLITE_OK || rc == SQLITE_ROW || rc == SQLITE_DONE )
+        {
+          ; // OK
+        }
+        else
+        {
+          str s;
+          if( zErr ) { s = zErr; sqlite3_free( zErr ); }
+          THRE(create_exc,rc,s.c_str(),false);
+        }
+        return true;
+      }
+
+      bool conn::impl::exec(const char * sql,common::ustr & res)
+      {
+        char * zErr = 0;
+        if( !db_ ) THR(exc::rs_notopened,false);
+        if( !sql ) THR(exc::rs_nullparam,false);
+
+        char    **   rset = NULL;
+        int          nrow = 0;
+        int          ncol = 0;
+
+        int rc = sqlite3_get_table( db_,
+                                    sql,
+                                    &rset,
+                                    &nrow,
+                                    &ncol,
+                                    &zErr );
+
+
+        if( rc == SQLITE_OK || rc == SQLITE_ROW || rc == SQLITE_DONE )
+        {
+          if( ncol > 0 && nrow > 0 && rset[ncol] )
+          {
+            res = rset[ncol];
+          }
+        }
+        else
+        {
+          if( rset ) sqlite3_free_table( rset );
+          rset = 0;
+          str s;
+          if( zErr ) { s = zErr; sqlite3_free( zErr ); }
+          THRE(create_exc,rc,s.c_str(),false);
+        }
+
+        if( rset ) sqlite3_free_table( rset );
+        return true;
+      }
+
+      conn::impl::~impl()
+      {
+        close();
+      }
+
+      /* tran */
+      tran::impl::impl(conn::impl_t & c)
+        : cn_(&(*c)), tr_(0), tran_id_(cn_->new_tran_id()),
+                 do_rollback_(false), do_commit_(true), use_exc_(c->use_exc_),
+                              started_(false) { }
+
+      tran::impl::impl(tran::impl_t & t)
+        : cn_(t->cn_), tr_(&(*t)), tran_id_(t->cn_->new_tran_id()),
+              do_rollback_(false), do_commit_(true), use_exc_(t->use_exc_),
+                           started_(false) { }
+
+      void tran::impl::start()
+      {
+        if( !started_ )
+        {
+          if( tr_ )
+          {
+            char * sql = sqlite3_mprintf("SAVEPOINT SP%lld;",tran_id_);
+            auto_free fr(sql);
+            cn_->exec_noret(sql);
+          }
+          else
+          {
+            cn_->exec_noret("BEGIN DEFERRED TRANSACTION;");
+          }
+          started_ = true;
+        }
+      }
+
+      tran::impl::~impl()
+      {
+        try
+        {
+          if( !started_ ) { }
+          else if( do_rollback_ )
+          {
+            rollback();
+          }
+          else if( do_commit_ )
+          {
+            commit();
+          }
+        }
+        catch(db::exc e)
+        {
+          // catch all
+        }
+      }
+
+      void tran::impl::commit_on_destruct(bool yesno)
+      {
+        do_commit_ = yesno;
+      }
+
+      void tran::impl::rollback_on_destruct(bool yesno)
+      {
+        do_rollback_ = yesno;
+      }
+
+      void tran::impl::commit()
       {
         if( !started_ ) { }
-        else if( do_rollback_ )
+        else if( cn_->valid_db_ptr() == false ) { THRNORET(exc::rs_notopened); return; }
+        else if( tr_ )
         {
-          rollback();
+          char * sql = sqlite3_mprintf("RELEASE SAVEPOINT SP%lld;",tran_id_);
+          auto_free fr(sql);
+          cn_->exec_noret(sql);
+          started_ = false;
         }
-        else if( do_commit_ )
+        else
         {
-          commit();
+          cn_->exec_noret("COMMIT TRANSACTION;");
+          started_ = false;
         }
       }
-      catch(slt3::exc e)
+
+      void tran::impl::rollback()
       {
-        // catch all
-      }
-    }
-
-    void tran::impl::commit_on_destruct(bool yesno)
-    {
-      do_commit_ = yesno;
-    }
-
-    void tran::impl::rollback_on_destruct(bool yesno)
-    {
-      do_rollback_ = yesno;
-    }
-
-    void tran::impl::commit()
-    {
-      if( !started_ ) { }
-      else if( cn_->valid_db_ptr() == false ) { THRNORET(exc::rs_notopened); return; }
-      else if( tr_ )
-      {
-        char * sql = sqlite3_mprintf("RELEASE SAVEPOINT SP%lld;",tran_id_);
-        auto_free fr(sql);
-        cn_->exec_noret(sql);
-        started_ = false;
-      }
-      else
-      {
-        cn_->exec_noret("COMMIT TRANSACTION;");
-        started_ = false;
-      }
-    }
-
-    void tran::impl::rollback()
-    {
-      if( !started_ ) { }
-      else if( cn_->valid_db_ptr() == false ) { THRNORET(exc::rs_notopened); return; }
-      else if( tr_ )
-      {
-        char * sql = sqlite3_mprintf("ROLLBACK TRANSACTION TO SAVEPOINT SP%lld;",tran_id_);
-        auto_free fr(sql);
-        cn_->exec_noret(sql);
-        started_ = false;
-      }
-      else
-      {
-        cn_->exec_noret("ROLLBACK TRANSACTION;");
-        started_ = false;
-      }
-    }
-
-    /* query */
-    query::impl::impl(tran::impl_t & t)
-      : tran_(&(*t)), stmt_(0), tail_(0), 
-                 use_exc_(t->use_exc_), autoreset_data_(true),
-                          last_insert_id_(-1), change_count_(-1)
-    {
-    }
-
-    query::impl::~impl()
-    {
-      finalize();
-    }
-
-    void query::impl::finalize()
-    {
-      if( stmt_ )
-      {
-        sqlite3_finalize(stmt_);
-        stmt_ = 0;
-      }
-    }
-
-    void query::impl::debug()
-    {
-      printf("== query::impl::debug ==\n");
-      printf("== ////// column_pool_ ==\n");
-      column_pool_.debug();
-      printf("== /////// field_pool_ ==\n");
-      field_pool_.debug();
-      printf("== /////////// params_ ==\n");
-      params_.debug();
-
-      parampool_t::iterator it(params_.begin());
-      parampool_t::iterator end(params_.end());
-
-      for( ;it!=end;++it )
-      {
-        printf("--");
-        // TODO var * p = (*it);
-        // TODO if( p ) { p->debug(); }
-        // TODO else    { printf("Param is null\n"); }
-      }
-    }
-    
-    void query::impl::clear_params()
-    {
-      params_.free_all();
-      param_pool_.free_all();
-    }
-
-    // stepwise query
-    bool query::impl::prepare(const char * sql)
-    {
-      if( !sql )               THR(exc::rs_nullparam,false);
-      if( !tran_ )             THR(exc::rs_nulltran,false);
-      if( !(tran_->cn_) )      THR(exc::rs_nullconn,false);
-      if( !(tran_->cn_->db_) ) THR(exc::rs_nulldb,false);
-
-      finalize();
-      tran_->start();
-
-      if( autoreset_data_ )
-      {
-        column_pool_.free_all();
-        field_pool_.free_all();
-        data_pool_.free_all();
-        coldata_pool_.free_all();
+        if( !started_ ) { }
+        else if( cn_->valid_db_ptr() == false ) { THRNORET(exc::rs_notopened); return; }
+        else if( tr_ )
+        {
+          char * sql = sqlite3_mprintf("ROLLBACK TRANSACTION TO SAVEPOINT SP%lld;",tran_id_);
+          auto_free fr(sql);
+          cn_->exec_noret(sql);
+          started_ = false;
+        }
+        else
+        {
+          cn_->exec_noret("ROLLBACK TRANSACTION;");
+          started_ = false;
+        }
       }
 
-      int rc = 0;
-
-      rc = sqlite3_prepare(tran_->cn_->db_, sql, strlen(sql), &stmt_, &tail_);
-
-      if(rc != SQLITE_OK)
+      /* query */
+      query::impl::impl(tran::impl_t & t)
+        : tran_(&(*t)), stmt_(0), tail_(0),
+                   use_exc_(t->use_exc_), autoreset_data_(true),
+                            last_insert_id_(-1), change_count_(-1)
       {
-        str s(sqlite3_errmsg(tran_->cn_->db_));
-        THRE(conn::impl::create_exc,rc,s.c_str(),false);
-      }
-      //
-      return true;
-    }
-
-    bool query::impl::reset()
-    {
-      if( !stmt_ )        THR(exc::rs_nullstmnt,false);
-      if( !tran_ )        THR(exc::rs_nulltran,false);
-      if( !(tran_->cn_) ) THR(exc::rs_nullconn,false);
-
-      int rc = 0;
-
-      rc = sqlite3_reset(stmt_);
-
-      if( rc != SQLITE_OK )
-      {
-        str s(sqlite3_errmsg(tran_->cn_->db_));
-        THRE(conn::impl::create_exc,rc,s.c_str(),false);
       }
 
-      return true;
-    }
-
-    void query::impl::reset_data()
-    {
-      field_pool_.free_all();
-      data_pool_.free_all();
-    }
-
-    bool query::impl::next(columns_t & cols, fields_t & fields)
-    {
-      if( !stmt_ )        THR(exc::rs_nullstmnt,false);
-      if( !tran_ )        THR(exc::rs_nulltran,false);
-      if( !(tran_->cn_) ) THR(exc::rs_nullconn,false);
-
-      parampool_t::iterator it(params_.begin());
-      parampool_t::iterator end(params_.end());
-      unsigned int which = 0;
-
-      if( autoreset_data_ ) reset_data();
-
-      // bind params
+      query::impl::~impl()
       {
+        finalize();
+      }
+
+      void query::impl::finalize()
+      {
+        if( stmt_ )
+        {
+          sqlite3_finalize(stmt_);
+          stmt_ = 0;
+        }
+      }
+
+      void query::impl::debug()
+      {
+        printf("== query::impl::debug ==\n");
+        printf("== ////// column_pool_ ==\n");
+        column_pool_.debug();
+        printf("== /////// field_pool_ ==\n");
+        field_pool_.debug();
+        printf("== /////////// params_ ==\n");
+        params_.debug();
+
+        parampool_t::iterator it(params_.begin());
+        parampool_t::iterator end(params_.end());
+
         for( ;it!=end;++it )
         {
-          common::var * p = *it;
-          if( p && which > 0 )
+          printf("--");
+          // TODO var * p = (*it);
+          // TODO if( p ) { p->debug(); }
+          // TODO else    { printf("Param is null\n"); }
+        }
+      }
+
+      void query::impl::clear_params()
+      {
+        params_.free_all();
+        param_pool_.free_all();
+      }
+
+      // stepwise query
+      bool query::impl::prepare(const char * sql)
+      {
+        if( !sql )               THR(exc::rs_nullparam,false);
+        if( !tran_ )             THR(exc::rs_nulltran,false);
+        if( !(tran_->cn_) )      THR(exc::rs_nullconn,false);
+        if( !(tran_->cn_->db_) ) THR(exc::rs_nulldb,false);
+
+        finalize();
+        tran_->start();
+
+        if( autoreset_data_ )
+        {
+          column_pool_.free_all();
+          field_pool_.free_all();
+          data_pool_.free_all();
+          coldata_pool_.free_all();
+        }
+
+        int rc = 0;
+
+        rc = sqlite3_prepare(tran_->cn_->db_, sql, strlen(sql), &stmt_, &tail_);
+
+        if(rc != SQLITE_OK)
+        {
+          str s(sqlite3_errmsg(tran_->cn_->db_));
+          THRE(conn::impl::create_exc,rc,s.c_str(),false);
+        }
+        //
+        return true;
+      }
+
+      bool query::impl::reset()
+      {
+        if( !stmt_ )        THR(exc::rs_nullstmnt,false);
+        if( !tran_ )        THR(exc::rs_nulltran,false);
+        if( !(tran_->cn_) ) THR(exc::rs_nullconn,false);
+
+        int rc = 0;
+
+        rc = sqlite3_reset(stmt_);
+
+        if( rc != SQLITE_OK )
+        {
+          str s(sqlite3_errmsg(tran_->cn_->db_));
+          THRE(conn::impl::create_exc,rc,s.c_str(),false);
+        }
+
+        return true;
+      }
+
+      void query::impl::reset_data()
+      {
+        field_pool_.free_all();
+        data_pool_.free_all();
+      }
+
+      bool query::impl::next(columns_t & cols, fields_t & fields)
+      {
+        if( !stmt_ )        THR(exc::rs_nullstmnt,false);
+        if( !tran_ )        THR(exc::rs_nulltran,false);
+        if( !(tran_->cn_) ) THR(exc::rs_nullconn,false);
+
+        parampool_t::iterator it(params_.begin());
+        parampool_t::iterator end(params_.end());
+        unsigned int which = 0;
+
+        if( autoreset_data_ ) reset_data();
+
+        // bind params
+        {
+          for( ;it!=end;++it )
           {
-            int t = p->var_type();
-            switch( t )
+            common::var * p = *it;
+            if( p && which > 0 )
+            {
+              int t = p->var_type();
+              switch( t )
+              {
+                case query::colhead::t_integer:
+                  sqlite3_bind_int64( stmt_, which, p->get_long() );
+                  break;
+
+                case query::colhead::t_double:
+                  sqlite3_bind_double( stmt_, which, p->get_double() );
+                  break;
+
+                case query::colhead::t_string:
+                  /* assume string always has a trailing zero */
+                  sqlite3_bind_text( stmt_, which, p->charp_data(), (p->var_size()-1), SQLITE_TRANSIENT );
+                  break;
+
+                case query::colhead::t_blob:
+                  sqlite3_bind_blob( stmt_, which, (p->charp_data()), (p->var_size()), SQLITE_TRANSIENT );
+                  break;
+
+                case query::colhead::t_null:
+                default:
+                  break;
+              };
+            }
+            ++which;
+          }
+        }
+
+        // step query
+        int rc = 0;
+
+        rc = sqlite3_step( stmt_ );
+
+        if( rc == SQLITE_ROW )
+        {
+          fill_columns();
+          if( cols.n_items() == 0 ) copy_columns( cols );
+
+          columnpool_t::iterator i( column_pool_.begin() );
+          columnpool_t::iterator e( column_pool_.end() );
+
+          fields.free_all();
+
+          unsigned int ac=0;
+          for( ;i!=e;++i )
+          {
+            query::field * f = 0;
+            switch( (*i)->type_ )
             {
               case query::colhead::t_integer:
-                sqlite3_bind_int64( stmt_, which, p->get_long() );
+                f = new common::int64(sqlite3_column_int64(stmt_,ac));
                 break;
 
               case query::colhead::t_double:
-                sqlite3_bind_double( stmt_, which, p->get_double() );
-                break;
-
-              case query::colhead::t_string:
-                /* assume string always has a trailing zero */
-                sqlite3_bind_text( stmt_, which, p->charp_data(), (p->var_size()-1), SQLITE_TRANSIENT );
+                f = new common::dbl(sqlite3_column_double(stmt_,ac));
                 break;
 
               case query::colhead::t_blob:
-                sqlite3_bind_blob( stmt_, which, (p->charp_data()), (p->var_size()), SQLITE_TRANSIENT );
+                f = new common::binry();
+                f->from_binary( sqlite3_column_blob(stmt_,ac), sqlite3_column_bytes(stmt_,ac) );
+                break;
+
+              case query::colhead::t_string:
+                f = new common::ustr( reinterpret_cast<const char *>(sqlite3_column_text(stmt_,ac)) );
                 break;
 
               case query::colhead::t_null:
               default:
+                //f = new common::ustr();
+                f = 0;
                 break;
             };
+            field_pool_.push_back(f);
+            fields.push_back(f);
+            ++ac;
           }
-          ++which;
         }
-      }
-
-      // step query
-      int rc = 0;
-
-      rc = sqlite3_step( stmt_ );
-
-      if( rc == SQLITE_ROW )
-      {
-        fill_columns();
-        if( cols.n_items() == 0 ) copy_columns( cols );
-
-        columnpool_t::iterator i( column_pool_.begin() );
-        columnpool_t::iterator e( column_pool_.end() );
-
-        fields.free_all();
-
-        unsigned int ac=0;
-        for( ;i!=e;++i )
+        else if( rc == SQLITE_OK )
         {
-          query::field * f = 0;
-          switch( (*i)->type_ )
-          {
-            case query::colhead::t_integer:
-              f = new common::int64(sqlite3_column_int64(stmt_,ac));
-              break;
-
-            case query::colhead::t_double:
-              f = new common::dbl(sqlite3_column_double(stmt_,ac));
-              break;
-
-            case query::colhead::t_blob:
-              f = new common::binry();
-              f->from_binary( sqlite3_column_blob(stmt_,ac), sqlite3_column_bytes(stmt_,ac) );
-              break;
-
-            case query::colhead::t_string:
-              f = new common::ustr( reinterpret_cast<const char *>(sqlite3_column_text(stmt_,ac)) );
-              break;
-
-            case query::colhead::t_null:
-            default:
-              //f = new common::ustr();
-              f = 0;
-              break;
-          };
-          field_pool_.push_back(f);
-          fields.push_back(f);
-          ++ac;
+          last_insert_id_ = tran_->cn_->last_insert_id();
+          change_count_ = tran_->cn_->change_count();
+          return true;
         }
-      }
-      else if( rc == SQLITE_OK )
-      {
-        last_insert_id_ = tran_->cn_->last_insert_id();
-        change_count_ = tran_->cn_->change_count();
+        else if( rc == SQLITE_DONE )
+        {
+          last_insert_id_ = tran_->cn_->last_insert_id();
+          change_count_ = tran_->cn_->change_count();
+          return false;
+        }
+        else
+        {
+          str s(sqlite3_errmsg(tran_->cn_->db_));
+          THRE(conn::impl::create_exc,rc,s.c_str(),false);
+        }
+
         return true;
       }
-      else if( rc == SQLITE_DONE )
+
+      bool query::impl::next()
       {
-        last_insert_id_ = tran_->cn_->last_insert_id();
-        change_count_ = tran_->cn_->change_count();
-        return false;
-      }
-      else
-      {
-        str s(sqlite3_errmsg(tran_->cn_->db_));
-        THRE(conn::impl::create_exc,rc,s.c_str(),false);
-      }
+        if( !stmt_ )         THR(exc::rs_nullstmnt,false);
+        if( !tran_ )         THR(exc::rs_nulltran,false);
+        if( !(tran_->cn_) )  THR(exc::rs_nullconn,false);
 
-      return true;
-    }
+        parampool_t::iterator it(params_.begin());
+        parampool_t::iterator end(params_.end());
+        unsigned int which = 0;
 
-    bool query::impl::next()
-    {
-      if( !stmt_ )         THR(exc::rs_nullstmnt,false);
-      if( !tran_ )         THR(exc::rs_nulltran,false);
-      if( !(tran_->cn_) )  THR(exc::rs_nullconn,false);
-
-      parampool_t::iterator it(params_.begin());
-      parampool_t::iterator end(params_.end());
-      unsigned int which = 0;
-
-      if( autoreset_data_ )
-      {
-        column_pool_.free_all();
-        field_pool_.free_all();
-        data_pool_.free_all();
-        coldata_pool_.free_all();
-      }
-
-      // bind params
-      {
-        for( ;it!=end;++it )
+        if( autoreset_data_ )
         {
-          common::var * p = *it;
-          if( p && which > 0 )
+          column_pool_.free_all();
+          field_pool_.free_all();
+          data_pool_.free_all();
+          coldata_pool_.free_all();
+        }
+
+        // bind params
+        {
+          for( ;it!=end;++it )
           {
-            int t = p->var_type();
-            switch( t )
+            common::var * p = *it;
+            if( p && which > 0 )
             {
-              case query::colhead::t_integer:
-                sqlite3_bind_int64( stmt_, which, p->get_long() );
-                break;
+              int t = p->var_type();
+              switch( t )
+              {
+                case query::colhead::t_integer:
+                  sqlite3_bind_int64( stmt_, which, p->get_long() );
+                  break;
 
-              case query::colhead::t_double:
-                sqlite3_bind_double( stmt_, which, p->get_double() );
-                break;
+                case query::colhead::t_double:
+                  sqlite3_bind_double( stmt_, which, p->get_double() );
+                  break;
 
-              case query::colhead::t_string:
-                /* assume string always has a trailing zero */
-                sqlite3_bind_text( stmt_, which, (p->charp_data()), (p->var_size()-1), SQLITE_TRANSIENT );
-                break;
+                case query::colhead::t_string:
+                  /* assume string always has a trailing zero */
+                  sqlite3_bind_text( stmt_, which, (p->charp_data()), (p->var_size()-1), SQLITE_TRANSIENT );
+                  break;
 
-              case query::colhead::t_blob:
-                sqlite3_bind_blob( stmt_, which, (p->charp_data()), (p->var_size()), SQLITE_TRANSIENT );
-                break;
+                case query::colhead::t_blob:
+                  sqlite3_bind_blob( stmt_, which, (p->charp_data()), (p->var_size()), SQLITE_TRANSIENT );
+                  break;
 
-              case query::colhead::t_null:
-              default:
-                break;
-            };
+                case query::colhead::t_null:
+                default:
+                  break;
+              };
+            }
+            ++which;
           }
-          ++which;
         }
-      }
 
-      // step query
-      int rc = 0;
+        // step query
+        int rc = 0;
 
-      rc = sqlite3_step( stmt_ );
+        rc = sqlite3_step( stmt_ );
 
-      if( rc == SQLITE_ROW )
-      {
+        if( rc == SQLITE_ROW )
+        {
+          return true;
+        }
+        else if( rc == SQLITE_OK  )
+        {
+          last_insert_id_ = tran_->cn_->last_insert_id();
+          change_count_ = tran_->cn_->change_count();
+          return true;
+        }
+        else if( rc == SQLITE_DONE )
+        {
+          last_insert_id_ = tran_->cn_->last_insert_id();
+          change_count_ = tran_->cn_->change_count();
+          return false;
+        }
+        else
+        {
+          str s(sqlite3_errmsg(tran_->cn_->db_));
+          THRE(conn::impl::create_exc,rc,s.c_str(),false);
+        }
+
         return true;
       }
-      else if( rc == SQLITE_OK  )
+
+      long long query::impl::last_insert_id()
       {
-        last_insert_id_ = tran_->cn_->last_insert_id();
-        change_count_ = tran_->cn_->change_count();
-        return true;
-      }
-      else if( rc == SQLITE_DONE )
-      {
-        last_insert_id_ = tran_->cn_->last_insert_id();
-        change_count_ = tran_->cn_->change_count();
-        return false;
-      }
-      else
-      {
-        str s(sqlite3_errmsg(tran_->cn_->db_));
-        THRE(conn::impl::create_exc,rc,s.c_str(),false);
+        return last_insert_id_;
       }
 
-      return true;
-    }
-
-    long long query::impl::last_insert_id()
-    {
-      return last_insert_id_;
-    }
-
-    long long query::impl::change_count()
-    {
-      return change_count_;
-    }
-
-    // oneshot query
-    bool query::impl::execute(const char * sql)
-    {
-      if( !sql )          THR(exc::rs_nullparam,false);
-      if( !tran_ )        THR(exc::rs_nulltran,false);
-      if( !(tran_->cn_) ) THR(exc::rs_nullconn,false);
-
-      finalize();
-      tran_->start();
-
-      if( autoreset_data_ )
+      long long query::impl::change_count()
       {
-        column_pool_.free_all();
-        field_pool_.free_all();
-        data_pool_.free_all();
-        coldata_pool_.free_all();
+        return change_count_;
       }
 
-      bool ret = tran_->cn_->exec_noret(sql);
-      if( ret )
+      // oneshot query
+      bool query::impl::execute(const char * sql)
       {
-        last_insert_id_ = tran_->cn_->last_insert_id();
-        change_count_ = tran_->cn_->change_count();
-      }
-      return ret;
-    }
+        if( !sql )          THR(exc::rs_nullparam,false);
+        if( !tran_ )        THR(exc::rs_nulltran,false);
+        if( !(tran_->cn_) ) THR(exc::rs_nullconn,false);
 
-    bool query::impl::execute(const char * sql, ustr & result)
-    {
-      if( !sql )          THR(exc::rs_nullparam,false);
-      if( !tran_ )        THR(exc::rs_nulltran,false);
-      if( !(tran_->cn_) ) THR(exc::rs_nullconn,false);
+        finalize();
+        tran_->start();
 
-      finalize();
-      tran_->start();
-
-      if( autoreset_data_ )
-      {
-        column_pool_.free_all();
-        field_pool_.free_all();
-        data_pool_.free_all();
-        coldata_pool_.free_all();
-      }
-
-      bool ret = tran_->cn_->exec(sql,result);
-      if( ret )
-      {
-        last_insert_id_ = tran_->cn_->last_insert_id();
-        change_count_ = tran_->cn_->change_count();
-      }
-
-      return ret;
-    }
-
-    void query::impl::copy_columns(columns_t & cols)
-    {
-      if( column_pool_.n_items() > 0 && cols.n_items() == 0 )
-      {
-        columnpool_t::iterator it(column_pool_.begin());
-        columnpool_t::iterator end(column_pool_.end());
-        for( ;it!=end;++it )
+        if( autoreset_data_ )
         {
-          cols.push_back( *it );
+          column_pool_.free_all();
+          field_pool_.free_all();
+          data_pool_.free_all();
+          coldata_pool_.free_all();
         }
-      }
-    }
 
-    bool query::impl::fill_columns()
-    {
-      if( !stmt_ ) return false;
-
-      if( column_pool_.n_items() == 0 )
-      {
-        int ncols = sqlite3_column_count(stmt_);
-        if( ncols > 0 )
+        bool ret = tran_->cn_->exec_noret(sql);
+        if( ret )
         {
-          for(int i=0;i<ncols;++i )
+          last_insert_id_ = tran_->cn_->last_insert_id();
+          change_count_ = tran_->cn_->change_count();
+        }
+        return ret;
+      }
+
+      bool query::impl::execute(const char * sql, ustr & result)
+      {
+        if( !sql )          THR(exc::rs_nullparam,false);
+        if( !tran_ )        THR(exc::rs_nulltran,false);
+        if( !(tran_->cn_) ) THR(exc::rs_nullconn,false);
+
+        finalize();
+        tran_->start();
+
+        if( autoreset_data_ )
+        {
+          column_pool_.free_all();
+          field_pool_.free_all();
+          data_pool_.free_all();
+          coldata_pool_.free_all();
+        }
+
+        bool ret = tran_->cn_->exec(sql,result);
+        if( ret )
+        {
+          last_insert_id_ = tran_->cn_->last_insert_id();
+          change_count_ = tran_->cn_->change_count();
+        }
+
+        return ret;
+      }
+
+      void query::impl::copy_columns(columns_t & cols)
+      {
+        if( column_pool_.n_items() > 0 && cols.n_items() == 0 )
+        {
+          columnpool_t::iterator it(column_pool_.begin());
+          columnpool_t::iterator end(column_pool_.end());
+          for( ;it!=end;++it )
           {
-            query::colhead * h = new query::colhead();
-            //
-            switch( sqlite3_column_type(stmt_,i) )
-            {
-              case SQLITE_INTEGER:
-                h->type_ = query::colhead::t_integer;
-                break;
-
-              case SQLITE_FLOAT:
-                h->type_ = query::colhead::t_double;
-                break;
-
-              case SQLITE_NULL:
-                h->type_ = query::colhead::t_null;
-                break;
-
-              case SQLITE_TEXT:
-                h->type_ = query::colhead::t_string;
-                break;
-
-              case SQLITE_BLOB:
-              default:
-                h->type_ = query::colhead::t_blob;
-                break;
-            };
-            //
-            h->name_   = coldata_pool_.strdup( reinterpret_cast<const char *>(sqlite3_column_name(stmt_,i)) );
-            h->table_  = coldata_pool_.strdup( reinterpret_cast<const char *>(sqlite3_column_table_name(stmt_,i)) );
-            h->db_     = coldata_pool_.strdup( reinterpret_cast<const char *>(sqlite3_column_database_name(stmt_,i)) );
-            h->origin_ = coldata_pool_.strdup( reinterpret_cast<const char *>(sqlite3_column_origin_name(stmt_,i)) );
-            column_pool_.push_back(h);
+            cols.push_back( *it );
           }
         }
       }
-      return (column_pool_.n_items() > 0 ? true : false);
-    }
 
-  } /* end of slt3 namespace */
+      bool query::impl::fill_columns()
+      {
+        if( !stmt_ ) return false;
+
+        if( column_pool_.n_items() == 0 )
+        {
+          int ncols = sqlite3_column_count(stmt_);
+          if( ncols > 0 )
+          {
+            for(int i=0;i<ncols;++i )
+            {
+              query::colhead * h = new query::colhead();
+              //
+              switch( sqlite3_column_type(stmt_,i) )
+              {
+                case SQLITE_INTEGER:
+                  h->type_ = query::colhead::t_integer;
+                  break;
+
+                case SQLITE_FLOAT:
+                  h->type_ = query::colhead::t_double;
+                  break;
+
+                case SQLITE_NULL:
+                  h->type_ = query::colhead::t_null;
+                  break;
+
+                case SQLITE_TEXT:
+                  h->type_ = query::colhead::t_string;
+                  break;
+
+                case SQLITE_BLOB:
+                default:
+                  h->type_ = query::colhead::t_blob;
+                  break;
+              };
+              //
+              h->name_   = coldata_pool_.strdup( reinterpret_cast<const char *>(sqlite3_column_name(stmt_,i)) );
+              h->table_  = coldata_pool_.strdup( reinterpret_cast<const char *>(sqlite3_column_table_name(stmt_,i)) );
+              h->db_     = coldata_pool_.strdup( reinterpret_cast<const char *>(sqlite3_column_database_name(stmt_,i)) );
+              h->origin_ = coldata_pool_.strdup( reinterpret_cast<const char *>(sqlite3_column_origin_name(stmt_,i)) );
+              column_pool_.push_back(h);
+            }
+          }
+        }
+        return (column_pool_.n_items() > 0 ? true : false);
+      }
+
+    } /* end of slt3 namespace */
+  } /* end of db namespace */
 } /* end of cls namespace */
 
 /* EOF */

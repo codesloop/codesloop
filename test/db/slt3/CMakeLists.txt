@@ -1,15 +1,15 @@
 # Copyright (c) 2008,2009, CodeSLoop Team
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
-# 
+#
 # 1. Redistributions of source code must retain the above copyright
 #    notice, this list of conditions and the following disclaimer.
 # 2. Redistributions in binary form must reproduce the above copyright
 #    notice, this list of conditions and the following disclaimer in the
 #    documentation and/or other materials provided with the distribution.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
 # IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
 # OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -22,23 +22,19 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 LINK_DIRECTORIES(
-                  ../../slt3
-                  ../../nthread
-                  ../../common
+                  ../../../db
+                  ../../../nthread
+                  ../../../common
                 )
 
-INCLUDE_DIRECTORIES( ../../..  
-                     ../../slt3
-                     ../../nthread
-                     ../../common
-                   )
+INCLUDE_DIRECTORIES( ../../../.. )
 
 IF(WIN32)
 
   IF(MSYS)
 
     LINK_LIBRARIES(
-                    csl_slt3
+                    csl_db_slt3
                     csl_nthread
                     csl_common
                     wsock32
@@ -60,7 +56,7 @@ IF(WIN32)
   ELSE(MSYS)
 
     LINK_LIBRARIES(
-                    csl_slt3
+                    csl_db_slt3
                     csl_nthread
                     csl_common
                     wsock32
@@ -93,21 +89,21 @@ ELSE(WIN32)
                  )
 
   LINK_LIBRARIES(
-                  csl_slt3 
-                  csl_nthread 
+                  csl_db_slt3
+                  csl_nthread
                   csl_common
-                  pthread 
+                  pthread
                   ${LIBDL}
                 )
 
 ENDIF(WIN32)
 
-ADD_EXECUTABLE(t__sqlite       t__sqlite.cc)
-ADD_EXECUTABLE(t__conn         t__conn.cc)
-ADD_EXECUTABLE(t__tran         t__tran.cc)
-ADD_EXECUTABLE(t__query        t__query.cc)
-ADD_EXECUTABLE(t__reg          t__reg.cc)
-ADD_EXECUTABLE(t__var          t__var.cc)
-ADD_EXECUTABLE(t__sql_helper   t__sql_helper.cc)
+ADD_EXECUTABLE( t__sqlite       t__sqlite.cc )
+ADD_EXECUTABLE( t__conn         t__conn.cc )
+ADD_EXECUTABLE( t__tran         t__tran.cc )
+ADD_EXECUTABLE( t__query        t__query.cc )
+ADD_EXECUTABLE( t__reg          t__reg.cc )
+ADD_EXECUTABLE( t__var          t__var.cc )
+ADD_EXECUTABLE( t__sql_helper   t__sql_helper.cc )
 
 # -- EOF --

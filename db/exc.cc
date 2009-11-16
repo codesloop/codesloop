@@ -34,7 +34,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace csl
 {
-  namespace slt3
+  namespace db
   {
     const wchar_t * exc::reason_string(int rc)
     {

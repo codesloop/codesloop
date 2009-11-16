@@ -38,25 +38,28 @@ using csl::common::ustr;
 
 namespace csl
 {
-  namespace slt3
+  namespace db
   {
-    long long conn::last_insert_id() { return impl_->last_insert_id(); }
-    long long conn::change_count() { return impl_->change_count(); }
+    namespace slt3
+    {
+      long long conn::last_insert_id() { return impl_->last_insert_id(); }
+      long long conn::change_count() { return impl_->change_count(); }
 
-    bool conn::open(const char * db) { return impl_->open(db); }
-    bool conn::close() { return impl_->close(); }
+      bool conn::open(const char * db) { return impl_->open(db); }
+      bool conn::close() { return impl_->close(); }
 
-    void conn::use_exc(bool yesno) { impl_->use_exc(yesno); }
-    bool conn::use_exc() { return impl_->use_exc(); }
-    const common::ustr & conn::name() const { return impl_->name(); }
+      void conn::use_exc(bool yesno) { impl_->use_exc(yesno); }
+      bool conn::use_exc() { return impl_->use_exc(); }
+      const common::ustr & conn::name() const { return impl_->name(); }
 
-    /* public interface */
-    conn::conn() : impl_(new impl) { }
-    conn::~conn() {}
+      /* public interface */
+      conn::conn() : impl_(new impl) { }
+      conn::~conn() {}
 
-    /* private functions, copying not allowed */
-    conn::conn(const conn & other) : impl_( reinterpret_cast<impl *>(0) ) { }
-    conn & conn::operator=(const conn & other) { return *this; }
+      /* private functions, copying not allowed */
+      conn::conn(const conn & other) : impl_( reinterpret_cast<impl *>(0) ) { }
+      conn & conn::operator=(const conn & other) { return *this; }
+    };
   };
 };
 

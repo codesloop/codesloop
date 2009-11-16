@@ -30,13 +30,14 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "codesloop/common/test_timer.h"
 #include "codesloop/db/reg.hh"
-#include "exc.hh"
+#include "codesloop/db/exc.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/mpool.hh"
 #include "codesloop/common/str.hh"
 #include <assert.h>
 
-using namespace csl::slt3;
+using namespace csl::db;
+
 using csl::common::str;
 
 /** @brief contains tests related to slt3::reg */
@@ -45,18 +46,18 @@ namespace test_reg {
   /** @test baseline for performance comparison */
   void baseline()
   {
-    reg & r(reg::instance("test.db"));
+    slt3::reg & r(slt3::reg::instance("test.db"));
   }
 
   /** @test registers and gets an item from database registry */
   void usage1()
   {
-    reg & r(reg::instance("test.db"));
+    slt3::reg & r(slt3::reg::instance("test.db"));
     char * name = ::strdup("Hello");
     char * db = ::strdup("hello.db");
-    reg::item i = { 0,name,db };
+    slt3::reg::item i = { 0,name,db };
     r.set( i );
-    conn h;
+    slt3::conn h;
     assert( r.get("Hello",h) == true );
     assert( h.close() == true );
     ::free(name);
@@ -66,9 +67,9 @@ namespace test_reg {
   /** @test simple usage scenario */
   void usage2()
   {
-    reg & r(reg::instance("test.db"));
-    reg::pool_t p;
-    reg::item i;
+    slt3::reg & r(slt3::reg::instance("test.db"));
+    slt3::reg::pool_t p;
+    slt3::reg::item i;
     assert( r.get( "Hello",i,p ) == true );
     assert( str("Hello") == i.name_ );
     assert( str("hello.db") == i.path_ );
@@ -77,10 +78,10 @@ namespace test_reg {
   /** @test how double inserting the same values behave */
   void usage3()
   {
-    reg & r(reg::instance("test.db"));
+    slt3::reg & r(slt3::reg::instance("test.db"));
     char * name = ::strdup("Hello");
     char * db = ::strdup("hello.db");
-    reg::item i = { 0,name,db };
+    slt3::reg::item i = { 0,name,db };
     r.set( i );
     assert( r.set( i ) == false );
     ::free(name);
@@ -90,11 +91,11 @@ namespace test_reg {
   /** @test how lookup of nonexistent values behave */
   void usage4()
   {
-    reg & r(reg::instance("test.db"));
-    reg::pool_t p;
-    reg::item i;
+    slt3::reg & r(slt3::reg::instance("test.db"));
+    slt3::reg::pool_t p;
+    slt3::reg::item i;
     assert( r.get( "Nonexsitant garbage",i,p ) == false );
-    conn c;
+    slt3::conn c;
     assert( r.get( "Nonexsitant garbage",c ) == false );
   }
 
@@ -107,12 +108,12 @@ int main()
   UNLINK("test.db");
   UNLINK("hello.db");
 
-  reg & r(reg::instance("test.db"));
-  conn c;
+  slt3::reg & r(slt3::reg::instance("test.db"));
+  slt3::conn c;
   assert( r.get("Hello",c) == false );
   char * name = ::strdup("Hello");
   char * db = ::strdup("hello.db");
-  reg::item i = { 0,name,db };
+  slt3::reg::item i = { 0,name,db };
   assert( r.set( i ) == true );
   assert( r.get("Hello",c) == true );
 
@@ -121,7 +122,7 @@ int main()
   csl_common_print_results( "usage2             ", csl_common_test_timer_v0(usage2),"" );
   csl_common_print_results( "usage3             ", csl_common_test_timer_v0(usage3),"" );
   csl_common_print_results( "usage4             ", csl_common_test_timer_v0(usage4),"" );
-  
+
   ::free(name);
   ::free(db);
   return 0;

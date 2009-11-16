@@ -41,317 +41,320 @@ using csl::common::int64;
 
 namespace csl
 {
-  namespace slt3
+  namespace db
   {
-    namespace
+    namespace slt3
     {
-      bool check_path(const char * path)
+      namespace
       {
-        if( !path ) return false;
-
-        FILE * fp = fopen(path,"a+");
-        if( !fp ) return false;
-        fclose( fp );
-        return true;
-      }
-    }
-
-    reg::helper::helper(const char * namev, const char * default_db_pathv)
-      : name_(namev), default_path_(default_db_pathv), use_exc_(true) { }
-
-    const char * reg::helper::path()
-    {
-      reg & r(reg::instance());
-      reg::pool_t p;
-      reg::item i;
-
-      /* lookup path */
-      if( path_ != 0 ) { return path_; }
-      else if( r.get(name(),i,pool_) == false )
-      {
-        i.name_ = p.strdup(name_);
-        i.path_ = p.strdup(default_path_);
-
-        /* should be able to register the peer db */
-        if( r.set(i) == false )
+        bool check_path(const char * path)
         {
-          str nm(name_);
+          if( !path ) return false;
 
-          THRR( slt3::exc::rs_cannot_reg, nm.c_str(), NULL );
+          FILE * fp = fopen(path,"a+");
+          if( !fp ) return false;
+          fclose( fp );
+          return true;
         }
-        return default_path_;
       }
-      else
-      {
-        if( path_ == 0 ) { path_ = i.path_; }
-        return path_;
-      }
-    }
 
-    conn & reg::helper::db()
-    {
-      if( conn_.name().size() == 0 )
+      reg::helper::helper(const char * namev, const char * default_db_pathv)
+        : name_(namev), default_path_(default_db_pathv), use_exc_(true) { }
+
+      const char * reg::helper::path()
       {
         reg & r(reg::instance());
+        reg::pool_t p;
+        reg::item i;
 
-        if( r.get(name(),conn_) == false )
+        /* lookup path */
+        if( path_ != 0 ) { return path_; }
+        else if( r.get(name(),i,pool_) == false )
         {
-          /* retry once */
-          (void)path();
-          if( r.get(name(),conn_) == false )
+          i.name_ = p.strdup(name_);
+          i.path_ = p.strdup(default_path_);
+
+          /* should be able to register the peer db */
+          if( r.set(i) == false )
           {
             str nm(name_);
 
-            THRR( slt3::exc::rs_cannot_reg, nm.c_str(), conn_ );
+            THRR( db::exc::rs_cannot_reg, nm.c_str(), NULL );
           }
-        }
-      }
-      return conn_;
-    }
-
-    reg & reg::instance()
-    {
-      if( check_path(SLT3_REGISTRY_PATH1) )
-      {
-        return instance(SLT3_REGISTRY_PATH1);
-      }
-      else if( check_path(SLT3_REGISTRY_PATH2) )
-      {
-        return instance(SLT3_REGISTRY_PATH2);
-      }
-      else if( check_path(SLT3_REGISTRY_PATH3) )
-      {
-        return instance(SLT3_REGISTRY_PATH3);
-      }
-      else
-      {
-        return instance(0);
-      }
-    }
-
-    std::auto_ptr<reg> reg::instance_;
-
-    reg & reg::instance(const char * p)
-    {
-      /* TODO fix multithreading here */
-      if( !(instance_.get()) )
-      {
-        instance_ = std::auto_ptr<reg>(new reg());
-      }
-
-      if( p )
-      {
-        instance_->path(p);
-      }
-      return *instance_;
-    }
-
-    reg & reg::instance(const ustr & path)
-    {
-      if( path.size() ) return instance(path.c_str());
-      else              return instance(0);
-    }
-
-    namespace
-    {
-      bool init_db(conn & c,const ustr & path)
-      {
-        c.use_exc(true);
-        if( c.open(path.c_str()) )
-        {
-          tran t(c);
-          query q(t);
-          return q.execute(
-               "CREATE TABLE IF NOT EXISTS registry ( "
-               " id INTEGER PRIMARY KEY ASC AUTOINCREMENT, "
-               " name string UNIQUE NOT NULL, "
-               " path string NOT NULL ); " );
-        }
-        return false;
-      }
-    }
-
-    bool reg::get( const ustr & name, item & i, pool_t & pool )
-    {
-      return get( name.c_str(),i,pool );
-    }
-
-    bool reg::get( const char * name, item & i, pool_t & pool )
-    {
-      if( !name ) return false;
-      try
-      {
-        conn c;
-        if( !init_db(c,path_) ) return false;
-
-        query::columns_t ch;
-        query::fields_t  fd;
-
-        c.use_exc(true);
-
-        tran t(c);
-        query q(t);
-
-        ustr & p(q.ustr_param(1));
-        p = name;
-
-        if( !q.prepare("SELECT id,name,path FROM registry where name=?;") ) return false;
-
-        q.next(ch,fd);
-
-        if( fd.size() > 0 )
-        {
-          i.id_   = ( reinterpret_cast<int64 *>(fd.get_at(0)) )->value();
-          i.name_ = pool.strdup( ( reinterpret_cast<ustr *>(fd.get_at(1)) )->c_str() );
-          i.path_ = pool.strdup( ( reinterpret_cast<ustr *>(fd.get_at(2)) )->c_str() );
-          return true;
+          return default_path_;
         }
         else
+        {
+          if( path_ == 0 ) { path_ = i.path_; }
+          return path_;
+        }
+      }
+
+      conn & reg::helper::db()
+      {
+        if( conn_.name().size() == 0 )
+        {
+          reg & r(reg::instance());
+
+          if( r.get(name(),conn_) == false )
+          {
+            /* retry once */
+            (void)path();
+            if( r.get(name(),conn_) == false )
+            {
+              str nm(name_);
+
+              THRR( db::exc::rs_cannot_reg, nm.c_str(), conn_ );
+            }
+          }
+        }
+        return conn_;
+      }
+
+      reg & reg::instance()
+      {
+        if( check_path(SLT3_REGISTRY_PATH1) )
+        {
+          return instance(SLT3_REGISTRY_PATH1);
+        }
+        else if( check_path(SLT3_REGISTRY_PATH2) )
+        {
+          return instance(SLT3_REGISTRY_PATH2);
+        }
+        else if( check_path(SLT3_REGISTRY_PATH3) )
+        {
+          return instance(SLT3_REGISTRY_PATH3);
+        }
+        else
+        {
+          return instance(0);
+        }
+      }
+
+      std::auto_ptr<reg> reg::instance_;
+
+      reg & reg::instance(const char * p)
+      {
+        /* TODO fix multithreading here */
+        if( !(instance_.get()) )
+        {
+          instance_ = std::auto_ptr<reg>(new reg());
+        }
+
+        if( p )
+        {
+          instance_->path(p);
+        }
+        return *instance_;
+      }
+
+      reg & reg::instance(const ustr & path)
+      {
+        if( path.size() ) return instance(path.c_str());
+        else              return instance(0);
+      }
+
+      namespace
+      {
+        bool init_db(conn & c,const ustr & path)
+        {
+          c.use_exc(true);
+          if( c.open(path.c_str()) )
+          {
+            tran t(c);
+            query q(t);
+            return q.execute(
+                 "CREATE TABLE IF NOT EXISTS registry ( "
+                 " id INTEGER PRIMARY KEY ASC AUTOINCREMENT, "
+                 " name string UNIQUE NOT NULL, "
+                 " path string NOT NULL ); " );
+          }
+          return false;
+        }
+      }
+
+      bool reg::get( const ustr & name, item & i, pool_t & pool )
+      {
+        return get( name.c_str(),i,pool );
+      }
+
+      bool reg::get( const char * name, item & i, pool_t & pool )
+      {
+        if( !name ) return false;
+        try
+        {
+          conn c;
+          if( !init_db(c,path_) ) return false;
+
+          query::columns_t ch;
+          query::fields_t  fd;
+
+          c.use_exc(true);
+
+          tran t(c);
+          query q(t);
+
+          ustr & p(q.ustr_param(1));
+          p = name;
+
+          if( !q.prepare("SELECT id,name,path FROM registry where name=?;") ) return false;
+
+          q.next(ch,fd);
+
+          if( fd.size() > 0 )
+          {
+            i.id_   = ( reinterpret_cast<int64 *>(fd.get_at(0)) )->value();
+            i.name_ = pool.strdup( ( reinterpret_cast<ustr *>(fd.get_at(1)) )->c_str() );
+            i.path_ = pool.strdup( ( reinterpret_cast<ustr *>(fd.get_at(2)) )->c_str() );
+            return true;
+          }
+          else
+          {
+            return false;
+          }
+        }
+        catch( db::exc e )
         {
           return false;
         }
       }
-      catch( slt3::exc e )
+
+      bool reg::get( const char * name, conn & cn )
       {
-        return false;
-      }
-    }
-
-    bool reg::get( const char * name, conn & cn )
-    {
-      if( !name ) return false;
-      try
-      {
-        conn c;
-        if( !init_db(c,path_) ) return false;
-
-        query::columns_t ch;
-        query::fields_t  fd;
-
-        tran t(c);
-        query q(t);
-
-        ustr & p(q.ustr_param(1));
-        p = name;
-
-        if( !q.prepare("SELECT path FROM registry WHERE name=? limit 1;") ) return false;
-
-        if( q.next(ch,fd) )
+        if( !name ) return false;
+        try
         {
-          ustr s;
-          fd.get_at(0)->to_string(s);
-          return cn.open( s.c_str() );
+          conn c;
+          if( !init_db(c,path_) ) return false;
+
+          query::columns_t ch;
+          query::fields_t  fd;
+
+          tran t(c);
+          query q(t);
+
+          ustr & p(q.ustr_param(1));
+          p = name;
+
+          if( !q.prepare("SELECT path FROM registry WHERE name=? limit 1;") ) return false;
+
+          if( q.next(ch,fd) )
+          {
+            ustr s;
+            fd.get_at(0)->to_string(s);
+            return cn.open( s.c_str() );
+          }
+          return false;
         }
-        return false;
-      }
-      catch( slt3::exc e )
-      {
-        return false;
-      }
-    }
-
-    bool reg::names( strlist_t & nms, pool_t & pool )
-    {
-      try
-      {
-        conn c;
-        if( !init_db(c,path_) ) return false;
-
-        query::columns_t ch;
-        query::fields_t  fd;
-
-        tran t(c);
-        query q(t);
-
-        if( !q.prepare("SELECT name FROM registry;") ) return false;
-
-        bool ret = false;
-
-        while( q.next(ch,fd) )
+        catch( db::exc e )
         {
-          ustr s;
-          fd.get_at(0)->to_string(s);
-          nms.push_back( pool.strdup(s.c_str()) );
-          ret = true;
+          return false;
         }
-
-        return ret;
       }
-      catch( slt3::exc e )
+
+      bool reg::names( strlist_t & nms, pool_t & pool )
       {
-        return false;
-      }
-    }
-
-    bool reg::dbs( itemlist_t & itms, pool_t & pool )
-    {
-      try
-      {
-        conn c;
-        if( !init_db(c,path_) ) return false;
-
-        query::columns_t ch;
-        query::fields_t  fd;
-
-        tran t(c);
-        query q(t);
-
-        if( !q.prepare("SELECT id,name,path FROM registry;") ) return false;
-
-        bool ret = false;
-
-        while( q.next(ch,fd) )
+        try
         {
-          item * p = reinterpret_cast<item *>(pool.allocate( sizeof(item) ));
-          p->id_   = ( reinterpret_cast<int64 *>(fd.get_at(0)))->value();
-          p->name_ = pool.strdup( ( reinterpret_cast<ustr *>(fd.get_at(1)) )->c_str() );
-          p->path_ = pool.strdup( ( reinterpret_cast<ustr *>(fd.get_at(2)) )->c_str() );
-          itms.push_back( p );
-          ret = true;
+          conn c;
+          if( !init_db(c,path_) ) return false;
+
+          query::columns_t ch;
+          query::fields_t  fd;
+
+          tran t(c);
+          query q(t);
+
+          if( !q.prepare("SELECT name FROM registry;") ) return false;
+
+          bool ret = false;
+
+          while( q.next(ch,fd) )
+          {
+            ustr s;
+            fd.get_at(0)->to_string(s);
+            nms.push_back( pool.strdup(s.c_str()) );
+            ret = true;
+          }
+
+          return ret;
         }
-
-        return ret;
+        catch( db::exc e )
+        {
+          return false;
+        }
       }
-      catch( slt3::exc e )
+
+      bool reg::dbs( itemlist_t & itms, pool_t & pool )
       {
-        return false;
-      }
-    }
+        try
+        {
+          conn c;
+          if( !init_db(c,path_) ) return false;
 
-    bool reg::set( const item & it )
-    {
-      try
+          query::columns_t ch;
+          query::fields_t  fd;
+
+          tran t(c);
+          query q(t);
+
+          if( !q.prepare("SELECT id,name,path FROM registry;") ) return false;
+
+          bool ret = false;
+
+          while( q.next(ch,fd) )
+          {
+            item * p = reinterpret_cast<item *>(pool.allocate( sizeof(item) ));
+            p->id_   = ( reinterpret_cast<int64 *>(fd.get_at(0)))->value();
+            p->name_ = pool.strdup( ( reinterpret_cast<ustr *>(fd.get_at(1)) )->c_str() );
+            p->path_ = pool.strdup( ( reinterpret_cast<ustr *>(fd.get_at(2)) )->c_str() );
+            itms.push_back( p );
+            ret = true;
+          }
+
+          return ret;
+        }
+        catch( db::exc e )
+        {
+          return false;
+        }
+      }
+
+      bool reg::set( const item & it )
       {
-        conn c;
-        if( !init_db(c,path_) ) return false;
+        try
+        {
+          conn c;
+          if( !init_db(c,path_) ) return false;
 
-        tran t(c);
-        query q(t);
+          tran t(c);
+          query q(t);
 
-        q.use_exc(true);
+          q.use_exc(true);
 
-        ustr & p1(q.ustr_param(1));
-        ustr & p2(q.ustr_param(2));
-        p1 = it.name_;
-        p2 = it.path_;
+          ustr & p1(q.ustr_param(1));
+          ustr & p2(q.ustr_param(2));
+          p1 = it.name_;
+          p2 = it.path_;
 
-        if( !q.prepare("INSERT INTO registry (name,path) VALUES(?,?);") ) return false;
+          if( !q.prepare("INSERT INTO registry (name,path) VALUES(?,?);") ) return false;
 
-        q.next(); // should throw an exception if failed
+          q.next(); // should throw an exception if failed
 
-        return true;
+          return true;
+        }
+        catch( db::exc e )
+        {
+          return false;
+        }
       }
-      catch( slt3::exc e )
+
+      bool reg::get( const ustr & name, conn & cn )
       {
-        return false;
+        return get( name.c_str(),cn );
       }
-    }
-
-    bool reg::get( const ustr & name, conn & cn )
-    {
-      return get( name.c_str(),cn );
-    }
-  }
-}
+    }; /* end of ns: csl::db::slt3 */
+  }; /* end of ns: csl::db */
+}; /* end of ns: csl */
 
 /* EOF */

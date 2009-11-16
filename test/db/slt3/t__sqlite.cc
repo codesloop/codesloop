@@ -37,7 +37,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include <assert.h>
 
-using namespace csl::slt3;
+using namespace csl::db;
+
 using csl::common::str;
 using csl::common::ustr;
 using csl::common::int64;
@@ -58,19 +59,19 @@ namespace test_sqlite {
   /** @test baseline for performance comparison */
   void conn_baseline()
   {
-    conn c;
+    slt3::conn c;
     assert( c.open("test.db") == true );
   }
 
   /** @test tran test */
   void tran_query()
   {
-    conn c;
+    slt3::conn c;
     assert( c.open("test.db") == true );
     {
-      tran t(c);
+      slt3::tran t(c);
       {
-        tran st(t);
+        slt3::tran st(t);
       }
     }
   }
@@ -78,13 +79,13 @@ namespace test_sqlite {
   /** @test create and drop table */
   void crdrp_table()
   {
-    conn c;
+    slt3::conn c;
     assert( c.open("test.db") == true );
     {
-      tran t(c);
+      slt3::tran t(c);
       {
-        tran st(t);
-        query q(st);
+        slt3::tran st(t);
+        slt3::query q(st);
         assert( q.execute("CREATE TABLE T(i INT);") == true );
         assert( q.execute("DROP TABLE T;;") == true );
       }
@@ -94,13 +95,13 @@ namespace test_sqlite {
   /** @test insert value and query count() */
   void single_return()
   {
-    conn c;
+    slt3::conn c;
     assert( c.open("test.db") == true );
     {
-      tran t(c);
+      slt3::tran t(c);
       {
-        tran st(t);
-        query q(st);
+        slt3::tran st(t);
+        slt3::query q(st);
         ustr v;
         assert( q.execute("CREATE TABLE t(i INT);") == true );
         assert( q.execute("INSERT INTO t (i) VALUES(1);") == true );
@@ -115,23 +116,25 @@ namespace test_sqlite {
   /** @test insert value with parametrized query and query count() and sum() */
   void test_params()
   {
-    conn c;
+    slt3::conn c;
     assert( c.open("test.db") == true );
     {
-      tran t(c);
+      slt3::tran t(c);
       {
-        tran st(t);
-        query q(st);
+        slt3::tran st(t);
+        slt3::query q(st);
         ustr v;
         assert( q.execute("CREATE TABLE tint(i INT NOT NULL);") == true );
         assert( q.prepare("INSERT INTO tint (i) VALUES(?);") == true );
         int64 & p(q.int64_param(1));
+
         for( int i=0; i<10; ++i )
         {
           p.from_integer(100ll+i);
           assert( q.next() == false );
           assert( q.reset() == true );
         }
+
         assert( q.execute("SELECT COUNT(*) FROM tint;",v) == true );
         assert( v == "10" );
         assert( q.execute("SELECT SUM(i) FROM tint;",v) == true );
@@ -144,10 +147,10 @@ namespace test_sqlite {
   /** @test insert multiple integer values w/ parametrized query */
   void int_param()
   {
-    conn c;
+    slt3::conn c;
     assert( c.open("test.db") == true );
-    tran t(c);
-    query q(t);
+    slt3::tran t(c);
+    slt3::query q(t);
     assert( q.execute("CREATE TABLE IF NOT EXISTS intp (i1 INT,i2 INT,i3 INT,i4 INT);") == true );
     assert( q.prepare("INSERT INTO intp (i1,i2,i3,i4) VALUES(?,?,?,?);") == true );
     //
@@ -168,8 +171,8 @@ namespace test_sqlite {
     //
     assert( q.prepare("SELECT * FROM intp WHERE i1=? AND i2=? AND i3=? AND i4=?;") == true );
     //
-    query::columns_t cols;
-    query::fields_t  flds;
+    slt3::query::columns_t cols;
+    slt3::query::fields_t  flds;
     //
     for( int i=0; i<10; ++i )
     {
@@ -181,10 +184,10 @@ namespace test_sqlite {
       assert( q.next(cols,flds) == true );
 
       {
-        assert( cols.get_at(0)->type_ == query::colhead::t_integer );
-        assert( cols.get_at(1)->type_ == query::colhead::t_integer );
-        assert( cols.get_at(2)->type_ == query::colhead::t_integer );
-        assert( cols.get_at(3)->type_ == query::colhead::t_integer );
+        assert( cols.get_at(0)->type_ == slt3::query::colhead::t_integer );
+        assert( cols.get_at(1)->type_ == slt3::query::colhead::t_integer );
+        assert( cols.get_at(2)->type_ == slt3::query::colhead::t_integer );
+        assert( cols.get_at(3)->type_ == slt3::query::colhead::t_integer );
 
         assert( str("i1") == cols.get_at(0)->name_ );
         assert( str("i2") == cols.get_at(1)->name_ );
@@ -219,10 +222,10 @@ namespace test_sqlite {
   /** @test insert multiple double values w/ parametrized query */
   void double_param()
   {
-    conn c;
+    slt3::conn c;
     assert( c.open("test.db") == true );
-    tran t(c);
-    query q(t);
+    slt3::tran t(c);
+    slt3::query q(t);
     assert( q.execute("CREATE TABLE IF NOT EXISTS doublep (d1 REAL,d2 REAL,d3 REAL,d4 REAL);") == true );
     assert( q.prepare("INSERT INTO doublep (d1,d2,d3,d4) VALUES(?,?,?,?);") == true );
     //
@@ -243,8 +246,8 @@ namespace test_sqlite {
     //
     assert( q.prepare("SELECT * FROM doublep WHERE d1=? AND d2=? AND d3=? AND d4=?;") == true );
     //
-    query::columns_t cols;
-    query::fields_t  flds;
+    slt3::query::columns_t cols;
+    slt3::query::fields_t  flds;
     //
     for( int i=0; i<10; ++i )
     {
@@ -256,10 +259,10 @@ namespace test_sqlite {
       assert( q.next(cols,flds) == true );
 
       {
-        assert( cols.get_at(0)->type_ == query::colhead::t_double );
-        assert( cols.get_at(1)->type_ == query::colhead::t_double );
-        assert( cols.get_at(2)->type_ == query::colhead::t_double );
-        assert( cols.get_at(3)->type_ == query::colhead::t_double );
+        assert( cols.get_at(0)->type_ == slt3::query::colhead::t_double );
+        assert( cols.get_at(1)->type_ == slt3::query::colhead::t_double );
+        assert( cols.get_at(2)->type_ == slt3::query::colhead::t_double );
+        assert( cols.get_at(3)->type_ == slt3::query::colhead::t_double );
 
         assert( str("d1") == cols.get_at(0)->name_ );
         assert( str("d2") == cols.get_at(1)->name_ );
@@ -293,10 +296,10 @@ namespace test_sqlite {
   /** @test insert multiple string values w/ parametrized query */
   void string_param()
   {
-    conn c;
+    slt3::conn c;
     assert( c.open("test.db") == true );
-    tran t(c);
-    query q(t);
+    slt3::tran t(c);
+    slt3::query q(t);
     assert( q.execute("CREATE TABLE IF NOT EXISTS textp (t1 TEXT,t2 TEXT);") == true );
     assert( q.prepare("INSERT INTO textp (t1,t2) VALUES(?,?);") == true );
     //
@@ -310,8 +313,8 @@ namespace test_sqlite {
     //
     assert( q.prepare("SELECT * FROM textp WHERE t1=? AND t2=?;") == true );
     //
-    query::columns_t cols;
-    query::fields_t  flds;
+    slt3::query::columns_t cols;
+    slt3::query::fields_t  flds;
     //
     p1.from_string("'_.\"");
     p2.from_string("0123.'\"");
@@ -319,8 +322,8 @@ namespace test_sqlite {
     assert( q.next(cols,flds) == true );
 
     {
-      assert( cols.get_at(0)->type_ == query::colhead::t_string );
-      assert( cols.get_at(1)->type_ == query::colhead::t_string );
+      assert( cols.get_at(0)->type_ == slt3::query::colhead::t_string );
+      assert( cols.get_at(1)->type_ == slt3::query::colhead::t_string );
 
       assert( ustr("t1") == cols.get_at(0)->name_ );
       assert( ustr("t2") == cols.get_at(1)->name_ );
@@ -352,10 +355,10 @@ namespace test_sqlite {
   /** @test insert multiple blob values w/ parametrized query */
   void blob_param()
   {
-    conn c;
+    slt3::conn c;
     assert( c.open("test.db") == true );
-    tran t(c);
-    query q(t);
+    slt3::tran t(c);
+    slt3::query q(t);
     assert( q.execute("CREATE TABLE IF NOT EXISTS blobp (b1 BLOB,b2 BLOB);") == true );
     assert( q.prepare("INSERT INTO blobp (b1,b2) VALUES(?,?);") == true );
     //
@@ -376,8 +379,8 @@ namespace test_sqlite {
     //
     assert( q.prepare("SELECT * FROM blobp WHERE b1=? AND b2=?;") == true );
     //
-    query::columns_t cols;
-    query::fields_t  flds;
+    slt3::query::columns_t cols;
+    slt3::query::fields_t  flds;
     //
     p1.from_binary(tx,sizeof(tx));
     p2.from_binary(qx,sizeof(qx));
@@ -385,8 +388,8 @@ namespace test_sqlite {
     assert( q.next(cols,flds) == true );
 
     {
-      assert( cols.get_at(0)->type_ == query::colhead::t_blob );
-      assert( cols.get_at(1)->type_ == query::colhead::t_blob );
+      assert( cols.get_at(0)->type_ == slt3::query::colhead::t_blob );
+      assert( cols.get_at(1)->type_ == slt3::query::colhead::t_blob );
 
       assert( str("b1") == cols.get_at(0)->name_ );
       assert( str("b2") == cols.get_at(1)->name_ );

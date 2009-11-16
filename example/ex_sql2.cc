@@ -31,20 +31,20 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/db/csl_slt3.hh"
 #include "codesloop/common/common.h"
 
-using namespace csl::slt3;
+using namespace csl::db;
 
 int main()
 {
-  conn c;
+  slt3::conn c;
   c.use_exc(false);
 
   if( c.open("testme.db") )
   {
     /* start a transaction */
-    tran t(c);
+    slt3::tran t(c);
 
     /* create a query object */
-    query q(t);
+    slt3::query q(t);
 
     if( q.execute("create table test(i int);") == false )
     {
