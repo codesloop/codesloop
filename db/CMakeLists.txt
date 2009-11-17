@@ -1,15 +1,15 @@
 # Copyright (c) 2008,2009, CodeSLoop Team
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
-# 
+#
 # 1. Redistributions of source code must retain the above copyright
 #    notice, this list of conditions and the following disclaimer.
 # 2. Redistributions in binary form must reproduce the above copyright
 #    notice, this list of conditions and the following disclaimer in the
 #    documentation and/or other materials provided with the distribution.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
 # IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
 # OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -35,7 +35,7 @@ IF(NOT WIN32)
                     -Wall
                     -g3
                     # -O3 -Os
-                   -DTHREADSAFE=1
+                    -DTHREADSAFE=1
                    -DSQLITE_DEFAULT_PAGE_SIZE=32768
                    -DSQLITE_MAX_ATTACHED=30
                    -DSQLITE_ENABLE_COLUMN_METADATA=1
@@ -49,9 +49,9 @@ IF(NOT WIN32)
 ELSE(NOT WIN32)
 
   IF(MSYS)
-  
+
     SET( CMAKE_CXX_FLAGS "-Wconversion -Wcast-qual -Wpointer-arith -Wcast-align -Wold-style-cast" )
-  
+
     ADD_DEFINITIONS(
                       -Wall
                       -g3
@@ -69,7 +69,7 @@ ELSE(NOT WIN32)
                    )
 
   ELSE(MSYS)
-  
+
     ADD_DEFINITIONS(
                      -DTHREADSAFE=1
                      -DSQLITE_DEFAULT_PAGE_SIZE=32768
@@ -77,11 +77,11 @@ ELSE(NOT WIN32)
                      -DSQLITE_ENABLE_COLUMN_METADATA=1
                      -DSQLITE_DEFAULT_CACHE_SIZE=10000
                      # -DDEBUG
-                     # -DPRINT_SQL    
+                     # -DPRINT_SQL
                    )
 
   ENDIF(MSYS)
-    
+
 ENDIF(NOT WIN32)
 
 ADD_LIBRARY( csl_db_slt3 STATIC

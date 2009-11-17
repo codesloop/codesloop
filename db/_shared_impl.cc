@@ -23,6 +23,14 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#if 0
+#ifndef DEBUG
+#define DEBUG
+#define DEBUG_ENABLE_INDENT
+//#define DEBUG_VERBOSE
+#endif /* DEBUG */
+#endif /* 0 */
+
 #include "codesloop/db/_shared_impl.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/int64.hh"
@@ -283,6 +291,7 @@ namespace csl
 
       void tran::impl::start()
       {
+        ENTER_FUNCTION( );
         if( !started_ )
         {
           if( tr_ )
@@ -297,6 +306,7 @@ namespace csl
           }
           started_ = true;
         }
+        LEAVE_FUNCTION( );
       }
 
       tran::impl::~impl()
@@ -321,18 +331,23 @@ namespace csl
 
       void tran::impl::commit_on_destruct(bool yesno)
       {
+        ENTER_FUNCTION( );
         do_commit_ = yesno;
+        LEAVE_FUNCTION( );
       }
 
       void tran::impl::rollback_on_destruct(bool yesno)
       {
+        ENTER_FUNCTION( );
         do_rollback_ = yesno;
+        LEAVE_FUNCTION( );
       }
 
       void tran::impl::commit()
       {
+        ENTER_FUNCTION( );
         if( !started_ ) { }
-        else if( cn_->valid_db_ptr() == false ) { THRNORET(exc::rs_notopened); return; }
+        else if( cn_->valid_db_ptr() == false ) { THRNORET(exc::rs_notopened); }
         else if( tr_ )
         {
           char * sql = sqlite3_mprintf("RELEASE SAVEPOINT SP%lld;",tran_id_);
@@ -345,12 +360,14 @@ namespace csl
           cn_->exec_noret("COMMIT TRANSACTION;");
           started_ = false;
         }
+        LEAVE_FUNCTION( );
       }
 
       void tran::impl::rollback()
       {
+        ENTER_FUNCTION( );
         if( !started_ ) { }
-        else if( cn_->valid_db_ptr() == false ) { THRNORET(exc::rs_notopened); return; }
+        else if( cn_->valid_db_ptr() == false ) { THRNORET(exc::rs_notopened); }
         else if( tr_ )
         {
           char * sql = sqlite3_mprintf("ROLLBACK TRANSACTION TO SAVEPOINT SP%lld;",tran_id_);
@@ -363,6 +380,7 @@ namespace csl
           cn_->exec_noret("ROLLBACK TRANSACTION;");
           started_ = false;
         }
+        LEAVE_FUNCTION( );
       }
 
       /* query */
@@ -411,17 +429,23 @@ namespace csl
 
       void query::impl::clear_params()
       {
+        ENTER_FUNCTION_X( );
         params_.free_all();
         param_pool_.free_all();
+        LEAVE_FUNCTION_X( );
       }
 
       // stepwise query
       bool query::impl::prepare(const char * sql)
       {
+        ENTER_FUNCTION( );
+
         if( !sql )               THR(exc::rs_nullparam,false);
         if( !tran_ )             THR(exc::rs_nulltran,false);
         if( !(tran_->cn_) )      THR(exc::rs_nullconn,false);
         if( !(tran_->cn_->db_) ) THR(exc::rs_nulldb,false);
+
+        CSL_DEBUGF(L"prepare(sql:'%s')",sql);
 
         finalize();
         tran_->start();
@@ -444,11 +468,13 @@ namespace csl
           THRE(conn::impl::create_exc,rc,s.c_str(),false);
         }
         //
-        return true;
+        RETURN_FUNCTION( true );
       }
 
       bool query::impl::reset()
       {
+        ENTER_FUNCTION( );
+
         if( !stmt_ )        THR(exc::rs_nullstmnt,false);
         if( !tran_ )        THR(exc::rs_nulltran,false);
         if( !(tran_->cn_) ) THR(exc::rs_nullconn,false);
@@ -463,17 +489,22 @@ namespace csl
           THRE(conn::impl::create_exc,rc,s.c_str(),false);
         }
 
-        return true;
+        RETURN_FUNCTION( true );
       }
 
       void query::impl::reset_data()
       {
+        ENTER_FUNCTION( );
         field_pool_.free_all();
         data_pool_.free_all();
+        LEAVE_FUNCTION( );
       }
 
       bool query::impl::next(columns_t & cols, fields_t & fields)
       {
+        ENTER_FUNCTION( );
+        CSL_DEBUGF(L"next(cols,fields) [assuming rows to be returned]");
+
         if( !stmt_ )        THR(exc::rs_nullstmnt,false);
         if( !tran_ )        THR(exc::rs_nulltran,false);
         if( !(tran_->cn_) ) THR(exc::rs_nullconn,false);
@@ -495,19 +526,23 @@ namespace csl
               switch( t )
               {
                 case query::colhead::t_integer:
+                  CSL_DEBUGF(L"binding param #%d [int64] = %lld",which,p->get_long());
                   sqlite3_bind_int64( stmt_, which, p->get_long() );
                   break;
 
                 case query::colhead::t_double:
+                  CSL_DEBUGF(L"binding param #%d [double] = %lf",which,p->get_double());
                   sqlite3_bind_double( stmt_, which, p->get_double() );
                   break;
 
                 case query::colhead::t_string:
                   /* assume string always has a trailing zero */
+                  CSL_DEBUGF(L"binding param #%d [string] = '%s'",which,p->charp_data());
                   sqlite3_bind_text( stmt_, which, p->charp_data(), (p->var_size()-1), SQLITE_TRANSIENT );
                   break;
 
                 case query::colhead::t_blob:
+                  CSL_DEBUGF(L"binding param #%d [blob] = %d bytes",which,p->var_size());
                   sqlite3_bind_blob( stmt_, which, (p->charp_data()), (p->var_size()), SQLITE_TRANSIENT );
                   break;
 
@@ -527,6 +562,8 @@ namespace csl
 
         if( rc == SQLITE_ROW )
         {
+          CSL_DEBUGF(L"sqlite3_step() returned %d = SQLITE_ROW",rc);
+
           fill_columns();
           if( cols.n_items() == 0 ) copy_columns( cols );
 
@@ -543,19 +580,23 @@ namespace csl
             {
               case query::colhead::t_integer:
                 f = new common::int64(sqlite3_column_int64(stmt_,ac));
+                CSL_DEBUGF(L"column%d [int64] = %lld",ac,f->get_long());
                 break;
 
               case query::colhead::t_double:
                 f = new common::dbl(sqlite3_column_double(stmt_,ac));
+                CSL_DEBUGF(L"column%d [double] = %lf",ac,f->get_double());
                 break;
 
               case query::colhead::t_blob:
                 f = new common::binry();
                 f->from_binary( sqlite3_column_blob(stmt_,ac), sqlite3_column_bytes(stmt_,ac) );
+                CSL_DEBUGF(L"column%d [blob] = %lld bytes",ac,f->var_size());
                 break;
 
               case query::colhead::t_string:
                 f = new common::ustr( reinterpret_cast<const char *>(sqlite3_column_text(stmt_,ac)) );
+                CSL_DEBUGF(L"column%d [string] = '%s'",ac,f->charp_data());
                 break;
 
               case query::colhead::t_null:
@@ -571,27 +612,34 @@ namespace csl
         }
         else if( rc == SQLITE_OK )
         {
+          CSL_DEBUGF(L"sqlite3_step() returned %d = SQLITE_OK",rc);
           last_insert_id_ = tran_->cn_->last_insert_id();
           change_count_ = tran_->cn_->change_count();
-          return true;
+          CSL_DEBUGF(L"last_insert_id:%lld change_count:%lld",last_insert_id_,change_count_);
+          RETURN_FUNCTION( true );
         }
         else if( rc == SQLITE_DONE )
         {
+          CSL_DEBUGF(L"sqlite3_step() returned %d = SQLITE_DONE",rc);
           last_insert_id_ = tran_->cn_->last_insert_id();
           change_count_ = tran_->cn_->change_count();
-          return false;
+          CSL_DEBUGF(L"last_insert_id:%lld change_count:%lld",last_insert_id_,change_count_);
+          RETURN_FUNCTION( false );
         }
         else
         {
+          CSL_DEBUGF(L"sqlite3_step() returned %d = ??? = ERROR",rc);
           str s(sqlite3_errmsg(tran_->cn_->db_));
           THRE(conn::impl::create_exc,rc,s.c_str(),false);
         }
-
-        return true;
+        RETURN_FUNCTION( true );
       }
 
       bool query::impl::next()
       {
+        ENTER_FUNCTION( );
+        CSL_DEBUGF(L"next()");
+
         if( !stmt_ )         THR(exc::rs_nullstmnt,false);
         if( !tran_ )         THR(exc::rs_nulltran,false);
         if( !(tran_->cn_) )  THR(exc::rs_nullconn,false);
@@ -619,19 +667,23 @@ namespace csl
               switch( t )
               {
                 case query::colhead::t_integer:
+                  CSL_DEBUGF(L"binding param #%d [int64] = %lld",which,p->get_long());
                   sqlite3_bind_int64( stmt_, which, p->get_long() );
                   break;
 
                 case query::colhead::t_double:
+                  CSL_DEBUGF(L"binding param #%d [double] = %lf",which,p->get_double());
                   sqlite3_bind_double( stmt_, which, p->get_double() );
                   break;
 
                 case query::colhead::t_string:
                   /* assume string always has a trailing zero */
+                  CSL_DEBUGF(L"binding param #%d [string] = '%s'",which,p->charp_data());
                   sqlite3_bind_text( stmt_, which, (p->charp_data()), (p->var_size()-1), SQLITE_TRANSIENT );
                   break;
 
                 case query::colhead::t_blob:
+                  CSL_DEBUGF(L"binding param #%d [blob] = %lld bytes",which,p->var_size());
                   sqlite3_bind_blob( stmt_, which, (p->charp_data()), (p->var_size()), SQLITE_TRANSIENT );
                   break;
 
@@ -651,42 +703,54 @@ namespace csl
 
         if( rc == SQLITE_ROW )
         {
-          return true;
+          CSL_DEBUGF(L"sqlite3_step() returned %d = SQLITE_ROW",rc);
+          RETURN_FUNCTION( true );
         }
         else if( rc == SQLITE_OK  )
         {
+          CSL_DEBUGF(L"sqlite3_step() returned %d = SQLITE_OK",rc);
           last_insert_id_ = tran_->cn_->last_insert_id();
           change_count_ = tran_->cn_->change_count();
-          return true;
+          CSL_DEBUGF(L"last_insert_id:%lld change_count:%lld",last_insert_id_,change_count_);
+          RETURN_FUNCTION( true );
         }
         else if( rc == SQLITE_DONE )
         {
+          CSL_DEBUGF(L"sqlite3_step() returned %d = SQLITE_DONE",rc);
           last_insert_id_ = tran_->cn_->last_insert_id();
           change_count_ = tran_->cn_->change_count();
-          return false;
+          CSL_DEBUGF(L"last_insert_id:%lld change_count:%lld",last_insert_id_,change_count_);
+          RETURN_FUNCTION( false );
         }
         else
         {
+          CSL_DEBUGF(L"sqlite3_step() returned %d = ??? = ERROR",rc);
           str s(sqlite3_errmsg(tran_->cn_->db_));
           THRE(conn::impl::create_exc,rc,s.c_str(),false);
         }
 
-        return true;
+        RETURN_FUNCTION( true );
       }
 
       long long query::impl::last_insert_id()
       {
-        return last_insert_id_;
+        ENTER_FUNCTION_X( );
+        CSL_DEBUGF_X( L"last_insert_id() => %lld",last_insert_id_ );
+        RETURN_FUNCTION_X( last_insert_id_ );
       }
 
       long long query::impl::change_count()
       {
-        return change_count_;
+        ENTER_FUNCTION_X( );
+        CSL_DEBUGF_X( L"change_count() => %lld",change_count_ );
+        RETURN_FUNCTION_X( change_count_ );
       }
 
       // oneshot query
       bool query::impl::execute(const char * sql)
       {
+        ENTER_FUNCTION( );
+
         if( !sql )          THR(exc::rs_nullparam,false);
         if( !tran_ )        THR(exc::rs_nulltran,false);
         if( !(tran_->cn_) ) THR(exc::rs_nullconn,false);
@@ -707,12 +771,15 @@ namespace csl
         {
           last_insert_id_ = tran_->cn_->last_insert_id();
           change_count_ = tran_->cn_->change_count();
+          CSL_DEBUGF(L"last_insert_id:%lld change_count:%lld",last_insert_id_,change_count_);
         }
-        return ret;
+        RETURN_FUNCTION( ret );
       }
 
       bool query::impl::execute(const char * sql, ustr & result)
       {
+        ENTER_FUNCTION( );
+
         if( !sql )          THR(exc::rs_nullparam,false);
         if( !tran_ )        THR(exc::rs_nulltran,false);
         if( !(tran_->cn_) ) THR(exc::rs_nullconn,false);
@@ -733,13 +800,15 @@ namespace csl
         {
           last_insert_id_ = tran_->cn_->last_insert_id();
           change_count_ = tran_->cn_->change_count();
+          CSL_DEBUGF(L"last_insert_id:%lld change_count:%lld",last_insert_id_,change_count_);
         }
 
-        return ret;
+        RETURN_FUNCTION( ret );
       }
 
       void query::impl::copy_columns(columns_t & cols)
       {
+        ENTER_FUNCTION( );
         if( column_pool_.n_items() > 0 && cols.n_items() == 0 )
         {
           columnpool_t::iterator it(column_pool_.begin());
@@ -749,11 +818,13 @@ namespace csl
             cols.push_back( *it );
           }
         }
+        LEAVE_FUNCTION( );
       }
 
       bool query::impl::fill_columns()
       {
-        if( !stmt_ ) return false;
+        ENTER_FUNCTION( );
+        if( !stmt_ ) { RETURN_FUNCTION( false ); }
 
         if( column_pool_.n_items() == 0 )
         {
@@ -796,7 +867,8 @@ namespace csl
             }
           }
         }
-        return (column_pool_.n_items() > 0 ? true : false);
+        bool ret = (column_pool_.n_items() > 0 ? true : false);
+        RETURN_FUNCTION( ret );
       }
 
     } /* end of slt3 namespace */

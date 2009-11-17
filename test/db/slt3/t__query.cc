@@ -454,17 +454,18 @@ int main()
   noopen_throw();
 
   UNLINK( "test.db" );
-  csl_common_print_results( "baseline           ", csl_common_test_timer_v0(baseline),"" );
-  csl_common_print_results( "test_colhead       ", csl_common_test_timer_v0(test_colhead),"" );
-  csl_common_print_results( "test_param         ", csl_common_test_timer_v0(test_param),"" );
-  csl_common_print_results( "stepw_noret_noaut  ", csl_common_test_timer_v0(stepw_noret_noaut),"" );
-  csl_common_print_results( "stepw_noret_aut    ", csl_common_test_timer_v0(stepw_noret_aut),"" );
-  csl_common_print_results( "stepw_ret_noaut    ", csl_common_test_timer_v0(stepw_ret_noaut),"" );
-  csl_common_print_results( "stepw_ret_aut      ", csl_common_test_timer_v0(stepw_ret_aut),"" );
-  csl_common_print_results( "onesht_noret_noaut ", csl_common_test_timer_v0(onesht_noret_noaut),"" );
-  csl_common_print_results( "onesht_noret_aut   ", csl_common_test_timer_v0(onesht_noret_aut),"" );
-  csl_common_print_results( "onesht_ret_noaut   ", csl_common_test_timer_v0(onesht_ret_noaut),"" );
-  csl_common_print_results( "onesht_ret_aut     ", csl_common_test_timer_v0(onesht_ret_aut),"" );
+  csl_common_print_results( "baseline              ", csl_common_test_timer_v0(baseline),"" );
+  csl_common_print_results( "test_colhead          ", csl_common_test_timer_v0(test_colhead),"" );
+  csl_common_print_results( "test_param            ", csl_common_test_timer_v0(test_param),"" );
+  csl_common_print_results( "stepw_noret_noaut     ", csl_common_test_timer_v0(stepw_noret_noaut),"" );
+  csl_common_print_results( "stepw_noret_aut       ", csl_common_test_timer_v0(stepw_noret_aut),"" );
+  csl_common_print_results( "stepw_ret_noaut       ", csl_common_test_timer_v0(stepw_ret_noaut),"" );
+  csl_common_print_results( "stepw_ret_aut         ", csl_common_test_timer_v0(stepw_ret_aut),"" );
+  csl_common_print_results( "onesht_noret_noaut    ", csl_common_test_timer_v0(onesht_noret_noaut),"" );
+  csl_common_print_results( "onesht_noret_aut      ", csl_common_test_timer_v0(onesht_noret_aut),"" );
+  csl_common_print_results( "onesht_ret_noaut      ", csl_common_test_timer_v0(onesht_ret_noaut),"" );
+  csl_common_print_results( "onesht_ret_aut        ", csl_common_test_timer_v0(onesht_ret_aut),"" );
+
   UNLINK( "test.db" );
 
   UNLINK( "test2.db" );
@@ -477,14 +478,14 @@ int main()
       slt3::query q(t);
       assert( q.execute("CREATE TABLE perftest (i int, d real, s string, b blob);") == true );
     }
-    csl_common_print_results( "ins_del_int        ", csl_common_test_timer_v0(ins_del_int),"" );
-    csl_common_print_results( "ins_del_double     ", csl_common_test_timer_v0(ins_del_double),"" );
-    csl_common_print_results( "ins_del_str        ", csl_common_test_timer_v0(ins_del_str),"" );
-    csl_common_print_results( "ins_del_blob       ", csl_common_test_timer_v0(ins_del_blob),"" );
+    csl_common_print_results( "ins_del_int           ", csl_common_test_timer_v0(ins_del_int),"" );
+    csl_common_print_results( "ins_del_double        ", csl_common_test_timer_v0(ins_del_double),"" );
+    csl_common_print_results( "ins_del_str           ", csl_common_test_timer_v0(ins_del_str),"" );
+    csl_common_print_results( "ins_del_blob          ", csl_common_test_timer_v0(ins_del_blob),"" );
     {
       slt3::tran t(c);
       perf_tran_ = &t;
-      csl_common_print_results( "insdel_int_notran  ", csl_common_test_timer_v0(insdel_int_notran),"" );
+      csl_common_print_results( "insdel_int_notran     ", csl_common_test_timer_v0(insdel_int_notran),"" );
     }
     assert( c.close() == true );
   }

@@ -33,6 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/common/mpool.hh"
 #include "codesloop/common/str.hh"
 #include "codesloop/common/ustr.hh"
+#include "codesloop/common/logger.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/csl_common.hh"
 
