@@ -28,12 +28,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to check and measure various slt3::sql::helper features
  */
 
-#include "codesloop/common/test_timer.h"
-#include "codesloop/db/sql.hh"
 #include "codesloop/common/obj.hh"
-#include "codesloop/db/obj.hh"
-#include "codesloop/db/reg.hh"
-#include "codesloop/db/tran.hh"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/db/slt3/sql.hh"
+#include "codesloop/db/slt3/obj.hh"
+#include "codesloop/db/slt3/reg.hh"
+#include "codesloop/db/slt3/tran.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/mpool.hh"
 #include <assert.h>

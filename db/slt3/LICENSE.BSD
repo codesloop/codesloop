@@ -1,4 +1,3 @@
-/*
 Copyright (c) 2008,2009, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
@@ -21,30 +20,3 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
-
-#ifndef _csl_slt3_slt3_hh_included_
-#define _csl_slt3_slt3_hh_included_
-
-/**
-  @file csl_slt3.hh
-  @brief common slt3 header
- */
-
-#define CSL_WINDOWS_H_INCLUDED
-#include "codesloop/db/slt3/query.hh"
-#include "codesloop/db/slt3/conn.hh"
-#include "codesloop/db/slt3/tran.hh"
-#include "codesloop/db/slt3/reg.hh"
-#include "codesloop/db/slt3/sql.hh"
-#ifdef __cplusplus
-
-namespace csl
-{
-  namespace slt3
-  {
-  }
-}
-
-#endif /*  __cplusplus */
-#endif /* _csl_slt3_slt3_hh_included_ */

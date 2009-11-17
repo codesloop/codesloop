@@ -24,8 +24,7 @@
 LINK_DIRECTORIES( ../nthread
                   ../common )
 
-INCLUDE_DIRECTORIES( ../..
-                      )
+INCLUDE_DIRECTORIES( ../../.. )
 
 IF(NOT WIN32)
 
@@ -89,14 +88,11 @@ ADD_LIBRARY( csl_db_slt3 STATIC
              _shared_impl.cc _shared_impl.hh
              sql.cc     sql.hh
              var.cc     var.hh
-             exc.cc     exc.hh
              reg.cc     reg.hh
              conn.cc    conn.hh
              tran.cc    tran.hh
              query.cc   query.hh
              obj.cc     obj.hh
            )
-
-ADD_LIBRARY( csl_db STATIC dummy.cc )
 
 # -- EOF --

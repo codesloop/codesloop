@@ -28,7 +28,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   @brief basic slt3 demonstration not using exceptions
  */
 
-#include "codesloop/db/csl_slt3.hh"
+#include "codesloop/db/slt3/csl_slt3.hh"
 #include "codesloop/common/common.h"
 
 using namespace csl::db;

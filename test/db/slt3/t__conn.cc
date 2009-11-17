@@ -29,7 +29,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "codesloop/common/test_timer.h"
-#include "codesloop/db/conn.hh"
+#include "codesloop/db/slt3/conn.hh"
 #include "codesloop/db/exc.hh"
 #include "codesloop/common/common.h"
 #include <assert.h>

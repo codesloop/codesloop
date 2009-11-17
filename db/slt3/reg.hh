@@ -36,10 +36,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "codesloop/common/pvlist.hh"
-#include "codesloop/db/conn.hh"
 #include "codesloop/common/mpool.hh"
 #include "codesloop/common/str.hh"
 #include "codesloop/common/ustr.hh"
+#include "codesloop/db/slt3/conn.hh"
 #ifdef __cplusplus
 #include <memory>
 

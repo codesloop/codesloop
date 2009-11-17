@@ -23,6 +23,7 @@
 
 LINK_DIRECTORIES(
                   ../../../db
+                  ../../../db/slt3
                   ../../../nthread
                   ../../../common
                 )
@@ -35,6 +36,7 @@ IF(WIN32)
 
     LINK_LIBRARIES(
                     csl_db_slt3
+                    csl_db
                     csl_nthread
                     csl_common
                     wsock32
@@ -57,6 +59,7 @@ IF(WIN32)
 
     LINK_LIBRARIES(
                     csl_db_slt3
+                    csl_db
                     csl_nthread
                     csl_common
                     wsock32
@@ -90,6 +93,7 @@ ELSE(WIN32)
 
   LINK_LIBRARIES(
                   csl_db_slt3
+                  csl_db
                   csl_nthread
                   csl_common
                   pthread

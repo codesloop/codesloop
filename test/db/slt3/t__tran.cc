@@ -30,9 +30,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "codesloop/common/common.h"
 #include "codesloop/common/test_timer.h"
-#include "codesloop/db/tran.hh"
-#include "codesloop/db/conn.hh"
-#include "codesloop/db/query.hh"
+#include "codesloop/db/slt3/tran.hh"
+#include "codesloop/db/slt3/conn.hh"
+#include "codesloop/db/slt3/query.hh"
 #include "codesloop/db/exc.hh"
 #include "codesloop/common/str.hh"
 #include "codesloop/common/ustr.hh"

@@ -28,7 +28,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   @brief basic slt3 demonstration using exceptions
  */
 
-#include "codesloop/db/csl_slt3.hh"
+#include "codesloop/db/slt3/csl_slt3.hh"
+#include "codesloop/db/exc.hh"
 #include "codesloop/common/str.hh"
 #include "codesloop/common/common.h"
 

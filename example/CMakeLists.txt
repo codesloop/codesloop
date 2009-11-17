@@ -52,6 +52,7 @@ IF(WIN32)
                   ../sec
                   ../nthread
                   ../db
+                  ../db/slt3
                   "C:/Program Files/GnuWin32/lib/"
                   $ENV{ZLIB_DEV_ENV}/lib
                   ../../3rdparty/zlib/GnuWin32/lib
@@ -66,6 +67,7 @@ IF(WIN32)
 
   LINK_LIBRARIES(
                   csl_db_slt3
+                  csl_db
                   csl_nthread
                   csl_common
                   ${ZLIB}
@@ -86,6 +88,7 @@ ELSE(WIN32)
                   ../sec
                   ../nthread
                   ../db
+                  ../db/slt3
                   )
 
   INCLUDE_DIRECTORIES(
@@ -109,6 +112,7 @@ ELSE(WIN32)
 
   LINK_LIBRARIES(
                   csl_db_slt3
+                  csl_db
                   csl_nthread
                   csl_common
                   pthread
@@ -118,12 +122,12 @@ ELSE(WIN32)
 
 ENDIF(WIN32)
 
-ADD_EXECUTABLE(ex_zfile1 ex_zfile1.cc)
-ADD_EXECUTABLE(ex_zfile2 ex_zfile2.cc)
-ADD_EXECUTABLE(ex_sql1 ex_sql1.cc)
-ADD_EXECUTABLE(ex_sql2 ex_sql2.cc)
-ADD_EXECUTABLE(ex_thread1 ex_thread1.cc)
-ADD_EXECUTABLE(ex_thrpool ex_thrpool.cc)
+ADD_EXECUTABLE( ex_zfile1 ex_zfile1.cc )
+ADD_EXECUTABLE( ex_zfile2 ex_zfile2.cc )
+ADD_EXECUTABLE( ex_sql1 ex_sql1.cc )
+ADD_EXECUTABLE( ex_sql2 ex_sql2.cc )
+ADD_EXECUTABLE( ex_thread1 ex_thread1.cc )
+ADD_EXECUTABLE( ex_thrpool ex_thrpool.cc )
 
 # -- EOF --
 

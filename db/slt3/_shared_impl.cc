@@ -31,7 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif /* DEBUG */
 #endif /* 0 */
 
-#include "codesloop/db/_shared_impl.hh"
+#include "codesloop/db/slt3/_shared_impl.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/int64.hh"
 #include "codesloop/common/dbl.hh"

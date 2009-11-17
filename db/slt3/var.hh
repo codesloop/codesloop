@@ -37,11 +37,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "codesloop/common/pvlist.hh"
 #include "codesloop/common/pbuf.hh"
-#include "codesloop/db/query.hh"
 #include "codesloop/common/int64.hh"
 #include "codesloop/common/dbl.hh"
 #include "codesloop/common/binry.hh"
 #include "codesloop/common/ustr.hh"
+#include "codesloop/db/slt3/query.hh"
 #ifdef __cplusplus
 #include <vector>
 
