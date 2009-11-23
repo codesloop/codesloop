@@ -30,11 +30,17 @@ INCLUDE_DIRECTORIES( ../.. )
 
 SUBDIRS( slt3 )
 
-ADD_LIBRARY( csl_db STATIC exc.cc exc.hh )
+ADD_LIBRARY( csl_db STATIC
+             exc.cc      exc.hh
+             driver.cc   driver.hh
+             conn.cc     conn.hh
+             tran.cc     tran.hh
+             query.cc    query.hh
+           )
 
 FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
 INSTALL( FILES ${includes} DESTINATION include/codesloop/db )
-INSTALL(TARGETS csl_db csl_db_slt3 
+INSTALL(TARGETS csl_db
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib

@@ -23,8 +23,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_slt3_tran_hh_included_
-#define _csl_slt3_tran_hh_included_
+#ifndef _csl_db_slt3_tran_hh_included_
+#define _csl_db_slt3_tran_hh_included_
 
 /**
    @file tran.hh
@@ -131,4 +131,4 @@ namespace csl
 } /* end of ns: csl */
 
 #endif /* __cplusplus */
-#endif /* _csl_slt3_tran_hh_included_ */
+#endif /* _csl_db_slt3_tran_hh_included_ */

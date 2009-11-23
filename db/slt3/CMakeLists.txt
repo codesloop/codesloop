@@ -95,4 +95,12 @@ ADD_LIBRARY( csl_db_slt3 STATIC
              obj.cc     obj.hh
            )
 
+FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
+INSTALL( FILES ${includes} DESTINATION include/codesloop/db/slt3 )
+INSTALL(TARGETS csl_db_slt3
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
+
 # -- EOF --
