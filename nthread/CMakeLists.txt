@@ -73,4 +73,11 @@ ADD_LIBRARY(
     thread.cc    thread.hh
     thrpool.cc   thrpool.hh )
 
+FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
+INSTALL( FILES ${includes} DESTINATION include/codesloop/nthread )
+INSTALL(TARGETS csl_nthread
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
 # -- EOF --

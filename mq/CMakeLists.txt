@@ -74,4 +74,11 @@ ADD_LIBRARY( csl_mq STATIC
              mqfactory.cc             mqfactory.hh
            )
 
+FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
+INSTALL( FILES ${includes} DESTINATION include/codesloop/mq )
+INSTALL(TARGETS csl_mq
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
 # -- EOF --

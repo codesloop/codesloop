@@ -102,4 +102,12 @@ ADD_LIBRARY( csl_common STATIC
              ustr.cc       ustr.hh
              binry.cc      binry.hh )
 
+FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
+INSTALL( FILES ${includes} DESTINATION include/codesloop/common ) 
+INSTALL(TARGETS csl_common
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
+
 # -- EOF --

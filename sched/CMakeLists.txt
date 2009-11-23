@@ -84,5 +84,12 @@ ADD_LIBRARY( csl_sched STATIC
              synchr.cc        synchr.hh
            )
 
+FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
+INSTALL( FILES ${includes} DESTINATION include/codesloop/sched )
+INSTALL(TARGETS csl_sched
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
 # -- EOF --
 

@@ -115,5 +115,12 @@ ADD_LIBRARY( csl_sec STATIC
              rijndael-alg-fst.c  rijndael-alg-fst.h
            )
 
+FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
+INSTALL( FILES ${includes} DESTINATION include/codesloop/sec )
+INSTALL(TARGETS csl_sec
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
 # -- EOF --
 
