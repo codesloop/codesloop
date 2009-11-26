@@ -27,3 +27,40 @@ SUBDIRS(
          slt3
        )
 
+LINK_DIRECTORIES(
+                  ../../db
+                  ../../db/slt3
+                  ../../nthread
+                  ../../common
+                )
+
+INCLUDE_DIRECTORIES( ../../.. )
+
+IF(WIN32)
+
+  LINK_LIBRARIES(
+                  csl_db
+                  csl_common
+                  wsock32
+                )
+
+ELSE(WIN32)
+
+  find_library(DLOPEN_FOUND NAMES dl PATH /usr/lib /lib /usr/local/lib)
+  set(LIBDL)
+
+  if (DLOPEN_FOUND)
+   set(LIBDL dl)
+   set(HAVE_LIBDL TRUE)
+  endif (DLOPEN_FOUND)
+
+  LINK_LIBRARIES(
+                  csl_db
+                  csl_common
+                  ${LIBDL}
+                )
+ENDIF(WIN32)
+
+ADD_EXECUTABLE( t__syntax       t__syntax.cc )
+
+# -- EOF --

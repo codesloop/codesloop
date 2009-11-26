@@ -26,4 +26,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_db_query_hh_included_
 #define _csl_db_query_hh_included_
 
+namespace csl
+{
+  namespace db
+  {
+    class query
+    {
+      public:
+    };
+  }; // end of ns:csl::db
+}; // end of ns:csl
+
 #endif // _csl_db_query_hh_included_
