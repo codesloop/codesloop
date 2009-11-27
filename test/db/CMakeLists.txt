@@ -30,7 +30,6 @@ SUBDIRS(
 LINK_DIRECTORIES(
                   ../../db
                   ../../db/slt3
-                  ../../nthread
                   ../../common
                 )
 
@@ -44,6 +43,23 @@ IF(WIN32)
                   wsock32
                 )
 
+  IF(MSYS)
+
+    ADD_DEFINITIONS( -Wall
+                     -Wwrite-strings
+                     -Wcast-qual
+                     -Wpointer-arith
+                     -Wold-style-cast
+                     -Wconversion
+                     -Wcomment
+                     -Wcast-align
+                     -Wshadow
+                     -Wredundant-decls
+                     -g3
+                   )
+
+  ENDIF(MSYS)
+
 ELSE(WIN32)
 
   find_library(DLOPEN_FOUND NAMES dl PATH /usr/lib /lib /usr/local/lib)
@@ -53,6 +69,20 @@ ELSE(WIN32)
    set(LIBDL dl)
    set(HAVE_LIBDL TRUE)
   endif (DLOPEN_FOUND)
+
+  ADD_DEFINITIONS(
+                   -Wall
+                   -Wwrite-strings
+                   -Wcast-qual
+                   -Wpointer-arith
+                   -Wold-style-cast
+                   -Wconversion
+                   -Wcomment
+                   -Wcast-align
+                   -Wshadow
+                   -Wredundant-decls
+                   -g3
+                 )
 
   LINK_LIBRARIES(
                   csl_db

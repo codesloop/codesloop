@@ -26,6 +26,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_db_conn_hh_included_
 #define _csl_db_conn_hh_included_
 
+#ifdef __cplusplus
+
 namespace csl
 {
   namespace db
@@ -37,4 +39,5 @@ namespace csl
   }; // end of ns:csl::db
 }; // end of ns:csl
 
+#endif // __cplusplus
 #endif // _csl_db_conn_hh_included_
