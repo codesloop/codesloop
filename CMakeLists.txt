@@ -34,7 +34,6 @@ SUBDIRS(
          db
          # sched
          rpc
-         mq
          example
          test
        )
