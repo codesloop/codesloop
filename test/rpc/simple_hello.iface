@@ -3,17 +3,17 @@
  * comm2
  */
 
-#include "hello"
-#include <world>
+#include <codesloop/common/str.hh>
+#include <codesloop/common/exc.hh>
 
-#version      1.2.3.4   
+#version      1.0
 #name         hello
-#namespace    csl::rpc
+#namespace    csl::rpc::hello
 #transport    tcp
 
 hello {
  input:
-     string arg_,
+     str arg_,
  exception:
      exc csl_exc
 }

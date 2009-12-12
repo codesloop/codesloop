@@ -240,6 +240,16 @@ void gettimeofday(struct timeval * tv, void * p)
 # endif /*STRDUP*/
 #endif
 
+#ifndef htonll
+#ifdef _BIG_ENDIAN
+#define htonll(x)   (x)
+#define ntohll(x)   (x)
+#else
+#define htonll(x)   ((((uint64_t)htonl(x)) << 32) + htonl(x >> 32))
+#define ntohll(x)   ((((uint64_t)ntohl(x)) << 32) + ntohl(x >> 32))
+#endif
+#endif
+
 #ifndef CSL_DEBUG_ASSERT
 # ifdef DEBUG
 #  include <assert.h>

@@ -66,6 +66,38 @@ namespace test_xdrbuf {
   }
 
   /** @test integer de/serialization */
+  void test_longlong()
+  {
+    pbuf pb;
+    xdrbuf xb(pb);
+    uint64_t a = 0xdeadbabedeadbabeLL;
+    uint64_t b;
+    xb << a;
+
+    xb.rewind();
+
+    xb >> b;
+    assert( a == b );
+    assert( xb.position() == sizeof(int64_t) );
+
+    bool caught = false;
+    try
+    {
+      unsigned int c;
+
+      /* read more than available */
+      xb >> c;
+    }
+    catch( csl::common::exc e )
+    {
+      caught = true;
+      assert( e.reason_    == csl::common::exc::rs_xdr_eof );
+      assert( e.component_ == L"csl::common::xdrbuf" );
+    }
+    assert( caught == true );
+  }
+
+  /** @test integer de/serialization */
   void test_int()
   {
     pbuf pb;
@@ -464,6 +496,7 @@ int main()
   csl_common_print_results( "baseline             ", csl_common_test_timer_v0(baseline),"" );
   csl_common_print_results( "test_copy            ", csl_common_test_timer_v0(test_copy),"" );
   csl_common_print_results( "test_int             ", csl_common_test_timer_v0(test_int),"" );
+  csl_common_print_results( "test_longlong        ", csl_common_test_timer_v0(test_longlong),"" );
   csl_common_print_results( "test_string          ", csl_common_test_timer_v0(test_string),"" );
   csl_common_print_results( "test_ustring         ", csl_common_test_timer_v0(test_ustring),"" );
   csl_common_print_results( "test_bin             ", csl_common_test_timer_v0(test_bin),"" );

@@ -57,10 +57,10 @@ namespace csl
       const char * class_name, * parent_class;
       if ( kind == STUB_SERVER ) {
         class_name = (ifname_ + "_srv").c_str();
-        parent_class = (std::string("srv_trans_") + ifc_->get_transport() ).c_str();
+        parent_class = (std::string("csl::rpc::srv_trans_") + ifc_->get_transport() ).c_str();
       } else {
         class_name = (ifname_ + "_cli").c_str();
-        parent_class = (std::string("cli_trans_") + ifc_->get_transport() ).c_str();
+        parent_class = (std::string("csl::rpc::cli_trans_") + ifc_->get_transport() ).c_str();
       }
 
       output_
@@ -91,6 +91,18 @@ namespace csl
          << "#endif" << endl
          << "#define  __if_" << ifname_.c_str()  << "_client"
          << endl << endl;
+      }
+
+      if ( kind == STUB_SERVER ) {
+        output_
+          << "#include <codesloop/rpc/srv_trans_" << ifc_->get_transport() << ".hh>" 
+          << endl
+        ;
+      } else {
+        output_
+          << "#include <codesloop/rpc/cli_trans_" << ifc_->get_transport() << ".hh>" 
+          << endl
+        ;
       }
 
       if ( ifc_->get_includes()->size() != 0 )
@@ -124,7 +136,7 @@ namespace csl
       
       // constructor
       output_ 
-        << ls_ << class_name << " : " << parent_class 
+        << ls_ << class_name << "() : " << parent_class 
         << "() {}" << endl
         << endl
       ;
@@ -138,10 +150,10 @@ namespace csl
       ;
       // crc
       output_
-        << ls_ << "static const long long get_crc64() {" << endl
+        << ls_ << "static const uint64_t get_crc64() {" << endl
         << ls_ << "  return " 
         << ustr( ifc_->to_string().c_str() ).crc64().value()         
-        << "LL;" << endl
+        << "ULL;" << endl
         << ls_ << "}" << endl << endl
       ;
 
@@ -177,6 +189,10 @@ namespace csl
           << " (" << endl
         ;
         this->generate_func_params( (*func_it).name, kind, false);
+        // make server definitions pure virtual
+        if ( kind == STUB_SERVER ) {
+          output_ << " = 0";
+        }
         output_ << ";" << endl;
 
         /* asynchronous call */
@@ -194,6 +210,21 @@ namespace csl
       }
 
       /*---------------------------------------------------------\
+      |  Specialies                                              |
+      \---------------------------------------------------------*/
+      ls_ = ls_.substr( 0, ls_.size() - 2 );
+      output_ << ls_ << "protected:" << endl;
+      ls_ += "  ";
+
+      if ( kind == STUB_SERVER ) 
+      {
+        output_ << ls_ << "virtual void despatch(" << endl;
+        output_ << ls_ << "  /* input */  function_ids fid," << endl;
+        output_ << ls_ << "  /* inout */  csl::common::pbuf & buffer" << endl;
+        output_ << ls_ << ");" << endl;
+      }
+
+      /*---------------------------------------------------------\
       |  Cleanup                                                 |
       \---------------------------------------------------------*/
       ls_ = ls_.substr( 0, ls_.size() - 2 );
@@ -203,9 +234,8 @@ namespace csl
 
       output_
         << endl
-        << "#ifndef /* __csl_interface_" << ifc_->get_name().c_str() << "*/" 
-        << endl
         << "#endif /* __cplusplus */" << endl
+        << "#endif /* __csl_interface_" << ifc_->get_name().c_str() << "*/" << endl
         << "/* EOF */" << endl
       ;
 

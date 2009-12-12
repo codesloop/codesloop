@@ -113,6 +113,30 @@ namespace csl
       return *this;
     }
 
+    xdrbuf & xdrbuf::operator<<(int64_t val)
+    {
+      int64_t v = htonll(val);
+
+      if( !b_->append( reinterpret_cast<unsigned char *>(&v),sizeof(int64_t)) )
+      {
+        THR(exc::rs_cannot_append,*this);
+      }
+
+      return *this;
+    }
+
+    xdrbuf & xdrbuf::operator<<(uint64_t val)
+    {
+      uint64_t v = htonll(val);
+
+      if( !b_->append( reinterpret_cast<unsigned char *>(&v),sizeof(uint64_t)) )
+      {
+        THR(exc::rs_cannot_append,*this);
+      }
+
+      return *this;
+    }
+
     xdrbuf & xdrbuf::operator<<(const char * val)
     {
       uint32_t sz = 0;
@@ -271,6 +295,56 @@ namespace csl
       if( (szrd=get_data( reinterpret_cast<unsigned char *>(&tmp),sizeof(tmp))) == sizeof(tmp) )
       {
         val = ntohl(tmp);
+      }
+      else if( szrd == 0 && it_==b_->end() )
+      {
+        THR(exc::rs_xdr_eof,*this);
+      }
+      else if( szrd != sizeof(tmp) )
+      {
+        THR(exc::rs_xdr_invalid,*this);
+      }
+      else
+      {
+        THR(exc::rs_cannot_get,*this);
+      }
+
+      return *this;
+    }
+
+    xdrbuf & xdrbuf::operator>>(int64_t & val)
+    {
+      int64_t tmp;
+      uint64_t szrd=0;
+
+      if( (szrd=get_data( reinterpret_cast<unsigned char *>(&tmp),sizeof(tmp))) == sizeof(tmp) )
+      {
+        val = ntohll(tmp);
+      }
+      else if( szrd == 0 && it_==b_->end() )
+      {
+        THR(exc::rs_xdr_eof,*this);
+      }
+      else if( szrd != sizeof(tmp) )
+      {
+        THR(exc::rs_xdr_invalid,*this);
+      }
+      else
+      {
+        THR(exc::rs_cannot_get,*this);
+      }
+
+      return *this;
+    }
+
+    xdrbuf & xdrbuf::operator>>(uint64_t & val)
+    {
+      uint64_t tmp;
+      uint64_t szrd=0;
+
+      if( (szrd=get_data( reinterpret_cast<unsigned char *>(&tmp),sizeof(tmp))) == sizeof(tmp) )
+      {
+        val = ntohll(tmp);
       }
       else if( szrd == 0 && it_==b_->end() )
       {

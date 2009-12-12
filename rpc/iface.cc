@@ -76,6 +76,21 @@ namespace csl
     void iface::set_param_type(const token_info & ti)
     {
       param_type_ = token_to_string(ti);
+
+      // handle "well known" parameter types
+      // TODO: make it as parser option (enabled by default)
+      if ( param_type_ == "str" ||
+           param_type_ == "exc" ||
+           param_type_ == "pbuf" ||
+           param_type_ == "int64" ||
+           param_type_ == "hash" ||
+           param_type_ == "dbl" ||
+           param_type_ == "binry" ||
+           param_type_ == "pbuf" ||
+           param_type_ == "xdrbuf" 
+          )
+        param_type_ = "csl::common::" + param_type_;
+        
     }
 
     void iface::set_param_name(const token_info & ti)

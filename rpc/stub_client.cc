@@ -25,6 +25,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "codesloop/rpc/stub_client.hh"
 #include "codesloop/common/common.h"
+#include "codesloop/common/ustr.hh"
 
 /**
   @file rpc/src/stub_client.cc
@@ -32,6 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 using std::endl;
+using csl::common::ustr;
 
 namespace csl
 {
@@ -45,7 +47,9 @@ namespace csl
 
       output_
         << "#ifdef __cplusplus" << endl
-        << "#include \"" << (ifname_+"_cli.hh").c_str() << "\""        
+        << "#include \"" << (ifname_+"_cli.hh").c_str() << "\""  
+        << endl
+        << "#include <codesloop/common/arch.hh>"        
         << endl
         ;
 
@@ -127,13 +131,14 @@ namespace csl
         ;
 
         // serializer
-        output_ 
-          << ls_ << "  arch archiver(arch::SERIALIZE);" << endl
+        output_
+          << ls_ << "  static uint64_t interface_id = " <<  ustr( ifc_->to_string().c_str() ).crc64().value()
+          << "ULL;"<< endl
+          << ls_ << "  static uint32_t function_id = fid_" << (*func_it).name << ";"<< endl
+          << ls_ << "  csl::common::arch archiver(csl::common::arch::SERIALIZE);" << endl
           << endl
-          << ls_ << "  archiver.serialize(__if_" << ifname_.c_str()  
-          <<             "_crc );" << endl
-          << ls_ << "  archiver.serialize(__func_"<< ifname_.c_str()  
-          <<             "_"<< (*func_it).name << "_id);" << endl        
+          << ls_ << "  archiver.serialize(interface_id); " << endl
+          << ls_ << "  archiver.serialize(function_id);" << endl        
         ;
 
         param_it = (*func_it).params.begin();
@@ -146,8 +151,9 @@ namespace csl
           }
 
           output_
-            << ls_ << "  archiver.serialize(" << (*param_it).name
-            << ");" << endl
+            << ls_ << "  archiver.serialize(const_cast<" << (*param_it).type 
+            << "&>(" << (*param_it).name
+            << "));" << endl
           ;
 
           param_it++;

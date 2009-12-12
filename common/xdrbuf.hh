@@ -110,6 +110,25 @@ namespace csl
         @return reference to xdrbuf
         @throw common::exc
 
+        puts a 64 bit integer to pbuf
+        */
+        xdrbuf & operator<<(int64_t val);
+
+        /**
+        @brief serialize val to pbuf
+        @param val is the value to be serialized
+        @return reference to xdrbuf
+        @throw common::exc
+
+        puts a 64 bit integer to stream
+        */
+        xdrbuf & operator<<(uint64_t val);
+        /**
+        @brief serialize val to pbuf
+        @param val is the value to be serialized
+        @return reference to xdrbuf
+        @throw common::exc
+
         @li puts a 32 bit integer to stream as size
         @li puts size bytes of val C string to pbuf
         @li puts optional padding 1-3 bytes
@@ -194,6 +213,26 @@ namespace csl
         @li reads a 32 bit integer from stream to val
         */
         xdrbuf & operator>>(uint32_t & val);
+
+        /**
+        @brief deserialize val from pbuf
+        @param val is the value to be deserialized
+        @return reference to xdrbuf
+        @throw common::exc
+
+        @li reads a 64 bit integer from stream to val
+        */
+        xdrbuf & operator>>(int64_t & val);
+
+        /**
+        @brief deserialize val from pbuf
+        @param val is the value to be deserialized
+        @return reference to xdrbuf
+        @throw common::exc
+
+        @li reads a 64 bit integer from stream to val
+        */
+        xdrbuf & operator>>(uint64_t & val);
 
         /**
         @brief deserialize val from variable
