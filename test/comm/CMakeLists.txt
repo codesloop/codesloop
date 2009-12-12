@@ -178,4 +178,16 @@ ADD_EXECUTABLE( t__udp_auth_server     t__udp_auth_server.cc )
 ADD_EXECUTABLE( t__udp_data_client     t__udp_data_client.cc )
 ADD_EXECUTABLE( t__udp_data_server     t__udp_data_server.cc )
 
+ADD_TEST(comm_bfd ${EXECUTABLE_OUTPUT_PATH}/t__bfd)
+ADD_TEST(comm_mt_udp ${EXECUTABLE_OUTPUT_PATH}/t__mt_udp)
+ADD_TEST(comm_tcp_client ${EXECUTABLE_OUTPUT_PATH}/t__tcp_client)
+ADD_TEST(comm_tcp_libev ${EXECUTABLE_OUTPUT_PATH}/t__tcp_libev)
+ADD_TEST(comm_tcp_lstnr ${EXECUTABLE_OUTPUT_PATH}/t__tcp_lstnr)
+ADD_TEST(comm_udp_auth_client ${EXECUTABLE_OUTPUT_PATH}/t__udp_auth_client)
+ADD_TEST(comm_udp_auth_server ${EXECUTABLE_OUTPUT_PATH}/t__udp_auth_server)
+ADD_TEST(comm_udp_data_client ${EXECUTABLE_OUTPUT_PATH}/t__udp_data_client)
+ADD_TEST(comm_udp_data_server ${EXECUTABLE_OUTPUT_PATH}/t__udp_data_server)
+ADD_TEST(comm_udp_hello_client ${EXECUTABLE_OUTPUT_PATH}/t__udp_hello_client)
+ADD_TEST(comm_udp_hello_server ${EXECUTABLE_OUTPUT_PATH}/t__udp_hello_server)
+
 # -- EOF --

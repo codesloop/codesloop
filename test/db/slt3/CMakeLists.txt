@@ -112,4 +112,14 @@ ADD_EXECUTABLE( t__sql_helper   t__sql_helper.cc )
 ADD_EXECUTABLE( t__var_mem      t__var_mem.cc )
 ADD_EXECUTABLE( t__query_mem    t__query_mem.cc )
 
+ADD_TEST(db_slt3_conn ${EXECUTABLE_OUTPUT_PATH}/t__conn)
+ADD_TEST(db_slt3_query ${EXECUTABLE_OUTPUT_PATH}/t__query)
+ADD_TEST(db_slt3_query_mem ${EXECUTABLE_OUTPUT_PATH}/t__query_mem)
+ADD_TEST(db_slt3_reg ${EXECUTABLE_OUTPUT_PATH}/t__reg)
+ADD_TEST(db_slt3_sql_helper ${EXECUTABLE_OUTPUT_PATH}/t__sql_helper)
+ADD_TEST(db_slt3_sqlite ${EXECUTABLE_OUTPUT_PATH}/t__sqlite)
+ADD_TEST(db_slt3_tran ${EXECUTABLE_OUTPUT_PATH}/t__tran)
+ADD_TEST(db_slt3_var ${EXECUTABLE_OUTPUT_PATH}/t__var)
+ADD_TEST(db_slt3_var_mem ${EXECUTABLE_OUTPUT_PATH}/t__var_mem)
+
 # -- EOF --

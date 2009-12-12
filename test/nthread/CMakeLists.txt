@@ -110,4 +110,11 @@ ADD_EXECUTABLE( t__event         t__event.cc )
 ADD_EXECUTABLE( t__pevent        t__pevent.cc )
 ADD_EXECUTABLE( t__thrpool       t__thrpool.cc )
 
+ADD_TEST(nthread_event ${EXECUTABLE_OUTPUT_PATH}/t__event)
+ADD_TEST(nthread_mutex ${EXECUTABLE_OUTPUT_PATH}/t__mutex)
+ADD_TEST(nthread_pevent ${EXECUTABLE_OUTPUT_PATH}/t__pevent)
+ADD_TEST(nthread_pt_mutex ${EXECUTABLE_OUTPUT_PATH}/t__pt_mutex)
+ADD_TEST(nthread_thread ${EXECUTABLE_OUTPUT_PATH}/t__thread)
+ADD_TEST(nthread_thrpool ${EXECUTABLE_OUTPUT_PATH}/t__thrpool)
+
 # -- EOF --

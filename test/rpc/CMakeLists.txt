@@ -23,4 +23,7 @@
 
 # SET(CMAKE_VERBOSE_MAKEFILE ON)
 
+ADD_TEST(rpc_csrgen_exp1 ../../rpc/csrgen exp1.txt )
+ADD_TEST(rpc_csrgen_exp2 ../../rpc/csrgen exp2.txt )
+
 # -- EOF --
