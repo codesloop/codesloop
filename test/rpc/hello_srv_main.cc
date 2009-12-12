@@ -18,56 +18,51 @@ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
 INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
 NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
 DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, objICT LIABILITY, OR TORT
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_mq_qpid_lstnr_hh_included_
-#define _csl_mq_qpid_lstnr_hh_included_
+#include "hello_srv.hh"
 
 /**
-   @file session.hh
-   @brief session interface for q'ing
+  @file test/rpc/hello_srv_main.cc
+  @brief main function for hello world test case
  */
 
-#include "codesloop/common/obj.hh"
-#include "codesloop/mq/sess.hh"
-#include "codesloop/common/tbuf.hh"
-#include <qpid/client/Connection.h>
-#include <qpid/client/Session.h>
-#include <qpid/client/Message.h>
-#include <qpid/client/MessageListener.h>
-#include <qpid/client/SubscriptionManager.h>
+using csl::common::str;
 
-
-#ifdef __cplusplus
-namespace csl
+namespace csl 
 {
-  namespace mq
+  namespace rpc 
   {
-    
-    class qpid_lstnr : public lstnr, public qpid::client::MessageListener
+    namespace hello 
     {
-      CSL_OBJ(csl::mq,qpid_lstnr);
-    
-    public:
-      virtual void received(qpid::client::Message& message)
+      class hello_impl : public hello_srv
       {
-        qpid_msg m;
-        csl::common::tbuf<512> buf( message.getData().c_str() );
-        m.set_tbuf( &buf );
-        m.set_routing_key(message.getDeliveryProperties().getRoutingKey().c_str());
-        m.set_destination(message.getDestination().c_str());
-        m.set_xchg(message.getDeliveryProperties().getExchange().c_str());
+        CSL_OBJ(csl::rpc::hello,hello);
+      public:
+        virtual void hello(csl::common::ustr arg_)        
+        {
+          ENTER_FUNCTION();
+          csl::common::logger::info( str( "Hello " + arg_) ); 
+          LEAVE_FUNCTION();
+        }
 
-        receive( m );
-      }
+      };
 
     };
-  }
+  };
+};
+
+
+int main()
+{
+    csl::rpc::hello::hello_impl srv;
+
+    srv.listen( "127.0.0.1", 12321 );
+
+    exit(0);
 }
 
-#endif /* __cplusplus */
-#endif /* _csl_mq_qpid_lstnr_hh_included_ */
-
+/* EOF */

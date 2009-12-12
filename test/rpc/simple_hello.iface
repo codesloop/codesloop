@@ -1,0 +1,20 @@
+// comm1 
+/* 
+ * comm2
+ */
+
+#include <codesloop/common/ustr.hh>
+#include <codesloop/common/exc.hh>
+
+#version      1.0
+#name         hello
+#namespace    csl::rpc::hello
+#transport    tcp
+
+hello {
+ input:
+     ustr arg_,
+ exception:
+     exc csl_exc
+}
+

@@ -23,29 +23,42 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
  
-#ifndef _csl_rpc_stub_server_hh_included_
-#define _csl_rpc_stub_server_hh_included_
+#ifndef _csl_rpc_cli_trans_tcp_hh_included_
+#define _csl_rpc_cli_trans_tcp_hh_included_
 
 #include "codesloop/common/common.h"
 #ifdef __cplusplus
 #include "codesloop/common/obj.hh"
-#include "codesloop/rpc/iface.hh"
-#include "codesloop/rpc/csrgen.hh"
-#include "codesloop/rpc/stub_base.hh"
+#include "codesloop/common/pbuf.hh"
+#include "codesloop/rpc/handle.hh"
+#include "codesloop/comm/tcp_client.hh"
+
 
 namespace csl 
 { 
   namespace rpc 
   {
     /** @brief stores parsed interface description */
-    class stub_server : public stub_base
+    class cli_trans_tcp : public csl::common::obj
     {
-      CSL_OBJ(csl::rpc,stub_client);
+      CSL_OBJ(csl::rpc,cli_trans_tcp);
 
-    public: 
-      stub_server(const iface * i) : stub_base(i) {}
-  
-      virtual void generate();
+    public:
+      /**
+       * connects to a remote server object
+       *
+       * @param hostname host to connect
+       * @param port port to connect
+       */
+      void connect(const char * hostname, unsigned short port);
+
+    protected:
+      void create_handle(handle &);
+      void wait(handle &);
+      void send(handle &, csl::common::pbuf *);
+
+    private:
+      csl::comm::tcp::client client_;
     };
 
 
@@ -53,4 +66,4 @@ namespace csl
 }
 
 #endif /* __cplusplus */
-#endif /* _csl_rpc_stub_server_hh_included_ */
+#endif /* _csl_rpc_cli_trans_tcp_hh_included_ */

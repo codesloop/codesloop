@@ -23,6 +23,7 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 PROJECT(codesloop)
+ENABLE_TESTING()
 
 # SET(CMAKE_VERBOSE_MAKEFILE ON)
 
@@ -34,7 +35,6 @@ SUBDIRS(
          db
          # sched
          rpc
-         mq
          example
          test
        )

@@ -18,58 +18,19 @@ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
 INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
 NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
 DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, objICT LIABILITY, OR TORT
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "codesloop/common/common.h"
+#include "codesloop/rpc/handle.hh"
+
 /**
-   @file qpid_msg.cc
-   @brief impl_ interface for qpid based queueing
+  @file rpc/src/handle.cc
+  @brief implementation of static rpc handle 
  */
 
-#include "codesloop/mq/sess.hh"
-#include "codesloop/mq/qpid_msg.hh"
-#include "codesloop/mq/qpid_sess.hh"
-#include "codesloop/common/logger.hh"
+csl::rpc::handle csl::rpc::__handle_sequence = 0;
 
-#include <qpid/client/Connection.h>
-#include <qpid/client/Session.h>
-
-
-using namespace qpid::client;
-using namespace qpid::framing;
-
-namespace csl 
-{
-  namespace mq 
-  {
-
-    void qpid_msg::send(const char * xchg)
-    {
-      ENTER_FUNCTION();
-
-      msg_.getDeliveryProperties().setRoutingKey( get_routing_key() );
-      msg_.setData(std::string( reinterpret_cast<const char*>(buf_->data()), buf_->size() ) );
-
-      dynamic_cast<qpid_sess * >(sess_)->get_native_sess().
-        messageTransfer(arg::content=msg_, arg::destination=xchg);
-
-
-      LEAVE_FUNCTION();
-    }
-
-    void qpid_msg::send(const char * xchg,const char * routing_key) 
-    {
-      ENTER_FUNCTION();
-      
-      set_routing_key(routing_key);
-      send(xchg);
-
-      LEAVE_FUNCTION();
-    }
-
-
-  }
-}
-
+/* EOF */

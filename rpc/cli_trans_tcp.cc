@@ -23,35 +23,65 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "codesloop/rpc/exc.hh"
-#include "codesloop/common/str.hh"
+#include "codesloop/rpc/cli_trans_tcp.hh"
 #include "codesloop/common/common.h"
+#include "codesloop/comm/tcp_client.hh"
+#include "codesloop/comm/exc.hh"
+
+using namespace csl::comm;
+using namespace csl::comm::tcp;
 
 /**
-  @file rpc/src/exc.cc
-  @brief implementation of rpc::exc
+  @file rpc/src/cli_trans_tcp.cc
+  @brief implementation of codesloop interface descriptor
  */
 
 namespace csl
 {
   namespace rpc
   {
-    const wchar_t * exc::reason_string(int rc)
+
+    void cli_trans_tcp::connect(const char * hostname, unsigned short port)
     {
-      switch( rc )
-      {
-        case rs_invalid_param:   return L"Invalid parameter received.";
-        case rs_not_implemented: return L"Function is not implemented.";
-        case rs_invalid_handle:  return L"Invalid handle received";
-        case rs_comm_err:        return L"Communication error";
-        case rs_incompat_iface:  return L"Incompatible interfaces";
-        case rs_srv_unknown_exc: return L"Unknown exception received from server side";
-        case rs_unknown:
-          default:               return L"Unknown reason";
-      };
+      ENTER_FUNCTION();
+      in_addr_t saddr = inet_addr(hostname);
+      SAI peer;
+
+      ::memset( &peer,0,sizeof(peer) );
+      ::memcpy( &(peer.sin_addr),&saddr,sizeof(saddr) );
+
+      peer.sin_family  = AF_INET;
+      peer.sin_port = htons( port );
+
+      bool iret = client_.init( peer );
+
+      if ( iret ) 
+        CSL_DEBUGF( L"Client connected to %s:%d", hostname, port);
+      else 
+        THRNORET(csl::comm::exc::rs_connect_failed);
+
+      LEAVE_FUNCTION();
     }
 
-    /* public interface */
+    void cli_trans_tcp::create_handle(handle & h)
+    {
+      h = __handle_sequence++;
+    }
+
+    void cli_trans_tcp::wait(handle &)
+    {
+    }
+
+    void cli_trans_tcp::send(handle & h, csl::common::pbuf * p )
+    {
+      uint8_t * data = new uint8_t[ p->size() ]; 
+
+      p->copy_to( data, p->size());
+      client_.write(data, p->size());
+
+      delete data;
+    }
+
   };
 };
 

@@ -28,5 +28,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef EV_STANDALONE
 #define EV_STANDALONE 1
 #endif /*EV_STANDALONE*/
+#include "config.h"
 #include "ev.h"
 #endif /*_csl_comm_libev_evwrap_h_included_*/

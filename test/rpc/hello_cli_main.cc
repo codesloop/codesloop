@@ -18,48 +18,31 @@ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
 INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
 NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
 DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, objICT LIABILITY, OR TORT
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_mq_qpid_msg_hh_included_
-#define _csl_mq_qpid_msg_hh_included_
+#include "hello_cli.hh"
 
 /**
-   @file session.hh
-   @brief session interface for q'ing
+  @file test/rpc/hello_cli_main.cc
+  @brief main function for hello world test case
  */
 
-#include "codesloop/common/obj.hh"
-#include "codesloop/mq/sess.hh"
-#include "codesloop/mq/msg.hh"
-#include <qpid/client/Connection.h>
-#include <qpid/client/Session.h>
-#include <qpid/client/Message.h>
+using csl::rpc::hello::hello_cli;
+using namespace csl::common;
 
-
-#ifdef __cplusplus
-namespace csl
+int main()
 {
-  namespace mq
-  {
-    
-    class qpid_msg : public msg
-    {
-      CSL_OBJ(csl::mq,qpid_msg)
+    hello_cli cli;
 
-    public:
-      virtual void send(const char * xchg);
-      virtual void send(const char * xchg,
-                        const char * routing_key);
+    cli.connect( "127.0.0.1", 12321 );
 
-    protected:
-      qpid::client::Message msg_;
-    };
-  }
+    cli.hello( ustr("world!") );
+
+
+    exit(0);
 }
 
-#endif /* __cplusplus */
-#endif /* _csl_mq_qpid_msg_hh_included_ */
-
+/* EOF */

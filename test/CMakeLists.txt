@@ -31,6 +31,5 @@ SUBDIRS(
          db
        #  sched
          rpc
-         mq
        )
 

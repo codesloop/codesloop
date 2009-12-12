@@ -65,6 +65,14 @@ ADD_EXECUTABLE( csrgen  csrparser.cc    csrparser.hh
                         csrgen_main.cc 
                         csrgen.hh)
 
+ADD_LIBRARY( csl_rpc STATIC
+             handle.cc        handle.hh
+             cli_trans_tcp.cc cli_trans_tcp.hh
+             srv_trans_tcp.cc srv_trans_tcp.hh
+          )
+
+
+
 FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
 INSTALL( FILES ${includes} DESTINATION include/codesloop/rpc )
 
@@ -73,4 +81,11 @@ INSTALL(TARGETS csrgen
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
+
+INSTALL(TARGETS csl_rpc
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
+
 # -- EOF 

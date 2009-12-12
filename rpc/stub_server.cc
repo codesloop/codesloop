@@ -26,6 +26,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/rpc/stub_server.hh"
 #include "codesloop/common/common.h"
 
+using std::endl;
+
 /**
   @file rpc/src/stub_server.cc
   @brief implementation of codesloop interface descriptor
@@ -35,6 +37,148 @@ namespace csl
 {
   namespace rpc
   {
+    void stub_server::generate()
+    {
+      const char * class_name = (ifname_ + "_srv").c_str();
+
+      open_file((ifname_+"_srv.cc").c_str());
+
+      output_
+        << "#ifdef __cplusplus" << endl
+        << "#include \"" << (ifname_+"_srv.hh").c_str() << "\""
+        << endl
+        << "#include <codesloop/common/arch.hh>"
+        << endl
+        << "#include <codesloop/common/pbuf.hh>" 
+        << endl
+      ;
+
+      /*---------------------------------------------------------\
+      |  Generate namespace info                                 |
+      \---------------------------------------------------------*/
+      this->generate_ns_open();
+
+
+
+
+      /*---------------------------------------------------------\
+      |  Despatcher function                                     |
+      \---------------------------------------------------------*/
+      iface::function_iterator func_it = ifc_->get_functions()->begin();
+      iface::func::param_iterator param_it;
+
+      output_
+        << ls_ << "/* implement function call routing */" << endl
+        << ls_ << "void " << class_name << "::despatch (" << endl
+        << ls_ << "  /* inout */  csl::common::pbuf & buffer)" << endl
+        << ls_ << "{" << endl 
+        << ls_ << "  ENTER_FUNCTION();" << endl << endl
+        << ls_ << "  CSL_DEBUG_ASSERT(buffer.size() != 0);" << endl << endl
+        << ls_ << "  csl::common::arch archiver(csl::common::arch::DESERIALIZE);" << endl
+        << ls_ << "  uint64_t interface_id;" << endl
+        << ls_ << "  uint32_t function_id = fid_hello;" << endl << endl
+        << ls_ << "  archiver.set_pbuf( buffer );" << endl << endl
+        << ls_ << "  archiver.serialize(interface_id);" << endl
+        << ls_ << "  archiver.serialize(function_id);" << endl << endl
+        << ls_ << "  switch( function_id )" << endl          
+        << ls_ << "  {" << endl
+      ;
+
+      while ( func_it != ifc_->get_functions()->end() )
+      {
+        output_
+          << ls_ << "    case fid_" << (*func_it).name << ":" << endl
+        ; 
+        param_it = (*func_it).params.begin();
+        while( param_it != (*func_it).params.end() )
+        {
+          // create type 
+          if ( (*param_it).kind!=MD_EXCEPTION ) {
+            output_ 
+              << ls_ << "      " << (*param_it).type << " " << (*param_it).name << ";"
+              << endl
+              ;
+
+            // deserialize data if necessary
+            if ( (*param_it).kind!=MD_OUTPUT ) {
+              output_ 
+                << ls_ << "      archiver.serialize( " << (*param_it).name << ");" 
+                << endl
+              ;
+            }
+          
+          } // create type
+
+          param_it++;
+        }
+        output_ << endl;
+
+
+        // call it!
+        output_ 
+          << ls_ << "      try { " << endl << endl
+          << ls_ << "        " << (*func_it).name << "("
+        ;
+
+        param_it = (*func_it).params.begin();
+        while( param_it != (*func_it).params.end() )
+        {
+          if ( (*param_it).kind!=MD_EXCEPTION ) {
+            output_ <<  (*param_it).name ;
+          }
+          param_it++;
+          // TODO: now it works only, if exceptions are defined last
+          if ( (*param_it).kind!=MD_EXCEPTION && param_it != (*func_it).params.end() )
+            output_ << ", ";
+        }
+
+        output_ << ");" << endl << endl;
+
+        // handl exceptions
+        param_it = (*func_it).params.begin();
+        while( param_it != (*func_it).params.end() )
+        {
+          if ( (*param_it).kind==MD_EXCEPTION ) {
+            output_
+              << ls_ << "      } catch(" << (*param_it).type << " & " 
+              << (*param_it).name<< ") {" << endl
+              << ls_ << "        /* TODO: handle as output parameter */" << endl 
+            ;
+          }
+          param_it++;
+        }
+        output_ << ls_ << "      } catch(...) {" << endl;
+        output_ << ls_ << "        /* TODO: raise csl::rpc::exc exception */" << endl;
+        output_ << ls_ << "      } " << endl;
+
+        output_
+          << ls_ << "    break;" << endl
+        ;
+
+        func_it++;
+      }
+      output_
+        << ls_ << "  } /* switch */" << endl
+      ;
+
+
+      output_
+        << ls_ << "  LEAVE_FUNCTION();" << endl 
+        << ls_ << "}" << endl
+      ;
+
+      /*---------------------------------------------------------\
+      |  Cleanup                                                 |
+      \---------------------------------------------------------*/
+      generate_ns_close();
+
+      output_
+        << endl
+        << "#endif /* __cplusplus */" << endl
+        << "/* EOF */" << endl
+      ;
+    }
+    
   };
 };
 

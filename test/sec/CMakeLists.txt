@@ -148,4 +148,12 @@ ADD_EXECUTABLE(t__sha1               t__sha1.c)
 ADD_EXECUTABLE(t__bignum             t__bignum.cc)
 ADD_EXECUTABLE(t__ecdh_key           t__ecdh_key.cc)
 
+ADD_TEST(sec_bignum ${EXECUTABLE_OUTPUT_PATH}/t__bignum)
+ADD_TEST(sec_crypt_buf ${EXECUTABLE_OUTPUT_PATH}/t__crypt_buf)
+ADD_TEST(sec_crypt_pkt ${EXECUTABLE_OUTPUT_PATH}/t__crypt_pkt)
+ADD_TEST(sec_derive_ec_params ${EXECUTABLE_OUTPUT_PATH}/t__derive_ec_params)
+ADD_TEST(sec_ecdh_key ${EXECUTABLE_OUTPUT_PATH}/t__ecdh_key)
+ADD_TEST(sec_sha1 ${EXECUTABLE_OUTPUT_PATH}/t__sha1)
+ADD_TEST(sec_umac ${EXECUTABLE_OUTPUT_PATH}/t__umac)
+
 # -- EOF --
