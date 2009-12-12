@@ -1,0 +1,20 @@
+// comm1 
+/* 
+ * comm2
+ */
+
+#include "hello"
+#include <world>
+
+#version      1.2.3.4   
+#name         hello
+#namespace    csl::rpc
+#transport    tcp
+
+hello {
+ input:
+     string arg_,
+ exception:
+     exc csl_exc
+}
+
