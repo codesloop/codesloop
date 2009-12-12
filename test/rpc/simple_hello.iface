@@ -3,7 +3,7 @@
  * comm2
  */
 
-#include <codesloop/common/str.hh>
+#include <codesloop/common/ustr.hh>
 #include <codesloop/common/exc.hh>
 
 #version      1.0
@@ -13,7 +13,7 @@
 
 hello {
  input:
-     str arg_,
+     ustr arg_,
  exception:
      exc csl_exc
 }

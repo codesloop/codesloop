@@ -42,6 +42,9 @@ ELSE(WIN32)
                  )
 ENDIF(WIN32)
 
+ADD_DEFINITIONS( -DDEBUG )
+
+
 
 ADD_CUSTOM_COMMAND( OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/hello_cli.cc
                   PRE_BUILD
@@ -56,7 +59,11 @@ LINK_DIRECTORIES( ../../common
 
 LINK_LIBRARIES(
                 csl_rpc
+                csl_comm
+                csl_nthread
+                csl_common_libev                
                 csl_common
+                pthread
               )
 
 

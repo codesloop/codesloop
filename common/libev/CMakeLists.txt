@@ -51,37 +51,6 @@ ELSE(WIN32)
                    -Wshadow
                    -Wredundant-decls
                    -g3
-                   # -- is this really needed ? --
-                   -DHAVE_DLFCN_H=1
-                   -DHAVE_EPOLL_CTL=1
-                   -DHAVE_EVENTFD=1
-                   -DHAVE_INOTIFY_INIT=1
-                   -DHAVE_INTTYPES_H=1
-                   -DHAVE_LIBM=1
-                   -DHAVE_MEMORY_H=1
-                   -DHAVE_POLL=1
-                   -DHAVE_POLL_H=1
-                   -DHAVE_SELECT=1
-                   -DHAVE_SIGNALFD=1
-                   -DHAVE_STDINT_H=1
-                   -DHAVE_STDLIB_H=1
-                   -DHAVE_STRINGS_H=1
-                   -DHAVE_STRING_H=1
-                   -DHAVE_SYS_EPOLL_H=1
-                   -DHAVE_SYS_EVENTFD_H=1
-                   -DHAVE_SYS_INOTIFY_H=1
-                   -DHAVE_SYS_QUEUE_H=1
-                   -DHAVE_SYS_SELECT_H=1
-                   -DHAVE_SYS_SIGNALFD_H=1
-                   -DHAVE_SYS_STAT_H=1
-                   -DHAVE_SYS_TYPES_H=1
-                   -DHAVE_UNISTD_H=1
-                   # -- feature settings --
-                   -DEV_USE_NANOSLEEP=1
-                   -DEV_USE_EPOLL=1
-                   -DEV_USE_INOTIFY=1
-                   -DEV_USE_4HEAP=1
-                   -DEV_HEAP_CACHE_AT=1
                  )
 
   #ADD_CUSTOM_COMMAND(

@@ -29,19 +29,38 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/common/common.h"
 #ifdef __cplusplus
 #include "codesloop/common/obj.hh"
+#include "codesloop/common/pbuf.hh"
+#include "codesloop/comm/handler.hh"
+#include "codesloop/comm/tcp_lstnr.hh"
+
+using namespace csl::comm;
+using namespace csl::comm::tcp;
 
 namespace csl 
 { 
   namespace rpc 
   {
     /** @brief stores parsed interface description */
-    class srv_trans_tcp : public csl::common::obj
+    class srv_trans_tcp : public csl::comm::handler
     {
       CSL_OBJ(csl::rpc,srv_trans_tcp);
 
     public:
       void listen(const char * hostname, unsigned short port);
 
+    protected:
+      virtual bool on_connected( connid_t id,
+                                 const SAI & sai,
+                                 bfd & buf_fd );
+
+      virtual bool on_data_arrival( connid_t id,
+                                    const SAI & sai,
+                                    bfd & buf_fd );
+
+      virtual void on_disconnected( connid_t id,
+                                    const SAI & sai );
+  
+      virtual void despatch( csl::common::pbuf & buffer) = 0;      
     };
 
 

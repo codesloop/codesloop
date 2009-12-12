@@ -37,8 +37,73 @@ namespace csl
   {
     void srv_trans_tcp::listen(const char * hostname, unsigned short port )
     {
-      // TODO: implement
+      ENTER_FUNCTION();
+      in_addr_t   saddr = inet_addr(hostname);
+      SAI         addr;
+
+      ::memset( &addr,0,sizeof(addr) );
+      ::memcpy( &(addr.sin_addr),&saddr,sizeof(saddr) );
+
+      addr.sin_family  = AF_INET;
+      addr.sin_port    = htons(port);
+
+      lstnr l;
+      l.init(*this, addr);
+      l.start();
+      CSL_DEBUGF( L"the listener has been started. wait 7 secs for connections" );
+      assert( l.exit_event().wait(7000) == false );
+      CSL_DEBUGF( L"the listener will be stopped on purpose after 7 seconds" );
+
+      l.stop();
+
+      LEAVE_FUNCTION();
     }
+
+    bool srv_trans_tcp::on_connected( connid_t id,
+                               const SAI & sai,
+                               bfd & buf_fd )
+    {
+      ENTER_FUNCTION();
+      bool ret = true;
+
+      CSL_DEBUGF( L"on_connected(id:%lld, sai:(%s:%d), bfd)",
+                   id, inet_ntoa(sai.sin_addr), ntohs(sai.sin_port));
+
+      RETURN_FUNCTION(ret);
+    }
+
+    bool srv_trans_tcp::on_data_arrival( connid_t id,
+                                  const SAI & sai,
+                                  bfd & buf_fd )
+    {
+      ENTER_FUNCTION();
+      bool ret = true;
+      csl::common::pbuf buf;
+      csl::common::read_res res;
+
+      CSL_DEBUGF( L"on_data_arrival(id:%lld, sai:(%s:%d), bfd)",
+                   id, inet_ntoa(sai.sin_addr), ntohs(sai.sin_port));
+
+      if(buf_fd.size()>0) 
+      {
+        buf_fd.read_buf( res, buf_fd.size() );
+        buf.append(  res.data(),  res.bytes() ) ;
+
+        despatch(buf);
+      }
+
+      RETURN_FUNCTION(ret);
+    }
+
+    void srv_trans_tcp::on_disconnected( connid_t id,
+                                  const SAI & sai )
+    {
+      ENTER_FUNCTION();
+      CSL_DEBUGF( L"on_disconnected(id:%lld, sai:(%s:%d))",
+                   id, inet_ntoa(sai.sin_addr), ntohs(sai.sin_port) );
+      LEAVE_FUNCTION();
+    }
+
   };
 };
 

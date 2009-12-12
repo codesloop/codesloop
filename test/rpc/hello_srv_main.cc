@@ -42,10 +42,10 @@ namespace csl
       {
         CSL_OBJ(csl::rpc::hello,hello);
       public:
-        virtual void hello(csl::common::str arg_)        
+        virtual void hello(csl::common::ustr arg_)        
         {
           ENTER_FUNCTION();
-          CSL_DEBUG( L"Hello: " + arg_ ); 
+          csl::common::logger::info( str( "Hello " + arg_) ); 
           LEAVE_FUNCTION();
         }
 
@@ -60,7 +60,7 @@ int main()
 {
     csl::rpc::hello::hello_impl srv;
 
-    srv.listen( "localhost", 12321 );
+    srv.listen( "127.0.0.1", 12321 );
 
     exit(0);
 }

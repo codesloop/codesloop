@@ -25,6 +25,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "codesloop/rpc/cli_trans_tcp.hh"
 #include "codesloop/common/common.h"
+#include "codesloop/comm/tcp_client.hh"
+#include "codesloop/comm/exc.hh"
+
+using namespace csl::comm;
+using namespace csl::comm::tcp;
 
 /**
   @file rpc/src/cli_trans_tcp.cc
@@ -38,19 +43,43 @@ namespace csl
 
     void cli_trans_tcp::connect(const char * hostname, unsigned short port)
     {
+      ENTER_FUNCTION();
+      in_addr_t saddr = inet_addr(hostname);
+      SAI peer;
 
+      ::memset( &peer,0,sizeof(peer) );
+      ::memcpy( &(peer.sin_addr),&saddr,sizeof(saddr) );
+
+      peer.sin_family  = AF_INET;
+      peer.sin_port = htons( port );
+
+      bool iret = client_.init( peer );
+
+      if ( iret ) 
+        CSL_DEBUGF( L"Client connected to %s:%d", hostname, port);
+      else 
+        THRNORET(csl::comm::exc::rs_connect_failed);
+
+      LEAVE_FUNCTION();
     }
 
-    void cli_trans_tcp::create_handle(handle &)
+    void cli_trans_tcp::create_handle(handle & h)
     {
+      h = __handle_sequence++;
     }
 
     void cli_trans_tcp::wait(handle &)
     {
     }
 
-    void cli_trans_tcp::send(handle &, csl::common::pbuf *)
+    void cli_trans_tcp::send(handle & h, csl::common::pbuf * p )
     {
+      uint8_t * data = new uint8_t[ p->size() ]; 
+
+      p->copy_to( data, p->size());
+      client_.write(data, p->size());
+
+      delete data;
     }
 
   };

@@ -161,7 +161,7 @@ namespace csl
       |  Generate function IDs enumeration                       |
       \---------------------------------------------------------*/
       iface::function_iterator func_it = ifc_->get_functions()->begin();
-      int func_seq = 0;
+      int func_seq = 1000;
 
       output_ 
         << ls_ << "enum function_ids { " << endl
@@ -210,7 +210,7 @@ namespace csl
       }
 
       /*---------------------------------------------------------\
-      |  Specialies                                              |
+      |  Specialities                                            |
       \---------------------------------------------------------*/
       ls_ = ls_.substr( 0, ls_.size() - 2 );
       output_ << ls_ << "protected:" << endl;
@@ -219,7 +219,6 @@ namespace csl
       if ( kind == STUB_SERVER ) 
       {
         output_ << ls_ << "virtual void despatch(" << endl;
-        output_ << ls_ << "  /* input */  function_ids fid," << endl;
         output_ << ls_ << "  /* inout */  csl::common::pbuf & buffer" << endl;
         output_ << ls_ << ");" << endl;
       }

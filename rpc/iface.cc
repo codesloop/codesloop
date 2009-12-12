@@ -87,6 +87,7 @@ namespace csl
            param_type_ == "dbl" ||
            param_type_ == "binry" ||
            param_type_ == "pbuf" ||
+           param_type_ == "ustr" ||
            param_type_ == "xdrbuf" 
           )
         param_type_ = "csl::common::" + param_type_;

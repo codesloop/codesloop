@@ -31,15 +31,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 using csl::rpc::hello::hello_cli;
-using csl::common::str;
+using namespace csl::common;
 
 int main()
 {
     hello_cli cli;
 
-    cli.connect( "localhost", 12321 );
+    cli.connect( "127.0.0.1", 12321 );
 
-    cli.hello( str("world!") );
+    cli.hello( ustr("world!") );
 
 
     exit(0);
