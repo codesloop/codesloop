@@ -59,7 +59,7 @@ namespace csl
       }
 
       unsigned char pad[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-      uint64_t elen = htonl( static_cast<uint32_t>(sz) ); // TODO : fix 64bit truncate here
+      uint64_t elen = htonll( sz ); 
 
       uint64_t new_len, pad_size;
       round_to_4( sz, new_len, pad_size );
@@ -175,12 +175,12 @@ namespace csl
 
     xdrbuf & xdrbuf::operator<<(const common::str & val)
     {
-      uint32_t sz = val.nbytes(); // TODO : 64bit length truncation
+      uint64_t sz = val.nbytes(); 
       if( sz )
       {
         try
         {
-          sz = val.size() * sizeof(wchar_t); // TODO : 64bit length truncation
+          sz = val.size() * sizeof(wchar_t); 
 
           size_and_buf_to_pbuf( b_, val.data(), sz );
         }
@@ -198,7 +198,7 @@ namespace csl
 
     xdrbuf & xdrbuf::operator<<(const common::ustr & val)
     {
-      uint32_t sz = val.nbytes();  // TODO : 64bit length truncation
+      uint64_t sz = val.nbytes(); 
       if( sz )
       {
         try
@@ -370,8 +370,9 @@ namespace csl
 
     xdrbuf & xdrbuf::operator>>(common::str & val)
     {
-      uint32_t sz = 0;
+      uint64_t sz = 0;
       (*this) >> sz;
+
       uint64_t szrd=0;
 
       if( !sz ) { val.clear(); return *this; }

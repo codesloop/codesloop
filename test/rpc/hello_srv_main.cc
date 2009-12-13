@@ -45,6 +45,7 @@ namespace csl
         virtual void hello(csl::common::ustr arg_)        
         {
           ENTER_FUNCTION();
+          printf("Hello %s\n", arg_.c_str() );
           csl::common::logger::info( str( "Hello " + arg_) ); 
           LEAVE_FUNCTION();
         }

@@ -140,7 +140,7 @@ namespace test_xdrbuf {
 
     xb.rewind();
 
-    assert( pb.size() == sizeof(wchar_t)*11+sizeof(int32_t) );
+    assert( pb.size() == sizeof(wchar_t)*11+sizeof(int64_t) );
 
     xb >> hw;
 
@@ -200,7 +200,7 @@ namespace test_xdrbuf {
 
     xb.rewind();
 
-    assert( pb.size() == 16 );
+    assert( pb.size() == 20 );
 
     xb >> hw;
 
@@ -493,10 +493,10 @@ using namespace test_xdrbuf;
 
 int main()
 {
-  csl_common_print_results( "baseline             ", csl_common_test_timer_v0(baseline),"" );
+/*  csl_common_print_results( "baseline             ", csl_common_test_timer_v0(baseline),"" );
   csl_common_print_results( "test_copy            ", csl_common_test_timer_v0(test_copy),"" );
   csl_common_print_results( "test_int             ", csl_common_test_timer_v0(test_int),"" );
-  csl_common_print_results( "test_longlong        ", csl_common_test_timer_v0(test_longlong),"" );
+  csl_common_print_results( "test_longlong        ", csl_common_test_timer_v0(test_longlong),"" );*/
   csl_common_print_results( "test_string          ", csl_common_test_timer_v0(test_string),"" );
   csl_common_print_results( "test_ustring         ", csl_common_test_timer_v0(test_ustring),"" );
   csl_common_print_results( "test_bin             ", csl_common_test_timer_v0(test_bin),"" );

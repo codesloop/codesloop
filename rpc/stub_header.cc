@@ -55,12 +55,16 @@ namespace csl
     void stub_header::write_file(stub_kind kind)
     {   
       const char * class_name, * parent_class;
+      const char * srv_cli;
+
       if ( kind == STUB_SERVER ) {
         class_name = (ifname_ + "_srv").c_str();
         parent_class = (std::string("csl::rpc::srv_trans_") + ifc_->get_transport() ).c_str();
+        srv_cli = "srv";
       } else {
         class_name = (ifname_ + "_cli").c_str();
         parent_class = (std::string("csl::rpc::cli_trans_") + ifc_->get_transport() ).c_str();
+        srv_cli = "cli";
       }
 
       output_
@@ -93,17 +97,10 @@ namespace csl
          << endl << endl;
       }
 
-      if ( kind == STUB_SERVER ) {
-        output_
-          << "#include <codesloop/rpc/srv_trans_" << ifc_->get_transport() << ".hh>" 
-          << endl
-        ;
-      } else {
-        output_
-          << "#include <codesloop/rpc/cli_trans_" << ifc_->get_transport() << ".hh>" 
-          << endl
-        ;
-      }
+      output_
+        << "#include <codesloop/rpc/" << srv_cli << "_trans_" << ifc_->get_transport() << ".hh>" 
+        << endl
+      ;
 
       if ( ifc_->get_includes()->size() != 0 )
         output_ << "/* User defined includes */" << endl;
@@ -129,7 +126,7 @@ namespace csl
         << ls_ << "{" << endl
         << ls_ << "public:" << endl
         << ls_ << "  CSL_OBJ(" << ifc_->get_namespc().c_str() 
-        << ", "<< ifname_.c_str() << "_cli);" << endl
+        << ", "<< ifname_.c_str() << "_" << srv_cli << ");" << endl
         << endl 
       ;
       ls_ += "  ";
@@ -150,7 +147,7 @@ namespace csl
       ;
       // crc
       output_
-        << ls_ << "static const uint64_t get_crc64() {" << endl
+        << ls_ << "inline static const uint64_t get_crc64() {" << endl
         << ls_ << "  return " 
         << ustr( ifc_->to_string().c_str() ).crc64().value()         
         << "ULL;" << endl
