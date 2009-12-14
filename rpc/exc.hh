@@ -55,6 +55,7 @@ namespace csl
           rs_incompat_iface,   ///<Incompatible interfaces          
           rs_not_implemented,  ///<Function is not implemented
           rs_srv_unknown_exc,  ///<Unknown exception received from server side
+          rs_invalid_fid,      ///<Invalid function ID received
         };
 
         /** @brief converts reason code to string */

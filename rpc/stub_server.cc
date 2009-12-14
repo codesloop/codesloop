@@ -51,6 +51,8 @@ namespace csl
         << endl
         << "#include <codesloop/common/pbuf.hh>" 
         << endl
+        << "#include <codesloop/rpc/exc.hh>" 
+        << endl
       ;
 
       /*---------------------------------------------------------\
@@ -70,16 +72,19 @@ namespace csl
       output_
         << ls_ << "/* implement function call routing */" << endl
         << ls_ << "void " << class_name << "::despatch (" << endl
-        << ls_ << "  /* inout */  csl::common::pbuf & buffer)" << endl
+        << ls_ << "  /* inout */  csl::common::arch & archiver)" << endl
         << ls_ << "{" << endl 
         << ls_ << "  ENTER_FUNCTION();" << endl << endl
-        << ls_ << "  CSL_DEBUG_ASSERT(buffer.size() != 0);" << endl << endl
-        << ls_ << "  csl::common::arch archiver(csl::common::arch::DESERIALIZE);" << endl
-        << ls_ << "  uint64_t interface_id;" << endl
-        << ls_ << "  uint32_t function_id = fid_hello;" << endl << endl
-        << ls_ << "  archiver.set_pbuf( buffer );" << endl << endl
+        << ls_ << "  int64_t interface_id;" << endl
+        << ls_ << "  uint32_t function_id = fid_hello;" << endl 
+        << ls_ << endl
         << ls_ << "  archiver.serialize(interface_id);" << endl
-        << ls_ << "  archiver.serialize(function_id);" << endl << endl
+        << ls_ << "  archiver.serialize(function_id);" << endl 
+        << ls_ << endl
+        << ls_ << "  if ( interface_id != get_crc64() ) " << endl
+        << ls_ << "    throw csl::rpc::exc(csl::rpc::exc::rs_incompat_iface,"
+        <<        "L\"Can not despatch request, interfaces are different\"); " << endl 
+        << ls_ << endl
         << ls_ << "  switch( function_id )" << endl          
         << ls_ << "  {" << endl
       ;
@@ -88,6 +93,7 @@ namespace csl
       {
         output_
           << ls_ << "    case fid_" << (*func_it).name << ":" << endl
+          << ls_ << "    {" << endl
         ; 
         param_it = (*func_it).params.begin();
         while( param_it != (*func_it).params.end() )
@@ -152,12 +158,17 @@ namespace csl
         output_ << ls_ << "      } " << endl;
 
         output_
+          << ls_ << "    }" << endl
           << ls_ << "    break;" << endl
         ;
 
         func_it++;
       }
       output_
+        << ls_ << "    default:" << endl
+        << ls_ << "      throw csl::rpc::exc(csl::rpc::exc::rs_invalid_fid,L\""
+        <<               ifname_.c_str() << " interface\");" << endl
+        << ls_ << "    break;" << endl
         << ls_ << "  } /* switch */" << endl
       ;
 

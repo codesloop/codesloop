@@ -46,6 +46,7 @@ namespace csl
         case rs_comm_err:        return L"Communication error";
         case rs_incompat_iface:  return L"Incompatible interfaces";
         case rs_srv_unknown_exc: return L"Unknown exception received from server side";
+        case rs_invalid_fid:     return L"Internal error: requested function does not exist";
         case rs_unknown:
           default:               return L"Unknown reason";
       };

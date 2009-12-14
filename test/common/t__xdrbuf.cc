@@ -140,7 +140,7 @@ namespace test_xdrbuf {
 
     xb.rewind();
 
-    assert( pb.size() == sizeof(wchar_t)*11+sizeof(int32_t) );
+    assert( pb.size() == sizeof(wchar_t)*11+sizeof(int64_t) );
 
     xb >> hw;
 
@@ -200,7 +200,7 @@ namespace test_xdrbuf {
 
     xb.rewind();
 
-    assert( pb.size() == 16 );
+    assert( pb.size() == 20 );
 
     xb >> hw;
 
@@ -271,7 +271,7 @@ namespace test_xdrbuf {
     xb.rewind();
     uint64_t sz;
     assert( xb.get_data(ptr2,sz,204808) == true );
-    assert( xb.position() == 204804 );
+    assert( xb.position() == 204808 );
     assert( sz == zf.get_size() );
     assert( sz == 204800 );
     assert( ::memcmp( ptr, ptr2, static_cast<size_t>(sz) ) == 0 );
@@ -292,7 +292,7 @@ namespace test_xdrbuf {
 
     xb << ptr;
 
-    assert( pb.size() == 2052 );
+    assert( pb.size() == 2056 );
 
     xb.rewind();
 
