@@ -85,6 +85,7 @@ namespace csl
       bool ret = true;
       csl::common::pbuf buf;
       csl::common::read_res res;
+      csl::rpc::client_info ci;
 
       CSL_DEBUGF( L"on_data_arrival(id:%lld, sai:(%s:%d), bfd)",
                    id, inet_ntoa(sai.sin_addr), ntohs(sai.sin_port));
@@ -96,12 +97,18 @@ namespace csl
 
         CSL_DEBUG_ASSERT(buf.size() != 0);
 
+        // fill client ino
+        ::memset( &ci,0,sizeof(ci) );
+        ci.id  = id;
+        ci.sai = const_cast<SAI *>(&sai);
+
+        // prepare data for deserialization
         csl::common::arch archiver(csl::common::arch::DESERIALIZE);
-        archiver.set_pbuf( buf );
+        archiver.set_pbuf( buf );        
 
         // invoke generated despatcher 
         try { 
-          despatch( archiver );
+          despatch( ci, archiver );
         } catch ( csl::rpc::exc & e ) {
           logger::error( e.to_string()  );
         }

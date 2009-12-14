@@ -216,6 +216,7 @@ namespace csl
       if ( kind == STUB_SERVER ) 
       {
         output_ << ls_ << "virtual void despatch(" << endl;
+        output_ << ls_ << "  /* input */  const csl::rpc::client_info & ci," << endl;
         output_ << ls_ << "  /* inout */  csl::common::arch & archive" << endl;
         output_ << ls_ << ");" << endl;
       }

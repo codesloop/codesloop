@@ -31,6 +31,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   @brief implementation of static rpc handle 
  */
 
-csl::rpc::handle csl::rpc::__handle_sequence = 0;
+csl::rpc::handle csl::rpc::__handle_sequence = 1;
 
 /* EOF */

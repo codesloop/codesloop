@@ -139,6 +139,7 @@ namespace csl
           << endl
           << ls_ << "  archiver.serialize(interface_id); " << endl
           << ls_ << "  archiver.serialize(function_id);" << endl        
+          << ls_ << "  archiver.serialize(__handle);" << endl        
         ;
 
         param_it = (*func_it).params.begin();

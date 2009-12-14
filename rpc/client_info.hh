@@ -23,51 +23,28 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
  
-#ifndef _csl_rpc_srv_trans_tcp_hh_included_
-#define _csl_rpc_srv_trans_tcp_hh_included_
+#ifndef _csl_rpc_client_info_hh_included_
+#define _csl_rpc_client_info_hh_included_
 
 #include "codesloop/common/common.h"
-#ifdef __cplusplus
-#include "codesloop/common/obj.hh"
-#include "codesloop/common/arch.hh"
-#include "codesloop/comm/handler.hh"
-#include "codesloop/comm/tcp_lstnr.hh"
-#include "codesloop/rpc/client_info.hh"
+#include "codesloop/comm/connid.hh"
+#include "codesloop/comm/sai.hh"
 
-using namespace csl::comm;
-using namespace csl::comm::tcp;
+#ifdef __cplusplus
 
 namespace csl 
 { 
   namespace rpc 
   {
-    /** @brief stores parsed interface description */
-    class srv_trans_tcp : public csl::comm::handler, public csl::common::obj
-    {
-      CSL_OBJ(csl::rpc,srv_trans_tcp);
 
-    public:
-      void listen(const char * hostname, unsigned short port);
-
-    protected:
-      virtual bool on_connected( connid_t id,
-                                 const SAI & sai,
-                                 bfd & buf_fd );
-
-      virtual bool on_data_arrival( connid_t id,
-                                    const SAI & sai,
-                                    bfd & buf_fd );
-
-      virtual void on_disconnected( connid_t id,
-                                    const SAI & sai );
-  
-      virtual void despatch(  const csl::rpc::client_info & ci,
-                              csl::common::arch & archive) = 0;      
-    };
-
+    /** @brief client information for invoked party */
+    typedef struct client_info {
+      csl::comm::connid_t id;  
+      csl::comm::SAI * sai;
+    } client_info;
 
   }
 }
 
 #endif /* __cplusplus */
-#endif /* _csl_rpc_srv_trans_tcp_hh_included_ */
+#endif /* _csl_rpc_client_info_hh_included_ */
