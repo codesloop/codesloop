@@ -139,7 +139,7 @@ namespace csl
 
     xdrbuf & xdrbuf::operator<<(const char * val)
     {
-      uint32_t sz = 0;
+      uint64_t sz = 0;
       if( !val )
       {
         sz = 0;
@@ -219,7 +219,7 @@ namespace csl
 
     xdrbuf & xdrbuf::operator<<(const xdrbuf::bindata_t & val)
     {
-      uint32_t sz = val.second; // TODO : check for 64bit truncation
+      uint64_t sz = val.second; // TODO : check for 64bit truncation
       if( sz )
       {
         try
@@ -240,7 +240,7 @@ namespace csl
 
     xdrbuf & xdrbuf::operator<<(const pbuf & val)
     {
-      uint32_t sz = val.size(); (*this) << sz;
+      uint64_t sz = val.size(); (*this) << sz;
 
       if( !val.size() ) return *this;
 
@@ -379,7 +379,7 @@ namespace csl
 
       wchar_t * wcp = reinterpret_cast<wchar_t *>(val.buffer().allocate(sz));
 
-      if( sz > 0 )
+      if( wcp && sz > 0 )
       {
         if( (szrd=get_data( reinterpret_cast<unsigned char *>(wcp),sz)) == sz )
         {
@@ -411,7 +411,7 @@ namespace csl
 
       unsigned char * cp = val.buffer().allocate(sz);
 
-      if( sz > 0 )
+      if( cp && sz > 0 )
       {
         if( (szrd=get_data(cp,sz)) == sz )
         {
@@ -435,8 +435,8 @@ namespace csl
 
     xdrbuf & xdrbuf::operator>>(pbuf & val)
     {
-      uint32_t size = 0;
-      uint32_t saved_size = 0;
+      uint64_t size = 0;
+      uint64_t saved_size = 0;
       uint64_t szrd = 0;
 
       if( it_ == b_->end() ) { goto bail; }
@@ -501,7 +501,7 @@ namespace csl
       pbuf::iterator oldit = it_;
       uint64_t oldpos  = pos_;
 
-      uint32_t sz = 0;
+      uint64_t sz = 0;
       (*this) >> sz;
 
       size = sz;
