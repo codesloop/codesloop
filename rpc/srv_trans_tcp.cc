@@ -26,6 +26,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/rpc/srv_trans_tcp.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/logger.hh"
+#include "codesloop/common/pbuf.hh"
+#include "codesloop/common/arch.hh"
 #include "codesloop/rpc/exc.hh"
 
 /**
@@ -92,8 +94,14 @@ namespace csl
         buf_fd.read_buf( res, buf_fd.size() );
         buf.append(  res.data(),  res.bytes() ) ;
 
+        CSL_DEBUG_ASSERT(buf.size() != 0);
+
+        csl::common::arch archiver(csl::common::arch::DESERIALIZE);
+        archiver.set_pbuf( buf );
+
+        // invoke generated despatcher 
         try { 
-          despatch(buf);
+          despatch( archiver );
         } catch ( csl::rpc::exc & e ) {
           logger::error( e.to_string()  );
         }

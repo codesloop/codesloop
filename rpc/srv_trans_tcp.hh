@@ -29,7 +29,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/common/common.h"
 #ifdef __cplusplus
 #include "codesloop/common/obj.hh"
-#include "codesloop/common/pbuf.hh"
+#include "codesloop/common/arch.hh"
 #include "codesloop/comm/handler.hh"
 #include "codesloop/comm/tcp_lstnr.hh"
 
@@ -60,7 +60,7 @@ namespace csl
       virtual void on_disconnected( connid_t id,
                                     const SAI & sai );
   
-      virtual void despatch( csl::common::pbuf & buffer) = 0;      
+      virtual void despatch( csl::common::arch & archive) = 0;      
     };
 
 

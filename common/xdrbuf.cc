@@ -219,7 +219,7 @@ namespace csl
 
     xdrbuf & xdrbuf::operator<<(const xdrbuf::bindata_t & val)
     {
-      uint64_t sz = val.second; // TODO : check for 64bit truncation
+      uint64_t sz = val.second; 
       if( sz )
       {
         try
