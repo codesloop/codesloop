@@ -147,10 +147,10 @@ namespace csl
       ;
       // crc
       output_
-        << ls_ << "inline static const uint64_t get_crc64() {" << endl
+        << ls_ << "inline static const int64_t get_crc64() {" << endl
         << ls_ << "  return " 
         << ustr( ifc_->to_string().c_str() ).crc64().value()         
-        << "ULL;" << endl
+        << "LL;" << endl
         << ls_ << "}" << endl << endl
       ;
 

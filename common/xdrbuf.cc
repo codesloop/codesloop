@@ -403,7 +403,7 @@ namespace csl
 
     xdrbuf & xdrbuf::operator>>(common::ustr & val)
     {
-      uint32_t sz = 0;
+      uint64_t sz = 0;
       (*this) >> sz;
       uint64_t szrd=0;
 

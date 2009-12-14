@@ -132,8 +132,8 @@ namespace csl
 
         // serializer
         output_
-          << ls_ << "  static uint64_t interface_id = " <<  ustr( ifc_->to_string().c_str() ).crc64().value()
-          << "ULL;"<< endl
+          << ls_ << "  static int64_t interface_id = " <<  ustr( ifc_->to_string().c_str() ).crc64().value()
+          << "LL;"<< endl
           << ls_ << "  static uint32_t function_id = fid_" << (*func_it).name << ";"<< endl
           << ls_ << "  csl::common::arch archiver(csl::common::arch::SERIALIZE);" << endl
           << endl
