@@ -30,9 +30,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 #include "codesloop/common/obj.hh"
 #include "codesloop/common/arch.hh"
-#include "codesloop/comm/handler.hh"
 #include "codesloop/comm/tcp_lstnr.hh"
 #include "codesloop/rpc/client_info.hh"
+#include "codesloop/rpc/srv_trans.hh"
 
 using namespace csl::comm;
 using namespace csl::comm::tcp;
@@ -42,7 +42,7 @@ namespace csl
   namespace rpc 
   {
     /** @brief stores parsed interface description */
-    class srv_trans_tcp : public csl::comm::handler, public csl::common::obj
+    class srv_trans_tcp : public srv_trans
     {
       CSL_OBJ(csl::rpc,srv_trans_tcp);
 

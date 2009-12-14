@@ -23,47 +23,34 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
  
-#ifndef _csl_rpc_cli_trans_tcp_hh_included_
-#define _csl_rpc_cli_trans_tcp_hh_included_
+#ifndef _csl_rpc_srv_trans_hh_included_
+#define _csl_rpc_srv_trans_hh_included_
 
 #include "codesloop/common/common.h"
 #ifdef __cplusplus
 #include "codesloop/common/obj.hh"
-#include "codesloop/common/pbuf.hh"
-#include "codesloop/rpc/handle.hh"
-#include "codesloop/comm/tcp_client.hh"
-#include "codesloop/rpc/cli_trans.hh"
+#include "codesloop/common/arch.hh"
+#include "codesloop/comm/handler.hh"
+#include "codesloop/comm/tcp_lstnr.hh"
+#include "codesloop/rpc/client_info.hh"
 
+using namespace csl::comm;
+using namespace csl::comm::tcp;
 
 namespace csl 
 { 
   namespace rpc 
   {
     /** @brief stores parsed interface description */
-    class cli_trans_tcp : public cli_trans
+    class srv_trans : public csl::comm::handler, public csl::common::obj
     {
-      CSL_OBJ(csl::rpc,cli_trans);
-
-    public:
-      /**
-       * connects to a remote server object
-       *
-       * @param hostname host to connect
-       * @param port port to connect
-       */
-      void connect(const char * hostname, unsigned short port);
-
-    protected:
-      void create_handle(handle &);
-      void wait(handle &);
-      void send(handle &, csl::common::pbuf *);
-
-    private:
-      csl::comm::tcp::client client_;
+      CSL_OBJ(csl::rpc,srv_trans);
 
     };
+
+
   }
 }
 
 #endif /* __cplusplus */
-#endif /* _csl_rpc_cli_trans_tcp_hh_included_ */
+#endif /* _csl_rpc_srv_trans_hh_included_ */
