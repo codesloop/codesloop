@@ -54,7 +54,6 @@ namespace csl
       void connect(const char * hostname, unsigned short port);
 
     protected:
-      void create_handle(handle &);
       void wait(handle &);
       void send(handle &, csl::common::pbuf *);
 

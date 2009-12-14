@@ -41,6 +41,11 @@ namespace csl
   namespace rpc
   {
     
+    void cli_trans::create_handle(handle & h)
+    {
+      h = __handle_sequence++;
+    }
+
 
   };
 };

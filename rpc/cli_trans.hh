@@ -43,6 +43,11 @@ namespace csl
     {
       CSL_OBJ(csl::rpc,cli_trans);
 
+    protected:
+      void create_handle(handle &);
+      virtual void wait(handle &) = 0;
+      virtual void send(handle &, csl::common::pbuf *) = 0;
+
     };
 
 
