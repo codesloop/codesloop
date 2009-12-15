@@ -23,13 +23,30 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "codesloop/db/query.hh"
+/**
+   @file t__syntax.cc
+   @brief @todo
+ */
 
-namespace csl
+#include "codesloop/db/exc.hh"
+#include "codesloop/common/test_timer.h"
+#include "codesloop/common/common.h"
+#include <assert.h>
+
+namespace test_syntax {
+
+  void test1() {}
+
+} // end of test_syntax
+
+using namespace test_syntax;
+
+int main()
 {
-  namespace db
-  {
-  }; // end of ns:csl::db
-}; // end of ns:csl
+  test1();
+  //csl_common_print_results( "baseline      ", csl_common_test_timer_v0(baseline),"" );
+  return 0;
+}
 
-/* EOF */
+// EOF
+

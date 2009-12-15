@@ -128,3 +128,4 @@ test/db/slt3/t__tran
 test/db/slt3/t__var
 test/db/slt3/t__query_mem
 test/db/slt3/t__var_mem
+test/db/t__syntax

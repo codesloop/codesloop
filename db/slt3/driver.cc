@@ -23,12 +23,16 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "codesloop/db/query.hh"
+#include "codesloop/db/slt3/driver.hh"
 
 namespace csl
 {
   namespace db
   {
+    namespace slt3
+    {
+
+    }; // end of ns:csl::db::slt3
   }; // end of ns:csl::db
 }; // end of ns:csl
 

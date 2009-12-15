@@ -111,7 +111,7 @@ int main()
 {
   initcomm w;
   conn();
-  //csl_common_print_results( "baseline          ", csl_common_test_timer_v0(baseline),"" );
+  csl_common_print_results( "baseline          ", csl_common_test_timer_v0(baseline),"" );
   return 0;
 }
 

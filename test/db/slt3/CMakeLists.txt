@@ -32,15 +32,15 @@ INCLUDE_DIRECTORIES( ../../../.. )
 
 IF(WIN32)
 
-  IF(MSYS)
+  LINK_LIBRARIES(
+                  csl_db_slt3
+                  csl_db
+                  csl_nthread
+                  csl_common
+                  wsock32
+                )
 
-    LINK_LIBRARIES(
-                    csl_db_slt3
-                    csl_db
-                    csl_nthread
-                    csl_common
-                    wsock32
-                  )
+  IF(MSYS)
 
     ADD_DEFINITIONS( -Wall
                      -Wwrite-strings
@@ -54,16 +54,6 @@ IF(WIN32)
                      -Wredundant-decls
                      -g3
                    )
-
-  ELSE(MSYS)
-
-    LINK_LIBRARIES(
-                    csl_db_slt3
-                    csl_db
-                    csl_nthread
-                    csl_common
-                    wsock32
-                  )
 
   ENDIF(MSYS)
 
