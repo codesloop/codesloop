@@ -147,10 +147,10 @@ const char * csl::rpc::param_kind_name[] = {
                     ;
   parameter_type  = (input|output|inout|exc) ':' %{token_.type = TT_PARAM_MOD;};
 
-  func_param_line      =  (ws* (parameter_type ws+)? <: 
+  func_param_line      =  (ws* (parameter_type ws+)?  
                                 parameter_spec ws*  ',')
                           ;
-  func_param_lastline  =  (ws* (parameter_type ws+)? <: 
+  func_param_lastline  =  (ws* (parameter_type ws+)?  
                                 parameter_spec ws* ('}' >s %end_function) )
                           ;
 

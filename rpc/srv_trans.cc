@@ -23,14 +23,24 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "codesloop/rpc/srv_trans.hh"
 #include "codesloop/common/common.h"
-#include "codesloop/rpc/handle.hh"
+#include "codesloop/common/logger.hh"
+#include "codesloop/common/pbuf.hh"
+#include "codesloop/common/arch.hh"
+#include "codesloop/rpc/exc.hh"
 
 /**
-  @file rpc/src/handle.cc
-  @brief implementation of static rpc handle 
+  @file rpc/src/srv_trans.cc
+  @brief common functions of rpc transport layer (server side)
  */
+using csl::common::logger;
 
-csl::rpc::handle csl::rpc::__handle_sequence = 1;
+namespace csl
+{
+  namespace rpc
+  {
+  };
+};
 
 /* EOF */

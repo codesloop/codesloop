@@ -53,6 +53,8 @@ namespace csl
         << endl
         << "#include <codesloop/rpc/exc.hh>" 
         << endl
+        << "#include <codesloop/rpc/handle.hh>" 
+        << endl
       ;
 
       /*---------------------------------------------------------\
@@ -72,14 +74,17 @@ namespace csl
       output_
         << ls_ << "/* implement function call routing */" << endl
         << ls_ << "void " << class_name << "::despatch (" << endl
+        << ls_ << "  /* input */  const csl::rpc::client_info & ci," << endl
         << ls_ << "  /* inout */  csl::common::arch & archiver)" << endl
         << ls_ << "{" << endl 
         << ls_ << "  ENTER_FUNCTION();" << endl << endl
         << ls_ << "  int64_t interface_id;" << endl
         << ls_ << "  uint32_t function_id = fid_hello;" << endl 
+        << ls_ << "  csl::rpc::handle __handle = CSL_RPC_HANDLE_NULL;" << endl 
         << ls_ << endl
         << ls_ << "  archiver.serialize(interface_id);" << endl
         << ls_ << "  archiver.serialize(function_id);" << endl 
+        << ls_ << "  archiver.serialize(__handle);" << endl 
         << ls_ << endl
         << ls_ << "  if ( interface_id != get_crc64() ) " << endl
         << ls_ << "    throw csl::rpc::exc(csl::rpc::exc::rs_incompat_iface,"
@@ -123,14 +128,15 @@ namespace csl
         // call it!
         output_ 
           << ls_ << "      try { " << endl << endl
-          << ls_ << "        " << (*func_it).name << "("
+          << ls_ << "        " << (*func_it).name << "(ci, "
         ;
 
         param_it = (*func_it).params.begin();
         while( param_it != (*func_it).params.end() )
         {
           if ( (*param_it).kind!=MD_EXCEPTION ) {
-            output_ <<  (*param_it).name ;
+            output_ 
+              <<  (*param_it).name ;
           }
           param_it++;
           // TODO: now it works only, if exceptions are defined last

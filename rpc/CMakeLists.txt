@@ -69,6 +69,8 @@ ADD_LIBRARY( csl_rpc STATIC
              handle.cc        handle.hh
              cli_trans_tcp.cc cli_trans_tcp.hh
              srv_trans_tcp.cc srv_trans_tcp.hh
+             srv_trans.cc     srv_trans.hh
+             cli_trans.cc     cli_trans.hh
           )
 
 

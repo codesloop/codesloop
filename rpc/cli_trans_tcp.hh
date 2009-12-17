@@ -32,6 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/common/pbuf.hh"
 #include "codesloop/rpc/handle.hh"
 #include "codesloop/comm/tcp_client.hh"
+#include "codesloop/rpc/cli_trans.hh"
 
 
 namespace csl 
@@ -39,9 +40,9 @@ namespace csl
   namespace rpc 
   {
     /** @brief stores parsed interface description */
-    class cli_trans_tcp : public csl::common::obj
+    class cli_trans_tcp : public cli_trans
     {
-      CSL_OBJ(csl::rpc,cli_trans_tcp);
+      CSL_OBJ(csl::rpc,cli_trans);
 
     public:
       /**
@@ -53,15 +54,13 @@ namespace csl
       void connect(const char * hostname, unsigned short port);
 
     protected:
-      void create_handle(handle &);
       void wait(handle &);
       void send(handle &, csl::common::pbuf *);
 
     private:
       csl::comm::tcp::client client_;
+
     };
-
-
   }
 }
 

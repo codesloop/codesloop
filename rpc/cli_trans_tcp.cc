@@ -63,11 +63,6 @@ namespace csl
       LEAVE_FUNCTION();
     }
 
-    void cli_trans_tcp::create_handle(handle & h)
-    {
-      h = __handle_sequence++;
-    }
-
     void cli_trans_tcp::wait(handle &)
     {
     }

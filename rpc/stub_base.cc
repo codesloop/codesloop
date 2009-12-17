@@ -153,6 +153,9 @@ namespace csl
         if ( is_async == true )
           output_ << ls_ << "\t/* inout */\tcsl::rpc::handle &\t__handle," << endl;
 
+        if ( kind == STUB_SERVER )
+          output_ << ls_ << "\t/* input */\tconst csl::rpc::client_info &\tci," << endl;
+
         // parameters
         while( param_it != (*func_it).params.end() ) 
         {
@@ -184,8 +187,10 @@ namespace csl
             if ( (*param_it).kind==MD_INPUT && (kind == STUB_CLIENT 
                 || (*param_it).is_array) )
               output_ << " &"; 
-            else if ( (*param_it).kind==MD_OUTPUT )
+            else if ( (*param_it).kind==MD_OUTPUT && kind == STUB_CLIENT )
               output_ << " *";
+            else if ( (*param_it).kind==MD_OUTPUT && kind == STUB_SERVER )
+              output_ << " &";
             else if ( (*param_it).kind==MD_INOUT )
               output_ << " &";
 

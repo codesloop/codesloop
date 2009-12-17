@@ -36,10 +36,11 @@ using namespace csl::common;
 int main()
 {
     hello_cli cli;
+    str * result;
 
     cli.connect( "127.0.0.1", 12321 );
 
-    cli.hello( ustr("world!") );
+    cli.hello( 10, str(L"world!"), result );
 
 
     exit(0);

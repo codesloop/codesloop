@@ -42,11 +42,14 @@ namespace csl
       {
         CSL_OBJ(csl::rpc::hello,hello);
       public:
-        virtual void hello(csl::common::ustr arg_)        
+        virtual void hello( const csl::rpc::client_info & ci, 
+            int n_times, 
+            csl::common::str hello_to, 
+            csl::common::str & result)        
         {
           ENTER_FUNCTION();
-          printf("Hello %s\n", arg_.c_str() );
-          csl::common::logger::info( str( "Hello " + arg_) ); 
+          printf("Hello %ls %d times\n", hello_to.c_str(), n_times );
+          csl::common::logger::info( str( L"Hello ")  + hello_to ); 
           LEAVE_FUNCTION();
         }
 

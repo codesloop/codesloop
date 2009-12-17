@@ -33,6 +33,8 @@ namespace csl
 { 
   namespace rpc 
   {
+
+#define CSL_RPC_HANDLE_NULL  csl::rpc::handle(NULL)
     /** @brief call identifier */
     typedef unsigned long long int handle;
 

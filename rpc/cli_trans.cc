@@ -23,14 +23,31 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "codesloop/rpc/cli_trans.hh"
 #include "codesloop/common/common.h"
-#include "codesloop/rpc/handle.hh"
+#include "codesloop/comm/tcp_client.hh"
+#include "codesloop/comm/exc.hh"
+
+using namespace csl::comm;
+using namespace csl::comm::tcp;
 
 /**
-  @file rpc/src/handle.cc
-  @brief implementation of static rpc handle 
+  @file rpc/src/cli_trans.cc
+  @brief implementation of codesloop interface descriptor
  */
 
-csl::rpc::handle csl::rpc::__handle_sequence = 1;
+namespace csl
+{
+  namespace rpc
+  {
+    
+    void cli_trans::create_handle(handle & h)
+    {
+      h = __handle_sequence++;
+    }
+
+
+  };
+};
 
 /* EOF */
