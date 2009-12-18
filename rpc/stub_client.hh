@@ -46,6 +46,8 @@ namespace csl
       stub_client(const iface * i) : stub_base(i) {}
 
       virtual void generate();
+    private:
+      void generate_ping_body();
     };
 
 

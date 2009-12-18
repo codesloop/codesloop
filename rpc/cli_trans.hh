@@ -44,6 +44,17 @@ namespace csl
       CSL_OBJ(csl::rpc,cli_trans);
 
     protected:
+      enum global_function_ids {   
+        fid_ping = 1,
+      };  
+
+      virtual void ping(uint64_t&, uint64_t*) = 0;
+      virtual void ping(csl::rpc::handle &,
+                        uint64_t &  client_time,
+                        uint64_t *  server_time) = 0;
+
+
+    protected:
       void create_handle(handle &);
       virtual void wait(handle &) = 0;
       virtual void send(handle &, csl::common::pbuf *) = 0;

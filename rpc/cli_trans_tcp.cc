@@ -23,6 +23,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <sys/time.h>
+
 #include "codesloop/rpc/cli_trans_tcp.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/comm/tcp_client.hh"
@@ -46,6 +48,10 @@ namespace csl
       ENTER_FUNCTION();
       in_addr_t saddr = inet_addr(hostname);
       SAI peer;
+      uint64_t server_time, client_time;
+      struct timeval tv;
+      struct timezone tz;
+
 
       ::memset( &peer,0,sizeof(peer) );
       ::memcpy( &(peer.sin_addr),&saddr,sizeof(saddr) );
@@ -59,6 +65,14 @@ namespace csl
         CSL_DEBUGF( L"Client connected to %s:%d", hostname, port);
       else 
         THRNORET(csl::comm::exc::rs_connect_failed);
+
+      ping( client_time, &server_time );
+      gettimeofday(&tv,&tz);
+
+      CSL_DEBUGF( L"Ping %fms, Pong: %fms", 
+          double(server_time - client_time) / 1000,
+          double((tv.tv_sec * 1000000 + tv.tv_usec) - client_time) / 1000
+          );
 
       LEAVE_FUNCTION();
     }

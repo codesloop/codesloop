@@ -43,8 +43,8 @@ namespace csl
         CSL_OBJ(csl::rpc::hello,hello);
       public:
         virtual void hello( const csl::rpc::client_info & ci, 
-            int n_times, 
-            csl::common::str hello_to, 
+            const int & n_times, 
+            const csl::common::str & hello_to, 
             csl::common::str & result)        
         {
           ENTER_FUNCTION();

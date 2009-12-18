@@ -45,11 +45,14 @@ namespace csl
   {
     void stub_header::generate()
     {
-      open_file((ifname_+"_cli.hh").c_str());
-      write_file(STUB_CLIENT);
-
       open_file((ifname_+"_srv.hh").c_str());
       write_file(STUB_SERVER);
+
+      // add internal functions for client stub
+      add_internal_functions();    
+
+      open_file((ifname_+"_cli.hh").c_str());
+      write_file(STUB_CLIENT);
     }
 
     void stub_header::write_file(stub_kind kind)

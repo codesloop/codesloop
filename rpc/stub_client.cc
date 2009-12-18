@@ -26,6 +26,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/rpc/stub_client.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/ustr.hh"
+#include "codesloop/rpc/iface.hh"
+
 
 /**
   @file rpc/src/stub_client.cc
@@ -34,6 +36,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using std::endl;
 using csl::common::ustr;
+using csl::rpc::iface;
 
 namespace csl
 {
@@ -45,8 +48,12 @@ namespace csl
 
       open_file((ifname_+"_cli.cc").c_str());
 
+//      add_internal_functions();
+
       output_
         << "#ifdef __cplusplus" << endl
+        << "#include <sys/time.h>"
+        << endl
         << "#include \"" << (ifname_+"_cli.hh").c_str() << "\""  
         << endl
         << "#include <codesloop/common/arch.hh>"        
@@ -135,6 +142,12 @@ namespace csl
           << ls_ << "  static int64_t interface_id = " <<  ustr( ifc_->to_string().c_str() ).crc64().value()
           << "LL;"<< endl
           << ls_ << "  static uint32_t function_id = fid_" << (*func_it).name << ";"<< endl
+        ;
+
+        if ( (*func_it).name == "ping" )
+          generate_ping_body();
+
+        output_
           << ls_ << "  csl::common::arch archiver(csl::common::arch::SERIALIZE);" << endl
           << endl
           << ls_ << "  archiver.serialize(interface_id); " << endl
@@ -183,6 +196,18 @@ namespace csl
         << "#endif /* __cplusplus */" << endl
         << "/* EOF */" << endl
       ;
+    }
+
+    void stub_client::generate_ping_body()
+    {
+      output_ 
+        << ls_ << "  struct timeval tv;" << endl
+        << ls_ << "  struct timezone tz;" << endl << endl
+        << ls_ << "  gettimeofday(&tv,&tz);" << endl
+        << ls_ << "  client_time = tv.tv_sec * 1000000 + tv.tv_usec;" << endl
+      ;
+
+      return; 
     }
   };
 };
