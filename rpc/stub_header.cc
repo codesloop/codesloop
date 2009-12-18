@@ -168,6 +168,9 @@ namespace csl
       ;
       for ( ; func_it != ifc_->get_functions()->end() ; func_it++ )      
       {
+        if ( (*func_it).name == "ping" )
+          continue;
+
         output_
           << ls_ << "  fid_" << (*func_it).name 
           << " = " << func_seq++

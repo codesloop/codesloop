@@ -142,6 +142,8 @@ namespace csl
           << ls_ << "  static int64_t interface_id = " <<  ustr( ifc_->to_string().c_str() ).crc64().value()
           << "LL;"<< endl
           << ls_ << "  static uint32_t function_id = fid_" << (*func_it).name << ";"<< endl
+          << ls_ << "  ptr_ivec_t * opp = new ptr_ivec_t();" << endl
+          
         ;
 
         if ( (*func_it).name == "ping" )
@@ -158,17 +160,31 @@ namespace csl
         param_it = (*func_it).params.begin();
         while( param_it != (*func_it).params.end() )
         {
-          /* ignore exceptions and output parameters */
-          if( (*param_it).kind==MD_EXCEPTION ||(*param_it).kind==MD_OUTPUT) {
+          /* ignore exceptions */
+          if( (*param_it).kind==MD_EXCEPTION ) 
+          {
             param_it++;
             continue;
           }
+          
+          /* parameter types which requrire output ptr registration */
+          if ( (*param_it).kind==MD_OUTPUT || (*param_it).kind==MD_INOUT ) 
+          {
+            output_ 
+              << ls_ << "  opp->push_back( " 
+              << (((*param_it).kind==MD_INOUT) ? "&" : "") // inout types needs refernce op 
+              << (*param_it).name << ");" << endl
+            ;
+          } 
 
-          output_
-            << ls_ << "  archiver.serialize(const_cast<" << (*param_it).type 
-            << "&>(" << (*param_it).name
-            << "));" << endl
-          ;
+          if ( (*param_it).kind!=MD_OUTPUT) 
+          {
+            output_
+              << ls_ << "  archiver.serialize(const_cast<" << (*param_it).type 
+              << "&>(" << (*param_it).name
+              << "));" << endl
+            ;
+          }
 
           param_it++;
         }
@@ -176,6 +192,8 @@ namespace csl
         output_
           << endl
           << ls_ << "  send(__handle,archiver.get_pbuf());"
+          << endl
+          << ls_ << "  outp_ptrs_.insert(handle_params_pair_t(__handle,out_params_t(function_id, opp)));"
           << endl
           << ls_ << "}" << endl
           << endl << endl

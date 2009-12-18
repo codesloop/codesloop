@@ -30,9 +30,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 #include "codesloop/common/obj.hh"
 #include "codesloop/common/pbuf.hh"
+#include "codesloop/common/inpvec.hh"
 #include "codesloop/rpc/handle.hh"
 #include "codesloop/comm/tcp_client.hh"
 
+#include <map>
 
 namespace csl 
 { 
@@ -59,6 +61,12 @@ namespace csl
       virtual void wait(handle &) = 0;
       virtual void send(handle &, csl::common::pbuf *) = 0;
 
+      typedef csl::common::inpvec<void *> ptr_ivec_t;
+      typedef std::pair<uint32_t, ptr_ivec_t *> out_params_t;
+      typedef std::pair<handle,out_params_t> handle_params_pair_t;
+      typedef std::map<handle,out_params_t> output_ptr_vec_t;
+    
+      output_ptr_vec_t outp_ptrs_;
     };
 
 

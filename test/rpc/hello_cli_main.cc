@@ -51,7 +51,7 @@ int main()
 
     cli.hello( 10, str(L"world!"), result );
 
-    csl_common_print_results( "ping             ", csl_common_test_timer_v0(test_ping_time),"" );
+//    csl_common_print_results( "ping             ", csl_common_test_timer_v0(test_ping_time),"" );
 
     exit(0);
 }
