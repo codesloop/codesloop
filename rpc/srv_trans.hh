@@ -51,6 +51,11 @@ namespace csl
         fid_ping = 1,
       };  
 
+      enum return_type {
+        rt_succcess = 0,
+        rt_exception = 1
+      };
+
       virtual void ping (
           /* input */     const csl::rpc::client_info &   ci,
           /* input */     const uint64_t & client_time,

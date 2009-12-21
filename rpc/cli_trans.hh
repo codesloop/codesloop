@@ -50,11 +50,21 @@ namespace csl
         fid_ping = 1,
       };  
 
+      enum return_type {
+        rt_succcess = 0,
+        rt_exception = 1
+      };
+
+
       virtual void ping(uint64_t&, uint64_t*) = 0;
       virtual void ping(csl::rpc::handle &,
                         uint64_t &  client_time,
                         uint64_t *  server_time) = 0;
-
+      
+      virtual void decode_response(
+          const csl::rpc::handle &,
+          const uint32_t,
+          csl::common::arch &) = 0;
 
     protected:
       void create_handle(handle &);

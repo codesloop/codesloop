@@ -95,6 +95,14 @@ namespace csl
       client_.read(1024/*bytes*/,1000/*timeout*/,rr);
       CSL_DEBUGF(L"Read %llu bytes from socket.", rr.bytes() );
 
+      csl::common::pbuf pb;
+      csl::common::arch arch( csl::common::arch::DESERIALIZE) ;
+      pb.append( rr.data(), rr.bytes() );
+      arch.set_pbuf(pb);
+
+      decode_response(__handle, hdata->second.first, arch );
+
+      // TODO: cleanup memory
 
 
       LEAVE_FUNCTION();

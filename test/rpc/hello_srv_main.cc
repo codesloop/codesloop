@@ -50,6 +50,9 @@ namespace csl
           ENTER_FUNCTION();
           printf("Hello %ls %d times\n", hello_to.c_str(), n_times );
           csl::common::logger::info( str( L"Hello ")  + hello_to ); 
+
+          result = L"Hello wooooorld";
+
           LEAVE_FUNCTION();
         }
 

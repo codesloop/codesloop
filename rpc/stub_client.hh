@@ -48,6 +48,7 @@ namespace csl
       virtual void generate();
     private:
       void generate_ping_body();
+      void generate_decode_response();
     };
 
 
