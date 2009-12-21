@@ -49,11 +49,11 @@ int main()
 
     cli.connect( "127.0.0.1", 12321 );
 
-    cli.hello( 10, str(L"world!"), &result );
+    cli.hello( 3, str(L"Hello world! "), &result );
     
-    wprintf( L"Result is: %ls", result.c_str() );
+    wprintf( L"Result is: %ls\n", result.c_str() );
 
-    csl_common_print_results( "ping             ", csl_common_test_timer_v0(test_ping_time),"" );
+//    csl_common_print_results( "ping             ", csl_common_test_timer_v0(test_ping_time),"" );
 
     exit(0);
 }

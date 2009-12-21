@@ -48,10 +48,10 @@ namespace csl
             csl::common::str & result)        
         {
           ENTER_FUNCTION();
-          printf("Hello %ls %d times\n", hello_to.c_str(), n_times );
-          csl::common::logger::info( str( L"Hello ")  + hello_to ); 
+          printf("Got string \"%ls\", concat it %d times\n", hello_to.c_str(), n_times );
 
-          result = L"Hello wooooorld";
+          for ( int i = 0; i < n_times ; i++ )
+            result += hello_to;
 
           LEAVE_FUNCTION();
         }
