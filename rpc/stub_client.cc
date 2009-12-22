@@ -245,6 +245,7 @@ namespace csl
         << ls_ << "  uint32_t retval = rt_succcess;" << endl
         << ls_ << "  ptr_ivec_t * ivec = (outp_ptrs_)[__handle].second;" << endl
         << ls_ << "  uint32_t ptr = 0;" << endl
+        << ls_ << "  uint32_t exc_nr = 0;" << endl
         << ls_ << endl
         << ls_ << "  archiver.serialize(retval);" << endl
         << ls_ << endl
@@ -291,14 +292,68 @@ namespace csl
         <<               ifname_.c_str() << " interface\");" << endl
         << ls_ << "    break;" << endl
         << ls_ << "    } /* switch */" << endl
-        << ls_ << "  } else { /* if not successs */" << endl
+        << ls_ << "  } else if ( retval == rt_exception) { /* if exception occured */"  << endl 
+        << endl
+        << ls_ << "    archiver.serialize(exc_nr);" << endl 
+        << endl
+        << ls_ << "    switch( function_id )" << endl
+        << ls_ << "    {" << endl
+      ;
+      
+      func_it = ifc_->get_functions()->begin();      
+      while ( func_it != ifc_->get_functions()->end() )
+      {
+        int exc_nr = 1; 
+
+        output_
+          << ls_ << "      case fid_" << (*func_it).name << ":" << endl
+          << ls_ << "      {" << endl
+        ; 
+        param_it = (*func_it).params.begin();
+        while( param_it != (*func_it).params.end() )
+        {
+          // create type 
+          if ( (*param_it).kind==MD_EXCEPTION ) {
+            output_ 
+              << ls_ << "        if ( exc_nr == " << exc_nr++ << " ) {" << endl
+              << ls_ << "          " << (*param_it).type << " " << (*param_it).name << "(L\"\");" << endl
+              << ls_ << "          archiver.serialize( " << (*param_it).name << " );" << endl
+              << ls_ << "          throw " << (*param_it).name << ";" << endl
+              << ls_ << "        }"
+              << endl
+              ;
+          }
+          param_it++;
+        } 
+
+        output_
+          << ls_ << "        if ( exc_nr == 0 ) {" << endl
+          << ls_ << "          throw csl::rpc::exc(csl::rpc::exc::rs_srv_unknown_exc," 
+          <<        "L\"" << class_name << "::" << (*func_it).name <<  "\");"
+          << endl
+          << ls_ << "        }" << endl
+          << ls_ << "      }" << endl
+          << ls_ << "      break;" << endl
+        ;
+
+        func_it++;
+      }
+      output_ << endl;
+
+      output_
+        << ls_ << "    default:" << endl
+        << ls_ << "      throw csl::rpc::exc(csl::rpc::exc::rs_invalid_fid,L\""
+        <<               ifname_.c_str() << " interface\");" << endl
+        << ls_ << "    break;" << endl
+        << ls_ << "    } /* switch */" << endl << endl
+        << ls_ << "  } else { /* neither exception nor success result*/" << endl
         << ls_ << "    throw csl::rpc::exc(csl::rpc::exc::rs_invalid_param,L\""
-                          << class_name <<"::decode_response\");" 
+        << class_name <<"::decode_response\");" << endl
         << ls_ << "  } /* if not successs */" << endl
       ;
 
       output_
-        << ls_ << "}" 
+        << ls_ << "} /* decode_response() */" 
         << endl << endl;
     }
       

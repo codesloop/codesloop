@@ -46,12 +46,27 @@ void test_ping_time()
 int main()
 {
     str result;
+    int caught = 0;
 
     cli.connect( "127.0.0.1", 12321 );
 
+    // normal case 
     cli.hello( 3, str(L"Hello world! "), &result );
-    
     wprintf( L"Result is: %ls\n", result.c_str() );
+
+    // case with an exception
+    try {
+      caught = 0;
+      cli.hello( 0, L"", &result );
+    } catch ( csl::common::exc & e ) {
+      wprintf(L"Exception caugth: %ls\n", e.text_.c_str() );
+      CSL_DEBUG_ASSERT( e.text_ == L"Can not echo empty string" );
+      caught = 1;
+    }
+
+    CSL_DEBUG_ASSERT( caught == 1 );
+
+
 
 //    csl_common_print_results( "ping             ", csl_common_test_timer_v0(test_ping_time),"" );
 
