@@ -28,20 +28,24 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
    @file tcp_lstnr.hh
-   @brief @todo
+   @brief TODO: complete description
  */
 
 #include "codesloop/comm/sai.hh"
-#include "codesloop/comm/read_res.hh"
 #include "codesloop/comm/bfd.hh"
 #include "codesloop/comm/connid.hh"
-#include "codesloop/comm/tcp_handler.hh"
-#include "codesloop/common/csl_common.hh"
+#include "codesloop/comm/handler.hh"
+#include "codesloop/common/read_res.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/obj.hh"
+#include "codesloop/nthread/pevent.hh"
 #ifdef __cplusplus
 #include <memory>
 
 namespace csl
 {
+  using nthread::pevent;
+
   namespace comm
   {
     namespace tcp
@@ -55,16 +59,12 @@ namespace csl
           /* address, to be setup during initialization */
           const SAI & own_addr() const;
 
-          bool init(handler & h, SAI address);
+          bool init(handler & h, SAI address, int backlog=100);
           bool start();
           bool stop();
 
-          /* network ops */
-          read_res read(connid_t id, size_t sz, uint32_t timeout_ms);
-          bool write(connid_t id, uint8_t * data, size_t sz);
-
-          /* info ops */
-          const SAI & peer_addr(connid_t id) const;
+          pevent & start_event();
+          pevent & exit_event();
 
           struct impl;
         private:

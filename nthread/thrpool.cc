@@ -23,10 +23,20 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#if 0
+#ifndef DEBUG
+#define DEBUG
+#define DEBUG_ENABLE_INDENT
+//#define DEBUG_VERBOSE
+#endif /* DEBUG */
+#endif //0
+
 #include "codesloop/nthread/exc.hh"
 #include "codesloop/nthread/thrpool.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/str.hh"
+#include "codesloop/common/logger.hh"
+#include <assert.h>
 
 /**
   @file thrpool.cc
@@ -44,11 +54,14 @@ namespace csl
 
     thrpool::~thrpool()
     {
+      ENTER_FUNCTION();
       if( graceful_stop() == false )
       {
+        CSL_DEBUGF( L"graceful stop has failed. wait 1 sec and do an unpolite_stop." );
         SleepSeconds(1);
         unpolite_stop();
       }
+      LEAVE_FUNCTION();
     }
 
     namespace
@@ -76,6 +89,10 @@ namespace csl
                     break;
                   }
                 }
+              }
+              else if( stop_me() == true )
+              {
+                break;
               }
               else
               {
@@ -112,18 +129,23 @@ namespace csl
 
           inline void stop_me(bool yesno)
           {
+            ENTER_FUNCTION();
             scoped_mutex m(mtx_);
+            CSL_DEBUGF( L"stop_me(%s)",(yesno==true?"TRUE":"FALSE") );
             stop_me_ = yesno;
+            LEAVE_FUNCTION();
           }
 
           inline bool stop_me()
           {
+            ENTER_FUNCTION();
             bool ret = false;
             {
               scoped_mutex m(mtx_);
               ret = stop_me_;
+              CSL_DEBUGF( L"stop_me() => %s",(ret==true?"TRUE":"FALSE") );
             }
-            return ret;
+            RETURN_FUNCTION( ret );
           }
 
           inline bool use_exc() { return false; }
@@ -146,6 +168,8 @@ namespace csl
           entry() {}
           entry(const entry & other) {}
           entry & operator=(const entry & other) { return *this; }
+
+          CSL_OBJ(csl::nthread::anonymous,entry);
       };
     }
 
@@ -161,6 +185,7 @@ namespace csl
 
     bool thrpool::start_one()
     {
+      ENTER_FUNCTION();
       thread * t = 0;
       entry *  e = 0;
 
@@ -168,7 +193,7 @@ namespace csl
         scoped_mutex m(mtx_);
 
         /* are there too many ? */
-        if( count() > max() ) return false;
+        if( count() > max() ) RETURN_FUNCTION( false );
 
         /* create new thread */
         t = new thread();
@@ -177,19 +202,21 @@ namespace csl
 
         /* launch thread */
         t->set_entry(*e);
-        if( t->start() == false ) return false;
+        if( t->start() == false ) RETURN_FUNCTION( false );
 
         /* register new thread */
         threads_.push_back(th);
       }
 
-      return t->start_event().wait(10000);
+      RETURN_FUNCTION( t->start_event().wait(10000) );
     }
 
     bool thrpool::init( unsigned int mint, unsigned int maxt,
                         unsigned int timeoutt, unsigned int attemptst,
                         event & ev, thread::callback & handler )
     {
+      ENTER_FUNCTION();
+
       if( maxt < mint )             { THR(nthread::exc::rs_invalid_param, false); }
       if( mint < 1 || maxt > 2000 ) { THR(nthread::exc::rs_invalid_param, false); }
       if( attemptst == 0 )          { THR(nthread::exc::rs_invalid_param, false); }
@@ -225,11 +252,12 @@ namespace csl
         }
       }
 
-      return true;
+      RETURN_FUNCTION( true );
     }
 
     unsigned int thrpool::cleanup()
     {
+      ENTER_FUNCTION();
       unsigned int ret = 0;
 
       std::list<thread *> thrs;
@@ -267,36 +295,83 @@ namespace csl
         delete *it;
       }
 
-      return ret;
+      RETURN_FUNCTION( ret );
     }
 
     bool thrpool::graceful_stop()
     {
+      ENTER_FUNCTION();
+      bool ret = false;
+
+      unsigned int i = 0;
       {
         scoped_mutex m(mtx_);
         thrlist_t::iterator it = threads_.begin();
         for( ;it!=threads_.end();++it )
         {
-          (dynamic_cast<entry *>((*it).second))->stop_me();
+          CSL_DEBUGF( L"set stop_me flag on thread: %p [%d]",((*it).second),i );
+          (dynamic_cast<entry *>((*it).second))->stop_me(true);
+          ++i;
         }
       }
 
-      if( exit_event_.wait(timeout_*3) == false ) return false;
+      if( i > 0 )
+      {
+        CSL_DEBUGF( L"send %d notification to the worker threads",i );
+        ev_->notify( i );
+      }
+
+      unsigned int failed_count = 0;
+
+      for( unsigned int j=0; j<i; ++j )
+      {
+        CSL_DEBUGF( L"wait thread %d/%d available:%d waiting:%d",
+                     j,
+                     i,
+                     exit_event_.available_count(),
+                     exit_event_.waiting_count() );
+
+        if( exit_event_.wait(timeout_*3) == false )
+        {
+          ++failed_count;
+        }
+      }
 
       cleanup();
 
+      if( count() > 0 && failed_count > 0 )
+      {
+        CSL_DEBUGF( L"do a second pass cleanup.... [failed:%d]",failed_count );
+        ev_->notify( failed_count );
+
+        for( unsigned int j=0; j<failed_count; ++j )
+        {
+          CSL_DEBUGF( L"wait thread %d/%d available:%d waiting:%d",
+                       j,
+                       failed_count,
+                       exit_event_.available_count(),
+                       exit_event_.waiting_count() );
+
+          exit_event_.wait(timeout_*5);
+        }
+      }
+
+      ret = (count() == 0);
       exit_event_.clear_available();
-      return (count() == 0);
+
+      RETURN_FUNCTION( ret );
     }
 
     bool thrpool::unpolite_stop()
     {
+      ENTER_FUNCTION();
       bool ret = true;
       {
         scoped_mutex m(mtx_);
         thrlist_t::iterator it = threads_.begin();
         for( ;it!=threads_.end();++it )
         {
+          CSL_DEBUGF( L"stoping thread: %p",((*it).second) );
           (*it).first->stop();
           if( (*it).first->exit_event().wait(timeout_) == false ) ret = false;
           delete (*it).first;
@@ -304,75 +379,89 @@ namespace csl
         }
         threads_.clear();
       }
-      return ret;
+      RETURN_FUNCTION( ret );
     }
 
     void thrpool::on_entry()
     {
+      ENTER_FUNCTION();
       {
         scoped_mutex m(mtx_);
         ++count_;
       }
       start_event().notify();
+      LEAVE_FUNCTION();
     }
 
     void thrpool::on_exit()
     {
+      ENTER_FUNCTION();
       {
         scoped_mutex m(mtx_);
         --count_;
       }
       exit_event().notify();
+      LEAVE_FUNCTION();
     }
 
     unsigned int thrpool::count()
     {
+      ENTER_FUNCTION();
       unsigned int ret = 0;
       {
         scoped_mutex m(mtx_);
         ret = count_;
       }
-      return ret;
+      CSL_DEBUGF( L"count() => %d",ret );
+      RETURN_FUNCTION( ret );
     }
 
     unsigned int thrpool::min()
     {
+      ENTER_FUNCTION();
       unsigned int ret = 0;
       {
         scoped_mutex m(mtx_);
         ret = min_;
       }
-      return ret;
+      CSL_DEBUGF( L"min() => %d",ret );
+      RETURN_FUNCTION( ret );
     }
 
     unsigned int thrpool::max()
     {
+      ENTER_FUNCTION();
       unsigned int ret = 0;
       {
         scoped_mutex m(mtx_);
         ret = max_;
       }
-      return ret;
+      CSL_DEBUGF( L"max() => %d",ret );
+      RETURN_FUNCTION( ret );
     }
 
     unsigned int thrpool::timeout()
     {
+      ENTER_FUNCTION();
       unsigned int ret = 0;
       {
         scoped_mutex m(mtx_);
         ret = timeout_;
       }
-      return ret;
+      CSL_DEBUGF( L"timeout() => %d",ret );
+      RETURN_FUNCTION( ret );
     }
 
     unsigned int thrpool::attempts()
     {
+      ENTER_FUNCTION();
       unsigned int ret = 0;
       {
         scoped_mutex m(mtx_);
         ret = attempts_;
       }
-      return ret;
+      CSL_DEBUGF( L"attempts() => %d",ret );
+      RETURN_FUNCTION( ret );
     }
 
     bool thrpool::use_exc()

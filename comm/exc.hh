@@ -78,21 +78,10 @@ namespace csl
           rs_sesskey_empty,       ///<session key is not set
           rs_salt_size,           ///<invalid salt size
           rs_not_implemented,     ///<Function is not implemented
-        };
-
-        enum {
-          cm_unknown,            ///<Unknown component
-          cm_wsa,                ///<WSA
-          cm_udp_recvr,          ///<UDP receiver
-          cm_udp_hello_handler,  ///<UDP hello handler
-          cm_udp_hello_cli,      ///<UDP hello client
-          cm_udp_hello_srv,      ///<UDP hello server
-          cm_udp_auth_handler,   ///<UDP auth handler
-          cm_udp_auth_cli,       ///<UDP auth client
-          cm_udp_auth_srv,       ///<UDP auth server
-          cm_udp_data_handler,   ///<UDP data handler
-          cm_udp_data_cli,       ///<UDP data client
-          cm_udp_data_srv,       ///<UDP data server
+          rs_setsockopt,          ///<setsockopt failed
+          rs_assert,              ///<assert failed
+          rs_unknown_op,          ///<uknown op
+          rs_internal_state,      ///<internal state is bad
         };
 
         /** @brief converts reason code to string */

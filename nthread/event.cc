@@ -43,7 +43,7 @@ namespace csl
 {
   namespace nthread
   {
-    event::event() : impl_(new impl) {}
+    event::event() : impl_(new impl), use_exc_(true) {}
     event::~event() {}
 
     bool event::notify(unsigned int n)
@@ -82,10 +82,16 @@ namespace csl
     }
 
     // no-copy
-    event::event(const event & other) 
-      : impl_( reinterpret_cast<impl *>(0) ) { throw nthread::exc(exc::rs_not_implemented,L"csl::nthread::event"); }
+    event::event(const event & other) : impl_( reinterpret_cast<impl *>(0) )
+    {
+      THRNORET(exc::rs_not_implemented);
+    }
 
-    event & event::operator=(const event & other) { return *this; }
+    event & event::operator=(const event & other)
+    {
+      THR(exc::rs_not_implemented, *this);
+      return *this;
+    }
   }
 }
 

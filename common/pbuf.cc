@@ -35,7 +35,7 @@ namespace csl
 {
   namespace common
   {
-    bool pbuf::append(const unsigned char * dta, unsigned int sz)
+    bool pbuf::append(const unsigned char * dta, uint64_t sz)
     {
       if( !sz )  return true;
       if( !dta ) return false;
@@ -44,9 +44,10 @@ namespace csl
       while( (p=allocate(sz)) != 0 )
       {
         unsigned int fsp = p->free_space();
-        if( fsp > sz ) { fsp = sz; }
+        if( fsp > sz ) { fsp = static_cast<unsigned int>(sz); }
 
-        ::memcpy(p->data_here(),dta,fsp);
+        ::memcpy( p->data_here(), dta, fsp );
+
         p->size_ += fsp;
         dta      += fsp;
         sz       -= fsp;
@@ -57,7 +58,7 @@ namespace csl
       else         return true;
     }
 
-    bool pbuf::copy_to(unsigned char * ptr, unsigned int max_size) const
+    bool pbuf::copy_to(unsigned char * ptr, uint64_t max_size) const
     {
       if( !ptr ) return false;
       const_iterator it(begin());
@@ -72,14 +73,14 @@ namespace csl
         {
           if( max_size >= bp->size_ )
           {
-            ::memcpy( ptr,bp->data_,bp->size_ );
+            ::memcpy( ptr, bp->data_, bp->size_ );
             ptr += bp->size_;
             max_size -= bp->size_;
           }
           else if( max_size == 0 ) { break; }
           else
           {
-            ::memcpy( ptr,bp->data_,max_size );
+            ::memcpy( ptr, bp->data_, static_cast<size_t>(max_size) );
             break;
           }
         }
@@ -87,7 +88,7 @@ namespace csl
       return true;
     }
 
-    pbuf::buf * pbuf::allocate(unsigned int sz)
+    pbuf::buf * pbuf::allocate(uint64_t sz)
     {
       if( !sz ) { return 0; }
 

@@ -50,6 +50,7 @@ namespace csl
         case rs_invalid_state:   return L"Component state invalid.";
         case rs_lookup_error:    return L"Lookup error.";
         case rs_out_of_memory:   return L"Out of memory.";
+        case rs_assert:          return L"Assert failed.";
         case rs_unknown:
           default:               return L"Unknown reason";
       };

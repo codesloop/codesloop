@@ -15,6 +15,7 @@ disposable function_name {
      int64 value_,
      myclass myvalue_,
      string mystring_,
+     int64 value2_,
  output:
      int64 ret,
      retclass e,

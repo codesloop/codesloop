@@ -168,7 +168,7 @@ namespace test_dbl {
     int64 i;
     assert( i.from_integer(99991111LL) == true );
     unsigned char o[sizeof(double)];
-    size_t sz = 0;
+    uint64_t sz = 0;
     assert( v.from_integer( i ) == true );
     assert( v.to_binary( o,sz ) == true );
     assert( sz == sizeof(double) );
@@ -184,7 +184,7 @@ namespace test_dbl {
     assert( i.from_integer(-99991111LL) == true );
     unsigned char o[sizeof(double)];
     void * vp = o;
-    size_t sz = 0;
+    uint64_t sz = 0;
     assert( v.from_double(i) == true );
     assert( v.to_binary( vp,sz ) == true );
     assert( sz == sizeof(double) );

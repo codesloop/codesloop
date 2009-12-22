@@ -72,11 +72,11 @@ namespace test_logger
       void exception()
       {
         ENTER_FUNCTION();
-        THRR( exc::rs_unknown, LOG_TEST_MSG, );
+        THRRNORET( exc::rs_unknown, LOG_TEST_MSG );
         LEAVE_FUNCTION();
       }
 
-      static void static_void() 
+      static void static_void()
       {
         ENTER_FUNCTION();
         LEAVE_FUNCTION();
@@ -93,10 +93,10 @@ int main()
   // assert def values
   assert( csl::common::logger::enable_trace_ == true );
 
-  // check return code from RETURN_FUNCTION 
+  // check return code from RETURN_FUNCTION
   test_logger::logtest l;
   l.use_exc(true);
-  assert( l.int_function(L"param1") == 0x12345678 );  
+  assert( l.int_function(L"param1") == 0x12345678 );
 
   // check created logfile
   assert( stat(CSL_LOGFILE,&st) == 0 );

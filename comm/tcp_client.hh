@@ -33,16 +33,17 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "codesloop/comm/sai.hh"
-#include "codesloop/comm/read_res.hh"
 #include "codesloop/comm/bfd.hh"
-#include "codesloop/comm/connid.hh"
-#include "codesloop/comm/tcp_handler.hh"
-#include "codesloop/common/csl_common.hh"
+#include "codesloop/common/read_res.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/common/obj.hh"
 #ifdef __cplusplus
 #include <memory>
 
 namespace csl
 {
+  using common::read_res;
+
   namespace comm
   {
     namespace tcp
@@ -51,30 +52,35 @@ namespace csl
       {
         public:
           client();
-          virtual ~client();
+          virtual ~client() { }
 
-          /* address, to be setup during initialization */
-          const SAI & peer_addr() const;
-
-          bool init(handler & h, SAI address);
-          bool start();
-          bool stop();
+          bool init(SAI address);
 
           /* network ops */
-          read_res read(size_t sz, uint32_t timeout_ms);
-          bool write(uint8_t * data, size_t sz);
+          read_res & read(uint64_t sz, uint32_t timeout_ms, read_res & rr)
+          {
+            return bfd_.recv(sz, timeout_ms, rr);
+          }
+
+          bool write(const uint8_t * data, uint64_t sz)
+          {
+            return bfd_.send(data, sz);
+          }
+
+          /* address, to be setup during initialization */
+          const SAI & peer_addr() const { return peer_addr_; }
 
           /* info ops */
-          const SAI & own_addr() const;
+          const SAI & own_addr() const { return own_addr_; }
 
-          struct impl;
         private:
-          /* private implementation */
-          std::auto_ptr<impl> impl_;
+          bfd bfd_;
+          SAI own_addr_;
+          SAI peer_addr_;
 
           /* no-copy */
-          client(const client & other);
-          client & operator=(const client & other);
+          client(const client & other) { }
+          client & operator=(const client & other) { return *this; }
 
           /* for trace and debug */
           CSL_OBJ(csl::comm::tcp,client);

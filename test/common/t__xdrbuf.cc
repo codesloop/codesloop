@@ -66,6 +66,38 @@ namespace test_xdrbuf {
   }
 
   /** @test integer de/serialization */
+  void test_longlong()
+  {
+    pbuf pb;
+    xdrbuf xb(pb);
+    uint64_t a = 0xdeadbabedeadbabeLL;
+    uint64_t b;
+    xb << a;
+
+    xb.rewind();
+
+    xb >> b;
+    assert( a == b );
+    assert( xb.position() == sizeof(int64_t) );
+
+    bool caught = false;
+    try
+    {
+      unsigned int c;
+
+      /* read more than available */
+      xb >> c;
+    }
+    catch( csl::common::exc e )
+    {
+      caught = true;
+      assert( e.reason_    == csl::common::exc::rs_xdr_eof );
+      assert( e.component_ == L"csl::common::xdrbuf" );
+    }
+    assert( caught == true );
+  }
+
+  /** @test integer de/serialization */
   void test_int()
   {
     pbuf pb;
@@ -108,7 +140,7 @@ namespace test_xdrbuf {
 
     xb.rewind();
 
-    assert( pb.size() == sizeof(wchar_t)*11+sizeof(int32_t) );
+    assert( pb.size() == sizeof(wchar_t)*11+sizeof(int64_t) );
 
     xb >> hw;
 
@@ -168,7 +200,7 @@ namespace test_xdrbuf {
 
     xb.rewind();
 
-    assert( pb.size() == 16 );
+    assert( pb.size() == 20 );
 
     xb >> hw;
 
@@ -237,12 +269,12 @@ namespace test_xdrbuf {
     assert( ptr2 != 0 );
 
     xb.rewind();
-    unsigned int sz;
+    uint64_t sz;
     assert( xb.get_data(ptr2,sz,204808) == true );
-    assert( xb.position() == 204804 );
+    assert( xb.position() == 204808 );
     assert( sz == zf.get_size() );
     assert( sz == 204800 );
-    assert( ::memcmp(ptr,ptr2,sz) == 0 );
+    assert( ::memcmp( ptr, ptr2, static_cast<size_t>(sz) ) == 0 );
   }
 
   /** @test pbuf de/serialization */
@@ -260,7 +292,7 @@ namespace test_xdrbuf {
 
     xb << ptr;
 
-    assert( pb.size() == 2052 );
+    assert( pb.size() == 2056 );
 
     xb.rewind();
 
@@ -464,6 +496,7 @@ int main()
   csl_common_print_results( "baseline             ", csl_common_test_timer_v0(baseline),"" );
   csl_common_print_results( "test_copy            ", csl_common_test_timer_v0(test_copy),"" );
   csl_common_print_results( "test_int             ", csl_common_test_timer_v0(test_int),"" );
+  csl_common_print_results( "test_longlong        ", csl_common_test_timer_v0(test_longlong),"" );
   csl_common_print_results( "test_string          ", csl_common_test_timer_v0(test_string),"" );
   csl_common_print_results( "test_ustring         ", csl_common_test_timer_v0(test_ustring),"" );
   csl_common_print_results( "test_bin             ", csl_common_test_timer_v0(test_bin),"" );

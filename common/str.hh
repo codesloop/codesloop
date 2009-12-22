@@ -22,7 +22,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-Credits: some techniques and code pieces are stolen from Christian 
+Credits: some techniques and code pieces are stolen from Christian
          Stigen Larsen http://csl.sublevel3.org/programming/my_str/
 */
 
@@ -70,7 +70,7 @@ namespace csl
           npos = 0xFFFFFFFF,                 ///<constant for find: not found
           var_type_v = CSL_TYPE_STR           ///<variable type
         };
-        
+
         typedef const wchar_t * value_t;
         inline value_t value() const { return c_str(); }
 
@@ -138,23 +138,23 @@ namespace csl
         @param s is the substring to be found
         @returns npos if not found or the position
          */
-        size_t find(const str & s) const;
+        uint64_t find(const str & s) const;
 
         /**
         @brief extracts a substring from a given position
         @param start start from this position
         @param length is the amount to be extracted
          */
-        str substr(const size_t start, const size_t length) const;
+        str substr(const uint64_t start, const uint64_t length) const;
 
         /**
         @brief extracts a substring from a given position
         */
         inline str trim()
         {
-            size_t start = npos, length = 0;
+            uint64_t start = npos, length = 0;
 
-            for ( size_t pos = 0; pos < size() ; pos ++ )
+            for ( uint64_t pos = 0; pos < size() ; pos ++ )
             {
                 if ( start == npos && !iswspace( (*this)[pos] )  )
                     start = pos;
@@ -251,7 +251,7 @@ namespace csl
         {
           return str(lhs) += rhs;
         }
-        
+
         /** @brief is equal operator */
         inline bool operator==(const wchar_t * s) const
         {
@@ -273,7 +273,7 @@ namespace csl
         inline str & assign(const wchar_t * start, const wchar_t * end)
         {
           buf_.set( reinterpret_cast<const unsigned char *>(start),
-                    reinterpret_cast<const char *>(end) - 
+                    reinterpret_cast<const char *>(end) -
                     reinterpret_cast<const char *>(start) );
           return *this;
         }
@@ -283,7 +283,7 @@ namespace csl
         @param s is the string to be found
         @returns npos if not found or the position
          */
-        size_t find(const wchar_t * s) const;
+        uint64_t find(const wchar_t * s) const;
 
         /** @brief get data as wchar_t */
         inline const wchar_t * data() const
@@ -310,33 +310,33 @@ namespace csl
         ** ------------------------------------------------------------------------ */
 
         /** @brief unchecked access to buffer */
-        inline wchar_t operator[](const size_t n) const
+        inline wchar_t operator[](const uint64_t n) const
         {
           return (data())[n];
         }
 
         /** @brief check access to buffer */
-        wchar_t at(const size_t n) const;
+        wchar_t at(const uint64_t n) const;
 
         /**
         @brief find a wide character in the string
         @param w is the character to be found
         @returns npos if not found or the position
          */
-        size_t find(wchar_t w) const;
+        uint64_t find(wchar_t w) const;
 
         /**
         @brief reverse find a wide character in the string
         @param w is the character to be found
         @returns npos if not found or the position
          */
-        size_t rfind(wchar_t w) const;
+        uint64_t rfind(wchar_t w) const;
 
         /* ------------------------------------------------------------------------ *
         **    int64  operations
         ** ------------------------------------------------------------------------ */
-        /** 
-        @brief generates crc64 hash value from string 
+        /**
+        @brief generates crc64 hash value from string
         @returns signed 64 bit integer with CRC
         */
         int64 crc64() const;
@@ -357,20 +357,20 @@ namespace csl
         }
 
         /** @brief gets str size  */
-        inline size_t size() const
+        inline uint64_t size() const
         {
           /* I presume the trailing zero is already there */
           return (empty() ? 0 : (nbytes()/sizeof(wchar_t))-1 );
         }
 
         /** @brief gets the total allocated bytes */
-        inline size_t nbytes() const
+        inline uint64_t nbytes() const
         {
           return buf_.size();
         }
 
         /** @brief return the number of characters in the string, excluding the trailing zero */
-        inline size_t nchars() const
+        inline uint64_t nchars() const
         {
           // wcstombs should take care of 'combining characters' too
           return empty() ? 0 : ::wcstombs(NULL, data(), 0);
@@ -410,7 +410,7 @@ namespace csl
         inline const unsigned char * ucharp_data() const { return buf_.data(); }
 
         /** @brief returns the size of the variable data */
-        inline size_t var_size() const { return buf_.size(); }
+        inline uint64_t var_size() const { return buf_.size(); }
 
         /* ------------------------------------------------------------------------ *
         **    conversion operations
@@ -502,7 +502,7 @@ namespace csl
         many bytes were stored. this function will place the trailing zero as well. to check
         how much space is needed use the nbytes() function.
          */
-        bool to_binary(unsigned char * v, size_t & sz) const;
+        bool to_binary(unsigned char * v, uint64_t & sz) const;
 
         /**
         @brief convert to ptr,size
@@ -514,7 +514,7 @@ namespace csl
         many bytes were stored. this function will place the trailing zero as well. to check
         how much space is needed use the nbytes() function.
          */
-        bool to_binary(void * v, size_t & sz) const;
+        bool to_binary(void * v, uint64_t & sz) const;
 
         /**
         @brief stores the content of this instance to an XDR stream
@@ -644,7 +644,7 @@ namespace csl
         region contains a wchar_t* string. after copying it ensures that the string will
         contain a trailing zero.
          */
-        bool from_binary(const unsigned char * v,size_t sz);
+        bool from_binary(const unsigned char * v,uint64_t sz);
 
         /**
         @brief convert a memory region
@@ -656,7 +656,7 @@ namespace csl
         region contains a wchar_t* string. after copying it ensures that the string will
         contain a trailing zero.
          */
-        bool from_binary(const void * v,size_t sz);
+        bool from_binary(const void * v,uint64_t sz);
 
         /**
         @brief read the content of this instance from an XDR stream
@@ -679,8 +679,8 @@ namespace csl
         this function delegates the conversion to v
          */
         inline bool from_var(const var & v) { return v.to_string(*this); }
-        
-        /** 
+
+        /**
         @brief serialize contents of objects
         @param buf archiver class to/from serialize
         @throw common::exc

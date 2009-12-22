@@ -1,0 +1,17 @@
+Error message should follow here:
+baseline              1976.052 ms,  2097150 calls,   0.000942 ms/call,   1061282.800250 calls/sec   
+test_colhead          2829.507 ms, 268435454 calls,   0.000011 ms/call,   94870044.145500 calls/sec   
+test_param            2243.801 ms,   262142 calls,   0.008559 ms/call,   116829.433626 calls/sec   
+stepw_noret_noaut     2264.757 ms,      126 calls,   17.974262 ms/call,   55.635108 calls/sec   
+stepw_noret_aut       2239.011 ms,      126 calls,   17.769929 ms/call,   56.274846 calls/sec   
+stepw_ret_noaut       2232.671 ms,      126 calls,   17.719611 ms/call,   56.434647 calls/sec   
+stepw_ret_aut         2224.174 ms,      126 calls,   17.652175 ms/call,   56.650244 calls/sec   
+onesht_noret_noaut    2206.214 ms,      126 calls,   17.509635 ms/call,   57.111413 calls/sec   
+onesht_noret_aut      2313.600 ms,      126 calls,   18.361905 ms/call,   54.460581 calls/sec   
+onesht_ret_noaut      2209.980 ms,      126 calls,   17.539524 ms/call,   57.014091 calls/sec   
+onesht_ret_aut        2282.920 ms,      126 calls,   18.118413 ms/call,   55.192473 calls/sec   
+ins_del_int           2034.541 ms,      126 calls,   16.147151 ms/call,   61.930431 calls/sec   
+ins_del_double        2013.382 ms,      126 calls,   15.979222 ms/call,   62.581269 calls/sec   
+ins_del_str           2023.272 ms,      126 calls,   16.057714 ms/call,   62.275364 calls/sec   
+ins_del_blob          2116.760 ms,      126 calls,   16.799683 ms/call,   59.524934 calls/sec   
+insdel_int_notran     2927.807 ms,    65534 calls,   0.044676 ms/call,   22383.306003 calls/sec   

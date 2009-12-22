@@ -26,6 +26,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/rpc/stub_server.hh"
 #include "codesloop/common/common.h"
 
+using std::endl;
+
 /**
   @file rpc/src/stub_server.cc
   @brief implementation of codesloop interface descriptor
@@ -35,6 +37,197 @@ namespace csl
 {
   namespace rpc
   {
+    void stub_server::generate()
+    {
+      const char * class_name = (ifname_ + "_srv").c_str();
+
+      open_file((ifname_+"_srv.cc").c_str());
+
+      output_
+        << "#ifdef __cplusplus" << endl
+        << "#include \"" << (ifname_+"_srv.hh").c_str() << "\""
+        << endl
+        << "#include <codesloop/common/arch.hh>"
+        << endl
+        << "#include <codesloop/common/pbuf.hh>" 
+        << endl
+        << "#include <codesloop/rpc/exc.hh>" 
+        << endl
+        << "#include <codesloop/rpc/handle.hh>" 
+        << endl
+      ;
+
+      /*---------------------------------------------------------\
+      |  Generate namespace info                                 |
+      \---------------------------------------------------------*/
+      this->generate_ns_open();
+
+
+
+
+      /*---------------------------------------------------------\
+      |  Despatcher function                                     |
+      \---------------------------------------------------------*/
+      iface::function_iterator func_it = ifc_->get_functions()->begin();
+      iface::func::param_iterator param_it;
+
+      output_
+        << ls_ << "/* implement function call routing */" << endl
+        << ls_ << "void " << class_name << "::despatch (" << endl
+        << ls_ << "  /* input */  const csl::rpc::client_info & ci," << endl
+        << ls_ << "  /* inout */  csl::common::arch & archiver)" << endl
+        << ls_ << "{" << endl 
+        << ls_ << "  ENTER_FUNCTION();" << endl << endl
+        << ls_ << "  int64_t interface_id;" << endl
+        << ls_ << "  uint32_t function_id;" << endl 
+        << ls_ << "  csl::rpc::handle __handle = CSL_RPC_HANDLE_NULL;" << endl 
+        << ls_ << "  uint32_t retval = rt_succcess;" << endl
+        << ls_ << "  uint32_t exc_nr = 0;" << endl
+        << ls_ << endl
+        << ls_ << "  archiver.serialize(interface_id);" << endl
+        << ls_ << "  archiver.serialize(function_id);" << endl 
+        << ls_ << "  archiver.serialize(__handle);" << endl 
+        << ls_ << endl
+        << ls_ << "  if ( interface_id != get_crc64() ) { " << endl
+        << ls_ << "    CSL_DEBUGF(L\"Interface error, local: %lld, remote: %lld\""
+        <<        ", get_crc64(), interface_id );" << endl
+        << ls_ << "    archiver.reset();" << endl
+        << ls_ << "    throw csl::rpc::exc(csl::rpc::exc::rs_incompat_iface,"
+        <<        "L\"Can not despatch request, interfaces are different\"); " << endl 
+        << ls_ << "  }" << endl << endl
+        << ls_ << "  switch( function_id )" << endl          
+        << ls_ << "  {" << endl
+      ;
+
+      while ( func_it != ifc_->get_functions()->end() )
+      {
+        output_
+          << ls_ << "    case fid_" << (*func_it).name << ":" << endl
+          << ls_ << "    {" << endl
+        ; 
+        param_it = (*func_it).params.begin();
+        while( param_it != (*func_it).params.end() )
+        {
+          // create type 
+          if ( (*param_it).kind!=MD_EXCEPTION ) {
+            output_ 
+              << ls_ << "      " << (*param_it).type << " " << (*param_it).name << ";"
+              << endl
+              ;
+
+            // deserialize data if necessary
+            if ( (*param_it).kind!=MD_OUTPUT ) {
+              output_ 
+                << ls_ << "      archiver.serialize( " << (*param_it).name << ");" 
+                << endl
+              ;
+            }
+          
+          } // create type
+
+          param_it++;
+        }
+        output_ << endl;
+
+
+        // call it!
+        output_ 
+          << ls_ << "      archiver.set_direction( csl::common::arch::SERIALIZE );" 
+          << endl << endl
+          << ls_ << "      try { " << endl << endl
+          << ls_ << "        " << (*func_it).name << "(ci, "
+        ;
+
+        param_it = (*func_it).params.begin();
+        while( param_it != (*func_it).params.end() )
+        {
+          if ( (*param_it).kind!=MD_EXCEPTION ) {
+            output_ 
+              <<  (*param_it).name ;
+          }
+          param_it++;
+          // TODO: now it works only, if exceptions are defined last
+          if ( (*param_it).kind!=MD_EXCEPTION && param_it != (*func_it).params.end() )
+            output_ << ", ";
+        }
+
+        output_ << ");" << endl << endl;
+
+        // handle output parameters
+        output_ << "              archiver.serialize( retval );" << endl;
+        param_it = (*func_it).params.begin();
+        while( param_it != (*func_it).params.end() )
+        {
+          // deserialize data if necessary
+          if ( (*param_it).kind==MD_OUTPUT ||  (*param_it).kind==MD_INOUT ) 
+          {
+            output_
+              << ls_ << "        archiver.serialize( " << (*param_it).name << ");"
+              << endl
+            ;
+          }
+
+          param_it++;
+        }
+        output_ << endl;
+
+        // handl exceptions
+        param_it = (*func_it).params.begin();
+        int exc_nr = 1;
+        while( param_it != (*func_it).params.end() )
+        {
+          if ( (*param_it).kind==MD_EXCEPTION ) {
+            output_
+              << ls_ << "      } catch(" << (*param_it).type << " & " 
+              << (*param_it).name<< ") {" << endl
+              << ls_ << "        retval = rt_exception;" << endl
+              << ls_ << "        exc_nr = " << exc_nr++ << ";" << endl
+              << ls_ << "        archiver.serialize( retval );" << endl
+              << ls_ << "        archiver.serialize( exc_nr );" << endl
+              << ls_ << "        archiver.serialize( "<<  (*param_it).name <<" ); " << endl 
+            ;
+          }
+          param_it++;
+        }
+        output_ 
+          << ls_ << "      } catch(...) {" << endl
+          << ls_ << "        archiver.serialize( retval );" << endl
+          << ls_ << "        archiver.serialize( exc_nr );" << endl
+          << ls_ << "      } " << endl;
+
+        output_
+          << ls_ << "    }" << endl
+          << ls_ << "    break;" << endl
+        ;
+
+        func_it++;
+      }
+      output_
+        << ls_ << "    default:" << endl
+        << ls_ << "      throw csl::rpc::exc(csl::rpc::exc::rs_invalid_fid,L\""
+        <<               ifname_.c_str() << " interface\");" << endl
+        << ls_ << "    break;" << endl
+        << ls_ << "  } /* switch */" << endl
+      ;
+
+
+      output_
+        << ls_ << "  LEAVE_FUNCTION();" << endl 
+        << ls_ << "}" << endl
+      ;
+
+      /*---------------------------------------------------------\
+      |  Cleanup                                                 |
+      \---------------------------------------------------------*/
+      generate_ns_close();
+
+      output_
+        << endl
+        << "#endif /* __cplusplus */" << endl
+        << "/* EOF */" << endl
+      ;
+    }
+    
   };
 };
 

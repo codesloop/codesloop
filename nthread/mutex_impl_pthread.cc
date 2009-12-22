@@ -26,9 +26,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/nthread/mutex.hh"
 #include "codesloop/common/common.h"
 #include <pthread.h>
-#include <unistd.h>
-#include <sys/time.h>
-#include <errno.h>
 
 /**
   @file mutex_impl_pthread.cc
@@ -44,16 +41,20 @@ namespace csl
       class scoped_pt_mutex
       {
       public:
-        scoped_pt_mutex(pthread_mutex_t * mtx) : mtx_(mtx)
+        bool is_good()
         {
-          pthread_mutex_lock(mtx_);
+          return ( *mtx_ != 0 );
+        }
+        scoped_pt_mutex(pthread_mutex_t ** mtx) : mtx_(mtx)
+        {
+          if( is_good() ) pthread_mutex_lock(*mtx_);
         }
         ~scoped_pt_mutex()
         {
-          pthread_mutex_unlock(mtx_);
+          if( is_good() ) pthread_mutex_unlock(*mtx_);
         }
       private:
-        pthread_mutex_t * mtx_;
+        pthread_mutex_t ** mtx_;
       };
 
       extern "C" void mutex_unlock_function_(void * mtx)
@@ -100,8 +101,8 @@ namespace csl
         locked_  = 0;
 
         // invalidate original mutex data
-        mtx_  = (pthread_mutex_t *)0xbad;
-        cond_ = (pthread_cond_t *)0xbad;
+        mtx_  = reinterpret_cast<pthread_mutex_t *>(0);
+        cond_ = reinterpret_cast<pthread_cond_t *>(0);
 
         // destroy the allocated pthread structures
         pthread_mutex_unlock(&mtx_var_);
@@ -143,7 +144,7 @@ namespace csl
           // locked section
           bool timed_out = false;
           int err=0;
-          scoped_pt_mutex m(mtx_);
+          scoped_pt_mutex m(&mtx_);
 
           ++waiting_;
 
@@ -204,7 +205,7 @@ namespace csl
         bool ret = false;
         {
           // locked section
-          scoped_pt_mutex m(mtx_);
+          scoped_pt_mutex m(&mtx_);
 
           // about to be destroyed ?
           if( invalid_ ) { ret = false; }
@@ -228,7 +229,7 @@ namespace csl
         bool ret = true;
         {
           // locked section
-          scoped_pt_mutex m(mtx_);
+          scoped_pt_mutex m(&mtx_);
           ret = is_locked_nl();
 
           if( ret == false )
@@ -261,7 +262,7 @@ bail_not_owner:
         bool ret = true;
         {
           // locked section
-          scoped_pt_mutex m(mtx_);
+          scoped_pt_mutex m(&mtx_);
           ret = is_locked_nl();
 
           if( ret == false )
@@ -290,7 +291,7 @@ bail_not_owner:
       {
         bool ret = false;
         {
-          scoped_pt_mutex m(mtx_);
+          scoped_pt_mutex m(&mtx_);
           ret = is_locked_nl();
         }
         return ret;
@@ -300,7 +301,7 @@ bail_not_owner:
       {
         unsigned int ret = 0;
         {
-          scoped_pt_mutex m(mtx_);
+          scoped_pt_mutex m(&mtx_);
           ret = waiting_;
         }
         return ret;
@@ -310,7 +311,7 @@ bail_not_owner:
       {
         unsigned int ret = 0;
         {
-          scoped_pt_mutex m(mtx_);
+          scoped_pt_mutex m(&mtx_);
           ret = locked_;
         }
         return ret;

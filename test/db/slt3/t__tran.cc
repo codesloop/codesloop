@@ -30,15 +30,16 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "codesloop/common/common.h"
 #include "codesloop/common/test_timer.h"
-#include "codesloop/db/tran.hh"
-#include "codesloop/db/conn.hh"
-#include "codesloop/db/query.hh"
-#include "exc.hh"
+#include "codesloop/db/slt3/tran.hh"
+#include "codesloop/db/slt3/conn.hh"
+#include "codesloop/db/slt3/query.hh"
+#include "codesloop/db/exc.hh"
 #include "codesloop/common/str.hh"
 #include "codesloop/common/ustr.hh"
 #include <assert.h>
 
-using namespace csl::slt3;
+using namespace csl::db;
+
 using csl::common::str;
 using csl::common::ustr;
 
@@ -48,9 +49,9 @@ namespace test_tran {
   /** @test baseline for performance comparison */
   void baseline()
   {
-    conn c;
+    slt3::conn c;
     c.use_exc(false);
-    tran t(c);
+    slt3::tran t(c);
     assert( c.use_exc() == false );
     assert( t.use_exc() == false );
   }
@@ -58,12 +59,12 @@ namespace test_tran {
   /** @test commit */
   void test_commit()
   {
-    conn c;
+    slt3::conn c;
     c.use_exc(false);
     assert(c.open("test.db") == true );
     {
-      tran t(c);
-      query q(t);
+      slt3::tran t(c);
+      slt3::query q(t);
       assert( q.execute("CREATE TABLE t(i INT);") == true );
       assert( q.execute("INSERT INTO t VALUES(1);") == true );
       t.commit();
@@ -71,8 +72,8 @@ namespace test_tran {
     assert( c.close() == true );
     assert(c.open("test.db") == true );
     {
-      tran t(c);
-      query q(t);
+      slt3::tran t(c);
+      slt3::query q(t);
       ustr s;
       assert( q.execute("SELECT SUM(i) FROM T;",s) == true );
       assert( s == "1" );
@@ -84,28 +85,28 @@ namespace test_tran {
   /** @test commit on destruct */
   void commit_on_destr()
   {
-    conn c;
+    slt3::conn c;
     c.use_exc(false);
     assert(c.open("test.db") == true );
     {
-      tran t(c);
+      slt3::tran t(c);
       t.commit_on_destruct(true);
-      query q(t);
+      slt3::query q(t);
       assert( q.execute("CREATE TABLE t(i INT);") == true );
       assert( q.execute("INSERT INTO t VALUES(1);") == true );
     }
     {
-      tran t(c);
+      slt3::tran t(c);
       t.commit_on_destruct(false);
-      query q(t);
+      slt3::query q(t);
       assert( q.execute("INSERT INTO t VALUES(3);") == true );
     }
     assert( c.close() == true );
     assert(c.open("test.db") == true );
     {
-      tran t(c);
+      slt3::tran t(c);
       t.commit_on_destruct(true);
-      query q(t);
+      slt3::query q(t);
       ustr s;
       assert( q.execute("SELECT SUM(i) FROM T;",s) == true );
       assert( s == "1" );
@@ -116,23 +117,27 @@ namespace test_tran {
   /** @test rollback */
   void test_rollback()
   {
-    conn c;
+    slt3::conn c;
     c.use_exc(true);
     bool caught = false;
+
     assert(c.open("test.db") == true );
+
     {
-      tran t(c);
-      query q(t);
+      slt3::tran t(c);
+      slt3::query q(t);
       assert( q.execute("CREATE TABLE t(i INT);") == true );
       assert( q.execute("INSERT INTO t VALUES(1);") == true );
       t.rollback();
     }
+
     assert( c.close() == true );
     assert( c.open("test.db") == true );
+
     try
     {
-      tran t(c);
-      query q(t);
+      slt3::tran t(c);
+      slt3::query q(t);
       ustr s;
       assert( q.execute("SELECT SUM(i) FROM T;",s) == true );
       assert( s == "1" );
@@ -147,24 +152,27 @@ namespace test_tran {
   /** @test rollback on destruct */
   void rollb_on_destr()
   {
-    conn c;
+    slt3::conn c;
     c.use_exc(true);
     bool caught = false;
+
     assert(c.open("test.db") == true );
     {
-      tran t(c);
+      slt3::tran t(c);
       t.rollback_on_destruct(true);
-      query q(t);
+      slt3::query q(t);
       assert( q.execute("CREATE TABLE t(i INT);") == true );
       assert( q.execute("INSERT INTO t VALUES(1);") == true );
     }
+
     assert( c.close() == true );
     assert( c.open("test.db") == true );
+
     try
     {
-      tran t(c);
+      slt3::tran t(c);
       t.rollback_on_destruct(false);
-      query q(t);
+      slt3::query q(t);
       ustr s;
       assert( q.execute("SELECT SUM(i) FROM T;",s) == true );
       assert( s == "1" );

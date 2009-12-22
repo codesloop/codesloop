@@ -26,7 +26,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/nthread/thread.hh"
 #include "codesloop/nthread/mutex.hh"
 #include "codesloop/common/common.h"
-#include <windows.h>
 
 /**
   @file thread_impl_windows.cc
@@ -62,15 +61,15 @@ namespace csl
       HANDLE                  entry_thread_;
       HANDLE                  guard_thread_;
 
-      impl() : stack_size_(0), 
-        start_routine_(&dummy_callback_), 
-        entry_thread_(0), 
+      impl() : stack_size_(0),
+        start_routine_(&dummy_callback_),
+        entry_thread_(0),
         guard_thread_(0) { }
 
       ~impl()
       {
         stop();
-        if( is_started() && guard_thread_ != 0 ) 
+        if( is_started() && guard_thread_ != 0 )
         {
           WaitForSingleObject( guard_thread_, INFINITE );
         }
@@ -121,7 +120,7 @@ namespace csl
           ss = stack_size_;
         }
 
-        HANDLE entry_thread = CreateThread( 
+        HANDLE entry_thread = CreateThread(
           NULL,            // security attrs
           ss,              // stack size
           thread_entry_,   // entry
@@ -129,11 +128,11 @@ namespace csl
           0,               // creation flag: run immediately
           NULL );          // thread id
 
-        if( entry_thread == NULL ) 
-        { 
+        if( entry_thread == NULL )
+        {
           // DWORD err = GetLastError();
-          // DebugBreak(); 
-          return false; 
+          // DebugBreak();
+          return false;
         }
 
         {
@@ -141,7 +140,7 @@ namespace csl
           entry_thread_ = entry_thread;
         }
 
-        HANDLE guard_thread = CreateThread( 
+        HANDLE guard_thread = CreateThread(
           NULL,            // security attrs
           32*1024,         // stack size
           thread_guard_,   // entry
@@ -149,11 +148,11 @@ namespace csl
           0,               // creation flag: run immediately
           NULL );          // thread id
 
-        if( guard_thread == NULL ) 
-        { 
+        if( guard_thread == NULL )
+        {
           // DWORD err = GetLastError();
-          // DebugBreak(); 
-          return false; 
+          // DebugBreak();
+          return false;
         }
 
         {
@@ -182,7 +181,7 @@ namespace csl
       DWORD WINAPI thread_guard_( LPVOID lpParam )
       {
         thread::impl * p = reinterpret_cast<thread::impl *>(lpParam);
-        
+
         if( p )
         {
           if( p->entry_thread_ )

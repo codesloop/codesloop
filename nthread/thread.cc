@@ -23,6 +23,14 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#if 0
+#ifndef DEBUG
+#define DEBUG
+#define DEBUG_ENABLE_INDENT
+//#define DEBUG_VERBOSE
+#endif /* DEBUG */
+#endif //0
+
 #include "codesloop/nthread/exc.hh"
 #include "codesloop/nthread/thread.hh"
 #include "codesloop/common/common.h"
@@ -43,7 +51,7 @@ namespace csl
 {
   namespace nthread
   {
-    thread::thread() : impl_(new impl) {}
+    thread::thread() : impl_(new impl), use_exc_(true) {}
     thread::~thread() {}
 
     void thread::set_entry(callback & entry)
@@ -104,10 +112,15 @@ namespace csl
     }
 
     // no-copy
-    thread::thread(const thread & other) 
-      : impl_( reinterpret_cast<impl *>(0) ) { throw nthread::exc(exc::rs_not_implemented,L"csl::nthread::thread"); }
+    thread::thread(const thread & other) : impl_( reinterpret_cast<impl *>(0) )
+    {
+      THRNORET(exc::rs_not_implemented);
+    }
 
-    thread & thread::operator=(const thread & other) { return *this; }
+    thread & thread::operator=(const thread & other)
+    {
+      THR(exc::rs_not_implemented, *this);
+    }
   }
 }
 

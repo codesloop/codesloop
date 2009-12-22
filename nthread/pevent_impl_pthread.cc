@@ -25,10 +25,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "codesloop/nthread/pevent.hh"
 #include "codesloop/common/common.h"
-#include <pthread.h> 
-#include <unistd.h>
-#include <sys/time.h>
-#include <errno.h>
+#include <pthread.h>
 
 /**
   @file pevent_impl_pthread.cc
@@ -44,16 +41,20 @@ namespace csl
       class scoped_pt_mutex
       {
       public:
-        scoped_pt_mutex(pthread_mutex_t * mtx) : mtx_(mtx)
+        bool is_good()
         {
-          pthread_mutex_lock(mtx_);
+          return ( *mtx_ != 0 );
+        }
+        scoped_pt_mutex(pthread_mutex_t ** mtx) : mtx_(mtx)
+        {
+          if( is_good() ) pthread_mutex_lock(*mtx_);
         }
         ~scoped_pt_mutex()
         {
-          pthread_mutex_unlock(mtx_);
+          if( is_good() ) pthread_mutex_unlock(*mtx_);
         }
       private:
-        pthread_mutex_t * mtx_;
+        pthread_mutex_t ** mtx_;
       };
     };
 
@@ -91,8 +92,8 @@ namespace csl
         if( waiting_ > 0 ) pthread_cond_broadcast(cond_);
 
         // invalidate original mutex data
-        mtx_  = (pthread_mutex_t *)0xbad;
-        cond_ = (pthread_cond_t *)0xbad;
+        mtx_  = reinterpret_cast<pthread_mutex_t *>(0);
+        cond_ = reinterpret_cast<pthread_cond_t *>(0);
 
         // destroy the allocated pthread structures
         pthread_mutex_unlock(&mtx_var_);
@@ -107,7 +108,7 @@ namespace csl
 
         bool ret = true;
         {
-          scoped_pt_mutex m(mtx_);
+          scoped_pt_mutex m(&mtx_);
 
           if( invalid_ )        { ret = false; }
           else if( permanent_ ) { ret = true; }
@@ -139,7 +140,7 @@ namespace csl
       {
         bool ret = true;
         {
-          scoped_pt_mutex m(mtx_);
+          scoped_pt_mutex m(&mtx_);
 
           if( invalid_ ) ret = false;
           else
@@ -177,7 +178,7 @@ namespace csl
           // locked section
           bool timed_out = false;
           int err=0;
-          scoped_pt_mutex m(mtx_);
+          scoped_pt_mutex m(&mtx_);
 
           ++waiting_;
 
@@ -235,7 +236,7 @@ namespace csl
       {
         bool ret = false;
         {
-          scoped_pt_mutex m(mtx_);
+          scoped_pt_mutex m(&mtx_);
 
           if( invalid_ )       { ret = false; }
           else if( available_ )
@@ -252,7 +253,7 @@ namespace csl
       {
         unsigned int ret = 0;
         {
-          scoped_pt_mutex m(mtx_);
+          scoped_pt_mutex m(&mtx_);
           ret = waiting_;
         }
         return ret;
@@ -262,7 +263,7 @@ namespace csl
       {
         unsigned int ret = 0;
         {
-          scoped_pt_mutex m(mtx_);
+          scoped_pt_mutex m(&mtx_);
           ret = available_;
         }
         return ret;
@@ -270,7 +271,7 @@ namespace csl
 
       void set_permanent()
       {
-        scoped_pt_mutex m(mtx_);
+        scoped_pt_mutex m(&mtx_);
         if( !permanent_ )
         {
           permanent_ = true;
@@ -281,7 +282,7 @@ namespace csl
 
       void clear_permanent()
       {
-        scoped_pt_mutex m(mtx_);
+        scoped_pt_mutex m(&mtx_);
         permanent_ = false;
       }
 
@@ -289,7 +290,7 @@ namespace csl
       {
         bool ret = false;
         {
-          scoped_pt_mutex m(mtx_);
+          scoped_pt_mutex m(&mtx_);
           ret = permanent_;
         }
         return ret;
@@ -297,7 +298,7 @@ namespace csl
 
       void clear_available()
       {
-        scoped_pt_mutex m(mtx_);
+        scoped_pt_mutex m(&mtx_);
         available_ = 0;
         permanent_ = false;
       }

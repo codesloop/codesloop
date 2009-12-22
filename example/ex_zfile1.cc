@@ -42,7 +42,7 @@ int main()
   zf.put_data( reinterpret_cast<const unsigned char *>("Hello World"),12);
 
   /* compression is done on demand */
-  size_t zsize = zf.get_zsize();
+  uint64_t zsize = zf.get_zsize();
 
   std::auto_ptr<unsigned char> buff(new unsigned char[zsize]);
 

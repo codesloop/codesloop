@@ -3,13 +3,13 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
-# 
+#
 # 1. Redistributions of source code must retain the above copyright
 #    notice, this list of conditions and the following disclaimer.
 # 2. Redistributions in binary form must reproduce the above copyright
 #    notice, this list of conditions and the following disclaimer in the
 #    documentation and/or other materials provided with the distribution.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
 # IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
 # OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -54,7 +54,7 @@ IF(WIN32)
                     ../../../3rdparty/zlib/GnuWin32/lib
                   )
 
-  INCLUDE_DIRECTORIES( ../../..  
+  INCLUDE_DIRECTORIES( ../../..
                        ../../common
                        "C:/Program Files/GnuWin32/include/"
                        $ENV{ZLIB_DEV_ENV}/include
@@ -111,9 +111,38 @@ ADD_EXECUTABLE( t__binry         t__binry.cc )
 ADD_EXECUTABLE( t__serial        t__serial.cc )
 ADD_EXECUTABLE( t__obj           t__obj.cc )
 ADD_EXECUTABLE( t__inpvec        t__inpvec.cc )
+ADD_EXECUTABLE( t__queue         t__queue.cc )
 ADD_EXECUTABLE( t__hash          t__hash.cc )
 ADD_EXECUTABLE( t__hash_helpers  t__hash_helpers.cc )
 ADD_EXECUTABLE( t__hash_exp      t__hash_exp.cc )
+ADD_EXECUTABLE( t__auto_cloce    t__auto_close.cc )
+ADD_EXECUTABLE( t__rdbuf         t__rdbuf.cc )
+ADD_EXECUTABLE( t__read_res      t__read_res.cc )
+
+
+ADD_TEST(common_auto_cloce ${EXECUTABLE_OUTPUT_PATH}/t__auto_cloce)
+ADD_TEST(common_binry ${EXECUTABLE_OUTPUT_PATH}/t__binry)
+ADD_TEST(common_circbuf ${EXECUTABLE_OUTPUT_PATH}/t__circbuf)
+ADD_TEST(common_dbl ${EXECUTABLE_OUTPUT_PATH}/t__dbl)
+ADD_TEST(common_hash ${EXECUTABLE_OUTPUT_PATH}/t__hash)
+ADD_TEST(common_hash_exp ${EXECUTABLE_OUTPUT_PATH}/t__hash_exp)
+ADD_TEST(common_hash_helpers ${EXECUTABLE_OUTPUT_PATH}/t__hash_helpers)
+ADD_TEST(common_inpvec ${EXECUTABLE_OUTPUT_PATH}/t__inpvec)
+ADD_TEST(common_int64 ${EXECUTABLE_OUTPUT_PATH}/t__int64)
+ADD_TEST(common_logger ${EXECUTABLE_OUTPUT_PATH}/t__logger)
+ADD_TEST(common_mpool ${EXECUTABLE_OUTPUT_PATH}/t__mpool)
+ADD_TEST(common_obj ${EXECUTABLE_OUTPUT_PATH}/t__obj)
+ADD_TEST(common_pbuf ${EXECUTABLE_OUTPUT_PATH}/t__pbuf)
+ADD_TEST(common_pvlist ${EXECUTABLE_OUTPUT_PATH}/t__pvlist)
+ADD_TEST(common_queue ${EXECUTABLE_OUTPUT_PATH}/t__queue)
+ADD_TEST(common_rdbuf ${EXECUTABLE_OUTPUT_PATH}/t__rdbuf)
+ADD_TEST(common_read_res ${EXECUTABLE_OUTPUT_PATH}/t__read_res)
+ADD_TEST(common_serial ${EXECUTABLE_OUTPUT_PATH}/t__serial)
+ADD_TEST(common_str ${EXECUTABLE_OUTPUT_PATH}/t__str)
+ADD_TEST(common_tbuf ${EXECUTABLE_OUTPUT_PATH}/t__tbuf)
+ADD_TEST(common_ustr ${EXECUTABLE_OUTPUT_PATH}/t__ustr)
+ADD_TEST(common_xdrbuf ${EXECUTABLE_OUTPUT_PATH}/t__xdrbuf)
+ADD_TEST(common_zfile ${EXECUTABLE_OUTPUT_PATH}/t__zfile)
 
 #ADD_EXECUTABLE( t__hash_macros   t__hash_macros.cc )
 #SET_TARGET_PROPERTIES( t__hash PROPERTIES LINK_FLAGS -pg )

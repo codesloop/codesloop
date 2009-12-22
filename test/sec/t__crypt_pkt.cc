@@ -46,11 +46,11 @@ using csl::common::pbuf;
 /** @brief contains tests related to crypt_pkt */
 namespace test_crypt_pkt {
 
-  void print_hex(const char * prefix,const void * vp,size_t len)
+  void print_hex(const char * prefix, const void * vp, uint64_t len)
   {
     const unsigned char * hx = reinterpret_cast<const unsigned char *>(vp);
     printf("%s: ",prefix);
-    for(size_t i=0;i<len;++i) printf("%.2X",hx[i]);
+    for(uint64_t i=0; i<len; ++i) printf("%.2X",hx[i]);
     printf("\n");
   }
 
@@ -64,8 +64,8 @@ namespace test_crypt_pkt {
     char buf[48+CSL_SEC_CRYPT_BUF_HEAD_LEN+CSL_SEC_CRYPT_BUF_MAC_LEN];
     char buf2[48+CSL_SEC_CRYPT_BUF_HEAD_LEN+CSL_SEC_CRYPT_BUF_MAC_LEN];
 
-    memcpy(buf+8,"Hello World Hello World Hello World Hello World",48);
-    memcpy(buf2+8,"Hello World Hello World Hello World Hello World",48);
+    ::memcpy(buf+8, "Hello World Hello World Hello World Hello World", 48);
+    ::memcpy(buf2+8, "Hello World Hello World Hello World Hello World", 48);
 
     crypt_buf cre;
     assert( cre.init_crypt( reinterpret_cast<unsigned char *>(buf),
@@ -166,8 +166,8 @@ namespace test_crypt_pkt {
     char buf[900+CSL_SEC_CRYPT_BUF_HEAD_LEN+CSL_SEC_CRYPT_BUF_MAC_LEN];
     char buf2[900+CSL_SEC_CRYPT_BUF_HEAD_LEN+CSL_SEC_CRYPT_BUF_MAC_LEN];
 
-    memset(buf,'A',sizeof(buf));
-    memset(buf2,'A',sizeof(buf2));
+    ::memset(buf, 'A', sizeof(buf));
+    ::memset(buf2, 'A', sizeof(buf2));
 
     crypt_buf cre;
 
@@ -191,7 +191,7 @@ namespace test_crypt_pkt {
     assert( crd.add_data( reinterpret_cast<unsigned char *>(buf+8),900,false) == true );
     assert( crd.finalize( reinterpret_cast<unsigned char *>(buf+900+8)) == true );
 
-    assert( memcmp(buf+8,buf2+8,900) == 0 );
+    assert( ::memcmp(buf+8, buf2+8, 900) == 0 );
 
     if( dbg )
     {
@@ -204,7 +204,7 @@ namespace test_crypt_pkt {
   {
     char buf[900];
 
-    memset(buf,'A',sizeof(buf));
+    ::memset(buf, 'A', sizeof(buf));
 
     crypt_pkt::saltbuf_t salt;
     crypt_pkt::keybuf_t  key;
@@ -221,7 +221,7 @@ namespace test_crypt_pkt {
     assert( pk.encrypt( salt,key,head,data,foot ) == true );
     assert( pk.decrypt( key,head,data,foot ) == true );
 
-    assert( memcmp(buf,data.data(),900) == 0 );
+    assert( ::memcmp(buf, data.data(), 900) == 0 );
 
     if( dbg )
     {
@@ -234,7 +234,7 @@ namespace test_crypt_pkt {
   {
     char buf[63*1024+CSL_SEC_CRYPT_BUF_HEAD_LEN+CSL_SEC_CRYPT_BUF_MAC_LEN];
 
-    memset(buf,'A',sizeof(buf));
+    ::memset(buf, 'A', sizeof(buf));
 
     crypt_buf cre;
 
@@ -252,7 +252,7 @@ namespace test_crypt_pkt {
   {
     char buf[63*1024];
 
-    memset(buf,'A',sizeof(buf));
+    ::memset(buf, 'A', sizeof(buf));
 
     crypt_pkt::saltbuf_t salt;
     crypt_pkt::keybuf_t  key;
@@ -274,8 +274,8 @@ namespace test_crypt_pkt {
     char buf[63*1024+CSL_SEC_CRYPT_BUF_HEAD_LEN+CSL_SEC_CRYPT_BUF_MAC_LEN];
     char buf2[63*1024+CSL_SEC_CRYPT_BUF_HEAD_LEN+CSL_SEC_CRYPT_BUF_MAC_LEN];
 
-    memset(buf,'A',sizeof(buf));
-    memset(buf2,'A',sizeof(buf2));
+    ::memset(buf, 'A', sizeof(buf));
+    ::memset(buf2, 'A', sizeof(buf2));
 
     crypt_buf cre;
 
@@ -304,7 +304,7 @@ namespace test_crypt_pkt {
   {
     char buf[63*1024];
 
-    memset(buf,'A',sizeof(buf));
+    ::memset(buf, 'A', sizeof(buf));
 
     crypt_pkt::saltbuf_t salt;
     crypt_pkt::keybuf_t  key;
@@ -325,7 +325,7 @@ namespace test_crypt_pkt {
 
   struct rndata
   {
-    size_t len_;
+    uint64_t len_;
     const char * filename_;
   };
 

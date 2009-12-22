@@ -68,7 +68,7 @@ namespace csl
           npos = 0xFFFFFFFF,         ///<constant for find: not found
           var_type_v = CSL_TYPE_USTR ///<variable type
         };
-        
+
         typedef const char * value_t;
         inline value_t value() const { return c_str(); }
 
@@ -147,7 +147,7 @@ namespace csl
         /** @brief is equal operator */
         inline bool operator==(const ustr& s) const
         {
-          return (::strncmp( data(), s.data(), nbytes()) == 0);
+          return (::strncmp( data(), s.data(), static_cast<size_t>(nbytes()) ) == 0);
         }
 
         /**
@@ -155,23 +155,23 @@ namespace csl
         @param s is the substring to be found
         @returns npos if not found or the position
          */
-        size_t find(const ustr & s) const;
+        uint64_t find(const ustr & s) const;
 
         /**
         @brief extracts a substring from a given position
         @param start start from this position
         @param length is the amount to be extracted
          */
-        ustr substr(const size_t start, const size_t length) const;
+        ustr substr(const uint64_t start, const uint64_t length) const;
 
         /**
         @brief trim spaces from string start and end positions
         */
-        inline ustr trim() 
+        inline ustr trim()
         {
-            size_t start = npos, length = 0;
+            uint64_t start = npos, length = 0;
 
-            for ( size_t pos = 0; pos < size() ; pos ++ ) 
+            for ( uint64_t pos = 0; pos < size() ; pos ++ )
             {
                 if ( start == npos && !isspace( (*this)[pos] )  )
                     start = pos;
@@ -232,7 +232,7 @@ namespace csl
         /** @brief is equal operator */
         inline bool operator==(const char * s) const
         {
-          return (::strncmp( data(), s, nbytes()) == 0);
+          return (::strncmp( data(), s, static_cast<size_t>(nbytes()) ) == 0);
         }
 
         /** @brief returns the background c str */
@@ -257,7 +257,7 @@ namespace csl
         @param s is the string to be found
         @returns npos if not found or the position
          */
-        size_t find(const char * s) const;
+        uint64_t find(const char * s) const;
 
         /** @brief get data as char * */
         inline const char * data() const
@@ -284,27 +284,27 @@ namespace csl
         ** ------------------------------------------------------------------------ */
 
         /** @brief unchecked access to buffer */
-        inline char operator[](const size_t n) const
+        inline char operator[](const uint64_t n) const
         {
           return data()[n];
         }
 
         /** @brief check access to buffer */
-        char at(const size_t n) const;
+        char at(const uint64_t n) const;
 
         /**
         @brief find a wide character in the string
         @param w is the character to be found
         @returns npos if not found or the position
          */
-        size_t find(char w) const;
+        uint64_t find(char w) const;
 
         /**
         @brief reverse find a wide character in the string
         @param w is the character to be found
         @returns npos if not found or the position
          */
-        size_t rfind(char w) const;
+        uint64_t rfind(char w) const;
 
         /* ------------------------------------------------------------------------ *
         **    wchar_t operations
@@ -335,20 +335,20 @@ namespace csl
         }
 
         /** @brief gets ustr size  */
-        inline size_t size() const
+        inline uint64_t size() const
         {
           /* I presume the trailing zero is already there */
           return (empty() ? 0 : nbytes()-1 );
         }
 
         /** @brief gets the total allocated bytes */
-        inline size_t nbytes() const
+        inline uint64_t nbytes() const
         {
           return buf_.size();
         }
 
         /** @brief return the number of characters in the string, excluding the trailing zero */
-        inline size_t nchars() const
+        inline uint64_t nchars() const
         {
           // strlen() wouldn't do here, because of multibyte utf-8 characters
           return (empty() ? 0 : ::mbstowcs(NULL,data(),0));
@@ -386,9 +386,9 @@ namespace csl
 
         /** @brief returns a const pointer to internal data */
         inline const unsigned char * ucharp_data() const { return buf_.data(); }
-        
+
         /** @brief returns the size of the variable data */
-        inline size_t var_size() const { return buf_.size(); }
+        inline uint64_t var_size() const { return buf_.size(); }
 
         /* ------------------------------------------------------------------------ *
         **    conversion operations
@@ -480,7 +480,7 @@ namespace csl
         many bytes were stored. this function will place the trailing zero as well. to check
         how much space is needed use the nbytes() function.
          */
-        bool to_binary(unsigned char * v, size_t & sz) const;
+        bool to_binary(unsigned char * v, uint64_t & sz) const;
 
         /**
         @brief convert to ptr,size
@@ -492,7 +492,7 @@ namespace csl
         many bytes were stored. this function will place the trailing zero as well. to check
         how much space is needed use the nbytes() function.
          */
-        bool to_binary(void * v, size_t & sz) const;
+        bool to_binary(void * v, uint64_t & sz) const;
 
         /**
         @brief stores the content of this instance to an XDR stream
@@ -620,7 +620,7 @@ namespace csl
         region contains a char* string. after copying it ensures that the string will
         contain a trailing zero.
          */
-        bool from_binary(const unsigned char * v,size_t sz);
+        bool from_binary(const unsigned char * v,uint64_t sz);
 
         /**
         @brief convert a memory region
@@ -632,7 +632,7 @@ namespace csl
         region contains a char* string. after copying it ensures that the string will
         contain a trailing zero.
          */
-        bool from_binary(const void * v,size_t sz);
+        bool from_binary(const void * v,uint64_t sz);
 
         /**
         @brief read the content of this instance from an XDR stream

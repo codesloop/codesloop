@@ -60,12 +60,13 @@ namespace csl
           rs_invalid_state,  ///<Component state invalid
           rs_lookup_error,   ///<Lookup error.
           rs_out_of_memory,  ///<Can not allocate memory
+          rs_assert,         ///<Assert failed
         };
 
         /** @brief converts reason code to string */
         static const wchar_t * reason_string(int rc);
 
-        /** @brief constructor 
+        /** @brief constructor
         *   @param component that caused the exception
         */
         exc(const wchar_t * component)

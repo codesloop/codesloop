@@ -1,0 +1,4 @@
+baseline              2178.703 ms,  1048574 calls,   0.002078 ms/call,   481283.589365 calls/sec   
+usage1                2470.111 ms,  2097150 calls,   0.001178 ms/call,   849010.429086 calls/sec   
+usage2                2255.318 ms,      126 calls,   17.899349 ms/call,   55.867953 calls/sec   
+crdelete              1978.569 ms,     4094 calls,   0.483285 ms/call,   2069.172215 calls/sec   

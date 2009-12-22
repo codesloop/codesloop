@@ -41,11 +41,11 @@ namespace csl
 
   namespace
   {
-    static void print_hex(const wchar_t * prefix,const void * vp,size_t len)
+    static void print_hex(const wchar_t * prefix,const void * vp, uint64_t len)
     {
       const unsigned char * hx = reinterpret_cast<const unsigned char *>(vp);
       PRINTF(L"%ls [%04d] : ",prefix,len);
-      for(size_t i=0;i<len;++i) PRINTF(L"%.2X",hx[i]);
+      for(uint64_t i=0;i<len;++i) PRINTF(L"%.2X",hx[i]);
       PRINTF(L"\n");
     }
   }
@@ -164,13 +164,13 @@ namespace csl
 
           /* output packet */
           unsigned char * outputp = m.data_+outer.size();
-          unsigned int retlen = outer.size()+head.size()+data.size()+foot.size();
+          uint64_t retlen = outer.size()+head.size()+data.size()+foot.size();
 
           if( retlen > m.max_len() ) { THR(comm::exc::rs_too_big,false); }
 
-          memcpy( outputp, head.data(), head.size() ); outputp += head.size();
-          memcpy( outputp, data.data(), data.size() ); outputp += data.size();
-          memcpy( outputp, foot.data(), foot.size() ); outputp += foot.size();
+          ::memcpy( outputp, head.data(), static_cast<size_t>(head.size()) ); outputp += head.size();
+          ::memcpy( outputp, data.data(), static_cast<size_t>(data.size()) ); outputp += data.size();
+          ::memcpy( outputp, foot.data(), static_cast<size_t>(foot.size()) ); outputp += foot.size();
 
           if( debug() )
           {
@@ -182,7 +182,7 @@ namespace csl
           }
 
           /* return the data */
-          m.size_ = retlen;
+          m.size_ = static_cast<unsigned int>(retlen); // TODO : check for size later
           return true;
         }
         catch( common::exc e )
@@ -236,7 +236,7 @@ namespace csl
           if( valid_key_cb_ && (*valid_key_cb_)(peer_public_key) == false ) { return; }
 
           /* hello callback */
-          if( hello_cb_ && 
+          if( hello_cb_ &&
               (*hello_cb_)( peer_public_key, ms.sender_, my_public_key,
                             need_login, need_pass, my_private_key) == false )
           {
@@ -328,7 +328,7 @@ namespace csl
         return ret;
       }
 
-      hello_srv::hello_srv() 
+      hello_srv::hello_srv()
         : debug_(false), min_threads_(1), max_threads_(4), timeout_ms_(1000), retries_(10)
       {
       }
@@ -372,8 +372,8 @@ namespace csl
 
           if( debug() ) { PRINTF(L" ++ [%ld] : ",xb.position()); public_key_.print(); }
 
-          pb.copy_to( m.data_,m.max_len() );
-          m.size_ = pb.size();
+          pb.copy_to( m.data_, m.max_len() );
+          m.size_ = static_cast<unsigned int>(pb.size()); // TODO : check size later
         }
         catch( common::exc e )
         {
@@ -406,7 +406,7 @@ namespace csl
           if( debug() ) { PRINTF(L" -- [%ld] : ",xbo.position()); server_public_key_.print(); }
 
           const unsigned char * ptrp = m.data_ + xbo.position();
-          unsigned int          lenp = m.size_ - xbo.position();
+          uint64_t              lenp = m.size_ - xbo.position();
 
           /* encrypted part */
 
@@ -431,7 +431,7 @@ namespace csl
           data.set(ptrp+(crypt_pkt::header_len()),
                    lenp-crypt_pkt::footer_len()-crypt_pkt::header_len());
 
-          key.set( reinterpret_cast<const unsigned char *>(session_key.c_str()), 
+          key.set( reinterpret_cast<const unsigned char *>(session_key.c_str()),
             (session_key.size()+1) );
 
           crypt_pkt pk;

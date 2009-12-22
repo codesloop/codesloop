@@ -1,0 +1,17 @@
+baseline              1746.335 ms, 268435454 calls,   0.000007 ms/call,   153713608.213773 calls/sec   
+single_int0           2477.958 ms,  4194302 calls,   0.000591 ms/call,   1692644.508099 calls/sec   
+single_int1           3366.491 ms,   131070 calls,   0.025685 ms/call,   38933.714660 calls/sec   
+single_int2           2064.233 ms,      126 calls,   16.382802 ms/call,   61.039621 calls/sec   
+single_int3           1866.221 ms,       62 calls,   30.100339 ms/call,   33.222218 calls/sec   
+single_str0           3141.847 ms,  4194302 calls,   0.000749 ms/call,   1334979.710979 calls/sec   
+single_str1           1731.818 ms,    65534 calls,   0.026426 ms/call,   37841.158828 calls/sec   
+single_str2           2022.500 ms,      126 calls,   16.051587 ms/call,   62.299135 calls/sec   
+single_str3           1780.320 ms,       62 calls,   28.714839 ms/call,   34.825200 calls/sec   
+single_dbl0           3008.306 ms,  4194302 calls,   0.000717 ms/call,   1394240.479526 calls/sec   
+single_dbl1           3386.970 ms,   131070 calls,   0.025841 ms/call,   38698.305565 calls/sec   
+single_dbl2           2208.421 ms,      126 calls,   17.527151 ms/call,   57.054339 calls/sec   
+single_dbl3           1885.567 ms,       62 calls,   30.412371 ms/call,   32.881356 calls/sec   
+single_blb0           3207.487 ms,  4194302 calls,   0.000765 ms/call,   1307659.859572 calls/sec   
+single_blb1           1740.315 ms,    65534 calls,   0.026556 ms/call,   37656.401284 calls/sec   
+single_blb2           2116.135 ms,      126 calls,   16.794722 ms/call,   59.542515 calls/sec   
+single_blb3           2042.437 ms,       62 calls,   32.942532 ms/call,   30.355893 calls/sec   

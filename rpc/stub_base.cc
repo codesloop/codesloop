@@ -153,6 +153,9 @@ namespace csl
         if ( is_async == true )
           output_ << ls_ << "\t/* inout */\tcsl::rpc::handle &\t__handle," << endl;
 
+        if ( kind == STUB_SERVER )
+          output_ << ls_ << "\t/* input */\tconst csl::rpc::client_info &\tci," << endl;
+
         // parameters
         while( param_it != (*func_it).params.end() ) 
         {
@@ -172,7 +175,7 @@ namespace csl
               << "\t"
               ;
 
-            if ( (*param_it).kind==MD_INPUT && kind == STUB_CLIENT )
+            if ( (*param_it).kind==MD_INPUT )
               output_ << "const ";
 
             if (  (*param_it).is_array ) {
@@ -181,11 +184,12 @@ namespace csl
               output_ << (*param_it).type;
             }
 
-            if ( (*param_it).kind==MD_INPUT && (kind == STUB_CLIENT 
-                || (*param_it).is_array) )
+            if ( (*param_it).kind==MD_INPUT )
               output_ << " &"; 
-            else if ( (*param_it).kind==MD_OUTPUT )
+            else if ( (*param_it).kind==MD_OUTPUT && kind == STUB_CLIENT )
               output_ << " *";
+            else if ( (*param_it).kind==MD_OUTPUT && kind == STUB_SERVER )
+              output_ << " &";
             else if ( (*param_it).kind==MD_INOUT )
               output_ << " &";
 
@@ -195,7 +199,7 @@ namespace csl
           }
 
           param_it++;
-          
+
           // TODO: now it works only, if exceptions are defined last
           if ( (*param_it).kind!=MD_EXCEPTION && param_it != (*func_it).params.end() )
             output_ << ",";
@@ -204,10 +208,34 @@ namespace csl
 
         output_ << ls_ << ")";
 
-        LEAVE_FUNCTION();
       }
+      
+      LEAVE_FUNCTION();
     }
-  };
+
+    void stub_base::add_internal_functions()
+    {
+      ENTER_FUNCTION();
+      struct iface::func f;
+      struct iface::param p = { "uint64_t", "client_time", MD_INOUT, false , 0 };
+
+      // TODO: make an interface for adding functions in iface
+
+      // internal function #1: ping
+      f.disposable = false;
+      f.name = "ping";
+      std::vector<iface::func> * functions; 
+      functions = const_cast<std::vector<iface::func> *>(ifc_->get_functions());
+      functions->push_back(f);
+      // parameters
+      (*functions)[functions->size()-1].params.push_back(p);
+      p.name = "server_time";
+      p.kind = MD_OUTPUT;
+      (*functions)[functions->size()-1].params.push_back(p);
+
+      LEAVE_FUNCTION();
+    }
+  }
 };
 
 /* EOF */

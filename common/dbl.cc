@@ -61,13 +61,13 @@ namespace csl
       return v.from_double(value_);
     }
 
-    bool dbl::to_binary(unsigned char * v, size_t & sz) const
+    bool dbl::to_binary(unsigned char * v, uint64_t & sz) const
     {
       binry b;
       return (b.from_double(value_) && b.to_binary(v,sz));
     }
 
-    bool dbl::to_binary(void * v, size_t & sz) const
+    bool dbl::to_binary(void * v, uint64_t & sz) const
     {
       binry b;
       return (b.from_double(value_) && b.to_binary(v,sz));
@@ -109,13 +109,13 @@ namespace csl
       return v.to_double(value_);
     }
 
-    bool dbl::from_binary(const unsigned char * v,size_t sz)
+    bool dbl::from_binary(const unsigned char * v,uint64_t sz)
     {
       binry b;
       return (b.from_binary(v,sz) && b.to_double(value_));
     }
 
-    bool dbl::from_binary(const void * v,size_t sz)
+    bool dbl::from_binary(const void * v,uint64_t sz)
     {
       binry b;
       return (b.from_binary(v,sz) && b.to_double(value_));

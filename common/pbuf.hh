@@ -85,7 +85,7 @@ namespace csl
         @param sz is the amount of memory to be appended
         @return true if successful
         */
-        bool append(const unsigned char * dta, unsigned int sz);
+        bool append(const unsigned char * dta, uint64_t sz);
 
         /**
         @brief appends the string pointed by str to the internal buffers
@@ -96,9 +96,9 @@ namespace csl
          */
         bool append(const char * str)
         {
-          unsigned int l=0;
+          uint64_t l=0;
           if( !str || (l=::strlen(str))== 0 ) return false;
-          return append( reinterpret_cast<const unsigned char *>(str),(l+1));
+          return append( reinterpret_cast<const unsigned char *>(str), (l+1) );
         }
 
         /**
@@ -110,7 +110,7 @@ namespace csl
          */
         bool append(const wchar_t * str)
         {
-          unsigned int l=0;
+          uint64_t l=0;
           if( !str || (l=::wcslen(str))== 0 ) return false;
           return append( reinterpret_cast<const unsigned char *>(str),(l+1)*sizeof(wchar_t));
         }
@@ -140,7 +140,7 @@ namespace csl
         templated parameter t. t must have an allocate() function that returns
         a pointer to the allocated buffer.
          */
-        template <typename T> bool t_copy_to(T & t,unsigned int max_size=0)
+        template <typename T> bool t_copy_to(T & t, uint64_t max_size=0)
         {
           if( !max_size ) max_size = size();
           if( max_size )
@@ -158,13 +158,13 @@ namespace csl
 
         this function assumes that the caller allocated the neccessary amount of memory
          */
-        bool copy_to(unsigned char * ptr, unsigned int max_size=0) const;
+        bool copy_to(unsigned char * ptr, uint64_t max_size=0) const;
 
         /** @brief returns the amount of data stored */
-        inline unsigned int size() const   { return size_; }
+        inline uint64_t size() const   { return size_; }
 
         /** @brief returns the amount of bufs allocated */
-        inline unsigned int n_bufs() const { return bufpool_.n_items(); }
+        inline uint64_t n_bufs() const { return bufpool_.n_items(); }
 
         typedef pvlist< 32,buf,delete_destructor<buf> > bufpool_t; ///<the buffer pool type
         typedef bufpool_t::iterator iterator;                      ///<iterator over the buffer pool
@@ -207,10 +207,10 @@ namespace csl
         virtual void serialize(arch & ar);
 
       private:
-        buf * allocate(unsigned int size);
+        buf * allocate(uint64_t size);
 
         /* variables */
-        unsigned int    size_;
+        uint64_t        size_;
         unsigned char   preallocated_[buf_size];
         bufpool_t       bufpool_;
         mpool<>         pool_;

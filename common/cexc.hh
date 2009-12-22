@@ -42,23 +42,23 @@ namespace csl
     /**
     @brief common base exception class for codesloop classes
 
-    this class is used as base class when a module implements its 
+    this class is used as base class when a module implements its
     own exception
      */
-    class cexc
+    class cexc : public serializable
     {
       public:
         /** @brief converts reason code to string */
         static const wchar_t * reason_string(int rc);
 
-        /** @brief converts exception to string 
+        /** @brief converts exception to string
         @param res string to store result */
         virtual void to_string(str & res);
 
         /** @brief converts exception to string */
         virtual str to_string();
 
-        /** @brief constructor 
+        /** @brief constructor
         *   @param component that caused the exception
         */
         cexc(const wchar_t * component)
@@ -89,6 +89,12 @@ namespace csl
         cexc(int reason, const wchar_t * component, const wchar_t * txt, const wchar_t * file, unsigned int line)
         : reason_(reason), component_(component), text_(txt), file_(file), line_(line) {}
 
+
+        /** @brief serialize contents of the exception class
+        *   @param arch archiver class 
+        */
+        virtual void serialize(class arch & ar);
+
         virtual ~cexc();
 
         int reason_;        ///<reason code: one of rs_*
@@ -102,6 +108,91 @@ namespace csl
     };
   }
 }
+
+#ifdef __cplusplus
+
+#ifndef THR
+#define THR(REASON,RET) \
+    do { \
+      CSL_DEBUGF(L"Exception(%ls:%d): [%ls] [%ls]\n", \
+                 L""__FILE__,__LINE__, \
+                 get_class_name(), \
+                 exc::reason_string(REASON)); \
+      if( this->use_exc() ) \
+            throw exc(REASON,get_class_name(),L"",L""__FILE__,__LINE__); \
+      RETURN_FUNCTION( RET ); \
+    } while(false);
+#endif /*THR*/
+
+#ifndef THRNORET
+#define THRNORET(REASON) \
+    do { \
+      CSL_DEBUGF(L"Exception(%ls:%d): [%ls] [%ls]\n", \
+                 L""__FILE__,__LINE__, \
+                 get_class_name(), \
+                 exc::reason_string(REASON)); \
+      if( this->use_exc() )  \
+          throw exc(REASON,get_class_name(),L"",L""__FILE__,__LINE__); \
+    } while(false);
+#endif /*THRNORET*/
+
+#ifndef THRR
+#define THRR(REASON,MSG,RET) \
+    do { \
+      CSL_DEBUGF(L"Exception(%ls:%d): [%ls] [%ls] [%ls]\n", \
+                 L""__FILE__,__LINE__, \
+                 get_class_name(), \
+                 exc::reason_string(REASON), \
+                 MSG ); \
+      if( this->use_exc() ) \
+            throw exc(REASON,get_class_name(),MSG,L""__FILE__,__LINE__); \
+      RETURN_FUNCTION( RET ); \
+    } while(false);
+#endif /*THRR*/
+
+#ifndef THRRNORET
+#define THRRNORET(REASON,MSG) \
+    do { \
+      CSL_DEBUGF(L"Exception(%ls:%d): [%ls] [%ls] [%ls]\n", \
+                 L""__FILE__,__LINE__, \
+                 get_class_name(), \
+                 exc::reason_string(REASON), \
+                 MSG ); \
+      if( this->use_exc() ) \
+            throw exc(REASON,get_class_name(),MSG,L""__FILE__,__LINE__); \
+    } while(false);
+#endif /*THRRNORET*/
+
+#ifndef THRC
+#define THRC(REASON,RET) \
+    do { \
+      CSL_DEBUGF(L"Exception(%ls:%d): [%ls] [%ls]\n", \
+                 L""__FILE__,__LINE__, \
+                 get_class_name(), \
+                 exc::reason_string(REASON)); \
+      if( this->use_exc() ) \
+      { \
+        wchar_t errstr[256]; \
+        mbstowcs( errstr,strerror(errno),255 ); \
+        throw exc(REASON,get_class_name(),errstr,L""__FILE__,__LINE__); \
+      } \
+      RETURN_FUNCTION( RET ); \
+    } while(false);
+#endif /*THRC*/
+
+#ifndef THREX
+#define THREX(E,RET) \
+    do { \
+      CSL_DEBUGF(L"Exception(%ls:%d): [%ls] [%ls]\n", \
+                 E.file_.c_str(),E.line_, \
+                 get_class_name(), \
+                 exc::reason_string(E.reason_)); \
+      if( this->use_exc() ) { throw ( E ); } \
+      RETURN_FUNCTION( RET ); \
+    } while(false);
+#endif /*THR*/
+
+#endif /*__cplusplus*/
 
 #endif /* __cplusplus */
 #endif /* _csl_common_cexc_hh_included_ */

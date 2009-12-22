@@ -48,42 +48,42 @@ namespace csl
     /**
     @brief arch de/serializes data to a pbuf in XDR format using xdrbuf
 
-    Allows you to save a complex network of objects in a permanent binary 
-    form (usually disk storage) that persists after those objects are deleted. 
+    Allows you to save a complex network of objects in a permanent binary
+    form (usually disk storage) that persists after those objects are deleted.
     */
     class arch : public obj
     {
       CSL_OBJ(csl::common,arch);
       public:
-        /** @brief specifies arch object's behaviour. 
-         
+        /** @brief specifies arch object's behaviour.
+
          if serialize specified in arch constructor, then
-         the serialize function serializes incoming data, otherwise 
+         the serialize function serializes incoming data, otherwise
          deserializes
         */
         enum direction {
-          SERIALIZE,    ///< serialize function serializes          
+          SERIALIZE,    ///< serialize function serializes
           DESERIALIZE   ///< serialize function deserializes
         };
 
-        /** 
-         @brief constructor with default direction 
+        /**
+         @brief constructor with default direction
          @param d default direction (serialization / deserialization )
          @throw common::exc
         */
         arch( direction d );
-        virtual ~arch(); 
+        virtual ~arch();
 
         /**
           @brief serialize or deserialize val to xdrbuf
           @param val is the value to be de/serialized
-          @throw common::exc               
+          @throw common::exc
 
           based on object's direction the function loads
           or stores val from/to buffer
         */
         template <typename T> void serialize(T & val)
-        {       
+        {
           if ( direction_ == SERIALIZE )
             (*xdrbuf_) << val;
           else
@@ -93,16 +93,26 @@ namespace csl
         /**
           @brief return the size of the serialized data
         */
-        unsigned int size() const;
+        uint64_t size() const;
         /**
           @brief return serialized data buffer in pbuf
         */
         pbuf * get_pbuf() const;
-        /** 
+        /**
           @brief sets input buffer for deserialization
         */
         void set_pbuf( const pbuf & src );
-        
+
+        /**
+          @brief sets direction of serialization
+        */
+        void set_direction( direction d);
+
+        /**
+          @brief resets archiver for reuse
+        */
+        void reset();
+
       private:
         pbuf * pbuf_;
         xdrbuf * xdrbuf_;

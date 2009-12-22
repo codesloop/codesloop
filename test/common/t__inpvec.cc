@@ -31,6 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #if 0
 #ifndef DEBUG
 #define DEBUG
+#define DEBUG_ENABLE_INDENT
 #endif /* DEBUG */
 #endif
 
@@ -259,16 +260,17 @@ namespace test_inpvec {
     assert( vec.n_items() == 0 );
   }
 
-  // TODO : test inpvec functionality:
-  // - push_back() w/ non default constructor arguments
-  // - last_free()
-  // - iterator : set() w/ non default constructor arguments
-  // - iterator : free() and double free()
-  // - iterator : is_empty()
-  // - iterator : operator() *
-  // - iterator : operator++
-  // - iterator : constructors
-  // force_iterator_at(a), force_iterator_at(a,b)
+  // TODO: test inpvec functionality:
+  // TODO: - push_back() w/ non default constructor arguments
+  // TODO: - last_free()
+  // TODO: - iterator : set() w/ non default constructor arguments
+  // TODO: - iterator : free() and double free()
+  // TODO: - iterator : is_empty()
+  // TODO: - iterator : operator() *
+  // TODO: - iterator : operator++
+  // TODO: - iterator : constructors
+  // TODO: - force_iterator_at(a), force_iterator_at(a,b)
+  // TODO: - test first_free position and iterator
 
   void fun_get_set()
   {
@@ -350,6 +352,43 @@ namespace test_inpvec {
     }
   }
 
+  void test_first_free()
+  {
+    inpvec<uint64_t> vec;
+    uint64_t i=0;
+
+    for( i=0;i<1000;++i )
+    {
+      vec.push_back( i );
+    }
+
+    for( i=900;i>9;i-=3 )
+    {
+      assert( vec.is_free_at( i ) == false );
+      assert( vec.free_at( i ) == true );
+      assert( vec.is_free_at( i ) == true );
+      assert( vec.first_free_pos() == i );
+    }
+  }
+
+  void test_alloc_1000()
+  {
+    typedef inpvec<uint64_t> ivec_t;
+    ivec_t vec;
+    uint64_t i=0;
+    ivec_t::iterator ii = vec.begin();
+
+    for( i=0;i<1000;++i )
+    {
+      assert( vec.first_free(ii).get_pos() == i );
+      assert( ii.is_empty() == true );
+      assert( vec.is_free_at(i) == true );
+      ii.set( i );
+      assert( ii.is_empty() == false );
+      assert( vec.is_free_at(i) == false );
+    }
+  }
+
 } // end of test_inpvec
 
 using namespace test_inpvec;
@@ -361,6 +400,8 @@ int main()
   fun_get_set();
 #else
   fun_get_set();
+  csl_common_print_results( "test_alloc_1000     ", csl_common_test_timer_v0(test_alloc_1000),"" );
+  csl_common_print_results( "test_first_free     ", csl_common_test_timer_v0(test_first_free),"" );
   csl_common_print_results( "fun_get_set         ", csl_common_test_timer_v0(fun_get_set),"" );
   csl_common_print_results( "push_back           ", csl_common_test_timer_v0(fun_push_back),"" );
 

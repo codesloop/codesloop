@@ -33,6 +33,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    Implementation is based on pthread (posix threads)
 */
 
+#include "codesloop/common/common.h"
+#include "codesloop/common/obj.hh"
+
 #ifdef __cplusplus
 #include <memory>
 
@@ -63,7 +66,7 @@ namespace csl
        and also to notify all waiting threads. for the latter the user does not need
        to specify the number of events to be posted
      */
-    class event 
+    class event
     {
     public:
       /** @brief constructor */
@@ -154,6 +157,9 @@ namespace csl
       // no-copy
       event(const event & other);
       event & operator=(const event & other);
+
+      CSL_OBJ(csl::nthread, event);
+      USE_EXC();
     };
   }
 }

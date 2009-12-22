@@ -1,0 +1,5 @@
+baseline           1708.562 ms,  4194302 calls,   0.000407 ms/call,   2454872.577056 calls/sec   
+test_commit        2038.330 ms,       62 calls,   32.876290 ms/call,   30.417057 calls/sec   
+test_rollback      1993.995 ms,     2046 calls,   0.974582 ms/call,   1026.080808 calls/sec   
+commit_on_destr    2002.559 ms,       62 calls,   32.299339 ms/call,   30.960386 calls/sec   
+rollb_on_destr     2049.386 ms,     2046 calls,   1.001655 ms/call,   998.347798 calls/sec   

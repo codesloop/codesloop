@@ -156,7 +156,7 @@ void test_compressed_data1()
   assert( zf2.put_zdata(r,zf.get_zsize()) );
   assert( zf2.get_size() == strlen(p)+1 );
   assert( zf2.get_data(r2) );
-  assert( memcmp(r2,p,zf.get_size()) == 0 );
+  assert( ::memcmp( r2, p, static_cast<size_t>(zf.get_size()) ) == 0 );
 }
 
 /**
@@ -193,13 +193,13 @@ void test_compressed_data2()
   assert( (zf2.put_zdata(z1,zf1.get_zsize())) );
   assert( (zf2.get_zdata(z2)) );
   assert( zf1.get_zsize() == 6759 );
-  assert( memcmp( z1,z2,zf1.get_zsize()) == 0 );
+  assert( ::memcmp( z1, z2, static_cast<size_t>(zf1.get_zsize()) ) == 0 );
 
   assert( zf2.get_zsize() == zf1.get_zsize() );
 
   assert( (zf1.get_data(t1)) );
   assert( (zf2.get_data(t2)) );
-  assert( memcmp( t1,t2,sizeof(t1)) == 0 );
+  assert( ::memcmp( t1, t2, sizeof(t1) ) == 0 );
 }
 
 /**
@@ -396,7 +396,7 @@ int main()
   csl_common_print_results( "test_fun__get_zsize     ",csl_common_test_timer_v0(test_fun__get_zsize), "" );
   csl_common_print_results( "test_fun__get_zdata     ",csl_common_test_timer_v0(test_fun__get_zdata), "" );
   csl_common_print_results( "test_fun__get_zbuff     ",csl_common_test_timer_v0(test_fun__get_zbuff), "" );
-  
+
   test_compressed_size_dbg();
 
   return 0;

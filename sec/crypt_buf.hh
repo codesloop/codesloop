@@ -89,13 +89,13 @@ namespace csl
          @brief how many bytes needed to store the message header
          @return number of bytes
       */
-      size_t get_header_len();
+      uint64_t get_header_len();
 
       /**
          @brief how many bytes needed to store the message checksum
          @return number of bytes
       */
-      size_t get_mac_len();
+      uint64_t get_mac_len();
 
       /**
          @brief initialization by C string key
@@ -141,7 +141,7 @@ namespace csl
       */
       bool init_crypt( unsigned char * buf,
                        const unsigned char * key,
-                       size_t keylen,
+                       uint64_t keylen,
                        bool encrypt,
                        const unsigned char * rndata=0);
 
@@ -156,7 +156,7 @@ namespace csl
          and the encryption of the next buffers, so the order of adding
          data does matter.
       */
-      bool add_data(unsigned char * buf, size_t len, bool encrypt);
+      bool add_data(unsigned char * buf, uint64_t len, bool encrypt);
 
       /**
          @brief generate checksum/MAC

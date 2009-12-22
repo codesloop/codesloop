@@ -114,7 +114,7 @@ namespace csl
         else if( !(from.size()) ) { THROWEXC("oBIGNUM 'from' has no data!"); }
         {
           to->reset();
-          to->bn_ = BN_bin2bn( from.data(), from.size(),NULL );
+          to->bn_ = BN_bin2bn( from.data(), static_cast<int>(from.size()), NULL );
           if( !to->bn_ ) { THROWEXC("oBIGNUM cannot convert bignum!"); }
           BN_set_negative( to->bn_, from.is_negative() );
         }
@@ -484,8 +484,8 @@ namespace csl
         char tmp[64];
         tmp[63] = 0;
 
-        unsigned int sz = 0;
-        ret = buf.get_data( reinterpret_cast<unsigned char *>(tmp),sz,64 );
+        uint64_t sz = 0;
+        ret = buf.get_data( reinterpret_cast<unsigned char *>(tmp), sz, 64 );
 
         if( ret )
         {

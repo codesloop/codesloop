@@ -67,9 +67,9 @@ namespace csl
       /* private functions */
       voidpf custom_alloc( uInt items, uInt size )
       {
-        size_t alloc_size = (items*size);
-        voidpf ret = pool_.allocate(alloc_size);
-        if( init_custom_memory_ ) memset( ret,0,alloc_size );
+        uint64_t alloc_size = (items*size);
+        voidpf ret = pool_.allocate( alloc_size );
+        if( init_custom_memory_ ) memset( ret, 0, static_cast<size_t>(alloc_size) );
         return ret;
       }
 
@@ -98,7 +98,7 @@ namespace csl
           if( p_zdata_.size() == 0 ) return false; /* empty */
           else
           {
-            size_t          sz = 0;
+            uint64_t         sz = 0;
             int             rc = Z_OK;
             unsigned char * b  = 0;
 
@@ -160,7 +160,7 @@ namespace csl
           if ( p_data_.size() == 0 ) return false;  /* empty */
           else
           {
-            size_t          sz = 0;
+            uint64_t        sz = 0;
             int             rc = Z_OK;
             unsigned char * b = 0;
 
@@ -283,7 +283,7 @@ namespace csl
       return ret;
       }
 
-      bool put_data_common(const unsigned char * data, size_t len, pbuf & b)
+      bool put_data_common(const unsigned char * data, uint64_t len, pbuf & b)
       {
         if( !data || !len ) return false;
         reset_files();
@@ -292,7 +292,7 @@ namespace csl
         return true;
       }
 
-      size_t get_size_common(const pbuf & b) const { return b.size(); }
+      uint64_t get_size_common(const pbuf & b) const { return b.size(); }
 
       bool read_file_common( const char * filename, pbuf & bf )
       {
@@ -320,7 +320,7 @@ namespace csl
         SWPRINTF(tmp,sizeof(tmp),L"[sz=%ld]\n",static_cast<unsigned long>(get_size_common(bf)));
         str += tmp;
 
-        size_t b = 0;
+        uint64_t b = 0;
 
         pbuf::const_iterator it(bf.begin());
         pbuf::const_iterator end(bf.end());
@@ -328,8 +328,8 @@ namespace csl
         for( ;it!=end;++it )
         {
           const pbuf::buf * bx = (*it);
-          size_t i,l=0;
-          size_t k=0;
+          uint64_t i,l=0;
+          uint64_t k=0;
           while( k<(bx)->size_ )
           {
             SWPRINTF( tmp,sizeof(tmp),L"%c[%.2d:%.2d:%.4d:%.4d]: ",
@@ -398,40 +398,42 @@ namespace csl
 
       unsigned char * get_buff()
       {
-        size_t sz = get_size();
+        uint64_t sz = get_size();
         if( !sz ) return 0;
-        unsigned char * ret = reinterpret_cast<unsigned char *>(pool_.allocate( sz ));
+        unsigned char * ret =
+          reinterpret_cast<unsigned char *>(pool_.allocate( static_cast<size_t>(sz) ));
         if( !ret || !get_data( ret ) ) return 0;
         return ret;
       }
 
       unsigned char * get_zbuff()
       {
-        size_t sz = get_zsize();
+        uint64_t sz = get_zsize();
         if( !sz ) return 0;
-        unsigned char * ret = reinterpret_cast<unsigned char *>(pool_.allocate( sz ));
+        unsigned char * ret =
+          reinterpret_cast<unsigned char *>(pool_.allocate( static_cast<size_t>(sz) ));
         if( !ret || !get_zdata( ret ) ) return 0;
         return ret;
       }
 
-      size_t get_size()
+      uint64_t get_size()
       {
         if( !ensure_file() ) return 0;
         return get_size_common( p_data_ );
       }
 
-      size_t get_zsize()
+      uint64_t get_zsize()
       {
         if( !ensure_zfile() ) return 0;
         return get_size_common( p_zdata_ );
       }
 
-      size_t get_size_const() const
+      uint64_t get_size_const() const
       {
         return get_size_common( p_data_ );
       }
 
-      size_t get_zsize_const() const
+      uint64_t get_zsize_const() const
       {
         return get_size_common( p_zdata_ );
       }
@@ -502,13 +504,13 @@ namespace csl
         return true;
       }
 
-      bool put_data(const unsigned char * data,size_t len)
+      bool put_data(const unsigned char * data, uint64_t len)
       {
         if( !data || !len ) return false;
         return put_data_common( data, len, p_data_ );
       }
 
-      bool put_zdata(const unsigned char * data,size_t len)
+      bool put_zdata(const unsigned char * data, uint64_t len)
       {
         if( !data || !len ) return false;
         return put_data_common( data, len, p_zdata_ );
@@ -539,11 +541,11 @@ namespace csl
     void zfile::init_custom_memory(bool yesno)    { impl_->init_custom_memory(yesno); }
     void zfile::custom_zlib_allocator(bool yesno) { impl_->custom_zlib_allocator(yesno); }
 
-    size_t zfile::get_size()  { return impl_->get_size();  }
-    size_t zfile::get_zsize() { return impl_->get_zsize(); }
+    uint64_t zfile::get_size()  { return impl_->get_size();  }
+    uint64_t zfile::get_zsize() { return impl_->get_zsize(); }
 
-    size_t zfile::get_size_const() const  { return impl_->get_size_const();  }
-    size_t zfile::get_zsize_const() const { return impl_->get_zsize_const(); }
+    uint64_t zfile::get_size_const() const  { return impl_->get_size_const();  }
+    uint64_t zfile::get_zsize_const() const { return impl_->get_zsize_const(); }
 
     bool zfile::get_data(unsigned char * data)  { return impl_->get_data(data);  }
     bool zfile::get_zdata(unsigned char * data) { return impl_->get_zdata(data); }
@@ -569,8 +571,8 @@ namespace csl
     bool zfile::drop_data()  { return impl_->drop_data();  }
     bool zfile::drop_zdata() { return impl_->drop_zdata(); }
 
-    bool zfile::put_data(const unsigned char * data,size_t len)  { return impl_->put_data(data,len);  }
-    bool zfile::put_zdata(const unsigned char * data,size_t len) { return impl_->put_zdata(data,len); }
+    bool zfile::put_data(const unsigned char * data, uint64_t len)  { return impl_->put_data(data,len);  }
+    bool zfile::put_zdata(const unsigned char * data, uint64_t len) { return impl_->put_zdata(data,len); }
 
     bool zfile::put_data(const pbuf & dta)  { return impl_->put_data(dta); }
     bool zfile::put_zdata(const pbuf & dta) { return impl_->put_zdata(dta); }
@@ -589,8 +591,8 @@ namespace csl
     bool zfile::operator==(const zfile & other) const
     {
       mpool<> mp;
-      size_t s1 = this->get_size_const();
-      size_t s2 = other.get_size_const();
+      uint64_t s1 = this->get_size_const();
+      uint64_t s2 = other.get_size_const();
       unsigned char * p1 = 0;
       unsigned char * p2 = 0;
 
@@ -598,12 +600,12 @@ namespace csl
 
       if( s1 )
       {
-        p1 = reinterpret_cast<unsigned char *>(mp.allocate(s1));
-        p2 = reinterpret_cast<unsigned char *>(mp.allocate(s2));
+        p1 = reinterpret_cast<unsigned char *>(mp.allocate( s1 ));
+        p2 = reinterpret_cast<unsigned char *>(mp.allocate( s2 ));
 
         if( this->get_data_const(p1) && other.get_data_const(p2) )
         {
-          return (::memcmp(p1,p2,s1)==0);
+          return (::memcmp(p1, p2, static_cast<size_t>(s1))==0);
         }
         else return false;
       }
@@ -615,12 +617,12 @@ namespace csl
         if( s1 != s2 ) return false;
         if( !s1 ) return true;
 
-        p1 = reinterpret_cast<unsigned char *>(mp.allocate(s1));
-        p2 = reinterpret_cast<unsigned char *>(mp.allocate(s2));
+        p1 = reinterpret_cast<unsigned char *>(mp.allocate( s1 ));
+        p2 = reinterpret_cast<unsigned char *>(mp.allocate( s2 ));
 
         if( this->get_zdata_const(p1) && other.get_zdata_const(p2) )
         {
-          return (::memcmp(p1,p2,s1)==0);
+          return (::memcmp(p1, p2, static_cast<size_t>(s1))==0);
         }
         else return false;
       }
@@ -631,7 +633,7 @@ namespace csl
       impl_->custom_zlib_allocator_ = other.impl_->custom_zlib_allocator_;
       impl_->init_custom_memory_    = other.impl_->init_custom_memory_;
 
-      size_t sz = other.get_zsize_const();
+      uint64_t sz = other.get_zsize_const();
       if( sz )
       {
         impl_->p_zdata_ = other.impl_->p_zdata_;

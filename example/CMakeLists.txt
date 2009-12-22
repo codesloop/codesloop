@@ -1,15 +1,15 @@
 # Copyright (c) 2008,2009, CodeSLoop Team
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
-# 
+#
 # 1. Redistributions of source code must retain the above copyright
 #    notice, this list of conditions and the following disclaimer.
 # 2. Redistributions in binary form must reproduce the above copyright
 #    notice, this list of conditions and the following disclaimer in the
 #    documentation and/or other materials provided with the distribution.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
 # IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
 # OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -52,6 +52,7 @@ IF(WIN32)
                   ../sec
                   ../nthread
                   ../db
+                  ../db/slt3
                   "C:/Program Files/GnuWin32/lib/"
                   $ENV{ZLIB_DEV_ENV}/lib
                   ../../3rdparty/zlib/GnuWin32/lib
@@ -64,8 +65,9 @@ IF(WIN32)
                   ../../3rdparty/zlib/GnuWin32/include
                   )
 
-  LINK_LIBRARIES( 
-                  csl_slt3
+  LINK_LIBRARIES(
+                  csl_db_slt3
+                  csl_db
                   csl_nthread
                   csl_common
                   ${ZLIB}
@@ -81,14 +83,15 @@ ELSE(WIN32)
    SET(HAVE_LIBDL TRUE)
   ENDIF(DLOPEN_FOUND)
 
-  LINK_DIRECTORIES( 
+  LINK_DIRECTORIES(
                   ../common
                   ../sec
                   ../nthread
                   ../db
+                  ../db/slt3
                   )
 
-  INCLUDE_DIRECTORIES( 
+  INCLUDE_DIRECTORIES(
                      ../..
                      )
 
@@ -109,6 +112,7 @@ ELSE(WIN32)
 
   LINK_LIBRARIES(
                   csl_db_slt3
+                  csl_db
                   csl_nthread
                   csl_common
                   pthread
@@ -118,12 +122,12 @@ ELSE(WIN32)
 
 ENDIF(WIN32)
 
-ADD_EXECUTABLE(ex_zfile1 ex_zfile1.cc)
-ADD_EXECUTABLE(ex_zfile2 ex_zfile2.cc)
-ADD_EXECUTABLE(ex_sql1 ex_sql1.cc)
-ADD_EXECUTABLE(ex_sql2 ex_sql2.cc)
-ADD_EXECUTABLE(ex_thread1 ex_thread1.cc)
-ADD_EXECUTABLE(ex_thrpool ex_thrpool.cc)
+ADD_EXECUTABLE( ex_zfile1 ex_zfile1.cc )
+ADD_EXECUTABLE( ex_zfile2 ex_zfile2.cc )
+ADD_EXECUTABLE( ex_sql1 ex_sql1.cc )
+ADD_EXECUTABLE( ex_sql2 ex_sql2.cc )
+ADD_EXECUTABLE( ex_thread1 ex_thread1.cc )
+ADD_EXECUTABLE( ex_thrpool ex_thrpool.cc )
 
 # -- EOF --
 

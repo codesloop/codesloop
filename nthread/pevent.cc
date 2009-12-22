@@ -43,7 +43,7 @@ namespace csl
 {
   namespace nthread
   {
-    pevent::pevent() : impl_(new impl) {}
+    pevent::pevent() : impl_(new impl), use_exc_(true) {}
     pevent::~pevent() {}
 
     bool pevent::notify(unsigned int n)
@@ -97,10 +97,15 @@ namespace csl
     }
 
     // no-copy
-    pevent::pevent(const pevent & other) 
-      : impl_( reinterpret_cast<impl *>(0) ) { throw nthread::exc(exc::rs_not_implemented,L"csl::nthread::event"); }
+    pevent::pevent(const pevent & other) : impl_( reinterpret_cast<impl *>(0) )
+    {
+      THRNORET(exc::rs_not_implemented);
+    }
 
-    pevent & pevent::operator=(const pevent & other) { return *this; }
+    pevent & pevent::operator=(const pevent & other)
+    {
+      THR(exc::rs_not_implemented, *this);
+    }
   }
 }
 

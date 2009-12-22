@@ -61,8 +61,8 @@ namespace csl
       /* internal */
 
       /* interface */
-      size_t get_header_len() { return CSL_SEC_CRYPT_BUF_HEAD_LEN; }
-      size_t get_mac_len()    { return CSL_SEC_CRYPT_BUF_MAC_LEN; }
+      uint64_t get_header_len() { return CSL_SEC_CRYPT_BUF_HEAD_LEN; }
+      uint64_t get_mac_len()    { return CSL_SEC_CRYPT_BUF_MAC_LEN; }
 
       bool init_crypt( unsigned char * buf,
                        const char * key,
@@ -75,28 +75,28 @@ namespace csl
 
       bool init_crypt( unsigned char * buf,
                        const unsigned char * key,
-                       size_t keylen,
+                       uint64_t keylen,
                        bool encrypt,
                        const unsigned char * rndata )
       {
         if( !key || !buf ) { return false; } /* invalid values */
 
-        size_t l = (keylen/4)*4;
+        uint64_t l = (keylen/4)*4;
 
         if( l<12 ) { return false; } /* at least 96 bits needed */
         if( l>56 ) { return false; } /* max 448 bits can be used */
 
-        BF_set_key(&key_,l,key);
-        SHA1(key, l, initvec_ );
+        BF_set_key( &key_, static_cast<int>(l), key );
+        SHA1( key, static_cast<size_t>(l), initvec_ );
 
         if( encrypt )
         {
           /* init random value */
           if( rndata == 0 )
           {
-            if( RAND_bytes(buf,get_header_len()) != 1 )
+            if( RAND_bytes( buf, static_cast<int>(get_header_len()) ) != 1 )
             {
-              if( RAND_pseudo_bytes(buf,get_header_len()) != 1 )
+              if( RAND_pseudo_bytes( buf, static_cast<int>(get_header_len()) ) != 1 )
               {
                 return false;
               }
@@ -104,39 +104,38 @@ namespace csl
           }
           else
           {
-            ::memcpy(buf,rndata,get_header_len());
+            ::memcpy( buf, rndata, static_cast<size_t>(get_header_len()) );
           }
 
-          SHA1(buf, get_header_len(), tail_);
-          BF_cfb64_encrypt(buf,buf,get_header_len(),&key_,initvec_,&bf_num_,BF_ENCRYPT);
+          SHA1( buf, static_cast<size_t>(get_header_len()), tail_ );
+          BF_cfb64_encrypt( buf, buf, static_cast<long int>(get_header_len()), &key_,initvec_, &bf_num_, BF_ENCRYPT );
         }
         else
         {
-          BF_cfb64_encrypt(buf,buf,get_header_len(),&key_,initvec_,&bf_num_,BF_DECRYPT);
-          SHA1(buf, get_header_len(), tail_);
+          BF_cfb64_encrypt( buf, buf, static_cast<long int>(get_header_len()), &key_,initvec_, &bf_num_,BF_DECRYPT );
+          SHA1( buf, static_cast<size_t>(get_header_len()), tail_ );
         }
 
         return true;
       }
 
-      bool add_data(unsigned char * buf, size_t len, bool encrypt)
+      bool add_data(unsigned char * buf, uint64_t len, bool encrypt)
       {
-        BF_cfb64_encrypt(buf,buf,len,&key_,initvec_,&bf_num_,(encrypt==true ? BF_ENCRYPT : BF_DECRYPT));
+        BF_cfb64_encrypt( buf, buf, static_cast<long int>(len), &key_, initvec_, &bf_num_, (encrypt==true ? BF_ENCRYPT : BF_DECRYPT) );
         return true;
       }
 
       bool finalize(unsigned char * outbuff)
       {
-        memcpy(outbuff,tail_,get_mac_len());
-        BF_cfb64_encrypt(outbuff,outbuff,get_mac_len(),&key_,initvec_,&bf_num_,BF_ENCRYPT);
+        ::memcpy( outbuff, tail_, static_cast<size_t>(get_mac_len()) );
+        BF_cfb64_encrypt( outbuff, outbuff, static_cast<long int>(get_mac_len()), &key_, initvec_, &bf_num_, BF_ENCRYPT );
         return true;
       }
-
     };
 
     /* public interface */
-    size_t crypt_buf::get_header_len() { return impl_->get_header_len(); }
-    size_t crypt_buf::get_mac_len()    { return impl_->get_mac_len();    }
+    uint64_t crypt_buf::get_header_len() { return impl_->get_header_len(); }
+    uint64_t crypt_buf::get_mac_len()    { return impl_->get_mac_len();    }
 
     bool
     crypt_buf::init_crypt( unsigned char * buf,
@@ -150,7 +149,7 @@ namespace csl
     bool
     crypt_buf::init_crypt( unsigned char * buf,
                            const unsigned char * key,
-                           size_t keylen,
+                           uint64_t keylen,
                            bool encrypt,
                            const unsigned char * rndata )
     {
@@ -158,7 +157,7 @@ namespace csl
     }
 
     bool
-    crypt_buf::add_data(unsigned char * buf, size_t len, bool encrypt)
+    crypt_buf::add_data(unsigned char * buf, uint64_t len, bool encrypt)
     {
       return impl_->add_data( buf, len, encrypt );
     }

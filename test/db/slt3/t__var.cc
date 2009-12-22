@@ -31,10 +31,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/common/test_timer.h"
 #include "codesloop/common/obj.hh"
 #include "codesloop/common/var.hh"
-#include "codesloop/db/sql.hh"
-#include "codesloop/db/reg.hh"
-#include "codesloop/db/conn.hh"
-#include "exc.hh"
+#include "codesloop/db/slt3/obj.hh"
+#include "codesloop/db/slt3/sql.hh"
+#include "codesloop/db/slt3/reg.hh"
+#include "codesloop/db/slt3/conn.hh"
+#include "codesloop/db/exc.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/mpool.hh"
 #include "codesloop/common/str.hh"
@@ -42,7 +43,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <assert.h>
 #include <vector>
 
-using namespace csl::slt3;
+using namespace csl::db;
+
 using csl::common::str;
 using csl::common::ustr;
 using csl::common::int64;
@@ -53,79 +55,79 @@ using csl::common::binry;
 namespace test_var {
 
   /** Helper base class */
-  class TestBase : public csl::slt3::obj
+  class TestBase : public slt3::obj
   {
     public:
       /* helper to lookup the database */
-      virtual conn & db() { return reg_.db(); }
-      static reg::helper  reg_;
+      virtual slt3::conn & db() { return reg_.db(); }
+      static slt3::reg::helper  reg_;
   };
 
-  reg::helper TestBase::reg_("test_var","test_var.db");
+  slt3::reg::helper TestBase::reg_("test_var","test_var.db");
 
   /** SingleInt tests a single integer to be stored in an SQLite DB by the ORM mapper (sql_helper) */
   class SingleInt : public TestBase
   {
     public:
-      virtual sql::helper & sql_helper() const { return sql_helper_; }
-      static sql::helper  sql_helper_;
+      virtual slt3::sql::helper & sql_helper() const { return sql_helper_; }
+      static slt3::sql::helper  sql_helper_;
 
       SingleInt() : id_("id",*this,"PRIMARY KEY ASC AUTOINCREMENT"),
                     value_("intval",*this) {}
 
-      intvar id_;
-      intvar value_;
+      slt3::intvar id_;
+      slt3::intvar value_;
   };
 
-  sql::helper SingleInt::sql_helper_("single_int");
+  slt3::sql::helper SingleInt::sql_helper_("single_int");
 
   /** SingleString tests a single string to be stored in an SQLite DB by the ORM mapper (sql_helper) */
   class SingleString : public TestBase
   {
     public:
-      virtual sql::helper & sql_helper() const { return sql_helper_; }
-      static sql::helper  sql_helper_;
+      virtual slt3::sql::helper & sql_helper() const { return sql_helper_; }
+      static slt3::sql::helper  sql_helper_;
 
       SingleString() : id_("id",*this,"PRIMARY KEY ASC AUTOINCREMENT"),
                        value_("strval",*this) {}
 
-      intvar id_;
-      strvar value_;
+      slt3::intvar id_;
+      slt3::strvar value_;
   };
 
-  sql::helper SingleString::sql_helper_("single_string");
+  slt3::sql::helper SingleString::sql_helper_("single_string");
 
   /** SingleDouble tests a double precision value to be stored in an SQLite DB by the ORM mapper (sql_helper) */
   class SingleDouble : public TestBase
   {
     public:
-      virtual sql::helper & sql_helper() const { return sql_helper_; }
-      static sql::helper    sql_helper_;
+      virtual slt3::sql::helper & sql_helper() const { return sql_helper_; }
+      static slt3::sql::helper    sql_helper_;
 
       SingleDouble() : id_("id",*this,"PRIMARY KEY ASC AUTOINCREMENT"),
                        value_("dblval",*this) {}
 
-      intvar     id_;
-      doublevar  value_;
+      slt3::intvar     id_;
+      slt3::doublevar  value_;
   };
 
-  sql::helper SingleDouble::sql_helper_("single_dbl");
+  slt3::sql::helper SingleDouble::sql_helper_("single_dbl");
 
   /** SingleBlob tests a single blob to be stored in an SQLite DB by the ORM mapper (sql_helper) */
   class SingleBlob : public TestBase
   {
     public:
-      virtual sql::helper & sql_helper() const { return sql_helper_; }
-      static sql::helper    sql_helper_;
+      virtual slt3::sql::helper & sql_helper() const { return sql_helper_; }
+      static slt3::sql::helper    sql_helper_;
 
       SingleBlob() : id_("id",*this,"PRIMARY KEY ASC AUTOINCREMENT"),
                      value_("blobval",*this) {}
 
-      intvar     id_;
-      blobvar  value_;
+      slt3::intvar     id_;
+      slt3::blobvar  value_;
   };
 
-  sql::helper SingleBlob::sql_helper_("single_blob");
+  slt3::sql::helper SingleBlob::sql_helper_("single_blob");
 
   /** @test baseline for performance comparison */
   void baseline()
@@ -149,7 +151,7 @@ namespace test_var {
   void single_int2()
   {
     SingleInt i0;
-    tran t(i0.db());
+    slt3::tran t(i0.db());
     // assume single_int1() already initialized it...
     // assert( i0.init(t) == true );
     assert( i0.create(t) == true );
@@ -161,7 +163,7 @@ namespace test_var {
   {
     SingleInt i0;
     {
-      tran t(i0.db());
+      slt3::tran t(i0.db());
       // assume single_int1() already initialized it...
       // assert( i0.init(t) == true );
       i0.value_ = 123987;
@@ -171,7 +173,7 @@ namespace test_var {
 
     SingleInt i1;
     {
-      tran t(i0.db());
+      slt3::tran t(i0.db());
       i1.value_ = i0.value_;
       assert( i1.find_by(t,1) == true );
       assert( i0.id_.get() == i1.id_.get() );
@@ -196,7 +198,7 @@ namespace test_var {
   void single_str2()
   {
     SingleString s0;
-    tran t(s0.db());
+    slt3::tran t(s0.db());
     assert( s0.create(t) == true );
     assert( s0.remove(t) == true );
   }
@@ -206,7 +208,7 @@ namespace test_var {
   {
     SingleString s0;
     {
-      tran t(s0.db());
+      slt3::tran t(s0.db());
       s0.value_ = "Hello World";
       assert( s0.create(t) == true );
       assert( s0.find_by_id(t) == true );
@@ -214,7 +216,7 @@ namespace test_var {
 
     SingleString s1;
     {
-      tran t(s0.db());
+      slt3::tran t(s0.db());
       s1.value_ = s0.value_;
       assert( s1.find_by(t,1) == true );
       assert( s0.id_.get() == s1.id_.get() );
@@ -239,7 +241,7 @@ namespace test_var {
   void single_dbl2()
   {
     SingleDouble v0;
-    tran t(v0.db());
+    slt3::tran t(v0.db());
     assert( v0.create(t) == true );
     assert( v0.remove(t) == true );
   }
@@ -249,7 +251,7 @@ namespace test_var {
   {
     SingleDouble v0;
     {
-      tran t(v0.db());
+      slt3::tran t(v0.db());
       v0.value_ = 3.14;
       assert( v0.create(t) == true );
       assert( v0.find_by_id(t) == true );
@@ -257,7 +259,7 @@ namespace test_var {
 
     SingleDouble v1;
     {
-      tran t(v0.db());
+      slt3::tran t(v0.db());
       v1.value_ = v0.value_;
       assert( v1.find_by(t,1) == true );
       assert( v0.id_.get() == v1.id_.get() );
@@ -282,7 +284,7 @@ namespace test_var {
   void single_blb2()
   {
     SingleBlob v0;
-    tran t(v0.db());
+    slt3::tran t(v0.db());
     assert( v0.create(t) == true );
     assert( v0.remove(t) == true );
   }
@@ -295,7 +297,7 @@ namespace test_var {
 
     SingleBlob v0;
     {
-      tran t(v0.db());
+      slt3::tran t(v0.db());
       v0.value_ = ve;
       assert( v0.create(t) == true );
       assert( v0.find_by_id(t) == true );
@@ -303,7 +305,7 @@ namespace test_var {
 
     SingleBlob v1;
     {
-      tran t(v0.db());
+      slt3::tran t(v0.db());
       v1.value_ = v0.value_;
       assert( v1.find_by(t,1) == true );
       assert( v0.id_.get() == v1.id_.get() );
@@ -341,7 +343,7 @@ int main()
   csl_common_print_results( "single_blb3        ", csl_common_test_timer_v0(single_blb3),"" );
 
   }
-  catch( csl::slt3::exc & e )
+  catch( csl::db::exc & e )
   {
     str s;
     e.to_string(s);

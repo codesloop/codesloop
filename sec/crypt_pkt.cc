@@ -72,14 +72,14 @@ namespace csl
       {
         salt2 += (16-(( (reinterpret_cast<unsigned long long>(salt2)) )&15));
       }
-      memcpy( salt2,salt.data(),salt.size() );
+      ::memcpy( salt2, salt.data(), static_cast<size_t>(salt.size()) );
 
       /* align key if needed */
       if( (reinterpret_cast<unsigned long long>(key2)) & ~(15ULL) )
       {
         char * key1  = reinterpret_cast<char *>(key0.allocate(key.size()+48));
         key2  = key1  + (16-(( reinterpret_cast<unsigned long long>(key1))&15ULL));
-        memcpy( key2,key.data(),key.size() );
+        ::memcpy( key2, key.data(), static_cast<size_t>(key.size()) );
       }
 
       /* align data if needed */
@@ -88,15 +88,15 @@ namespace csl
         data2 += (16-(( reinterpret_cast<unsigned long long>(data2) )&15ULL));
       }
 
-      if( RAND_bytes( reinterpret_cast<unsigned char *>(data2),4 ) != 1 )
+      if( RAND_bytes( reinterpret_cast<unsigned char *>(data2), 4 ) != 1 )
       {
         /* fallback */
-        if( RAND_pseudo_bytes( reinterpret_cast<unsigned char *>(data2),4) != 1 )
+        if( RAND_pseudo_bytes( reinterpret_cast<unsigned char *>(data2), 4) != 1 )
         {
           THR(sec::exc::rs_rand_failed,false);
         }
       }
-      memcpy( data2+4,data.data(),data.size() );
+      ::memcpy( data2+4, data.data(),static_cast<size_t>(data.size()) );
 
       /* align output data if needed */
       if( (reinterpret_cast<unsigned long long>(res2)) & ~(15ULL) )
@@ -108,15 +108,15 @@ namespace csl
       header.set( reinterpret_cast<const unsigned char *>(salt2), 8 );
 
       /* encrypt and calculate mac */
-      umac_ae_set_key(key2, ctx);
-      umac_ae_header(salt2, 8, ctx);
-      umac_ae_encrypt(data2, res2, data.size()+4, salt2, ctx);
-      umac_ae_finalize(salt2, ctx);
-      umac_ae_done(ctx);
+      umac_ae_set_key( key2, ctx );
+      umac_ae_header( salt2, 8, ctx );
+      umac_ae_encrypt( data2, res2, static_cast<unsigned int>(data.size()+4), salt2, ctx );
+      umac_ae_finalize( salt2, ctx );
+      umac_ae_done( ctx );
 
       /* copy out data */
-      data.set( reinterpret_cast<const unsigned char *>(res2),data.size()+4);
-      footer.set( reinterpret_cast<const unsigned char *>(salt2),8);
+      data.set( reinterpret_cast<const unsigned char *>(res2), data.size()+4 );
+      footer.set( reinterpret_cast<const unsigned char *>(salt2), 8 );
 
       free( ctx );
       return true;
@@ -153,14 +153,14 @@ namespace csl
       {
         salt2 += (16-(( reinterpret_cast<unsigned long long>(salt2) )&15ULL));
       }
-      memcpy( salt2,header.data(),8 );
+      ::memcpy( salt2, header.data(), 8 );
 
       /* align key if needed */
       if( (reinterpret_cast<unsigned long long>(key2)) & ~(15ULL) )
       {
-        char * key1  = (reinterpret_cast<char *>(key0.allocate(key.size()+48)));
+        char * key1  = (reinterpret_cast<char *>( key0.allocate(key.size()+48)));
         key2  = key1  + (16-(((reinterpret_cast<unsigned long long>(key1)))&15ULL));
-        memcpy( key2,key.data(),key.size() );
+        ::memcpy( key2, key.data(), static_cast<size_t>(key.size()) );
       }
 
       /* align data if needed */
@@ -168,7 +168,7 @@ namespace csl
       {
         char * data1 = (reinterpret_cast<char *>(data0.allocate(data.size()+48)));
         data2 = data1 + (16-(((reinterpret_cast<unsigned long long>(data1)))&15ULL));
-        memcpy( data2,data.data(),data.size() );
+        ::memcpy( data2, data.data(), static_cast<size_t>(data.size()) );
       }
 
       /* align output data if needed */
@@ -178,16 +178,16 @@ namespace csl
       }
 
       /* decrypt and calculate mac */
-      umac_ae_set_key(key2, ctx);
-      umac_ae_header(salt2, 8, ctx);
-      umac_ae_decrypt(data2, res2, data.size(), salt2, ctx);
-      umac_ae_finalize(salt2, ctx);
-      umac_ae_done(ctx);
+      umac_ae_set_key( key2, ctx );
+      umac_ae_header( salt2, 8, ctx );
+      umac_ae_decrypt( data2, res2, static_cast<unsigned int>(data.size()), salt2, ctx );
+      umac_ae_finalize( salt2, ctx );
+      umac_ae_done( ctx );
 
       /* copy out data */
       bool ret = false;
 
-      if( memcmp(footer.data(),salt2,8) == 0 )
+      if( ::memcmp(footer.data(),salt2,8) == 0 )
       {
         if( data.size() > 4 ) { data.set((reinterpret_cast<const unsigned char *>(res2+4)),data.size()-4); }
         else                  { data.reset(); }

@@ -62,6 +62,7 @@ namespace csl
     const unsigned char * byte_bits();
     const unsigned char * byte_last_free();
     const unsigned char * byte_last_used();
+    const unsigned char * byte_first_free();
   }
 }
 

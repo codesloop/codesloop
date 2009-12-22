@@ -28,29 +28,80 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief @todo
  */
 
-#if 0
+//#if 0
 #ifndef DEBUG
 #define DEBUG
 #define DEBUG_ENABLE_INDENT
 //#define DEBUG_VERBOSE
 #endif /* DEBUG */
-#endif
+//#endif
 
 #include "codesloop/comm/bfd.hh"
 #include "codesloop/comm/initcomm.hh"
 #include "codesloop/common/logger.hh"
+#include "codesloop/common/ustr.hh"
+#include "codesloop/common/zfile.hh"
+#include "codesloop/common/auto_close.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/test_timer.h"
 #include <assert.h>
 
 using namespace csl::comm;
-//using namespace csl::common;
+using namespace csl::common;
 //using namespace csl::nthread;
 
 /** @brief @todo */
 namespace test_bfd {
 
+  /*
+  ** DEBUG support --------------------------------------------------------------------
+  */
+  static inline const wchar_t * get_namespace()   { return L"test_bfd"; }
+  static inline const wchar_t * get_class_name()  { return L"test_bfd::noclass"; }
+  static inline const wchar_t * get_class_short() { return L"noclass"; }
+
   void baseline() { bfd o; }
+
+  void conn()
+  {
+    ENTER_FUNCTION();
+    in_addr_t saddr = inet_addr("127.0.0.1");
+    int sock = ::socket( AF_INET, SOCK_STREAM, 0 );
+    SAI peer;
+
+    ::memset( &peer,0,sizeof(peer) );
+    ::memcpy( &(peer.sin_addr),&saddr,sizeof(saddr) );
+
+    peer.sin_family  = AF_INET;
+    peer.sin_port = htons( 631 );
+
+    int err = ::connect( sock, reinterpret_cast<struct sockaddr *>(&peer), sizeof(SAI) );
+
+    CSL_DEBUGF( L"connect(sock:%d,...) => %d",sock,err );
+
+    if( !err )
+    {
+      bfd bf;
+      bf.init( sock );
+      read_res rr;
+      uint32_t timeout_ms = 9000;
+      ustr req("GET / HTTP/1.0\r\n\r\n");
+      bf.write(reinterpret_cast<const uint8_t *>(req.data()),req.size());
+      read_res & rf(bf.read(80000,timeout_ms,rr));
+      assert( rf.bytes() > 0 );
+      assert( rf.data() != NULL );
+      assert( rf.failed() == false );
+      assert( rf.timed_out() == false );
+      CSL_DEBUGF(L"received %lld bytes\n%s",
+                  rf.bytes(),
+                  reinterpret_cast<const char *>(rf.data()));
+      // zfile zf;
+      // zf.put_data( rf.data(), rf.bytes() );
+      // zf.write_file( "test.out" );
+    }
+
+    LEAVE_FUNCTION();
+  }
 
 } /* end of test_bfd */
 
@@ -59,6 +110,7 @@ using namespace test_bfd;
 int main()
 {
   initcomm w;
+  conn();
   csl_common_print_results( "baseline          ", csl_common_test_timer_v0(baseline),"" );
   return 0;
 }

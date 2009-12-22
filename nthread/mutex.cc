@@ -24,7 +24,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "codesloop/nthread/mutex.hh"
-#include "codesloop/common/common.h"
+#include "codesloop/nthread/exc.hh"
 #include "codesloop/common/str.hh"
 
 #ifdef WIN32
@@ -32,7 +32,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #else /* NOT WIN32 */
 # include "mutex_impl_pthread.cc"
 #endif /* WIN32 */
-
 
 /**
   @file mutex.cc
@@ -43,7 +42,7 @@ namespace csl
 {
   namespace nthread
   {
-    mutex::mutex() : impl_(new impl) {}
+    mutex::mutex() : impl_(new impl), use_exc_(true) {}
     mutex::~mutex() {}
 
     // mutex operations
@@ -83,10 +82,16 @@ namespace csl
     }
 
     // no-copy
-    mutex::mutex(const mutex & other) 
-      : impl_( reinterpret_cast<impl *>(0) ) {throw common::str("should never be called"); }
+    mutex::mutex(const mutex & other) : impl_( reinterpret_cast<impl *>(0) )
+    {
+      THRNORET(exc::rs_not_implemented);
+    }
 
-    mutex & mutex::operator=(const mutex & other) { return *this; }
+    mutex & mutex::operator=(const mutex & other)
+    {
+      THR(exc::rs_not_implemented, *this);
+      return *this;
+    }
   }
 }
 

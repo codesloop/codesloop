@@ -35,6 +35,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/nthread/mutex.hh"
 #include "codesloop/nthread/thread.hh"
 #include "codesloop/common/csl_common.hh"
+#include "codesloop/common/obj.hh"
+#include "codesloop/common/logger.hh"
 #ifdef __cplusplus
 #include <list>
 

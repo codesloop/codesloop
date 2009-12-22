@@ -72,7 +72,6 @@ ADD_LIBRARY( csl_comm STATIC
              # -- TCP --
              tcp_lstnr.cc         tcp_lstnr.hh
              tcp_client.cc        tcp_client.hh
-             tcp_handler.cc       tcp_handler.hh
              # -- UDP --
              udp_recvr.cc         udp_recvr.hh
              udp_hello.cc         udp_hello.hh
@@ -83,8 +82,16 @@ ADD_LIBRARY( csl_comm STATIC
              exc.cc               exc.hh
              initcomm.cc          initcomm.hh
              sai.hh               connid.hh
-             read_res.hh
+             handler.hh
              csl_comm.hh
            )
+
+FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
+INSTALL( FILES ${includes} DESTINATION include/codesloop/comm )
+INSTALL(TARGETS csl_comm
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
 
 # -- EOF --

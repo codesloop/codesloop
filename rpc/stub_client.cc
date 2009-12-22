@@ -25,6 +25,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "codesloop/rpc/stub_client.hh"
 #include "codesloop/common/common.h"
+#include "codesloop/common/ustr.hh"
+#include "codesloop/rpc/iface.hh"
+
 
 /**
   @file rpc/src/stub_client.cc
@@ -32,6 +35,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 using std::endl;
+using csl::common::ustr;
+using csl::rpc::iface;
 
 namespace csl
 {
@@ -45,7 +50,13 @@ namespace csl
 
       output_
         << "#ifdef __cplusplus" << endl
-        << "#include \"" << (ifname_+"_cli.hh").c_str() << "\""        
+        << "#include <sys/time.h>"
+        << endl
+        << "#include \"" << (ifname_+"_cli.hh").c_str() << "\""  
+        << endl
+        << "#include <codesloop/common/arch.hh>"        
+        << endl
+        << "#include <codesloop/rpc/exc.hh>"        
         << endl
         ;
 
@@ -127,28 +138,53 @@ namespace csl
         ;
 
         // serializer
-        output_ 
-          << ls_ << "  arch archiver(arch::SERIALIZE);" << endl
+        output_
+          << ls_ << "  static int64_t interface_id = " <<  ustr( ifc_->to_string().c_str() ).crc64().value()
+          << "LL;"<< endl
+          << ls_ << "  static uint32_t function_id = fid_" << (*func_it).name << ";"<< endl
+          << ls_ << "  ptr_ivec_t * opp = new ptr_ivec_t();" << endl
+          
+        ;
+
+        if ( (*func_it).name == "ping" )
+          generate_ping_body();
+
+        output_
+          << ls_ << "  csl::common::arch archiver(csl::common::arch::SERIALIZE);" << endl
           << endl
-          << ls_ << "  archiver.serialize(__if_" << ifname_.c_str()  
-          <<             "_crc );" << endl
-          << ls_ << "  archiver.serialize(__func_"<< ifname_.c_str()  
-          <<             "_"<< (*func_it).name << "_id);" << endl        
+          << ls_ << "  archiver.serialize(interface_id); " << endl
+          << ls_ << "  archiver.serialize(function_id);" << endl        
+          << ls_ << "  archiver.serialize(__handle);" << endl        
         ;
 
         param_it = (*func_it).params.begin();
         while( param_it != (*func_it).params.end() )
         {
-          /* ignore exceptions and output parameters */
-          if( (*param_it).kind==MD_EXCEPTION ||(*param_it).kind==MD_OUTPUT) {
+          /* ignore exceptions */
+          if( (*param_it).kind==MD_EXCEPTION ) 
+          {
             param_it++;
             continue;
           }
+          
+          /* parameter types which requrire output ptr registration */
+          if ( (*param_it).kind==MD_OUTPUT || (*param_it).kind==MD_INOUT ) 
+          {
+            output_ 
+              << ls_ << "  opp->push_back( " 
+              << (((*param_it).kind==MD_INOUT) ? "&" : "") // inout types needs refernce op 
+              << (*param_it).name << ");" << endl
+            ;
+          } 
 
-          output_
-            << ls_ << "  archiver.serialize(" << (*param_it).name
-            << ");" << endl
-          ;
+          if ( (*param_it).kind!=MD_OUTPUT) 
+          {
+            output_
+              << ls_ << "  archiver.serialize(const_cast<" << (*param_it).type 
+              << "&>(" << (*param_it).name
+              << "));" << endl
+            ;
+          }
 
           param_it++;
         }
@@ -157,6 +193,8 @@ namespace csl
           << endl
           << ls_ << "  send(__handle,archiver.get_pbuf());"
           << endl
+          << ls_ << "  outp_ptrs_.insert(handle_params_pair_t(__handle,out_params_t(function_id, opp)));"
+          << endl
           << ls_ << "}" << endl
           << endl << endl
         ;
@@ -164,7 +202,7 @@ namespace csl
         func_it++;
       }
 
-
+      generate_decode_response();
 
       /*---------------------------------------------------------\
       |  Cleanup                                                 |
@@ -177,6 +215,94 @@ namespace csl
         << "/* EOF */" << endl
       ;
     }
+
+    void stub_client::generate_ping_body()
+    {
+      output_ 
+        << ls_ << "  struct timeval tv;" << endl
+        << ls_ << "  struct timezone tz;" << endl << endl
+        << ls_ << "  gettimeofday(&tv,&tz);" << endl
+        << ls_ << "  client_time = tv.tv_sec * 1000000 + tv.tv_usec;" << endl
+      ;
+
+      return; 
+    }
+
+
+    void stub_client::generate_decode_response()
+    {
+      const char * class_name = (ifname_ + "_cli").c_str();
+      iface::function_iterator func_it = ifc_->get_functions()->begin();
+      iface::func::param_iterator param_it;
+
+      output_ 
+        << ls_ << "void " << class_name << "::decode_response(" << endl
+        << ls_ << "        /* input */ const csl::rpc::handle & __handle," << endl
+        << ls_ << "        /* input */ const uint32_t function_id," << endl
+        << ls_ << "        /* inout */ csl::common::arch & archiver) " << endl
+        << ls_ << "{"<< endl
+        << ls_ << "  ENTER_FUNCTION();" << endl << endl
+        << ls_ << "  uint32_t retval = rt_succcess;" << endl
+        << ls_ << "  ptr_ivec_t * ivec = (outp_ptrs_)[__handle].second;" << endl
+        << ls_ << "  uint32_t ptr = 0;" << endl
+        << ls_ << endl
+        << ls_ << "  archiver.serialize(retval);" << endl
+        << ls_ << endl
+        << ls_ << "  if ( retval == rt_succcess ) {" << endl
+        << ls_ << endl
+        << ls_ << "    switch( function_id )" << endl
+        << ls_ << "    {" << endl
+      ;
+      
+      while ( func_it != ifc_->get_functions()->end() )
+      {
+        output_
+          << ls_ << "      case fid_" << (*func_it).name << ":" << endl
+          << ls_ << "      {" << endl
+        ; 
+        param_it = (*func_it).params.begin();
+        while( param_it != (*func_it).params.end() )
+        {
+          // create type 
+          if ( (*param_it).kind!=MD_EXCEPTION &&  (*param_it).kind!=MD_INPUT) {
+            output_ 
+              << ls_ << "        " << (*param_it).type << " *" << (*param_it).name << " = " 
+              << "static_cast<"<<  (*param_it).type<< " *>(ivec->get(ptr++));"
+              << endl
+              << ls_ << "        archiver.serialize( *" << (*param_it).name << ");" << endl
+              << endl
+              ;
+          }
+          param_it++;
+        } 
+
+        output_
+          << ls_ << "      }" << endl
+          << ls_ << "      break;" << endl
+        ;
+
+        func_it++;
+      }
+      output_ << endl;
+
+      output_
+        << ls_ << "    default:" << endl
+        << ls_ << "      throw csl::rpc::exc(csl::rpc::exc::rs_invalid_fid,L\""
+        <<               ifname_.c_str() << " interface\");" << endl
+        << ls_ << "    break;" << endl
+        << ls_ << "    } /* switch */" << endl
+        << ls_ << "  } else { /* if not successs */" << endl
+        << ls_ << "    throw csl::rpc::exc(csl::rpc::exc::rs_invalid_param,L\""
+                          << class_name <<"::decode_response\");" 
+        << ls_ << "  } /* if not successs */" << endl
+      ;
+
+      output_
+        << ls_ << "}" 
+        << endl << endl;
+    }
+      
+
   };
 };
 

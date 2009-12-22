@@ -24,38 +24,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "codesloop/db/tran.hh"
-#include "codesloop/db/_shared_impl.hh"
-
-/**
-  @file tran.cc
-  @brief implementation of slt3::tran
- */
 
 namespace csl
 {
-  namespace slt3
+  namespace db
   {
-    void tran::commit_on_destruct(bool yesno)   { impl_->commit_on_destruct(yesno);   }
-    void tran::rollback_on_destruct(bool yesno) { impl_->rollback_on_destruct(yesno); }
-
-    void tran::commit()   { impl_->commit();   }
-    void tran::rollback() { impl_->rollback(); }
-
-    void tran::use_exc(bool yesno) { impl_->use_exc(yesno); }
-    bool tran::use_exc() { return impl_->use_exc(); }
-
-    /* public interface */
-    tran::tran(conn & c) : impl_(new impl(c.impl_)) {}
-    tran::tran(tran & t) : impl_(new impl(t.impl_)) {}
-
-    tran::~tran() {}
-
-    /* private functions, copying not allowed */
-    tran & tran::operator=(const tran & other) { return *this; }
-
-    /* transactions should only be created in conn, or tran context */
-    tran::tran() : impl_( reinterpret_cast<impl *>(0) ) { }
-  };
-};
+  }; // end of ns:csl::db
+}; // end of ns:csl
 
 /* EOF */

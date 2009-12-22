@@ -81,7 +81,7 @@ namespace csl
         }
 
         /** @brief helper to pass a (ptr,size) pair to operators */
-        typedef std::pair<const unsigned char *,unsigned int> bindata_t;
+        typedef std::pair<const unsigned char *,uint64_t> bindata_t;
 
 
         /**
@@ -110,11 +110,41 @@ namespace csl
         @return reference to xdrbuf
         @throw common::exc
 
+        puts a 64 bit integer to pbuf
+        */
+        xdrbuf & operator<<(int64_t val);
+
+        /**
+        @brief serialize val to pbuf
+        @param val is the value to be serialized
+        @return reference to xdrbuf
+        @throw common::exc
+
+        puts a 64 bit integer to stream
+        */
+        xdrbuf & operator<<(uint64_t val);
+        /**
+        @brief serialize val to pbuf
+        @param val is the value to be serialized
+        @return reference to xdrbuf
+        @throw common::exc
+
         @li puts a 32 bit integer to stream as size
         @li puts size bytes of val C string to pbuf
         @li puts optional padding 1-3 bytes
         */
         xdrbuf & operator<<(const char * val);
+
+        /**
+        @brief serialize val to variable
+        @param val is the value to be serialized
+        @return reference to xdrbuf
+        @throw common::exc
+
+        calls the matching xdr function based on
+        variable's implementation
+        */
+        xdrbuf & operator<<(const common::serializable & val);
 
         /**
         @brief serialize val to variable
@@ -196,6 +226,34 @@ namespace csl
         xdrbuf & operator>>(uint32_t & val);
 
         /**
+        @brief deserialize val from pbuf
+        @param val is the value to be deserialized
+        @return reference to xdrbuf
+        @throw common::exc
+
+        @li reads a 64 bit integer from stream to val
+        */
+        xdrbuf & operator>>(int64_t & val);
+
+        /**
+        @brief deserialize val from pbuf
+        @param val is the value to be deserialized
+        @return reference to xdrbuf
+        @throw common::exc
+
+        @li reads a 64 bit integer from stream to val
+        */
+        xdrbuf & operator>>(uint64_t & val);
+
+        /**
+        @brief deserialize val from variable
+        @param val is the value to be deserialized
+        @return reference to xdrbuf
+        @throw common::exc
+         */
+        xdrbuf & operator>>(common::serializable & val);
+
+        /**
         @brief deserialize val from variable
         @param val is the value to be deserialized
         @return reference to xdrbuf
@@ -253,8 +311,8 @@ namespace csl
         @li then reads size bytes from the stream (asis)
         @li align internal pointer with 1-3 optional padding bytes
         */
-        unsigned int get_data( unsigned char * where,
-                               unsigned int size );
+        uint64_t get_data( unsigned char * where,
+                           uint64_t size );
 
         /**
         @brief deserialize data to 'where'
@@ -271,8 +329,8 @@ namespace csl
         @li puts the read size to 'size'
         */
         bool get_data( unsigned char * where,
-                       unsigned int & size,
-                       unsigned int max_size );
+                       uint64_t & size,
+                       uint64_t max_size );
 
         /**
         @brief deserialize data to 'where'
@@ -290,11 +348,11 @@ namespace csl
         */
         template <typename T>
         bool get_data( T & t,
-                       unsigned int & size,
-                       unsigned int max_size )
+                       uint64_t & size,
+                       uint64_t max_size )
         {
           pbuf::iterator oldit = it_;
-          unsigned int oldpos  = pos_;
+          uint64_t oldpos  = pos_;
           uint32_t sz;
           (*this) >> sz;
           it_  = oldit;
@@ -304,7 +362,7 @@ namespace csl
         }
 
         /** @brief steps forward in the stream by n bytes (plus padding) */
-        bool forward(unsigned int n);
+        bool forward(uint64_t n);
 
         /** @brief Specifies whether param should throw common::exc exceptions
             @param yesno is the desired value to be set
@@ -326,13 +384,13 @@ namespace csl
         void rewind();
 
         /** @brief returns the number of bytes consumed from the stream */
-        unsigned long position();
+        uint64_t position();
 
       private:
         bool use_exc_;
         pbuf * b_;
         pbuf::iterator it_;
-        unsigned int pos_;
+        uint64_t pos_;
 
         xdrbuf() : use_exc_(true), b_(0), it_(0,0), pos_(0) {}
     };

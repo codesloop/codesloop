@@ -37,7 +37,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace csl
 {
-  namespace slt3
+  namespace db
   {
     /**
     @brief common exception class used by slt3 classes
@@ -85,7 +85,7 @@ namespace csl
         /** @brief converts reason code to string */
         static const wchar_t * reason_string(int rc);
 
-        /** @brief constructor 
+        /** @brief constructor
          *   @param component that caused the exception
          */
         exc(const wchar_t * component)

@@ -25,7 +25,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "codesloop/nthread/event.hh"
 #include "codesloop/common/common.h"
-#include <windows.h> 
 #include <errno.h>
 
 /**
@@ -134,7 +133,7 @@ namespace csl
       {
         bool ret = false;
         if( WaitForSingleObject( *mutex_, INFINITE ) == WAIT_OBJECT_0 )
-        {          
+        {
           if( invalid_ ) { ret = false; }
           else
           {
@@ -159,14 +158,14 @@ namespace csl
 
         if( WaitForSingleObject( *mutex_, INFINITE ) == WAIT_OBJECT_0 )
         {
-          if( invalid_ ) 
+          if( invalid_ )
           {
             ret = false;
             ReleaseMutex( *mutex_ );
           }
           else if( available_ )
           {
-            --available_; 
+            --available_;
             if( !available_ ) ResetEvent(*event_);
             ReleaseMutex( *mutex_ );
           }
@@ -182,7 +181,7 @@ retry_wait:
               else
               {
                 if( available_ == 0 ) { goto retry_wait; } // this should not happen
-                else 
+                else
                 {
                   --available_;
                   if( !available_  ) { ResetEvent(*event_); }

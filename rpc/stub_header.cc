@@ -45,22 +45,29 @@ namespace csl
   {
     void stub_header::generate()
     {
-      open_file((ifname_+"_cli.hh").c_str());
-      write_file(STUB_CLIENT);
+      // add internal functions for client and server stub
+      add_internal_functions();    
 
       open_file((ifname_+"_srv.hh").c_str());
       write_file(STUB_SERVER);
+
+      open_file((ifname_+"_cli.hh").c_str());
+      write_file(STUB_CLIENT);
     }
 
     void stub_header::write_file(stub_kind kind)
     {   
       const char * class_name, * parent_class;
+      const char * srv_cli;
+
       if ( kind == STUB_SERVER ) {
         class_name = (ifname_ + "_srv").c_str();
-        parent_class = (std::string("srv_trans_") + ifc_->get_transport() ).c_str();
+        parent_class = (std::string("csl::rpc::srv_trans_") + ifc_->get_transport() ).c_str();
+        srv_cli = "srv";
       } else {
         class_name = (ifname_ + "_cli").c_str();
-        parent_class = (std::string("cli_trans_") + ifc_->get_transport() ).c_str();
+        parent_class = (std::string("csl::rpc::cli_trans_") + ifc_->get_transport() ).c_str();
+        srv_cli = "cli";
       }
 
       output_
@@ -93,6 +100,11 @@ namespace csl
          << endl << endl;
       }
 
+      output_
+        << "#include <codesloop/rpc/" << srv_cli << "_trans_" << ifc_->get_transport() << ".hh>" 
+        << endl
+      ;
+
       if ( ifc_->get_includes()->size() != 0 )
         output_ << "/* User defined includes */" << endl;
 
@@ -117,14 +129,14 @@ namespace csl
         << ls_ << "{" << endl
         << ls_ << "public:" << endl
         << ls_ << "  CSL_OBJ(" << ifc_->get_namespc().c_str() 
-        << ", "<< ifname_.c_str() << "_cli);" << endl
+        << ", "<< ifname_.c_str() << "_" << srv_cli << ");" << endl
         << endl 
       ;
       ls_ += "  ";
       
       // constructor
       output_ 
-        << ls_ << class_name << " : " << parent_class 
+        << ls_ << class_name << "() : " << parent_class 
         << "() {}" << endl
         << endl
       ;
@@ -138,7 +150,7 @@ namespace csl
       ;
       // crc
       output_
-        << ls_ << "static const long long get_crc64() {" << endl
+        << ls_ << "inline static const int64_t get_crc64() {" << endl
         << ls_ << "  return " 
         << ustr( ifc_->to_string().c_str() ).crc64().value()         
         << "LL;" << endl
@@ -149,13 +161,16 @@ namespace csl
       |  Generate function IDs enumeration                       |
       \---------------------------------------------------------*/
       iface::function_iterator func_it = ifc_->get_functions()->begin();
-      int func_seq = 0;
+      int func_seq = 1000;
 
       output_ 
         << ls_ << "enum function_ids { " << endl
       ;
       for ( ; func_it != ifc_->get_functions()->end() ; func_it++ )      
       {
+        if ( (*func_it).name == "ping" )
+          continue;
+
         output_
           << ls_ << "  fid_" << (*func_it).name 
           << " = " << func_seq++
@@ -171,12 +186,21 @@ namespace csl
 
       while ( func_it != ifc_->get_functions()->end() )
       {
+        if ( kind == STUB_SERVER && (*func_it).name == "ping" ) 
+        {
+          func_it++;
+          continue;
+        }
         /* synchronous call */
         output_ 
           << ls_ << "virtual void " << (*func_it).name 
           << " (" << endl
         ;
         this->generate_func_params( (*func_it).name, kind, false);
+        // make server definitions pure virtual
+        if ( kind == STUB_SERVER ) {
+          output_ << " = 0";
+        }
         output_ << ";" << endl;
 
         /* asynchronous call */
@@ -194,6 +218,27 @@ namespace csl
       }
 
       /*---------------------------------------------------------\
+      |  Specialities                                            |
+      \---------------------------------------------------------*/
+      ls_ = ls_.substr( 0, ls_.size() - 2 );
+      output_ << ls_ << "protected:" << endl;
+      ls_ += "  ";
+
+      if ( kind == STUB_SERVER ) 
+      {
+        output_ << ls_ << "virtual void despatch(" << endl;
+        output_ << ls_ << "  /* input */  const csl::rpc::client_info & ci," << endl;
+        output_ << ls_ << "  /* inout */  csl::common::arch & archive" << endl;
+        output_ << ls_ << ");" << endl;
+      } else if ( kind == STUB_CLIENT)  {
+        output_ << ls_ << "virtual void decode_response(" << endl;
+        output_ << ls_ << "  /* input */  const csl::rpc::handle & __handle," << endl;
+        output_ << ls_ << "  /* input */  const uint32_t function_id," << endl;
+        output_ << ls_ << "  /* inout */  csl::common::arch & archive" << endl;
+        output_ << ls_ << ");" << endl;
+      }
+
+      /*---------------------------------------------------------\
       |  Cleanup                                                 |
       \---------------------------------------------------------*/
       ls_ = ls_.substr( 0, ls_.size() - 2 );
@@ -203,9 +248,8 @@ namespace csl
 
       output_
         << endl
-        << "#ifndef /* __csl_interface_" << ifc_->get_name().c_str() << "*/" 
-        << endl
         << "#endif /* __cplusplus */" << endl
+        << "#endif /* __csl_interface_" << ifc_->get_name().c_str() << "*/" << endl
         << "/* EOF */" << endl
       ;
 

@@ -69,6 +69,10 @@ namespace csl
         case rs_sesskey_empty:        return L"session key is not set";
         case rs_salt_size:            return L"invalid salt size";
         case rs_not_implemented:      return L"Function is not implemented.";
+        case rs_setsockopt:           return L"setsockopt() call failed";
+        case rs_assert:               return L"assert failed";
+        case rs_unknown_op:           return L"unknown op received";
+        case rs_internal_state:       return L"internal state inconsystency";
         case rs_unknown:
           default:                    return L"Unknown reason";
       };
