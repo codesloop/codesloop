@@ -31,6 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/common/str.hh"
 #include "codesloop/common/var.hh"
 #include "codesloop/common/ustr.hh"
+#include "codesloop/common/arch.hh"
 #include <memory>
 
 /**
@@ -164,6 +165,18 @@ namespace csl
           }
         }
       }
+      return *this;
+    }
+
+    xdrbuf & xdrbuf::operator<<(const common::serializable & val)
+    {
+      common::pbuf pb;
+      common::arch ar(common::arch::SERIALIZE);
+      ar.set_pbuf( pb );
+      const_cast<common::serializable&>(val).serialize( ar );
+      
+      (*this) << pb;
+
       return *this;
     }
 
@@ -358,6 +371,19 @@ namespace csl
       {
         THR(exc::rs_cannot_get,*this);
       }
+
+      return *this;
+    }
+
+    xdrbuf & xdrbuf::operator>>(common::serializable & val)
+    {
+      common::pbuf pb;
+      common::arch ar(common::arch::DESERIALIZE);
+
+      (*this) >> pb;
+      
+      ar.set_pbuf( pb );
+      val.serialize( ar );
 
       return *this;
     }

@@ -82,6 +82,7 @@ namespace csl
         << ls_ << "  uint32_t function_id;" << endl 
         << ls_ << "  csl::rpc::handle __handle = CSL_RPC_HANDLE_NULL;" << endl 
         << ls_ << "  uint32_t retval = rt_succcess;" << endl
+        << ls_ << "  uint32_t exc_nr = 0;" << endl
         << ls_ << endl
         << ls_ << "  archiver.serialize(interface_id);" << endl
         << ls_ << "  archiver.serialize(function_id);" << endl 
@@ -172,6 +173,7 @@ namespace csl
 
         // handl exceptions
         param_it = (*func_it).params.begin();
+        int exc_nr = 1;
         while( param_it != (*func_it).params.end() )
         {
           if ( (*param_it).kind==MD_EXCEPTION ) {
@@ -179,15 +181,19 @@ namespace csl
               << ls_ << "      } catch(" << (*param_it).type << " & " 
               << (*param_it).name<< ") {" << endl
               << ls_ << "        retval = rt_exception;" << endl
+              << ls_ << "        exc_nr = " << exc_nr++ << ";" << endl
               << ls_ << "        archiver.serialize( retval );" << endl
-              << ls_ << "        /* TODO: handle as output parameter */" << endl 
+              << ls_ << "        archiver.serialize( exc_nr );" << endl
+              << ls_ << "        archiver.serialize( "<<  (*param_it).name <<" ); " << endl 
             ;
           }
           param_it++;
         }
-        output_ << ls_ << "      } catch(...) {" << endl;
-        output_ << ls_ << "        /* TODO: raise csl::rpc::exc exception */" << endl;
-        output_ << ls_ << "      } " << endl;
+        output_ 
+          << ls_ << "      } catch(...) {" << endl
+          << ls_ << "        archiver.serialize( retval );" << endl
+          << ls_ << "        archiver.serialize( exc_nr );" << endl
+          << ls_ << "      } " << endl;
 
         output_
           << ls_ << "    }" << endl
