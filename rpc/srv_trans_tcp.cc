@@ -35,6 +35,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   @brief implementation of codesloop interface descriptor
  */
 using csl::common::logger;
+using csl::common::pbuf;
 
 namespace csl
 {
@@ -83,19 +84,21 @@ namespace csl
     {
       ENTER_FUNCTION();
       bool ret = true;
-      csl::common::pbuf buf;
+      csl::common::pbuf pb;
       csl::common::read_res res;
       csl::rpc::client_info ci;
 
-      CSL_DEBUGF( L"on_data_arrival(id:%lld, sai:(%s:%d), bfd)",
-                   id, inet_ntoa(sai.sin_addr), ntohs(sai.sin_port));
+      CSL_DEBUGF( L"on_data_arrival(id:%lld, sai:(%s:%d), bfd(len:%d))",
+                   id, inet_ntoa(sai.sin_addr), ntohs(sai.sin_port),
+                   buf_fd.size()
+                   );
 
       if(buf_fd.size()>0) 
       {
         buf_fd.read_buf( res, buf_fd.size() );
-        buf.append(  res.data(),  res.bytes() ) ;
+        pb.append(  res.data(),  res.bytes() ) ;
 
-        CSL_DEBUG_ASSERT(buf.size() != 0);
+        CSL_DEBUG_ASSERT(pb.size() != 0);
 
         // fill client ino
         ::memset( &ci,0,sizeof(ci) );
@@ -104,7 +107,7 @@ namespace csl
 
         // prepare data for deserialization
         csl::common::arch archiver(csl::common::arch::DESERIALIZE);
-        archiver.set_pbuf( buf );        
+        archiver.set_pbuf( pb );        
 
         // invoke generated despatcher 
         try { 
@@ -112,6 +115,12 @@ namespace csl
         } catch ( csl::rpc::exc & e ) {
           logger::error( e.to_string()  );
         }
+
+        // send back the results
+        pbuf::iterator it(archiver.get_pbuf()->begin());
+        pbuf::iterator end(archiver.get_pbuf()->end());
+        for( ;it!=end;++it )
+          buf_fd.send((*it)->data_, (*it)->size_ );
       }
 
       RETURN_FUNCTION(ret);

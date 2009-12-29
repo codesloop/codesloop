@@ -78,6 +78,16 @@ namespace csl
       if ( !xdrbuf_ )
         THRNORET(exc::rs_out_of_memory);
     }
+    
+    void arch::set_direction( direction d) { 
+      reset();
+      direction_ = d;
+    }
+
+    void arch::reset() {
+      xdrbuf_->rewind();
+      pbuf_->free_all();
+    }
   }
 }
 

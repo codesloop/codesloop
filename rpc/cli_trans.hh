@@ -30,9 +30,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 #include "codesloop/common/obj.hh"
 #include "codesloop/common/pbuf.hh"
+#include "codesloop/common/inpvec.hh"
 #include "codesloop/rpc/handle.hh"
 #include "codesloop/comm/tcp_client.hh"
 
+#include <map>
 
 namespace csl 
 { 
@@ -44,10 +46,37 @@ namespace csl
       CSL_OBJ(csl::rpc,cli_trans);
 
     protected:
+      enum global_function_ids {   
+        fid_ping = 1,
+      };  
+
+      enum return_type {
+        rt_succcess = 0,
+        rt_exception = 1
+      };
+
+
+      virtual void ping(uint64_t&, uint64_t*) = 0;
+      virtual void ping(csl::rpc::handle &,
+                        uint64_t &  client_time,
+                        uint64_t *  server_time) = 0;
+      
+      virtual void decode_response(
+          const csl::rpc::handle &,
+          const uint32_t,
+          csl::common::arch &) = 0;
+
+    protected:
       void create_handle(handle &);
       virtual void wait(handle &) = 0;
       virtual void send(handle &, csl::common::pbuf *) = 0;
 
+      typedef csl::common::inpvec<void *> ptr_ivec_t;
+      typedef std::pair<uint32_t, ptr_ivec_t *> out_params_t;
+      typedef std::pair<handle,out_params_t> handle_params_pair_t;
+      typedef std::map<handle,out_params_t> output_ptr_vec_t;
+    
+      output_ptr_vec_t outp_ptrs_;
     };
 
 

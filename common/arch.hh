@@ -103,6 +103,16 @@ namespace csl
         */
         void set_pbuf( const pbuf & src );
 
+        /**
+          @brief sets direction of serialization
+        */
+        void set_direction( direction d);
+
+        /**
+          @brief resets archiver for reuse
+        */
+        void reset();
+
       private:
         pbuf * pbuf_;
         xdrbuf * xdrbuf_;

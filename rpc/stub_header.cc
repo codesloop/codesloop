@@ -45,11 +45,14 @@ namespace csl
   {
     void stub_header::generate()
     {
-      open_file((ifname_+"_cli.hh").c_str());
-      write_file(STUB_CLIENT);
+      // add internal functions for client and server stub
+      add_internal_functions();    
 
       open_file((ifname_+"_srv.hh").c_str());
       write_file(STUB_SERVER);
+
+      open_file((ifname_+"_cli.hh").c_str());
+      write_file(STUB_CLIENT);
     }
 
     void stub_header::write_file(stub_kind kind)
@@ -165,6 +168,9 @@ namespace csl
       ;
       for ( ; func_it != ifc_->get_functions()->end() ; func_it++ )      
       {
+        if ( (*func_it).name == "ping" )
+          continue;
+
         output_
           << ls_ << "  fid_" << (*func_it).name 
           << " = " << func_seq++
@@ -180,6 +186,11 @@ namespace csl
 
       while ( func_it != ifc_->get_functions()->end() )
       {
+        if ( kind == STUB_SERVER && (*func_it).name == "ping" ) 
+        {
+          func_it++;
+          continue;
+        }
         /* synchronous call */
         output_ 
           << ls_ << "virtual void " << (*func_it).name 
@@ -217,6 +228,12 @@ namespace csl
       {
         output_ << ls_ << "virtual void despatch(" << endl;
         output_ << ls_ << "  /* input */  const csl::rpc::client_info & ci," << endl;
+        output_ << ls_ << "  /* inout */  csl::common::arch & archive" << endl;
+        output_ << ls_ << ");" << endl;
+      } else if ( kind == STUB_CLIENT)  {
+        output_ << ls_ << "virtual void decode_response(" << endl;
+        output_ << ls_ << "  /* input */  const csl::rpc::handle & __handle," << endl;
+        output_ << ls_ << "  /* input */  const uint32_t function_id," << endl;
         output_ << ls_ << "  /* inout */  csl::common::arch & archive" << endl;
         output_ << ls_ << ");" << endl;
       }

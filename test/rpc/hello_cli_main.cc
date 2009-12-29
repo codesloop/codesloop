@@ -24,6 +24,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "hello_cli.hh"
+#include "codesloop/common/test_timer.h"
+
 
 /**
   @file test/rpc/hello_cli_main.cc
@@ -33,15 +35,25 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using csl::rpc::hello::hello_cli;
 using namespace csl::common;
 
+hello_cli cli;
+
+void test_ping_time() 
+{
+  static uint64_t server_time,client_time;
+  cli.ping(client_time,&server_time);
+}
+
 int main()
 {
-    hello_cli cli;
-    str * result;
+    str result;
 
     cli.connect( "127.0.0.1", 12321 );
 
-    cli.hello( 10, str(L"world!"), result );
+    cli.hello( 3, str(L"Hello world! "), &result );
+    
+    wprintf( L"Result is: %ls\n", result.c_str() );
 
+//    csl_common_print_results( "ping             ", csl_common_test_timer_v0(test_ping_time),"" );
 
     exit(0);
 }

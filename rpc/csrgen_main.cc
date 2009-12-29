@@ -66,12 +66,12 @@ int  main(  int  argc,  char  **argv  )
   
 
   stub_header h(p.get_iface());
-  stub_client c(p.get_iface());
   stub_server s(p.get_iface());
+  stub_client c(p.get_iface());
 
   h.generate();
-  c.generate();
   s.generate();
+  c.generate();
 
   if ( ret != 0 )
     exit(0);

@@ -144,6 +144,17 @@ namespace csl
         calls the matching xdr function based on
         variable's implementation
         */
+        xdrbuf & operator<<(const common::serializable & val);
+
+        /**
+        @brief serialize val to variable
+        @param val is the value to be serialized
+        @return reference to xdrbuf
+        @throw common::exc
+
+        calls the matching xdr function based on
+        variable's implementation
+        */
         xdrbuf & operator<<(const common::var & val);
 
         /**
@@ -233,6 +244,14 @@ namespace csl
         @li reads a 64 bit integer from stream to val
         */
         xdrbuf & operator>>(uint64_t & val);
+
+        /**
+        @brief deserialize val from variable
+        @param val is the value to be deserialized
+        @return reference to xdrbuf
+        @throw common::exc
+         */
+        xdrbuf & operator>>(common::serializable & val);
 
         /**
         @brief deserialize val from variable

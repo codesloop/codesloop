@@ -23,6 +23,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <sys/time.h>
+
 #include "codesloop/rpc/srv_trans.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/logger.hh"
@@ -40,6 +42,25 @@ namespace csl
 {
   namespace rpc
   {
+    
+    void srv_trans::ping (
+        /* input */     const csl::rpc::client_info &   ci,
+        /* input */     const uint64_t & client_time,
+        /* output */    uint64_t & server_time
+        /* throws csl::common::exc */
+        ) 
+    {
+      ENTER_FUNCTION();
+
+      struct timeval tv;
+      struct timezone tz;
+
+      gettimeofday(&tv,&tz);
+      server_time = tv.tv_sec * 1000000 + tv.tv_usec;
+
+      LEAVE_FUNCTION();
+    }
+
   };
 };
 

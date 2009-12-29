@@ -45,7 +45,7 @@ namespace csl
     this class is used as base class when a module implements its
     own exception
      */
-    class cexc
+    class cexc : public serializable
     {
       public:
         /** @brief converts reason code to string */
@@ -88,6 +88,12 @@ namespace csl
         */
         cexc(int reason, const wchar_t * component, const wchar_t * txt, const wchar_t * file, unsigned int line)
         : reason_(reason), component_(component), text_(txt), file_(file), line_(line) {}
+
+
+        /** @brief serialize contents of the exception class
+        *   @param arch archiver class 
+        */
+        virtual void serialize(class arch & ar);
 
         virtual ~cexc();
 

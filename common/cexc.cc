@@ -26,6 +26,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/common/cexc.hh"
 #include "codesloop/common/str.hh"
 #include "codesloop/common/common.h"
+#include "codesloop/common/arch.hh"
 
 /**
   @file common/src/cexc.cc
@@ -64,6 +65,16 @@ namespace csl
     const wchar_t * cexc::reason_string(int rc)
     {
         return L"unknown";
+    }
+
+
+    void cexc::serialize(arch & ar)
+    {
+      ar.serialize(reason_);      
+      ar.serialize(component_);    
+      ar.serialize(text_); 
+      ar.serialize(file_);      
+      ar.serialize(line_);       
     }
 
 

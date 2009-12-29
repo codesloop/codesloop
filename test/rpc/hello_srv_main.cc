@@ -43,13 +43,16 @@ namespace csl
         CSL_OBJ(csl::rpc::hello,hello);
       public:
         virtual void hello( const csl::rpc::client_info & ci, 
-            int n_times, 
-            csl::common::str hello_to, 
+            const int & n_times, 
+            const csl::common::str & hello_to, 
             csl::common::str & result)        
         {
           ENTER_FUNCTION();
-          printf("Hello %ls %d times\n", hello_to.c_str(), n_times );
-          csl::common::logger::info( str( L"Hello ")  + hello_to ); 
+          printf("Got string \"%ls\", concat it %d times\n", hello_to.c_str(), n_times );
+
+          for ( int i = 0; i < n_times ; i++ )
+            result += hello_to;
+
           LEAVE_FUNCTION();
         }
 

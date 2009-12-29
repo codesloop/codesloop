@@ -66,6 +66,8 @@ namespace csl
 
       virtual void open_file(const char * filename);
 
+      virtual void add_internal_functions();
+
     protected:
       const iface * ifc_;
 

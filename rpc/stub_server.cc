@@ -79,17 +79,22 @@ namespace csl
         << ls_ << "{" << endl 
         << ls_ << "  ENTER_FUNCTION();" << endl << endl
         << ls_ << "  int64_t interface_id;" << endl
-        << ls_ << "  uint32_t function_id = fid_hello;" << endl 
+        << ls_ << "  uint32_t function_id;" << endl 
         << ls_ << "  csl::rpc::handle __handle = CSL_RPC_HANDLE_NULL;" << endl 
+        << ls_ << "  uint32_t retval = rt_succcess;" << endl
+        << ls_ << "  uint32_t exc_nr = 0;" << endl
         << ls_ << endl
         << ls_ << "  archiver.serialize(interface_id);" << endl
         << ls_ << "  archiver.serialize(function_id);" << endl 
         << ls_ << "  archiver.serialize(__handle);" << endl 
         << ls_ << endl
-        << ls_ << "  if ( interface_id != get_crc64() ) " << endl
+        << ls_ << "  if ( interface_id != get_crc64() ) { " << endl
+        << ls_ << "    CSL_DEBUGF(L\"Interface error, local: %lld, remote: %lld\""
+        <<        ", get_crc64(), interface_id );" << endl
+        << ls_ << "    archiver.reset();" << endl
         << ls_ << "    throw csl::rpc::exc(csl::rpc::exc::rs_incompat_iface,"
         <<        "L\"Can not despatch request, interfaces are different\"); " << endl 
-        << ls_ << endl
+        << ls_ << "  }" << endl << endl
         << ls_ << "  switch( function_id )" << endl          
         << ls_ << "  {" << endl
       ;
@@ -127,6 +132,8 @@ namespace csl
 
         // call it!
         output_ 
+          << ls_ << "      archiver.set_direction( csl::common::arch::SERIALIZE );" 
+          << endl << endl
           << ls_ << "      try { " << endl << endl
           << ls_ << "        " << (*func_it).name << "(ci, "
         ;
@@ -146,22 +153,47 @@ namespace csl
 
         output_ << ");" << endl << endl;
 
+        // handle output parameters
+        output_ << "              archiver.serialize( retval );" << endl;
+        param_it = (*func_it).params.begin();
+        while( param_it != (*func_it).params.end() )
+        {
+          // deserialize data if necessary
+          if ( (*param_it).kind==MD_OUTPUT ||  (*param_it).kind==MD_INOUT ) 
+          {
+            output_
+              << ls_ << "        archiver.serialize( " << (*param_it).name << ");"
+              << endl
+            ;
+          }
+
+          param_it++;
+        }
+        output_ << endl;
+
         // handl exceptions
         param_it = (*func_it).params.begin();
+        int exc_nr = 1;
         while( param_it != (*func_it).params.end() )
         {
           if ( (*param_it).kind==MD_EXCEPTION ) {
             output_
               << ls_ << "      } catch(" << (*param_it).type << " & " 
               << (*param_it).name<< ") {" << endl
-              << ls_ << "        /* TODO: handle as output parameter */" << endl 
+              << ls_ << "        retval = rt_exception;" << endl
+              << ls_ << "        exc_nr = " << exc_nr++ << ";" << endl
+              << ls_ << "        archiver.serialize( retval );" << endl
+              << ls_ << "        archiver.serialize( exc_nr );" << endl
+              << ls_ << "        archiver.serialize( "<<  (*param_it).name <<" ); " << endl 
             ;
           }
           param_it++;
         }
-        output_ << ls_ << "      } catch(...) {" << endl;
-        output_ << ls_ << "        /* TODO: raise csl::rpc::exc exception */" << endl;
-        output_ << ls_ << "      } " << endl;
+        output_ 
+          << ls_ << "      } catch(...) {" << endl
+          << ls_ << "        archiver.serialize( retval );" << endl
+          << ls_ << "        archiver.serialize( exc_nr );" << endl
+          << ls_ << "      } " << endl;
 
         output_
           << ls_ << "    }" << endl
