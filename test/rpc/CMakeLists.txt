@@ -47,10 +47,13 @@ ADD_DEFINITIONS( -DDEBUG )
 
 
 ADD_CUSTOM_COMMAND( OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/hello_cli.cc
-                  PRE_BUILD
-                  COMMAND ../../rpc/csrgen simple_hello.iface
-                  MAIN_DEPENDENCY simple_hello.iface
-                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} )
+                    ${CMAKE_CURRENT_SOURCE_DIR}/hello_cli.hh
+                    ${CMAKE_CURRENT_SOURCE_DIR}/hello_srv.cc
+                    ${CMAKE_CURRENT_SOURCE_DIR}/hello_srv.hh
+                    PRE_BUILD
+                    COMMAND ../../rpc/csrgen simple_hello.iface
+                    MAIN_DEPENDENCY simple_hello.iface
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} )
 
 INCLUDE_DIRECTORIES( ../../.. )
 LINK_DIRECTORIES( ../../common
