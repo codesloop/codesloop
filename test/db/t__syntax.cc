@@ -40,17 +40,17 @@ namespace test_syntax {
 
   struct X
   {
-    X() : do_str_(true) {}
+    X() {}
 
     struct update_columns
     {
       update_columns(X * x) : x_(x) {}
       X * x_;
 
-      update_columns & set(const char * column, common::ustr & v)
+      update_columns & set(const char * column, csl::common::ustr & v)
       {
         x_->result_ += v;
-        return this;
+        return *this;
       }
     };
 
