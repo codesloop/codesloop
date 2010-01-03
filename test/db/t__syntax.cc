@@ -30,12 +30,48 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "codesloop/db/exc.hh"
 #include "codesloop/common/test_timer.h"
+#include "codesloop/common/ustr.hh"
 #include "codesloop/common/common.h"
 #include <assert.h>
 
+using namespace csl::common;
+
 namespace test_syntax {
 
-  void test1() {}
+  struct X
+  {
+    X() : do_str_(true) {}
+
+    struct update_columns
+    {
+      update_columns(X * x) : x_(x) {}
+      X * x_;
+
+      update_columns & set(const char * column, common::ustr & v)
+      {
+        x_->result_ += v;
+        return this;
+      }
+    };
+
+    update_columns update(const char * table)
+    {
+      result_ += "uppdate ";
+      result_ += table;
+      return update_columns(this);
+    }
+
+    ustr result_;
+  };
+
+  void test1()
+  {
+    X x;
+    ustr els("oo");
+    x.update("hello").set("elso",els);
+
+    fprintf(stderr,"%s",x.result_.c_str());
+  }
 
 } // end of test_syntax
 
