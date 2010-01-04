@@ -23,6 +23,7 @@
 
 LINK_DIRECTORIES(
                   ../nthread
+                  ../common/libev
                   ../common
                   ../sec
                 )
@@ -68,6 +69,8 @@ ELSE(NOT WIN32)
 
 ENDIF(NOT WIN32)
 
+LINK_LIBRARIES( csl_common_libev csl_common )
+
 ADD_LIBRARY( csl_comm STATIC
              # -- TCP --
              tcp_lstnr.cc         tcp_lstnr.hh
@@ -85,6 +88,8 @@ ADD_LIBRARY( csl_comm STATIC
              handler.hh
              csl_comm.hh
            )
+
+ADD_DEPENDENCIES( csl_comm ../common/libev/config.h )
 
 FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
 INSTALL( FILES ${includes} DESTINATION include/codesloop/comm )

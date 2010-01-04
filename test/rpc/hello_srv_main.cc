@@ -50,6 +50,15 @@ namespace csl
           ENTER_FUNCTION();
           printf("Got string \"%ls\", concat it %d times\n", hello_to.c_str(), n_times );
 
+          if ( hello_to.empty() ) 
+            throw csl::common::exc(
+                csl::common::exc::rs_invalid_param,
+                L"hello_impl::hello",
+                L"Can not echo empty string", 
+                L""__FILE__,
+                __LINE__
+                );
+
           for ( int i = 0; i < n_times ; i++ )
             result += hello_to;
 
