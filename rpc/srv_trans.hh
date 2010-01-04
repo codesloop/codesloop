@@ -58,8 +58,8 @@ namespace csl
 
       virtual void ping (
           /* input */     const csl::rpc::client_info &   ci,
-          /* input */     const uint64_t & client_time,
-          /* output */    uint64_t & client_time
+          /* input */     const uint64_t & client_time_in,
+          /* output */    uint64_t & client_time_out
           /* throws csl::common::exc */
           );
                  

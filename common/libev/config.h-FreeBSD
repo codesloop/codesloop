@@ -23,66 +23,31 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/**
-   @file t__syntax.cc
-   @brief @todo
- */
+#define HAVE_DLFCN_H 1
+#define HAVE_INTTYPES_H 1
+#define HAVE_KQUEUE 1
+#define HAVE_LIBM 1
+#define HAVE_MEMORY_H 1
+#define HAVE_POLL 1
+#define HAVE_POLL_H 1
+#define HAVE_SELECT 1
+#define HAVE_STDINT_H 1
+#define HAVE_STDLIB_H 1
+#define HAVE_STRINGS_H 1
+#define HAVE_STRING_H 1
+#define HAVE_SYS_EVENT_H 1
+#define HAVE_SYS_QUEUE_H 1
+#define HAVE_SYS_SELECT_H 1
+#define HAVE_SYS_STAT_H 1
+#define HAVE_SYS_TYPES_H 1
+#define HAVE_UNISTD_H 1
+#define STDC_HEADERS 1
 
-#include "codesloop/db/exc.hh"
-#include "codesloop/common/test_timer.h"
-#include "codesloop/common/ustr.hh"
-#include "codesloop/common/common.h"
-#include <assert.h>
+/* features */
 
-using namespace csl::common;
+#define EV_USE_KQUEUE 1
+#define EV_USE_4HEAP 1
+#define EV_HEAP_CACHE_AT 1
 
-namespace test_syntax {
-
-  struct X
-  {
-    X() {}
-
-    struct update_columns
-    {
-      update_columns(X * x) : x_(x) {}
-      X * x_;
-
-      update_columns & set(const char * column, csl::common::ustr & v)
-      {
-        x_->result_ += v;
-        return *this;
-      }
-    };
-
-    update_columns update(const char * table)
-    {
-      result_ += "uppdate ";
-      result_ += table;
-      return update_columns(this);
-    }
-
-    ustr result_;
-  };
-
-  void test1()
-  {
-    X x;
-    ustr els("oo");
-    x.update("hello").set("elso",els);
-
-    fprintf(stderr,"%s",x.result_.c_str());
-  }
-
-} // end of test_syntax
-
-using namespace test_syntax;
-
-int main()
-{
-  test1();
-  //csl_common_print_results( "baseline      ", csl_common_test_timer_v0(baseline),"" );
-  return 0;
-}
-
-// EOF
+/* EOF */
 

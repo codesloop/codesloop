@@ -26,15 +26,68 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_db_driver_hh_included_
 #define _csl_db_driver_hh_included_
 
+#include "codesloop/common/ustr.hh"
+#include "codesloop/common/obj.hh"
+#include "codesloop/common/inpvec.hh"
+#include "codesloop/common/common.h"
 #ifdef __cplusplus
 
 namespace csl
 {
+  using common::ustr;
+  using common::inpvec;
+  using common::var;
+
   namespace db
   {
     class driver
     {
       public:
+        enum {
+          t_null    = CSL_TYPE_NULL,      ///<Null column
+          t_integer = CSL_TYPE_INT64,     ///<64 bit integer column
+          t_double  = CSL_TYPE_DOUBLE,    ///<standard 8 byte double precision column
+          t_string  = CSL_TYPE_USTR,      ///<string column
+          t_blob    = CSL_TYPE_BIN        ///<blob column
+        };
+
+        // transactions
+        virtual bool begin(ustr & id) = 0;
+        virtual bool commit(const ustr & id) = 0;
+        virtual bool rollback(const ustr & id) = 0;
+
+        // subtransactions
+        virtual bool savepoint(ustr & id) = 0;
+        virtual bool release_savepoint(const ustr & id) = 0;
+        virtual bool rollback_savepoint(const ustr & id) = 0;
+
+        // infos
+        virtual uint64_t last_insert_id() = 0;
+        virtual uint64_t change_count() = 0;
+        virtual void reset_change_count() = 0;
+
+        // table data
+        struct column_info
+        {
+          int  type_;
+          ustr db_;
+          ustr table_;
+          ustr column_;
+          ustr origin_;
+
+          column_info() : type_(CSL_TYPE_NULL) {}
+        };
+
+        typedef inpvec<column_info> column_vec_t;
+
+        // parameters
+        typedef inpvec<var *> param_ptr_vec_t;
+
+        // update( query, [params] )
+        // select( query, [params] )
+        // insert( query, [params] )
+        // delete( query, [params] )
+        // other( query, [params] )
     };
   }; // end of ns:csl::db
 }; // end of ns:csl

@@ -100,7 +100,6 @@ test/db/t__synqry
 test/db/t__tran
 test/db/t__var
 test/db/*.db
-common/libev/config.h
 example/ex_thrpool
 rpc/csrgen
 rpc/csrparser.cc
@@ -129,3 +128,10 @@ test/db/slt3/t__var
 test/db/slt3/t__query_mem
 test/db/slt3/t__var_mem
 test/db/t__syntax
+common/libev/config.h
+test/rpc/hello_cli.cc
+test/rpc/hello_cli.hh
+test/rpc/hello_srv.cc
+test/rpc/hello_srv.hh
+test/rpc/hello_srv
+test/rpc/hello_cli
