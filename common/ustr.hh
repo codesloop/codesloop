@@ -105,12 +105,6 @@ namespace csl
         /** @brief append operator */
         ustr& operator+=(const str&);
 
-        /** @brief append operator */
-        inline ustr& operator<<(const str& other)
-        {
-          return (this->operator+=(other));
-        }
-
         /** @brief is equal operator */
         inline bool operator==(const str& s) const
         {
@@ -137,12 +131,6 @@ namespace csl
 
         /** @brief append operator */
         ustr& operator+=(const ustr&);
-
-        /** @brief append operator */
-        inline ustr& operator<<(const ustr& other)
-        {
-          return (this->operator+=(other));
-        }
 
         /**
         @brief append operator with two parameters
@@ -240,12 +228,6 @@ namespace csl
 
         /** @brief append operator */
         ustr& operator+=(const char * s);
-
-        /** @brief append operator */
-        inline ustr& operator<<(const char * other)
-        {
-          return (this->operator+=(other));
-        }
 
         /** @brief is equal operator */
         inline bool operator==(const char * s) const
@@ -681,10 +663,23 @@ namespace csl
         */
         virtual inline void serialize(arch & buf) { buf.serialize(*this); }
 
+        inline ustr & operator+=(const var & other)
+        {
+          ustr tmp;
+          tmp.from_var(other);
+          return this->operator+=(tmp);
+        }
 
       private:
         tbuf<buf_size>   buf_;
     };
+
+    // append template
+    template <typename ARG>
+    ustr & operator<<(ustr & s, const ARG & arg)
+    {
+      return (s.operator+=(arg));
+    }
   }
 }
 

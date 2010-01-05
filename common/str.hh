@@ -114,12 +114,6 @@ namespace csl
         /** @brief append operator */
         str& operator+=(const str&);
 
-        /** @brief append operator */
-        inline str& operator<<(const str & other)
-        {
-          return (this->operator+=(other));
-        }
-
         /**
         @brief append operator with two parameters
         @param lhs is the left-hand-side of add
@@ -190,12 +184,6 @@ namespace csl
           return (*this == rhs);
         }
 
-        /** @brief append operator */
-        inline str& operator<<(const ustr & other)
-        {
-          return (this->operator+=(other));
-        }
-
         /* ------------------------------------------------------------------------ *
         **    char * operations
         ** ------------------------------------------------------------------------ */
@@ -239,12 +227,6 @@ namespace csl
 
         /** @brief append operator */
         str& operator+=(const wchar_t * str);
-
-        /** @brief append operator */
-        inline str& operator<<(const wchar_t * other)
-        {
-          return (this->operator+=(other));
-        }
 
         /**
         @brief append operator with two parameters
@@ -704,9 +686,24 @@ namespace csl
         @throw common::exc
         */
         virtual inline void serialize(arch & buf) { buf.serialize(*this); }
+
+        inline str & operator+=(const var & other)
+        {
+          str tmp;
+          tmp.from_var(other);
+          return this->operator+=(tmp);
+        }
+
       private:
         tbuf<buf_size>   buf_;
     };
+
+    // append template
+    template <typename ARG>
+    str & operator<<(str & s, const ARG & arg)
+    {
+      return (s.operator+=(arg));
+    }
   }
 }
 
