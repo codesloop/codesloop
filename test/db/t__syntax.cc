@@ -31,6 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/db/exc.hh"
 #include "codesloop/common/test_timer.h"
 #include "codesloop/common/ustr.hh"
+#include "codesloop/common/int64.hh"
 #include "codesloop/common/common.h"
 #include <assert.h>
 
@@ -40,37 +41,92 @@ namespace test_syntax {
 
   struct X
   {
-    X() {}
+    X() : n_update_columns_(0), n_where_columns_(0) {}
+
+    struct where_conditions
+    {
+      where_conditions(X * x) : x_(x) {}
+      X * x_;
+
+      template <typename COL, typename ARG>
+      where_conditions & gen(const COL & column, const char * op, const ARG & arg)
+      {
+        ustr & out(x_->result_);
+        out << column << " " << op << "'" << arg << "'";
+        ++(x_->n_where_columns_);
+        return *this;
+      }
+
+      template <typename COL, typename ARG>
+      where_conditions & condition(const COL & column, const char * op, const ARG & arg)
+      {
+        ustr & out(x_->result_);
+        out << " WHERE ";
+        return gen( column, op, arg );
+      }
+
+      template <typename COL, typename ARG>
+      where_conditions & AND(const COL & column, const char * op, const ARG & arg)
+      {
+        ustr & out(x_->result_);
+        out << " AND ";
+        return gen( column, op, arg );
+      }
+
+      template <typename COL, typename ARG>
+      where_conditions & OR(const COL & column, const char * op, const ARG & arg)
+      {
+        ustr & out(x_->result_);
+        out << " OR ";
+        return gen( column, op, arg );
+      }
+    };
 
     struct update_columns
     {
       update_columns(X * x) : x_(x) {}
       X * x_;
 
-      update_columns & set(const char * column, csl::common::ustr & v)
+      template <typename COL, typename ARG>
+      update_columns & SET(const COL & column, const ARG & arg)
       {
-        x_->result_ += v;
+        ustr & out(x_->result_);
+
+        if( x_->n_update_columns_ > 0 ) out << ",";
+        else out << " SET";
+
+        out << " " << column << " = '" << arg << "'";
+        ++(x_->n_update_columns_);
         return *this;
+      }
+
+      template <typename COL, typename ARG>
+      where_conditions & WHERE(const COL & column, const char * op, const ARG & arg)
+      {
+        where_conditions w(x_);
+        return w.condition(column,op,arg);
       }
     };
 
-    update_columns update(const char * table)
+    update_columns UPDATE(const char * table)
     {
-      result_ += "uppdate ";
-      result_ += table;
+      result_ << "UPDATE " << table;
       return update_columns(this);
     }
 
     ustr result_;
+    uint32_t n_update_columns_;
+    uint32_t n_where_columns_;
   };
 
   void test1()
   {
     X x;
     ustr els("oo");
-    x.update("hello").set("elso",els);
+    int64 i1(1);
+    x.UPDATE("hello").SET("elso",els).SET("what",i1).WHERE("what","=",i1).AND("Q","<",els);
 
-    fprintf(stderr,"%s",x.result_.c_str());
+    fprintf(stderr,"%s\n",x.result_.c_str());
   }
 
 } // end of test_syntax
