@@ -105,6 +105,12 @@ namespace csl
         /** @brief append operator */
         ustr& operator+=(const str&);
 
+        /** @brief append operator */
+        inline ustr& operator<<(const str& other)
+        {
+          return (this->operator+=(other));
+        }
+
         /** @brief is equal operator */
         inline bool operator==(const str& s) const
         {
@@ -131,6 +137,12 @@ namespace csl
 
         /** @brief append operator */
         ustr& operator+=(const ustr&);
+
+        /** @brief append operator */
+        inline ustr& operator<<(const ustr& other)
+        {
+          return (this->operator+=(other));
+        }
 
         /**
         @brief append operator with two parameters
@@ -228,6 +240,12 @@ namespace csl
 
         /** @brief append operator */
         ustr& operator+=(const char * s);
+
+        /** @brief append operator */
+        inline ustr& operator<<(const char * other)
+        {
+          return (this->operator+=(other));
+        }
 
         /** @brief is equal operator */
         inline bool operator==(const char * s) const
