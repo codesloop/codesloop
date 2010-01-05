@@ -91,6 +91,7 @@ ELSE(WIN32)
                 )
 ENDIF(WIN32)
 
-ADD_EXECUTABLE( t__syntax       t__syntax.cc )
+ADD_EXECUTABLE( t__syntax          t__syntax.cc )
+ADD_EXECUTABLE( t__syntax_cxx_sql  t__syntax_cxx_sql.cc )
 
 # -- EOF --

@@ -43,6 +43,14 @@ namespace csl
     class driver
     {
       public:
+        // allocate driver instance
+        enum {
+          d_unknown,  // unknown DB driver
+          d_sqlite3,  // SQLite3 driver
+        };
+
+        static driver * instance(int driver_type);
+
         enum {
           t_null    = CSL_TYPE_NULL,      ///<Null column
           t_integer = CSL_TYPE_INT64,     ///<64 bit integer column

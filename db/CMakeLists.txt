@@ -33,7 +33,7 @@ SUBDIRS( slt3 )
 ADD_LIBRARY( csl_db STATIC
              exc.cc      exc.hh
              driver.cc   driver.hh
-             conn.cc     conn.hh
+             conn.hh
              tran.cc     tran.hh
              query.cc    query.hh
            )

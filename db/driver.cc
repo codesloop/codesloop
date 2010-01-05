@@ -29,6 +29,11 @@ namespace csl
 {
   namespace db
   {
+    driver * driver::instance(int driver_type)
+    {
+      return 0;
+    }
+
   }; // end of ns:csl::db
 }; // end of ns:csl
 

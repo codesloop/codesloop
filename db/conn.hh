@@ -26,15 +26,47 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_db_conn_hh_included_
 #define _csl_db_conn_hh_included_
 
+#include "codesloop/common/ustr.hh"
+#include "codesloop/common/str.hh"
+#include "codesloop/common/common.h"
+#include "codesloop/db/driver.hh"
+
 #ifdef __cplusplus
 
 namespace csl
 {
+  using common::str;
+  using common::ustr;
+
   namespace db
   {
+    /* only forwarding functionality, everythin meaningful should be done
+       in the driver */
+
     class conn
     {
       public:
+        conn(int driver_type) : driver_(driver::instance(driver_type)) { }
+
+        bool open( const char * connect_string ) { return false; }
+        bool open( const ustr & connect_string ) { return false; }
+        bool open( const  str & connect_string ) { return false; }
+
+        uint64_t last_insert_id() { return 0; }
+        uint64_t change_count()   { return 0; }
+        void reset_change_count() { }
+        bool close() { return false; }
+
+      private:
+        /* no default construction */
+        conn() {}
+
+        /* no copy */
+        conn(const conn & other) {}
+        conn & operator=(const conn & other) { return *this; }
+
+        /* variables */
+        driver * driver_;
     };
   }; // end of ns:csl::db
 }; // end of ns:csl
