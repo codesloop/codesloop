@@ -46,6 +46,7 @@ namespace csl
         // allocate driver instance
         enum {
           d_unknown,  // unknown DB driver
+          d_dummy,    // for debugging purposes
           d_sqlite3,  // SQLite3 driver
         };
 
@@ -58,6 +59,10 @@ namespace csl
           t_string  = CSL_TYPE_USTR,      ///<string column
           t_blob    = CSL_TYPE_BIN        ///<blob column
         };
+
+        // connection related
+        virtual bool open(const ustr & connect_string) = 0;
+        virtual bool close() = 0;
 
         // transactions
         virtual bool begin(ustr & id) = 0;

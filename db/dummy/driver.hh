@@ -23,25 +23,51 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef _csl_db_dummy_driver_hh_included_
+#define _csl_db_dummy_driver_hh_included_
+
 #include "codesloop/db/driver.hh"
-#include "codesloop/db/dummy/driver.hh"
+
+#ifdef __cplusplus
 
 namespace csl
 {
   namespace db
   {
-    driver * driver::instance(int driver_type)
+    namespace dummy
     {
-      switch( driver_type )
+      class driver : public csl::db::driver
       {
-        case d_dummy:
-          return csl::db::dummy::driver::instance();
-        // case d_sqlite3:
+        public:
+          //
+          static driver * instance();
+
+          // connection related
+          bool open(const ustr & connect_string);
+          bool close();
+
+          // transactions
+          bool begin(ustr & id);
+          bool commit(const ustr & id);
+          bool rollback(const ustr & id);
+
+          // subtransactions
+          bool savepoint(ustr & id);
+          bool release_savepoint(const ustr & id);
+          bool rollback_savepoint(const ustr & id);
+
+          // infos
+          uint64_t last_insert_id();
+          uint64_t change_count();
+          void reset_change_count();
+
+          // construction / destruction
+          virtual ~driver();
+          driver();
       };
-      return 0;
-    }
+    } // end of ns:csl::db::dummy
+  } // end of ns:csl::db
+} // end of ns:csl
 
-  }; // end of ns:csl::db
-}; // end of ns:csl
-
-/* EOF */
+#endif // __cplusplus
+#endif // _csl_db_dummy_driver_hh_included_

@@ -29,7 +29,6 @@ SUBDIRS(
 
 LINK_DIRECTORIES(
                   ../../db
-                  ../../db/slt3
                   ../../common
                 )
 
@@ -85,6 +84,7 @@ ELSE(WIN32)
                  )
 
   LINK_LIBRARIES(
+                  csl_db_dummy
                   csl_db
                   csl_common
                   ${LIBDL}

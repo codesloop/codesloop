@@ -44,7 +44,7 @@ namespace test_syntax {
 
   void conn_syntax_sqlite3()
   {
-    conn c( driver::d_sqlite3 );
+    conn c( driver::d_dummy );
 
     /* conn features */
     bool open_ret = c.open("test.db");

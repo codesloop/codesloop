@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009, CodeSloop Team
+# Copyright (c) 2008,2009, CodeSLoop Team
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -21,36 +21,55 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# SET(CMAKE_VERBOSE_MAKEFILE ON)
-
 LINK_DIRECTORIES(
-                  ../nthread
-                  ../common
-                  ../db/dummy
-                  ../db/slt3
+                  ../../common
+                  ../../db
                 )
 
-INCLUDE_DIRECTORIES( ../.. )
+INCLUDE_DIRECTORIES( ../../.. )
 
-LINK_LIBRARIES(
-                csl_db_dummy
-                csl_db_slt3
-              )
+IF(NOT WIN32)
 
-SUBDIRS( slt3
-         dummy )
+  SET( CMAKE_CXX_FLAGS "-Wconversion -Wcast-qual -Wpointer-arith -Wcast-align -Wold-style-cast" )
 
-ADD_LIBRARY( csl_db STATIC
-             exc.cc      exc.hh
-             driver.cc   driver.hh
-             conn.hh
-             tran.cc     tran.hh
-             query.cc    query.hh
+  ADD_DEFINITIONS(
+                   -Wall
+                   -g3
+                   -Wwrite-strings
+                   -Wcomment
+                   -Wshadow
+                   -Wredundant-decls
+                 )
+
+ELSE(NOT WIN32)
+
+  IF(MSYS)
+
+    SET( CMAKE_CXX_FLAGS "-Wconversion -Wcast-qual -Wpointer-arith -Wcast-align -Wold-style-cast" )
+
+    ADD_DEFINITIONS(
+                      -Wall
+                      -g3
+                      -Wwrite-strings
+                      -Wcomment
+                      -Wshadow
+                      -Wredundant-decls
+                   )
+
+  ELSE(MSYS)
+
+
+  ENDIF(MSYS)
+
+ENDIF(NOT WIN32)
+
+ADD_LIBRARY( csl_db_dummy STATIC
+             driver.cc  driver.hh
            )
 
 FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
-INSTALL( FILES ${includes} DESTINATION include/codesloop/db )
-INSTALL(TARGETS csl_db
+INSTALL( FILES ${includes} DESTINATION include/codesloop/db/dummy )
+INSTALL(TARGETS csl_db_dummy
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib

@@ -249,3 +249,4 @@ test/rpc/hello_cli
 /home/li.chen/kk/lib/libcsl_rpc.a
 */Testing
 */*/Testing
+test/db/t__syntax_cxx_sql

@@ -30,8 +30,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/common/str.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/db/driver.hh"
-
 #ifdef __cplusplus
+#include <memory>
 
 namespace csl
 {
@@ -46,16 +46,33 @@ namespace csl
     class conn
     {
       public:
-        conn(int driver_type) : driver_(driver::instance(driver_type)) { }
+        conn( int driver_type ) : driver_(driver::instance(driver_type)) { }
 
-        bool open( const char * connect_string ) { return false; }
-        bool open( const ustr & connect_string ) { return false; }
-        bool open( const  str & connect_string ) { return false; }
+        bool open(const char * connect_string)
+        {
+          if(!connect_string) return false;
+          else
+          {
+            ustr tmp(connect_string);
+            return this->open(tmp);
+          }
+        }
 
-        uint64_t last_insert_id() { return 0; }
-        uint64_t change_count()   { return 0; }
-        void reset_change_count() { }
-        bool close() { return false; }
+        bool open(const ustr & connect_string)
+        {
+          return driver_->open(connect_string);
+        }
+
+        bool open(const  str & connect_string)
+        {
+          ustr tmp(connect_string);
+          return this->open(tmp);
+        }
+
+        uint64_t last_insert_id() { return driver_->last_insert_id(); }
+        uint64_t change_count()   { return driver_->change_count();   }
+        void reset_change_count() { driver_->reset_change_count();    }
+        bool close()              { return driver_->close();          }
 
       private:
         /* no default construction */
@@ -66,7 +83,7 @@ namespace csl
         conn & operator=(const conn & other) { return *this; }
 
         /* variables */
-        driver * driver_;
+        std::auto_ptr<driver> driver_;
     };
   }; // end of ns:csl::db
 }; // end of ns:csl

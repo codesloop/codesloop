@@ -23,25 +23,51 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "codesloop/db/driver.hh"
+// #if 0
+#ifndef DEBUG
+#define DEBUG
+#define DEBUG_ENABLE_INDENT
+#endif /* DEBUG */
+// #endif
+
+#include "codesloop/common/logger.hh"
+#include "codesloop/common/common.h"
 #include "codesloop/db/dummy/driver.hh"
 
 namespace csl
 {
   namespace db
   {
-    driver * driver::instance(int driver_type)
+    namespace dummy
     {
-      switch( driver_type )
+      /* static */ driver * driver::instance()
       {
-        case d_dummy:
-          return csl::db::dummy::driver::instance();
-        // case d_sqlite3:
-      };
-      return 0;
-    }
+        return new driver();
+      }
 
-  }; // end of ns:csl::db
-}; // end of ns:csl
+      // connection related
+      bool driver::open(const ustr & connect_string) { return false; }
+      bool driver::close() { return false; }
+
+      // transactions
+      bool driver::begin(ustr & id) { return false; }
+      bool driver::commit(const ustr & id) { return false; }
+      bool driver::rollback(const ustr & id) { return false; }
+
+      // subtransactions
+      bool driver::savepoint(ustr & id) { return false; }
+      bool driver::release_savepoint(const ustr & id) { return false; }
+      bool driver::rollback_savepoint(const ustr & id) { return false; }
+
+      // infos
+      uint64_t driver::last_insert_id() { return 0; }
+      uint64_t driver::change_count() { return 0; }
+      void driver::reset_change_count() { }
+
+      driver::driver() { }
+      driver::~driver() { }
+    } // end of ns:csl::db::dummy
+  } // end of ns:csl::db
+} // end of ns:csl
 
 /* EOF */
