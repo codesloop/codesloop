@@ -46,26 +46,97 @@ namespace csl
       }
 
       // connection related
-      bool driver::open(const ustr & connect_string) { return false; }
-      bool driver::close() { return false; }
+      bool driver::open(const ustr & connect_string)
+      {
+        ENTER_FUNCTION();
+        CSL_DEBUGF(L"open(%s)",connect_string.c_str());
+        RETURN_FUNCTION(false);
+      }
+
+      bool driver::close()
+      {
+        ENTER_FUNCTION();
+        RETURN_FUNCTION(false);
+      }
 
       // transactions
-      bool driver::begin(ustr & id) { return false; }
-      bool driver::commit(const ustr & id) { return false; }
-      bool driver::rollback(const ustr & id) { return false; }
+      bool driver::begin(ustr & id)
+      {
+        ENTER_FUNCTION();
+        id="dummy-transaction";
+        RETURN_FUNCTION(false);
+      }
+
+      bool driver::commit(const ustr & id)
+      {
+        ENTER_FUNCTION();
+        CSL_DEBUGF(L"commit(%s)",id.c_str());
+        RETURN_FUNCTION(false);
+      }
+
+      bool driver::rollback(const ustr & id)
+      {
+        ENTER_FUNCTION();
+        CSL_DEBUGF(L"rollback(%s)",id.c_str());
+        RETURN_FUNCTION(false);
+      }
 
       // subtransactions
-      bool driver::savepoint(ustr & id) { return false; }
-      bool driver::release_savepoint(const ustr & id) { return false; }
-      bool driver::rollback_savepoint(const ustr & id) { return false; }
+      bool driver::savepoint(ustr & id)
+      {
+        ENTER_FUNCTION();
+        id="dummy-savepoint";
+        RETURN_FUNCTION(false);
+      }
+
+      bool driver::release_savepoint(const ustr & id)
+      {
+        ENTER_FUNCTION();
+        CSL_DEBUGF(L"release_savepoint(%s)",id.c_str());
+        RETURN_FUNCTION(false);
+      }
+
+      bool driver::rollback_savepoint(const ustr & id)
+      {
+        ENTER_FUNCTION();
+        CSL_DEBUGF(L"rollback_savepoint(%s)",id.c_str());
+        RETURN_FUNCTION(false);
+      }
 
       // infos
-      uint64_t driver::last_insert_id() { return 0; }
-      uint64_t driver::change_count() { return 0; }
-      void driver::reset_change_count() { }
+      uint64_t driver::last_insert_id()
+      {
+        ENTER_FUNCTION();
+        uint64_t id=0;
+        CSL_DEBUGF(L"last_insert_id() => %lld",id);
+        RETURN_FUNCTION(0);
+      }
 
-      driver::driver() { }
-      driver::~driver() { }
+      uint64_t driver::change_count()
+      {
+        ENTER_FUNCTION();
+        uint64_t cn=0;
+        CSL_DEBUGF(L"change_count() => %lld",cn);
+        RETURN_FUNCTION(0);
+      }
+
+      void driver::reset_change_count()
+      {
+        ENTER_FUNCTION();
+        LEAVE_FUNCTION();
+      }
+
+      driver::driver()
+      {
+        ENTER_FUNCTION();
+        LEAVE_FUNCTION();
+      }
+
+      driver::~driver()
+      {
+        ENTER_FUNCTION();
+        LEAVE_FUNCTION();
+      }
     } // end of ns:csl::db::dummy
   } // end of ns:csl::db
 } // end of ns:csl

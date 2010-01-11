@@ -331,25 +331,33 @@ namespace test_inpvec {
 
     inpvec<uint64_t>::iterator it = vec.begin();
     uint64_t * x = 0;
+    int cn = 0;
 
     CSL_DEBUGF(L"\n\nnext_used\n\n");
     while( (x=it.next_used()) != 0 )
     {
-      CSL_DEBUGF(L"next_used returned: %p",x);
+      CSL_DEBUGF(L"next_used returned: %p:%lld  [pos=%lld] [cn=%d]",x,*x,it.get_pos(),cn);
       CSL_DEBUGF(L"\n\nnext_used\n\n");
+      ++cn;
     }
+
+    assert( cn == 3 );
 
     CSL_DEBUGF(L"\n\nsetting: 0,777777777\n\n");
     vec.set( 0,777777777 );
 
     it = vec.begin();
+    cn = 0;
 
     CSL_DEBUGF(L"\n\nnext_used B\n\n");
     while( (x=it.next_used()) != 0 )
     {
-      CSL_DEBUGF(L"next_used returned: %p:%lld B  [pos=%lld]",x,*x,it.get_pos());
+      CSL_DEBUGF(L"next_used returned: %p:%lld B  [pos=%lld] [cn=%d]",x,*x,it.get_pos(),cn);
       CSL_DEBUGF(L"\n\nnext_used B\n\n");
+      ++cn;
     }
+
+    assert( cn == 3 );
   }
 
   void test_first_free()
@@ -399,6 +407,7 @@ int main()
   test_next_used();
   fun_get_set();
 #else
+  test_next_used();
   fun_get_set();
   csl_common_print_results( "test_alloc_1000     ", csl_common_test_timer_v0(test_alloc_1000),"" );
   csl_common_print_results( "test_first_free     ", csl_common_test_timer_v0(test_first_free),"" );

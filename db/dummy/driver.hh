@@ -27,6 +27,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _csl_db_dummy_driver_hh_included_
 
 #include "codesloop/db/driver.hh"
+#include "codesloop/common/obj.hh"
 
 #ifdef __cplusplus
 
@@ -64,6 +65,8 @@ namespace csl
           // construction / destruction
           virtual ~driver();
           driver();
+
+          CSL_OBJ(csl::db::dummy,driver);
       };
     } // end of ns:csl::db::dummy
   } // end of ns:csl::db
