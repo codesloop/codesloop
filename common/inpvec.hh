@@ -381,6 +381,7 @@ namespace csl
 
         bool free_at(uint64_t pos);
         bool is_free_at(uint64_t pos);
+        void reset();
         T & get(uint64_t at);
         T * get_ptr(uint64_t at);
         uint64_t iterator_pos(const iterator & it);
