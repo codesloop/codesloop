@@ -416,7 +416,7 @@ namespace csl
     template <typename T> void inpvec<T>::allocate(mul_t mul)
     {
       ENTER_FUNCTION();
-      CSL_DEBUGF(L"allocate(%lld)",mul);
+      CSL_DEBUGF(L"allocate(%lld)",static_cast<uint64_t>(mul));
       item * n = new item( );
       n->mul_alloc( mul );
       n->parent_ = this;
