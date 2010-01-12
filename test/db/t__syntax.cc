@@ -31,6 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/db/exc.hh"
 #include "codesloop/db/conn.hh"
 #include "codesloop/db/tran.hh"
+#include "codesloop/db/query.hh"
 #include "codesloop/db/driver.hh"
 #include "codesloop/common/test_timer.h"
 #include "codesloop/common/ustr.hh"
@@ -78,6 +79,22 @@ namespace test_syntax {
     }
   }
 
+  void query_syntax_dummy()
+  {
+    conn c( driver::d_dummy );
+    bool open_ret = c.open("test.db");
+
+    tran t(c);
+
+    ustr first("1st");
+    ustr second("2nd");
+
+    csl::db::query q(t);
+
+    // TODO: support this thingie:
+    // q.INSERT_INTO("hello_table").VAL("f1",first).VAL("f2",second).DO();
+  }
+
 } // end of test_syntax
 
 using namespace test_syntax;
@@ -86,6 +103,7 @@ int main()
 {
   conn_syntax_dummy();
   tran_syntax_dummy();
+  query_syntax_dummy();
   return 0;
 }
 

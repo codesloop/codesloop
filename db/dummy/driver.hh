@@ -37,11 +37,35 @@ namespace csl
   {
     namespace dummy
     {
+      namespace syntax
+      {
+        class insert_column : public csl::db::syntax::insert_column
+        {
+          public:
+        };
+
+        class update_column : public csl::db::syntax::update_column
+        {
+          public:
+        };
+
+        class where_condition : public csl::db::syntax::where_condition
+        {
+          public:
+        };
+
+        class generator : public csl::db::syntax::generator
+        {
+          public:
+        };
+      }
+
       class driver : public csl::db::driver
       {
         public:
           //
           static driver * instance();
+          csl::db::syntax::generator * generator();
 
           // connection related
           bool open(const ustr & connect_string);

@@ -40,6 +40,29 @@ namespace csl
 
   namespace db
   {
+    namespace syntax
+    {
+      class insert_column
+      {
+        public:
+      };
+
+      class update_column
+      {
+        public:
+      };
+
+      class where_condition
+      {
+        public:
+      };
+
+      class generator
+      {
+        public:
+      };
+    }
+
     class driver
     {
       public:
@@ -51,6 +74,8 @@ namespace csl
         };
 
         static driver * instance(int driver_type);
+
+        virtual syntax::generator * generator() = 0;
 
         enum {
           t_null    = CSL_TYPE_NULL,      ///<Null column

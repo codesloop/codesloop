@@ -26,6 +26,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_db_query_hh_included_
 #define _csl_db_query_hh_included_
 
+#include "codesloop/db/tran.hh"
+
 #ifdef __cplusplus
 
 namespace csl
@@ -35,6 +37,17 @@ namespace csl
     class query
     {
       public:
+        query(tran & t) : tran_(&t) { }
+
+      private:
+        /* no default construction */
+        query() : tran_(0) { }
+
+        /* no copy */
+        query(const query & other) : tran_(0) { }
+        query & operator=(const query & other) { return *this; }
+
+        tran * tran_;
     };
   }; // end of ns:csl::db
 }; // end of ns:csl

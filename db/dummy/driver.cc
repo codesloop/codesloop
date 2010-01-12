@@ -45,6 +45,11 @@ namespace csl
         return new driver();
       }
 
+      csl::db::syntax::generator * driver::generator()
+      {
+        return new csl::db::dummy::syntax::generator();
+      }
+
       // connection related
       bool driver::open(const ustr & connect_string)
       {
