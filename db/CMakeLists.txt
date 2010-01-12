@@ -44,7 +44,7 @@ ADD_LIBRARY( csl_db STATIC
              exc.cc      exc.hh
              driver.cc   driver.hh
              conn.hh
-             tran.cc     tran.hh
+             tran.hh
              query.cc    query.hh
            )
 
