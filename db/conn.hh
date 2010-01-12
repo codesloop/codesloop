@@ -73,6 +73,7 @@ namespace csl
         uint64_t change_count()   { return driver_->change_count();   }
         void reset_change_count() { driver_->reset_change_count();    }
         bool close()              { return driver_->close();          }
+        driver & get_driver()     { return (*(driver_.get()));        }
 
       private:
         /* no default construction */

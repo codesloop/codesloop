@@ -30,6 +30,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "codesloop/db/exc.hh"
 #include "codesloop/db/conn.hh"
+#include "codesloop/db/tran.hh"
 #include "codesloop/db/driver.hh"
 #include "codesloop/common/test_timer.h"
 #include "codesloop/common/ustr.hh"
@@ -42,9 +43,9 @@ using namespace csl::db;
 
 namespace test_syntax {
 
-  void conn_syntax_sqlite3()
+  void conn_syntax_dummy()
   {
-    conn c( driver::d_dummy );
+    csl::db::conn c( driver::d_dummy );
 
     /* conn features */
     bool open_ret = c.open("test.db");
@@ -54,13 +55,37 @@ namespace test_syntax {
     bool close_ret = c.close();
   }
 
+  void tran_syntax_dummy()
+  {
+    conn c( driver::d_dummy );
+    bool open_ret = c.open("test.db");
+
+    /* tran features */
+    {
+      csl::db::tran t(c);
+      t.commit_on_destruct();
+      t.commit_on_destruct(false);
+      t.rollback_on_destruct();
+      t.rollback_on_destruct(true);
+      t.commit();
+      t.rollback();
+    }
+
+    /* subtransactions */
+    {
+      csl::db::tran t0(c);
+      csl::db::tran t1(t0);
+    }
+  }
+
 } // end of test_syntax
 
 using namespace test_syntax;
 
 int main()
 {
-  conn_syntax_sqlite3();
+  conn_syntax_dummy();
+  tran_syntax_dummy();
   return 0;
 }
 

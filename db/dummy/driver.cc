@@ -82,24 +82,25 @@ namespace csl
       }
 
       // subtransactions
-      bool driver::savepoint(ustr & id)
+      bool driver::savepoint(ustr & id, const ustr & parent_id)
       {
         ENTER_FUNCTION();
         id="dummy-savepoint";
+        CSL_DEBUGF(L"savepoint(%s,%s)",id.c_str(),parent_id.c_str());
         RETURN_FUNCTION(false);
       }
 
-      bool driver::release_savepoint(const ustr & id)
+      bool driver::release_savepoint(const ustr & id, const ustr & parent_id)
       {
         ENTER_FUNCTION();
-        CSL_DEBUGF(L"release_savepoint(%s)",id.c_str());
+        CSL_DEBUGF(L"release_savepoint(%s,%s)",id.c_str(),parent_id.c_str());
         RETURN_FUNCTION(false);
       }
 
-      bool driver::rollback_savepoint(const ustr & id)
+      bool driver::rollback_savepoint(const ustr & id, const ustr & parent_id)
       {
         ENTER_FUNCTION();
-        CSL_DEBUGF(L"rollback_savepoint(%s)",id.c_str());
+        CSL_DEBUGF(L"rollback_savepoint(%s,%s)",id.c_str(),parent_id.c_str());
         RETURN_FUNCTION(false);
       }
 

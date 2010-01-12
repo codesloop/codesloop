@@ -70,9 +70,9 @@ namespace csl
         virtual bool rollback(const ustr & id) = 0;
 
         // subtransactions
-        virtual bool savepoint(ustr & id) = 0;
-        virtual bool release_savepoint(const ustr & id) = 0;
-        virtual bool rollback_savepoint(const ustr & id) = 0;
+        virtual bool savepoint(ustr & id, const ustr & parent_id) = 0;
+        virtual bool release_savepoint(const ustr & id, const ustr & parent_id) = 0;
+        virtual bool rollback_savepoint(const ustr & id, const ustr & parent_id) = 0;
 
         // infos
         virtual uint64_t last_insert_id() = 0;

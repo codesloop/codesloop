@@ -53,9 +53,9 @@ namespace csl
           bool rollback(const ustr & id);
 
           // subtransactions
-          bool savepoint(ustr & id);
-          bool release_savepoint(const ustr & id);
-          bool rollback_savepoint(const ustr & id);
+          bool savepoint(ustr & id, const ustr & parent_id);
+          bool release_savepoint(const ustr & id, const ustr & parent_id);
+          bool rollback_savepoint(const ustr & id, const ustr & parent_id);
 
           // infos
           uint64_t last_insert_id();
