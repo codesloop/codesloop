@@ -51,7 +51,7 @@ namespace csl
           virtual void table_name(const char * table) = 0;
           virtual const char * table_name() = 0;
           virtual insert_column & VAL(const char * column_name, const var & value) = 0;
-          virtual void DO() = 0;
+          virtual bool GO() = 0;
 
           // internals
           insert_column() {}
@@ -73,7 +73,7 @@ namespace csl
         public:
           // interface
           virtual insert_column & INSERT_INTO(const char * table) = 0;
-          virtual void DO() = 0;
+          virtual bool GO() = 0;
 
           // internals
           generator(driver & d) : driver_(&d) {}
@@ -91,11 +91,11 @@ namespace csl
     {
       public:
         // interface
-        virtual bool bind(uint32_t which, const ustr & column, const var & value) = 0;
+        virtual bool bind(uint64_t which, const ustr & column, const var & value) = 0;
         virtual bool execute() = 0;
 
         // internals
-        statement(driver & d, const char * q) : driver_(&d), query_(q) { }
+        statement(driver & d, const ustr & q) : driver_(&d), query_(q) { }
         virtual ~statement() {}
         driver & get_driver() { return *driver_; }
         ustr & get_query()    { return query_;   }
@@ -150,7 +150,7 @@ namespace csl
         virtual void reset_change_count() = 0;
 
         // prepare statement
-        virtual statement * prepare(const char * q) = 0;
+        virtual statement * prepare(const ustr & q) = 0;
 
         // internals
         virtual ~driver() {}

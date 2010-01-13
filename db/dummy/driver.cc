@@ -32,6 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "codesloop/common/logger.hh"
 #include "codesloop/common/common.h"
+#include "codesloop/common/int64.hh"
 #include "codesloop/db/dummy/driver.hh"
 
 namespace csl
@@ -68,6 +69,7 @@ namespace csl
           ENTER_FUNCTION();
           CSL_DEBUGF(L"INSERT_INTO(%s)",table);
           insert_column_.table_name(table);
+          statement_.reset(0);
           RETURN_FUNCTION(insert_column_);
         }
 
@@ -89,17 +91,55 @@ namespace csl
         // ==============================================================
         // = others =====================================================
         // ==============================================================
-        void generator::DO()
+        bool generator::GO()
         {
           ENTER_FUNCTION();
-          LEAVE_FUNCTION();
+          if(statement_.get() == 0)
+          {
+            // calculate statement
+            if( insert_column_.items().n_items() > 0 )
+            {
+              common::ustr query("INSERT INTO "); query << insert_column_.table_name() << " ( ";
+              insert_column::items_t::iterator it = insert_column_.items().begin();
+              insert_column::item * i = *it;
+              query << i->column_;
+              common::ustr bound(":param1");
+
+              while( (i=it.next_used()) != 0 )
+              {
+                query << ", " << i->column_;
+                common::int64 in(it.get_pos()+1);
+                bound << ", :param" << in;
+              }
+
+              query << " ) VALUES ( " << bound << " )";
+
+              // prepare statement
+              statement_.reset(get_driver().prepare(query));
+            }
+          }
+
+          // bind variables
+          if( insert_column_.items().n_items() > 0 )
+          {
+            insert_column::items_t::iterator it = insert_column_.items().begin();
+            insert_column::item * i = *it;
+            statement_->bind( 1ULL, i->column_, *(i->arg_) );
+
+            while( (i=it.next_used()) != 0 )
+            {
+              statement_->bind( it.get_pos()+1, i->column_, *(i->arg_) );
+            }
+          }
+
+          // execute statement
+          RETURN_FUNCTION(statement_->execute());
         }
 
-        void insert_column::DO()
+        bool insert_column::GO()
         {
           ENTER_FUNCTION();
-          generator_->DO();
-          LEAVE_FUNCTION();
+          RETURN_FUNCTION(generator_->GO());
         }
 
         // ==============================================================
@@ -137,7 +177,7 @@ namespace csl
         }
       } /* end of syntax ns */
 
-      statement::statement(csl::db::driver & d, const char * q) :
+      statement::statement(csl::db::driver & d, const ustr & q) :
         csl::db::statement(d,q)
       {
         ENTER_FUNCTION();
@@ -145,18 +185,18 @@ namespace csl
       }
 
       statement::statement() :
-        csl::db::statement(*(new csl::db::dummy::driver()),0)
+        csl::db::statement(*(new csl::db::dummy::driver()),*(new ustr()))
       {
         ENTER_FUNCTION();
         throw "should never be called";
         LEAVE_FUNCTION();
       }
 
-      bool statement::bind(uint32_t which, const ustr & column, const var & value)
+      bool statement::bind(uint64_t which, const ustr & column, const var & value)
       {
         ENTER_FUNCTION();
         ustr tmp; tmp << value;
-        CSL_DEBUGF(L"bind(which:%ld,column:%s,value:%s",which,column.c_str(),tmp.c_str());
+        CSL_DEBUGF(L"bind(which:'param%lld',column:%s,value:'%s')",which,column.c_str(),tmp.c_str());
         RETURN_FUNCTION(true);
       }
 
@@ -166,10 +206,10 @@ namespace csl
         RETURN_FUNCTION(true);
       }
 
-      csl::db::statement * driver::prepare(const char * q)
+      csl::db::statement * driver::prepare(const ustr & q)
       {
         ENTER_FUNCTION();
-        CSL_DEBUGF(L"prepare(%s)",q);
+        CSL_DEBUGF(L"prepare(%s)",q.c_str());
         RETURN_FUNCTION( (new csl::db::dummy::statement(*this,q)) );
       }
 

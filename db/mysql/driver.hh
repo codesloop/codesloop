@@ -51,7 +51,7 @@ namespace csl
             const char * table_name();
             csl::db::syntax::insert_column & VAL(const char * column_name,
                                                 const var & value);
-            void DO();
+            bool GO();
 
             // internals
             insert_column(csl::db::mysql::syntax::generator & g);
@@ -84,7 +84,7 @@ namespace csl
           public:
             // interface
             csl::db::syntax::insert_column & INSERT_INTO(const char * table);
-            void DO();
+            bool GO();
 
             // internals
             generator(csl::db::driver & d);
@@ -104,11 +104,11 @@ namespace csl
       {
         public:
           // interface
-          bool bind(uint32_t which, const ustr & column, const var & value);
+          bool bind(uint64_t which, const ustr & column, const var & value);
           bool execute();
 
           // internals
-          statement(csl::db::driver & d, const char * q);
+          statement(csl::db::driver & d, const ustr & q);
           virtual ~statement() {}
 
         private:
@@ -145,7 +145,7 @@ namespace csl
           void reset_change_count();
 
           // prepare statement
-          csl::db::statement * prepare(const char * q);
+          csl::db::statement * prepare(const ustr & q);
 
           // construction / destruction
           virtual ~driver();

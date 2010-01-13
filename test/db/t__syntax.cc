@@ -92,18 +92,18 @@ namespace test_syntax {
     {
       /* first INSERT usage scenario */
       csl::db::query q(t);
-      q.INSERT_INTO("hello_table").VAL("f1",first).VAL("f2",second).DO();
+      q.INSERT_INTO("hello_table").VAL("f1",first).VAL("f2",second).GO();
     }
 
     {
       /* second INSERT usage scenario */
       csl::db::query q(t);
       syntax::insert_column & ic(q.INSERT_INTO("hello_table").VAL("f1",first).VAL("f2",second));
-      ic.DO();
+      ic.GO();
 
       first  = "1st-2";
       second = "2nd-2";
-      ic.DO();
+      ic.GO();
     }
   }
 

@@ -82,17 +82,16 @@ namespace csl
         // ==============================================================
         // = others =====================================================
         // ==============================================================
-        void generator::DO()
+        bool generator::GO()
         {
           ENTER_FUNCTION();
-          LEAVE_FUNCTION();
+          RETURN_FUNCTION(true);
         }
 
-        void insert_column::DO()
+        bool insert_column::GO()
         {
           ENTER_FUNCTION();
-          generator_->DO();
-          LEAVE_FUNCTION();
+          RETURN_FUNCTION(generator_->GO());
         }
 
         // ==============================================================
@@ -130,7 +129,7 @@ namespace csl
         }
       } /* end of syntax ns */
 
-      statement::statement(csl::db::driver & d, const char * q) :
+      statement::statement(csl::db::driver & d, const ustr & q) :
         csl::db::statement(d,q)
       {
         ENTER_FUNCTION();
@@ -138,18 +137,18 @@ namespace csl
       }
 
       statement::statement() :
-        csl::db::statement(*(new csl::db::mysql::driver()),0)
+        csl::db::statement(*(new csl::db::mysql::driver()),*(new ustr()))
       {
         ENTER_FUNCTION();
         throw "should never be called";
         LEAVE_FUNCTION();
       }
 
-      bool statement::bind(uint32_t which, const ustr & column, const var & value)
+      bool statement::bind(uint64_t which, const ustr & column, const var & value)
       {
         ENTER_FUNCTION();
         ustr tmp; tmp << value;
-        CSL_DEBUGF(L"bind(which:%ld,column:%s,value:%s",which,column.c_str(),tmp.c_str());
+        CSL_DEBUGF(L"bind(which:%lld,column:%s,value:'%s')",which,column.c_str(),tmp.c_str());
         RETURN_FUNCTION(true);
       }
 
@@ -159,10 +158,10 @@ namespace csl
         RETURN_FUNCTION(true);
       }
 
-      csl::db::statement * driver::prepare(const char * q)
+      csl::db::statement * driver::prepare(const ustr & q)
       {
         ENTER_FUNCTION();
-        CSL_DEBUGF(L"prepare(%s)",q);
+        CSL_DEBUGF(L"prepare(%s)",q.c_str());
         RETURN_FUNCTION( (new csl::db::mysql::statement(*this,q)) );
       }
 
