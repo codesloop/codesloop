@@ -23,8 +23,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _csl_db_dummy_driver_hh_included_
-#define _csl_db_dummy_driver_hh_included_
+#ifndef _csl_db_mysql_driver_hh_included_
+#define _csl_db_mysql_driver_hh_included_
 
 #include "codesloop/db/driver.hh"
 #include "codesloop/common/obj.hh"
@@ -37,7 +37,7 @@ namespace csl
 {
   namespace db
   {
-    namespace dummy
+    namespace mysql
     {
       namespace syntax
       {
@@ -50,46 +50,33 @@ namespace csl
             void table_name(const char * table);
             const char * table_name();
             csl::db::syntax::insert_column & VAL(const char * column_name,
-                                                 const var & value);
+                                                const var & value);
             void DO();
 
             // internals
-            insert_column(csl::db::dummy::syntax::generator & g);
+            insert_column(csl::db::mysql::syntax::generator & g);
             virtual ~insert_column() {}
-
-            struct item
-            {
-              ustr         column_;
-              const var *  arg_;
-            };
-
-            typedef inpvec<item> items_t;
-
-            items_t & items() { return items_; }
 
           private:
             // no default construction
             insert_column();
 
-            ustr table_name_;
-            csl::db::dummy::syntax::generator * generator_;
+            common::ustr table_name_;
+            csl::db::mysql::syntax::generator * generator_;
 
-            items_t items_;
-
-            CSL_OBJ(csl::db::dummy::syntax,insert_column);
+            CSL_OBJ(csl::db::mysql::syntax,insert_column);
         };
 
         class update_column : public csl::db::syntax::update_column
         {
           public:
-            CSL_OBJ(csl::db::dummy::syntax,update_column);
+            CSL_OBJ(csl::db::mysql::syntax,update_column);
         };
 
         class where_condition : public csl::db::syntax::where_condition
         {
           public:
-
-            CSL_OBJ(csl::db::dummy::syntax,where_condition);
+            CSL_OBJ(csl::db::mysql::syntax,where_condition);
         };
 
         class generator : public csl::db::syntax::generator
@@ -109,7 +96,7 @@ namespace csl
 
             insert_column insert_column_;
 
-            CSL_OBJ(csl::db::dummy::syntax,generator);
+            CSL_OBJ(csl::db::mysql::syntax,generator);
         };
       }
 
@@ -128,7 +115,7 @@ namespace csl
           // no default construction
           statement();
 
-          CSL_OBJ(csl::db::dummy,statement);
+          CSL_OBJ(csl::db::mysql,statement);
       };
 
       class driver : public csl::db::driver
@@ -164,11 +151,11 @@ namespace csl
           virtual ~driver();
           driver();
 
-          CSL_OBJ(csl::db::dummy,driver);
+          CSL_OBJ(csl::db::mysql,driver);
       };
-    } // end of ns:csl::db::dummy
+    } // end of ns:csl::db::mysql
   } // end of ns:csl::db
 } // end of ns:csl
 
 #endif // __cplusplus
-#endif // _csl_db_dummy_driver_hh_included_
+#endif // _csl_db_mysql_driver_hh_included_

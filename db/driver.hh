@@ -47,12 +47,13 @@ namespace csl
       class insert_column
       {
         public:
-          /* interface */
+          // interface
           virtual void table_name(const char * table) = 0;
+          virtual const char * table_name() = 0;
           virtual insert_column & VAL(const char * column_name, const var & value) = 0;
           virtual void DO() = 0;
 
-          /* internals */
+          // internals
           insert_column() {}
           virtual ~insert_column() {}
       };
@@ -70,21 +71,41 @@ namespace csl
       class generator
       {
         public:
-          /* interface */
+          // interface
           virtual insert_column & INSERT_INTO(const char * table) = 0;
           virtual void DO() = 0;
 
-          /* internals */
+          // internals
           generator(driver & d) : driver_(&d) {}
           virtual ~generator() {}
           driver & get_driver() { return *driver_; }
 
         private:
-          /* no default construction */
+          // no default construction
           generator() {}
           driver * driver_;
       };
     }
+
+    class statement
+    {
+      public:
+        // interface
+        virtual bool bind(uint32_t which, const ustr & column, const var & value) = 0;
+        virtual bool execute() = 0;
+
+        // internals
+        statement(driver & d, const char * q) : driver_(&d), query_(q) { }
+        virtual ~statement() {}
+        driver & get_driver() { return *driver_; }
+        ustr & get_query()    { return query_;   }
+
+      private:
+        // no default construction
+        statement() {}
+        driver * driver_;
+        ustr     query_;
+    };
 
     class driver
     {
@@ -94,6 +115,7 @@ namespace csl
           d_unknown,  // unknown DB driver
           d_dummy,    // for debugging purposes
           d_sqlite3,  // SQLite3 driver
+          d_mysql,    // MySQL driver
         };
 
         static driver * instance(int driver_type);
@@ -127,28 +149,11 @@ namespace csl
         virtual uint64_t change_count() = 0;
         virtual void reset_change_count() = 0;
 
-        // table data
-        struct column_info
-        {
-          int  type_;
-          ustr db_;
-          ustr table_;
-          ustr column_;
-          ustr origin_;
+        // prepare statement
+        virtual statement * prepare(const char * q) = 0;
 
-          column_info() : type_(CSL_TYPE_NULL) {}
-        };
-
-        typedef inpvec<column_info> column_vec_t;
-
-        // parameters
-        typedef inpvec<var *> param_ptr_vec_t;
-
-        // update( query, [params] )
-        // select( query, [params] )
-        // insert( query, [params] )
-        // delete( query, [params] )
-        // other( query, [params] )
+        // internals
+        virtual ~driver() {}
     };
   }; // end of ns:csl::db
 }; // end of ns:csl

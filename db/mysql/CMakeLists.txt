@@ -26,12 +26,11 @@ LINK_DIRECTORIES(
                   ../../db
                 )
 
+INCLUDE_DIRECTORIES( ../../.. )
+
 LINK_LIBRARIES(
                 csl_common
               )
-
-
-INCLUDE_DIRECTORIES( ../../.. )
 
 IF(NOT WIN32)
 
@@ -68,13 +67,13 @@ ELSE(NOT WIN32)
 
 ENDIF(NOT WIN32)
 
-ADD_LIBRARY( csl_db_dummy STATIC
+ADD_LIBRARY( csl_db_mysql STATIC
              driver.cc  driver.hh
            )
 
 FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
-INSTALL( FILES ${includes} DESTINATION include/codesloop/db/dummy )
-INSTALL(TARGETS csl_db_dummy
+INSTALL( FILES ${includes} DESTINATION include/codesloop/db/mysql )
+INSTALL(TARGETS csl_db_mysql
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib

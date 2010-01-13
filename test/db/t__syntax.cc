@@ -89,9 +89,22 @@ namespace test_syntax {
     ustr first("1st");
     ustr second("2nd");
 
-    csl::db::query q(t);
+    {
+      /* first INSERT usage scenario */
+      csl::db::query q(t);
+      q.INSERT_INTO("hello_table").VAL("f1",first).VAL("f2",second).DO();
+    }
 
-    q.INSERT_INTO("hello_table").VAL("f1",first).VAL("f2",second).DO();
+    {
+      /* second INSERT usage scenario */
+      csl::db::query q(t);
+      syntax::insert_column & ic(q.INSERT_INTO("hello_table").VAL("f1",first).VAL("f2",second));
+      ic.DO();
+
+      first  = "1st-2";
+      second = "2nd-2";
+      ic.DO();
+    }
   }
 
 } // end of test_syntax

@@ -32,13 +32,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "codesloop/common/logger.hh"
 #include "codesloop/common/common.h"
-#include "codesloop/db/dummy/driver.hh"
+#include "codesloop/db/mysql/driver.hh"
 
 namespace csl
 {
   namespace db
   {
-    namespace dummy
+    namespace mysql
     {
       namespace syntax
       {
@@ -59,7 +59,6 @@ namespace csl
           CSL_DEBUGF(L"table_name() => %s",table_name_.c_str());
           RETURN_FUNCTION(table_name_.c_str());
         }
-
         // ==============================================================
         // == insert query ==============================================
         // ==============================================================
@@ -76,13 +75,7 @@ namespace csl
         {
           ENTER_FUNCTION();
           ustr tmp; tmp << value;
-          CSL_DEBUGF(L"VAL(%s,'%s') [%lld]",column_name,tmp.c_str(),items_.n_items()+1);
-          {
-            item i;
-            i.column_ = column_name;
-            i.arg_    = &value;
-            items_.push_back(i);
-          }
+          CSL_DEBUGF(L"VAL(%s,'%s')",column_name,tmp.c_str());
           RETURN_FUNCTION((*this));
         }
 
@@ -111,7 +104,7 @@ namespace csl
           LEAVE_FUNCTION();
         }
 
-        insert_column::insert_column(csl::db::dummy::syntax::generator & g) :
+        insert_column::insert_column(csl::db::mysql::syntax::generator & g) :
             csl::db::syntax::insert_column(),
             generator_(&g)
         {
@@ -120,7 +113,7 @@ namespace csl
         }
 
         generator::generator() :
-            csl::db::syntax::generator(*(new csl::db::dummy::driver())),
+            csl::db::syntax::generator(*(new csl::db::mysql::driver())),
             insert_column_(*this)
         {
           ENTER_FUNCTION();
@@ -145,7 +138,7 @@ namespace csl
       }
 
       statement::statement() :
-        csl::db::statement(*(new csl::db::dummy::driver()),0)
+        csl::db::statement(*(new csl::db::mysql::driver()),0)
       {
         ENTER_FUNCTION();
         throw "should never be called";
@@ -170,7 +163,7 @@ namespace csl
       {
         ENTER_FUNCTION();
         CSL_DEBUGF(L"prepare(%s)",q);
-        RETURN_FUNCTION( (new csl::db::dummy::statement(*this,q)) );
+        RETURN_FUNCTION( (new csl::db::mysql::statement(*this,q)) );
       }
 
       /* static */ driver * driver::instance()
@@ -182,7 +175,7 @@ namespace csl
       csl::db::syntax::generator * driver::generator(csl::db::driver & d)
       {
         ENTER_FUNCTION();
-        RETURN_FUNCTION((new csl::db::dummy::syntax::generator(d)));
+        RETURN_FUNCTION((new csl::db::mysql::syntax::generator(d)));
       }
 
       // connection related
@@ -203,7 +196,7 @@ namespace csl
       bool driver::begin(ustr & id)
       {
         ENTER_FUNCTION();
-        id="dummy-transaction";
+        id="mysql-transaction";
         RETURN_FUNCTION(false);
       }
 
@@ -225,7 +218,7 @@ namespace csl
       bool driver::savepoint(ustr & id, const ustr & parent_id)
       {
         ENTER_FUNCTION();
-        id="dummy-savepoint";
+        id="mysql-savepoint";
         CSL_DEBUGF(L"savepoint(%s,%s)",id.c_str(),parent_id.c_str());
         RETURN_FUNCTION(false);
       }
@@ -278,7 +271,7 @@ namespace csl
         ENTER_FUNCTION();
         LEAVE_FUNCTION();
       }
-    } // end of ns:csl::db::dummy
+    } // end of ns:csl::db::mysql
   } // end of ns:csl::db
 } // end of ns:csl
 

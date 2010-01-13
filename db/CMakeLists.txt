@@ -27,6 +27,7 @@ LINK_DIRECTORIES(
                   ../nthread
                   ../common
                   ../db/dummy
+                  ../db/mysql
                   ../db/slt3
                 )
 
@@ -35,9 +36,12 @@ INCLUDE_DIRECTORIES( ../.. )
 LINK_LIBRARIES(
                 csl_db_dummy
                 csl_db_slt3
+                csl_db_mysql
+                csl_common
               )
 
 SUBDIRS( slt3
+         mysql
          dummy )
 
 ADD_LIBRARY( csl_db STATIC
@@ -45,7 +49,7 @@ ADD_LIBRARY( csl_db STATIC
              driver.cc   driver.hh
              conn.hh
              tran.hh
-             query.cc    query.hh
+             query.hh
            )
 
 FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
