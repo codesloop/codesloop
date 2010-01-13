@@ -29,6 +29,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/db/tran.hh"
 
 #ifdef __cplusplus
+#include <memory>
 
 namespace csl
 {
@@ -39,6 +40,12 @@ namespace csl
       public:
         query(tran & t) : tran_(&t) { }
 
+        csl::db::syntax::insert_column & INSERT_INTO(const char * table)
+        {
+          generator_.reset(tran_->get_driver().generator(tran_->get_driver()));
+          return generator_->INSERT_INTO(table);
+        }
+
       private:
         /* no default construction */
         query() : tran_(0) { }
@@ -48,6 +55,8 @@ namespace csl
         query & operator=(const query & other) { return *this; }
 
         tran * tran_;
+
+        std::auto_ptr<csl::db::syntax::generator>  generator_;
     };
   }; // end of ns:csl::db
 }; // end of ns:csl

@@ -40,14 +40,71 @@ namespace csl
   {
     namespace dummy
     {
+      namespace syntax
+      {
+        // ==============================================================
+        // == interface =================================================
+        // ==============================================================
+        void insert_column::table_name(const char * table)
+        {
+          table_name_ = table;
+        }
+
+        // ==============================================================
+        // == insert query ==============================================
+        // ==============================================================
+        csl::db::syntax::insert_column & generator::INSERT_INTO(const char * table)
+        {
+          insert_column_.table_name(table);
+          return insert_column_;
+        }
+
+        csl::db::syntax::insert_column & insert_column::VAL(const char * column_name,
+                                                            const var & value)
+        {
+          return *this;
+        }
+
+        // ==============================================================
+        // = others =====================================================
+        // ==============================================================
+        void generator::DO()
+        {
+        }
+
+        void insert_column::DO() { generator_->DO(); }
+
+        // ==============================================================
+
+        /* internals */
+        insert_column::insert_column() : csl::db::syntax::insert_column() {}
+
+        insert_column::insert_column(csl::db::dummy::syntax::generator & g) :
+            csl::db::syntax::insert_column(),
+            generator_(&g) { }
+
+        generator::generator() :
+            csl::db::syntax::generator(*(new csl::db::dummy::driver())),
+            insert_column_(*this)
+        {
+          throw "should never be called";
+        }
+
+        generator::generator(csl::db::driver & d) :
+            csl::db::syntax::generator(d),
+            insert_column_(*this)
+        {
+        }
+      }
+
       /* static */ driver * driver::instance()
       {
         return new driver();
       }
 
-      csl::db::syntax::generator * driver::generator()
+      csl::db::syntax::generator * driver::generator(csl::db::driver & d)
       {
-        return new csl::db::dummy::syntax::generator();
+        return new csl::db::dummy::syntax::generator(d);
       }
 
       // connection related

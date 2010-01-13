@@ -91,8 +91,7 @@ namespace test_syntax {
 
     csl::db::query q(t);
 
-    // TODO: support this thingie:
-    // q.INSERT_INTO("hello_table").VAL("f1",first).VAL("f2",second).DO();
+    q.INSERT_INTO("hello_table").VAL("f1",first).VAL("f2",second).DO();
   }
 
 } // end of test_syntax

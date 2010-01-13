@@ -46,7 +46,7 @@ namespace csl
             commit_on_destruct_(true),
             rollback_on_destruct_(false)
         {
-          conn_->get_driver().begin(id_);
+          get_driver().begin(id_);
         }
 
         tran(tran & t) :
@@ -54,21 +54,21 @@ namespace csl
             commit_on_destruct_(true),
             rollback_on_destruct_(false)
         {
-          conn_->get_driver().savepoint(id_, t.id_);
+          get_driver().savepoint(id_, t.id_);
         }
 
         void commit()
         {
-          if( parent_ == 0 ) conn_->get_driver().commit(id_);
-          else               conn_->get_driver().release_savepoint(id_, parent_->id_);
+          if( parent_ == 0 ) get_driver().commit(id_);
+          else               get_driver().release_savepoint(id_, parent_->id_);
           commit_on_destruct_    = false;
           rollback_on_destruct_  = false;
         }
 
         void rollback()
         {
-          if( parent_ == 0 ) conn_->get_driver().rollback(id_);
-          else               conn_->get_driver().rollback_savepoint(id_, parent_->id_);
+          if( parent_ == 0 ) get_driver().rollback(id_);
+          else               get_driver().rollback_savepoint(id_, parent_->id_);
           commit_on_destruct_    = false;
           rollback_on_destruct_  = false;
         }
@@ -81,6 +81,8 @@ namespace csl
           if( commit_on_destruct_ )         commit();
           else if( rollback_on_destruct_ )  rollback();
         }
+
+        driver & get_driver() { return conn_->get_driver(); }
 
       private:
         /* no default construction */

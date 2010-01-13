@@ -28,6 +28,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "codesloop/db/driver.hh"
 #include "codesloop/common/obj.hh"
+#include "codesloop/common/ustr.hh"
+#include "codesloop/common/inpvec.hh"
 
 #ifdef __cplusplus
 
@@ -39,9 +41,27 @@ namespace csl
     {
       namespace syntax
       {
+        class generator;
+
         class insert_column : public csl::db::syntax::insert_column
         {
           public:
+            /* interface */
+            void table_name(const char * table);
+            csl::db::syntax::insert_column & VAL(const char * column_name,
+                                                const var & value);
+            void DO();
+
+            /* internals */
+            insert_column(csl::db::dummy::syntax::generator & g);
+            virtual ~insert_column() {}
+
+          private:
+            /* no default construction */
+            insert_column();
+
+            common::ustr table_name_;
+            csl::db::dummy::syntax::generator * generator_;
         };
 
         class update_column : public csl::db::syntax::update_column
@@ -57,6 +77,19 @@ namespace csl
         class generator : public csl::db::syntax::generator
         {
           public:
+            /* interface */
+            csl::db::syntax::insert_column & INSERT_INTO(const char * table);
+            void DO();
+
+            /* internals */
+            generator(csl::db::driver & d);
+            virtual ~generator() {}
+
+          private:
+            /* no default construction */
+            generator();
+
+            insert_column insert_column_;
         };
       }
 
@@ -65,7 +98,7 @@ namespace csl
         public:
           //
           static driver * instance();
-          csl::db::syntax::generator * generator();
+          csl::db::syntax::generator * generator(csl::db::driver & d);
 
           // connection related
           bool open(const ustr & connect_string);

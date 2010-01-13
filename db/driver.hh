@@ -40,11 +40,21 @@ namespace csl
 
   namespace db
   {
+    class driver;
+
     namespace syntax
     {
       class insert_column
       {
         public:
+          /* interface */
+          virtual void table_name(const char * table) = 0;
+          virtual insert_column & VAL(const char * column_name, const var & value) = 0;
+          virtual void DO() = 0;
+
+          /* internals */
+          insert_column() {}
+          virtual ~insert_column() {}
       };
 
       class update_column
@@ -60,6 +70,19 @@ namespace csl
       class generator
       {
         public:
+          /* interface */
+          virtual insert_column & INSERT_INTO(const char * table) = 0;
+          virtual void DO() = 0;
+
+          /* internals */
+          generator(driver & d) : driver_(&d) {}
+          virtual ~generator() {}
+          driver & get_driver() { return *driver_; }
+
+        private:
+          /* no default construction */
+          generator() {}
+          driver * driver_;
       };
     }
 
@@ -75,7 +98,7 @@ namespace csl
 
         static driver * instance(int driver_type);
 
-        virtual syntax::generator * generator() = 0;
+        virtual syntax::generator * generator(driver & d) = 0;
 
         enum {
           t_null    = CSL_TYPE_NULL,      ///<Null column
