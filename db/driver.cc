@@ -25,6 +25,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "codesloop/db/driver.hh"
 #include "codesloop/db/dummy/driver.hh"
+#include "codesloop/db/slt3/driver.hh"
 #include "codesloop/db/mysql/driver.hh"
 
 namespace csl
@@ -38,9 +39,11 @@ namespace csl
         case d_dummy:
           return csl::db::dummy::driver::instance();
 
+        case d_sqlite3:
+          return csl::db::slt3::driver::instance();
+
         case d_mysql:
           return csl::db::mysql::driver::instance();
-        // case d_sqlite3:
       };
       return 0;
     }

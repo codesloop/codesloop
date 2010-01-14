@@ -69,6 +69,25 @@ namespace csl
           return this->open(tmp);
         }
 
+        bool open(const driver::connect_desc & info)
+        {
+          return driver_->open(info);
+        }
+
+        template <typename HOST,  typename PORT,  typename DB_NAME,
+                  typename USER,  typename PASS>
+        bool open(const HOST & h, const PORT & p, const DB_NAME & d,
+                  const USER & u, const PASS & pa)
+        {
+          driver::connect_desc info;
+          info.host_     = h;
+          info.port_     = p;
+          info.db_name_  = d;
+          info.user_     = u;
+          info.password_ = pa;
+          return driver_->open(info);
+        }
+
         uint64_t last_insert_id() { return driver_->last_insert_id(); }
         uint64_t change_count()   { return driver_->change_count();   }
         void reset_change_count() { driver_->reset_change_count();    }

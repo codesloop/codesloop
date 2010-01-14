@@ -250,3 +250,4 @@ test/rpc/hello_cli
 */Testing
 */*/Testing
 test/db/t__syntax_cxx_sql
+install_manifest.txt

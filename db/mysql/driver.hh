@@ -126,6 +126,7 @@ namespace csl
           csl::db::syntax::generator * generator(csl::db::driver & d);
 
           // connection related
+          bool open(const csl::db::driver::connect_desc & info);
           bool open(const ustr & connect_string);
           bool close();
 

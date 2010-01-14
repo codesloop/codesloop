@@ -27,6 +27,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _csl_db_driver_hh_included_
 
 #include "codesloop/common/ustr.hh"
+#include "codesloop/common/int64.hh"
 #include "codesloop/common/obj.hh"
 #include "codesloop/common/inpvec.hh"
 #include "codesloop/common/common.h"
@@ -35,6 +36,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace csl
 {
   using common::ustr;
+  using common::int64;
   using common::inpvec;
   using common::var;
 
@@ -131,6 +133,16 @@ namespace csl
         };
 
         // connection related
+        struct connect_desc
+        {
+          ustr   host_;
+          int64  port_;
+          ustr   db_name_;
+          ustr   user_;
+          ustr   password_;
+        };
+
+        virtual bool open(const connect_desc & info) = 0;
         virtual bool open(const ustr & connect_string) = 0;
         virtual bool close() = 0;
 

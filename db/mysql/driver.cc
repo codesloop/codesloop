@@ -178,6 +178,18 @@ namespace csl
       }
 
       // connection related
+      bool driver::open(const csl::db::driver::connect_desc & info)
+      {
+        ENTER_FUNCTION();
+        CSL_DEBUGF(L"open(info[host:%s port:%lld db_name:%s user:%s password:%s])",
+                    info.host_.c_str(),
+                    info.port_.value(),
+                    info.db_name_.c_str(),
+                    info.user_.c_str(),
+                    info.password_.c_str() );
+        RETURN_FUNCTION(false);
+      }
+
       bool driver::open(const ustr & connect_string)
       {
         ENTER_FUNCTION();
