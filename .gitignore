@@ -251,3 +251,4 @@ test/rpc/hello_cli
 */*/Testing
 test/db/t__syntax_cxx_sql
 install_manifest.txt
+test/db/mysql/t__mysql_conn

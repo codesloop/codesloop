@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009,2010, CodeSloop Team
+# Copyright (c) 2008,2009,2010, CodeSLoop Team
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -21,24 +21,21 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# SET(CMAKE_VERBOSE_MAKEFILE ON)
-
-SUBDIRS(
-         slt3
-         mysql
-       )
-
 LINK_DIRECTORIES(
-                  ../../db
-                  ../../common
+                  ../../../db
+                  ../../../db/mysql
+                  ../../../nthread
+                  ../../../common
                 )
 
-INCLUDE_DIRECTORIES( ../../.. )
+INCLUDE_DIRECTORIES( ../../../.. )
 
 IF(WIN32)
 
   LINK_LIBRARIES(
+                  csl_db_mysql
                   csl_db
+                  csl_nthread
                   csl_common
                   wsock32
                 )
@@ -85,14 +82,18 @@ ELSE(WIN32)
                  )
 
   LINK_LIBRARIES(
-                  csl_db_dummy
+                  csl_db_mysql
                   csl_db
+                  csl_nthread
                   csl_common
+                  pthread
                   ${LIBDL}
                 )
+
 ENDIF(WIN32)
 
-ADD_EXECUTABLE( t__syntax          t__syntax.cc )
-ADD_EXECUTABLE( t__syntax_cxx_sql  t__syntax_cxx_sql.cc )
+ADD_EXECUTABLE( t__mysql_conn         t__mysql_conn.cc )
+
+ADD_TEST(db_mysql_conn ${EXECUTABLE_OUTPUT_PATH}/t__mysql_conn)
 
 # -- EOF --
