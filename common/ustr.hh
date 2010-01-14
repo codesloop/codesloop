@@ -46,7 +46,7 @@ namespace csl
 {
   namespace common
   {
-    //extern unsigned long long CRCTable[256];
+    //extern unsigned int64_t CRCTable[256];
 
     /**
     @brief UTF-8 ready C-String class
@@ -406,13 +406,13 @@ namespace csl
         inline bool to_integer(int64 & v) const { return v.from_string(data()); }
 
         /**
-        @brief convert to long long
+        @brief convert to int64_t
         @param v is where to put the data
         @return true if successful
 
         The function assumes that the internal string contains a max 64 bit integer in a string form.
          */
-        bool to_integer(long long & v) const;
+        bool to_integer(int64_t & v) const;
 
         /**
         @brief convert to common::dbl
@@ -529,14 +529,14 @@ namespace csl
         inline bool from_integer(const int64 & v) { return v.to_string(*this); }
 
         /**
-        @brief convert a long long
+        @brief convert a int64_t
         @param v is the value to be stored
         @return true if successful
 
         the result of this conversion is a formatted character string. conversion
         specification used is: "%lld"
          */
-        bool from_integer(long long v);
+        bool from_integer(int64_t v);
 
         /**
         @brief convert a common::dbl

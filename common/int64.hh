@@ -51,21 +51,21 @@ namespace csl
     this class is part of the common::var family and implements all neccesary abstract
     functions that are mainly related to conversions to and from other variable classes.
 
-    integers are represented by the internal long long type
+    integers are represented by the internal int64_t type
      */
     class int64 : public csl::common::var
     {
       private:
-        long long value_;
+        int64_t value_;
 
       public:
-        typedef long long value_t;
+        typedef int64_t value_t;
         enum { var_type_v =  CSL_TYPE_INT64 };
 
         inline int64() : var(), value_(0) { }             ///<default constructor
-        inline int64(long long v) : var(), value_(v) { }  ///<copy constructor
+        inline int64(int64_t v) : var(), value_(v) { }  ///<copy constructor
         virtual inline ~int64() {}                        ///<destructor
-        inline value_t value() const { return value_; } ///< returns the long long value
+        inline value_t value() const { return value_; } ///< returns the int64_t value
         inline int var_type() const { return var_type_v; }   ///<value type helps distinguish from other var types
         inline void reset() { value_ = 0LL; }             ///<resets the internal value to 0LL
 
@@ -94,13 +94,13 @@ namespace csl
         inline bool to_integer(int64 & v) const { return v.from_integer(value_); }
 
         /**
-        @brief convert to long long
+        @brief convert to int64_t
         @param v is where to put the data
         @return true if successful
 
         no conversion is needed
          */
-        inline bool to_integer(long long & v) const { v = value_; return true; }
+        inline bool to_integer(int64_t & v) const { v = value_; return true; }
 
         /**
         @brief convert to common::dbl
@@ -209,13 +209,13 @@ namespace csl
         inline bool from_integer(const int64 & v) { return v.to_integer(value_); }
 
         /**
-        @brief convert a long long
+        @brief convert a int64_t
         @param v is the value to be stored
         @return true if successful
 
         no conversion is needed
          */
-        inline bool from_integer(long long v) { value_ = v; return true; }
+        inline bool from_integer(int64_t v) { value_ = v; return true; }
 
         /**
         @brief convert a common::dbl
@@ -232,7 +232,7 @@ namespace csl
 
         conversion is done w/ cast and assignment
          */
-        inline bool from_double(double v) { value_ = static_cast<long long>(v); return true; }
+        inline bool from_double(double v) { value_ = static_cast<int64_t>(v); return true; }
 
         /**
         @brief convert a common::str

@@ -101,14 +101,14 @@ namespace csl
         inline bool to_integer(int64 & v) const { return v.from_binary(value_.data(),value_.size()); }
 
         /**
-        @brief convert to long long
+        @brief convert to int64_t
         @param v is where to put the data
         @return true if successful
 
-        This function treats the internal data as binary representation of long long. This representation
+        This function treats the internal data as binary representation of int64_t. This representation
         is then copied to v byte-by-byte. No real conversion is done.
          */
-        bool to_integer(long long & v) const;
+        bool to_integer(int64_t & v) const;
 
         /**
         @brief convert to common::dbl
@@ -222,14 +222,14 @@ namespace csl
         inline bool from_integer(const int64 & v) { return v.to_binary(*this); }
 
         /**
-        @brief convert a long long
+        @brief convert a int64_t
         @param v is the value to be stored
         @return true if successful
 
         the result of this conversion is a bit-by-bit representation of v in the memory buffer.
         there is no real conversion to happen.
          */
-        bool from_integer(long long v);
+        bool from_integer(int64_t v);
 
         /**
         @brief convert a common::dbl

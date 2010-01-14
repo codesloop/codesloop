@@ -94,13 +94,13 @@ namespace csl
         inline bool to_integer(int64 & v) const { return v.from_double(value_); }
 
         /**
-        @brief convert to long long
+        @brief convert to int64_t
         @param v is where to put the data
         @return true if successful
 
         convert using cast and assignment
          */
-        inline bool to_integer(long long & v) const { v = static_cast<long long>(value_); return true; }
+        inline bool to_integer(int64_t & v) const { v = static_cast<int64_t>(value_); return true; }
 
         /**
         @brief convert to common::dbl
@@ -203,13 +203,13 @@ namespace csl
         inline bool from_integer(const int64 & v) { return v.to_double( value_ ); }
 
         /**
-        @brief convert a long long
+        @brief convert a int64_t
         @param v is the value to be stored
         @return true if successful
 
         the conversion is done using internal cast and assignment
          */
-        inline bool from_integer(long long v) { value_ = static_cast<double>(v); return true; }
+        inline bool from_integer(int64_t v) { value_ = static_cast<double>(v); return true; }
 
         /**
         @brief convert a common::dbl

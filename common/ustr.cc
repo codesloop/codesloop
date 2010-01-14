@@ -214,7 +214,7 @@ namespace csl
     }
 
     /* conversions to other types */
-    bool ustr::to_integer(long long & v) const
+    bool ustr::to_integer(int64_t & v) const
     {
       v = ATOLL(data());
       return true;
@@ -262,7 +262,7 @@ namespace csl
     }
 
     /* conversions from other types */
-    bool ustr::from_integer(long long v)
+    bool ustr::from_integer(int64_t v)
     {
       char * p = reinterpret_cast<char *>(buf_.allocate(buf_size-1));
       int ret = SNPRINTF(p,(buf_size-1),"%lld",v);
@@ -343,9 +343,9 @@ namespace csl
     {
       int64 ret;
       int i, j;
-      unsigned long long crc = 0x0000000000000000ULL, part;
+      uint64_t crc = 0x0000000000000000ULL, part;
       static int init = 0;
-      static unsigned long long CRCTable[256];
+      static uint64_t CRCTable[256];
       const unsigned char * seq = ucharp_data();
 
       if (!init)

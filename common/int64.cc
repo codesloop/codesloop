@@ -157,7 +157,7 @@ namespace csl
         v >> high;
         v >> low;
 
-        value_ = ( (static_cast<long long>(high)<<32) + static_cast<long long>(low) );
+        value_ = ( (static_cast<int64_t>(high)<<32) + static_cast<int64_t>(low) );
 
         return true;
       }
