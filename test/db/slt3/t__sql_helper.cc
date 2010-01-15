@@ -94,7 +94,7 @@ namespace test_sql_helper {
       x.height_ = 3.14;
       assert( x.save(t) == true );
 
-      x2.id_ = 100000000;
+      x2.id_ = 100000000LL;
       assert( x2.find_by_id(t) == false );
       assert( x2.height_.get() != 3.14 );
       assert( x.find_by_id(t) == true );

@@ -367,6 +367,16 @@ namespace csl
           return *this;
         }
 
+        /** @brief copy constructor (initialize from binary buffer) */
+        template <typename X>
+        inline varT & operator=(const X & other)
+        {
+          T tmp(other);
+          bool success = value_.from_var(tmp);
+          if( success ) parent()->on_change();
+          return *this;
+        }
+
         /** @brief copy constructor (initialize from unsigned char vector) */
         inline varT & operator=(const std::vector<unsigned char> & vref)
         {
