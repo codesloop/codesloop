@@ -62,12 +62,17 @@ namespace csl
         typedef int64_t value_t;
         enum { var_type_v =  CSL_TYPE_INT64 };
 
-        inline int64() : var(), value_(0) { }             ///<default constructor
-        inline int64(int64_t v) : var(), value_(v) { }  ///<copy constructor
-        virtual inline ~int64() {}                        ///<destructor
-        inline value_t value() const { return value_; } ///< returns the int64_t value
+        explicit inline int64(uint64_t v) : var(), value_(v) { }
+        explicit inline int64(int64_t v) : var(), value_(v)  { }
+        explicit inline int64(double v) : var()              { from_double(v); }
+        inline int64(const char * v) : var()                 { from_string(v); }
+        inline int64(const wchar_t * v) : var()              { from_string(v); }
+
+        inline int64() : var(), value_(0) { }                ///<default constructor
+        virtual inline ~int64() {}                           ///<destructor
+        inline value_t value() const { return value_; }      ///< returns the int64_t value
         inline int var_type() const { return var_type_v; }   ///<value type helps distinguish from other var types
-        inline void reset() { value_ = 0LL; }             ///<resets the internal value to 0LL
+        inline void reset() { value_ = 0LL; }                ///<resets the internal value to 0LL
 
         /** @brief copy operator */
         inline int64 & operator=(const int64 & other)

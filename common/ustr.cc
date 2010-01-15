@@ -338,7 +338,6 @@ namespace csl
       }
     }
 
-
     int64 ustr::crc64() const
     {
       int64 ret;
@@ -370,7 +369,6 @@ namespace csl
 
       return int64(crc);
     }
-
   };
 };
 
