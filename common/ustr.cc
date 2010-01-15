@@ -367,7 +367,7 @@ namespace csl
       while (*seq)
           crc = CRCTable[(crc ^ *seq++) & 0xff] ^ (crc >> 8);
 
-      return int64(crc);
+      return int64(static_cast<int64_t>(crc));
     }
   };
 };

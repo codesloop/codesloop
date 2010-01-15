@@ -62,8 +62,8 @@ namespace csl
         typedef double value_t;
         enum { var_type_v =  CSL_TYPE_DOUBLE };
 
-        explicit inline dbl(double v) : var(), value_(v) { }
-        explicit inline dbl(int64_t v) : var()           { from_integer(v); }
+        inline dbl(double v) : var(), value_(v)          { }
+        inline dbl(int64_t v) : var()                    { from_integer(v); }
         inline dbl(const char * v) : var()               { from_string(v);  }
         inline dbl(const wchar_t * v) : var()            { from_string(v);  }
 

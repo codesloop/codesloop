@@ -62,8 +62,14 @@ namespace csl
         typedef int64_t value_t;
         enum { var_type_v =  CSL_TYPE_INT64 };
 
-        explicit inline int64(uint64_t v) : var(), value_(v) { }
+        explicit inline int64(int8_t v) : var(), value_(v)   { }
+        explicit inline int64(int16_t v) : var(), value_(v)  { }
+        explicit inline int64(int32_t v) : var(), value_(v)  { }
         explicit inline int64(int64_t v) : var(), value_(v)  { }
+        explicit inline int64(uint8_t v) : var(), value_(v)  { }
+        explicit inline int64(uint16_t v) : var(), value_(v) { }
+        explicit inline int64(uint32_t v) : var(), value_(v) { }
+        explicit inline int64(uint64_t v) : var(), value_(v) { }
         explicit inline int64(double v) : var()              { from_double(v); }
         inline int64(const char * v) : var()                 { from_string(v); }
         inline int64(const wchar_t * v) : var()              { from_string(v); }
