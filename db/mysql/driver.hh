@@ -32,6 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/common/inpvec.hh"
 
 #ifdef __cplusplus
+#include <memory>
 
 namespace csl
 {
@@ -152,7 +153,13 @@ namespace csl
           virtual ~driver();
           driver();
 
+          struct impl;
+
+        private:
+          std::auto_ptr<impl> impl_;
+
           CSL_OBJ(csl::db::mysql,driver);
+          USE_EXC();
       };
     } // end of ns:csl::db::mysql
   } // end of ns:csl::db

@@ -33,6 +33,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/common/logger.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/db/mysql/driver.hh"
+#include "codesloop/db/exc.hh"
+
+// mysql related thingies
+#include <mysql/mysql.h>
 
 namespace csl
 {
@@ -40,6 +44,71 @@ namespace csl
   {
     namespace mysql
     {
+      // ==============================================================
+      // driver guts (implementation)
+      // ==============================================================
+
+      struct driver::impl
+      {
+        MYSQL * conn_;
+
+        impl() : conn_(0)
+        {
+          ENTER_FUNCTION();
+          // init
+          conn_ = mysql_init(NULL);
+          if( !conn_ ) { THRNORET(db::exc::rs_mysql_init);          }
+          else         { CSL_DEBUGF(L"mysql connection: %p",conn_); }
+          //
+          LEAVE_FUNCTION();
+        }
+
+        bool connect( const csl::db::driver::connect_desc & info )
+        {
+          ENTER_FUNCTION();
+
+          bool ret = false;
+
+          CSL_DEBUGF(L"open(info[host:%s port:%lld db_name:%s user:%s password:%s])",
+                      info.host_.c_str(),
+                      info.port_.value(),
+                      info.db_name_.c_str(),
+                      info.user_.c_str(),
+                      info.password_.c_str() );
+
+          if( mysql_real_connect( conn_,
+                                  info.host_.c_str(),
+                                  info.user_.c_str(),
+                                  info.password_.c_str(),
+                                  info.db_name_.c_str(),
+                                  static_cast<unsigned int>(info.port_.value()),
+                                  NULL, /* unix socket */
+                                  0 /* client flags */ ) == NULL )
+          {
+            THR(db::exc::rs_mysql_real_connect,ret);
+          }
+          ret = true;
+
+          RETURN_FUNCTION(ret);
+        }
+
+        ~impl()
+        {
+          ENTER_FUNCTION();
+          if( conn_ )
+          {
+            CSL_DEBUGF(L"closing mysql connection:%p",conn_);
+            mysql_close(conn_);
+            conn_ = 0;
+          }
+          LEAVE_FUNCTION();
+        }
+
+        CSL_OBJ(csl::db::mysql,driver::impl);
+        USE_EXC();
+      };
+
+
       namespace syntax
       {
         // ==============================================================
@@ -129,6 +198,9 @@ namespace csl
         }
       } /* end of syntax ns */
 
+      // ==============================================================
+      // statement thingies
+
       statement::statement(csl::db::driver & d, const ustr & q) :
         csl::db::statement(d,q)
       {
@@ -157,6 +229,11 @@ namespace csl
         ENTER_FUNCTION();
         RETURN_FUNCTION(true);
       }
+
+      // ==============================================================
+      // driver thingies
+
+
 
       csl::db::statement * driver::prepare(const ustr & q)
       {
@@ -187,13 +264,16 @@ namespace csl
                     info.db_name_.c_str(),
                     info.user_.c_str(),
                     info.password_.c_str() );
-        RETURN_FUNCTION(false);
+        bool ret = impl_->connect( info );
+        CSL_DEBUGF(L"open(info[...]) => %s",(ret==true?"TRUE":"FALSE"));
+        RETURN_FUNCTION(ret);
       }
 
       bool driver::open(const ustr & connect_string)
       {
         ENTER_FUNCTION();
         CSL_DEBUGF(L"open(%s)",connect_string.c_str());
+        THR(db::exc::rs_not_implemented,false);
         RETURN_FUNCTION(false);
       }
 
@@ -271,7 +351,7 @@ namespace csl
         LEAVE_FUNCTION();
       }
 
-      driver::driver()
+      driver::driver() : impl_(new impl()), use_exc_(true)
       {
         ENTER_FUNCTION();
         LEAVE_FUNCTION();

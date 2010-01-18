@@ -30,6 +30,8 @@ INCLUDE_DIRECTORIES( ../../.. )
 
 LINK_LIBRARIES(
                 csl_common
+                csl_db
+                mysqlclient
               )
 
 IF(NOT WIN32)
