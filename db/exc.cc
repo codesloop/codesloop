@@ -74,6 +74,7 @@ namespace csl
         case rs_not_implemented:    return L"not implemented";
         case rs_mysql_init:         return L"mysql_init() failed";
         case rs_mysql_real_connect: return L"mysq_real_connect() failed";
+        case rs_mysql_outofmem:     return L"mysql client ran out of memory";
         case rs_unknown:
           default:               return L"Unknown reason";
       };

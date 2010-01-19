@@ -31,6 +31,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/common/ustr.hh"
 #include "codesloop/common/inpvec.hh"
 
+// mysql related thingies
+#include <mysql/mysql.h>
+
 #ifdef __cplusplus
 #include <memory>
 
@@ -58,12 +61,24 @@ namespace csl
             insert_column(csl::db::mysql::syntax::generator & g);
             virtual ~insert_column() {}
 
+            struct item
+            {
+              ustr         column_;
+              const var *  arg_;
+            };
+
+            typedef inpvec<item> items_t;
+
+            items_t & items() { return items_; }
+
           private:
             // no default construction
             insert_column();
 
             common::ustr table_name_;
             csl::db::mysql::syntax::generator * generator_;
+
+            items_t items_;
 
             CSL_OBJ(csl::db::mysql::syntax,insert_column);
         };
@@ -96,6 +111,7 @@ namespace csl
             generator();
 
             insert_column insert_column_;
+            std::auto_ptr<csl::db::statement> statement_;
 
             CSL_OBJ(csl::db::mysql::syntax,generator);
         };
@@ -109,14 +125,18 @@ namespace csl
           bool execute();
 
           // internals
-          statement(csl::db::driver & d, const ustr & q);
-          virtual ~statement() {}
+          statement(csl::db::driver & d, const ustr & q, MYSQL * c);
+          virtual ~statement();
 
         private:
           // no default construction
           statement();
 
+          MYSQL_STMT * stmt_;
+          MYSQL *      conn_;
+
           CSL_OBJ(csl::db::mysql,statement);
+          USE_EXC();
       };
 
       class driver : public csl::db::driver
@@ -153,10 +173,8 @@ namespace csl
           virtual ~driver();
           driver();
 
-          struct impl;
-
         private:
-          std::auto_ptr<impl> impl_;
+          MYSQL * conn_;
 
           CSL_OBJ(csl::db::mysql,driver);
           USE_EXC();

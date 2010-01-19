@@ -83,6 +83,7 @@ namespace csl
           rs_not_implemented,   ///<Not implemented
           rs_mysql_init,        ///<mysql_init() failed
           rs_mysql_real_connect,///<mysq_real_co
+          rs_mysql_outofmem,    ///<mysql client ran out of memory
         };
 
         /** @brief converts reason code to string */
