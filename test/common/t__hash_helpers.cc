@@ -28,12 +28,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify hash related macros
  */
 
-//#if 0
+#if 0
 #ifndef DEBUG
 #define DEBUG_ENABLE_INDENT
 #define DEBUG
 #endif /* DEBUG */
-//#endif
+#endif
 
 #include "codesloop/common/hash.hh"
 #include "codesloop/common/hash_helpers.hh"
