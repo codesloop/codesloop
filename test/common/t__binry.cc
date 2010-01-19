@@ -62,7 +62,7 @@ namespace test_binry {
   void to_integer_l()
   {
     binry v;
-    long long o;
+    int64::value_t o;
     assert( v.from_integer(-298890111LL) == true );
     assert( v.to_integer( o ) == true );
     assert( o == -298890111LL );
@@ -178,7 +178,7 @@ namespace test_binry {
     int64 o,o2;
     assert( o.from_double(3.14) == true );
     assert( v.from_integer(o) == true );
-    assert( v.value().size() == sizeof(long long) );
+    assert( v.value().size() == sizeof(int64::value_t) );
     assert( v.to_integer(o2) == true );
     assert( o2.value() == 3 );
   }

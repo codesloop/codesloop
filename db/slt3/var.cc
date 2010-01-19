@@ -57,7 +57,7 @@ namespace csl
           data * dx = *it;
 
           query::colhead ch;
-          common::int64 fd(id);
+          common::int64 fd( static_cast<common::int64::value_t>(id) );
 
           ch.type_  = query::colhead::t_integer;
           dx->var_->set_value(&ch,&fd);

@@ -579,12 +579,12 @@ namespace csl
             switch( (*i)->type_ )
             {
               case query::colhead::t_integer:
-                f = new common::int64(sqlite3_column_int64(stmt_,ac));
+                f = new common::int64( static_cast<common::int64::value_t>(sqlite3_column_int64(stmt_,ac)) );
                 CSL_DEBUGF(L"column%d [int64] = %lld",ac,f->get_long());
                 break;
 
               case query::colhead::t_double:
-                f = new common::dbl(sqlite3_column_double(stmt_,ac));
+                f = new common::dbl( static_cast<common::dbl::value_t>(sqlite3_column_double(stmt_,ac)) );
                 CSL_DEBUGF(L"column%d [double] = %lf",ac,f->get_double());
                 break;
 
