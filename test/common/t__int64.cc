@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, CodeSLoop Team
+Copyright (c) 2008,2009,2010, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -62,7 +62,7 @@ namespace test_int64 {
   void to_integer_l()
   {
     int64 v;
-    long long o = 0;
+    int64::value_t o = 0;
     assert( v.from_integer(12345678LL) == true );
     assert( v.to_integer(o) == true ); /**/
     assert( v.value() == 12345678LL );
@@ -119,7 +119,7 @@ namespace test_int64 {
   {
     int64 v;
     binry o;
-    long long l = 98765432LL;
+    int64::value_t l = 98765432LL;
     assert( v.from_integer(l) == true );
     assert( v.to_binary(o) == true ); /**/
     assert( ::memcmp( o.value().data(), &l, static_cast<size_t>(o.value().size()) ) == 0 );
@@ -128,27 +128,27 @@ namespace test_int64 {
   void to_binary_u()
   {
     int64 v;
-    long long o = 98765432LL;
-    unsigned char l[sizeof(long long)];
+    int64::value_t o = 98765432LL;
+    unsigned char l[sizeof(int64::value_t)];
     uint64_t sz=0;
 
     assert( v.from_string(L"98765432") == true );
     assert( v.to_binary(l,sz) == true ); /**/
-    assert( sz == sizeof(long long) );
+    assert( sz == sizeof(int64::value_t) );
     assert( ::memcmp( &o, l, static_cast<size_t>(sz) ) == 0 );
   }
 
   void to_binary_v()
   {
     int64 v;
-    long long o = 98765432LL;
-    unsigned char l[sizeof(long long)];
+    int64::value_t o = 98765432LL;
+    unsigned char l[sizeof(int64::value_t)];
     uint64_t sz=0;
     void * vp = l;
 
     assert( v.from_string("98765432") == true );
     assert( v.to_binary(vp,sz) == true ); /**/
-    assert( sz == sizeof(long long) );
+    assert( sz == sizeof(int64::value_t) );
     assert( ::memcmp( &o, vp, static_cast<size_t>(sz) ) == 0 );
   }
 
@@ -182,7 +182,7 @@ namespace test_int64 {
     assert( vs == L"989843431" );
     assert( vu == "989843431" );
 
-    long long ck;
+    int64::value_t ck;
     assert( vi.to_integer(ck) == true );
     assert( ::memcmp( vb.value().data(), &ck, static_cast<size_t>(vb.value().size()) ) == 0 );
   }
@@ -251,7 +251,7 @@ namespace test_int64 {
   {
     int64 v;
     binry o;
-    long long l = 44337788LL;
+    int64::value_t l = 44337788LL;
     assert( o.from_integer(l) == true );
     assert( v.from_binary(o) == true ); /**/
     assert( v.value() == l );
@@ -261,9 +261,9 @@ namespace test_int64 {
   {
     int64 v;
     binry o;
-    long long l = 44337788LL;
+    int64::value_t l = 44337788LL;
     assert( o.from_integer(l) == true );
-    unsigned char u[sizeof(long long)];
+    unsigned char u[sizeof(int64::value_t)];
     uint64_t sz = 0;
     assert( o.to_binary(u,sz) == true );
     assert( v.from_binary(u,sz) == true ); /**/
@@ -274,9 +274,9 @@ namespace test_int64 {
   {
     int64 v;
     binry o;
-    long long l = 44337788LL;
+    int64::value_t l = 44337788LL;
     assert( o.from_integer(l) == true );
-    unsigned char u[sizeof(long long)];
+    unsigned char u[sizeof(int64::value_t)];
     uint64_t sz = 0;
     void * vp = u;
     assert( o.to_binary(vp,sz) == true );
@@ -310,7 +310,7 @@ namespace test_int64 {
 
   void conv_int()
   {
-    long long iorig=12345678, idest=0;
+    int64::value_t iorig=12345678, idest=0;
     int64 v;
     assert( v.from_integer( iorig ) == true );
     assert( v.to_integer( idest ) == true );
@@ -327,7 +327,7 @@ namespace test_int64 {
 
   void conv_double()
   {
-    double dorig=12345.6789, ddest=0;
+    dbl::value_t dorig=12345.6789, ddest=0;
     int64 v;
     assert( v.from_double( dorig ) == true );
     assert( v.to_double( ddest ) == true );

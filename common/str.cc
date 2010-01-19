@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, CodeSLoop Team
+Copyright (c) 2008,2009,2010, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -42,12 +42,12 @@ namespace csl
   {
     namespace
     {
-      static unsigned long long CRCTable[256];
+      static uint64_t CRCTable[256];
 
       static int initalize_CRCTable()
       {
         int i, j;
-        unsigned long long part;
+        uint64_t part;
 
         for (i = 0; i < 256; i++)
         {
@@ -302,7 +302,7 @@ namespace csl
     }
 
     /* conversions to other types */
-    bool str::to_integer(long long & v) const
+    bool str::to_integer(int64_t & v) const
     {
       wchar_t * endp = 0;
       v = WCSTOLL( data(), &endp, 0 );
@@ -364,7 +364,7 @@ namespace csl
     }
 
     /* conversions from other types */
-    bool str::from_integer(long long v)
+    bool str::from_integer(int64_t v)
     {
       wchar_t * p = reinterpret_cast<wchar_t *>(buf_.allocate(buf_size-1));
       int ret = SWPRINTF(p,(buf_size-1),L"%lld",v);
@@ -443,13 +443,13 @@ namespace csl
     int64 str::crc64() const
     {
       int64 ret;
-      unsigned long long crc = 0x0000000000000000ULL;
+      uint64_t crc = 0x0000000000000000ULL;
       const unsigned char * seq = ucharp_data();
 
       while (*seq)
           crc = CRCTable[(crc ^ *seq++) & 0xff] ^ (crc >> 8);
 
-      return int64(crc);
+      return int64(static_cast<int64_t>(crc));
     }
 
   };

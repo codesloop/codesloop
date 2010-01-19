@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, CodeSLoop Team
+Copyright (c) 2008,2009,2010, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -24,11 +24,30 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "codesloop/db/driver.hh"
+#include "codesloop/db/dummy/driver.hh"
+#include "codesloop/db/slt3/driver.hh"
+#include "codesloop/db/mysql/driver.hh"
 
 namespace csl
 {
   namespace db
   {
+    driver * driver::instance(int driver_type)
+    {
+      switch( driver_type )
+      {
+        case d_dummy:
+          return csl::db::dummy::driver::instance();
+
+        case d_sqlite3:
+          return csl::db::slt3::driver::instance();
+
+        case d_mysql:
+          return csl::db::mysql::driver::instance();
+      };
+      return 0;
+    }
+
   }; // end of ns:csl::db
 }; // end of ns:csl
 

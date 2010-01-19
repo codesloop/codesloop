@@ -1,5 +1,5 @@
 /*
-   Copyright (c) 2008,2009, CodeSLoop Team
+   Copyright (c) 2008,2009,2010, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -239,7 +239,7 @@ namespace test_ustr {
   void to_integer_l()
   {
     ustr b("-111000999");
-    long long o;
+    int64::value_t o;
     assert( b.to_integer(o) == true );
     assert( o == -111000999LL );
   }
@@ -368,7 +368,7 @@ namespace test_ustr {
   void from_double_d()
   {
     ustr b;
-    double o = 12984.788;
+    dbl::value_t o = 12984.788;
     assert( b.from_double(o) == true );
     assert( b == "12984.788000000000" );
   }

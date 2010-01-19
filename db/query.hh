@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, CodeSLoop Team
+Copyright (c) 2008,2009,2010, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -26,7 +26,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_db_query_hh_included_
 #define _csl_db_query_hh_included_
 
+#include "codesloop/db/tran.hh"
+
 #ifdef __cplusplus
+#include <memory>
 
 namespace csl
 {
@@ -35,6 +38,25 @@ namespace csl
     class query
     {
       public:
+        query(tran & t) : tran_(&t) { }
+
+        csl::db::syntax::insert_column & INSERT_INTO(const char * table)
+        {
+          generator_.reset(tran_->get_driver().generator(tran_->get_driver()));
+          return generator_->INSERT_INTO(table);
+        }
+
+      private:
+        /* no default construction */
+        query() : tran_(0) { }
+
+        /* no copy */
+        query(const query & other) : tran_(0) { }
+        query & operator=(const query & other) { return *this; }
+
+        tran * tran_;
+
+        std::auto_ptr<csl::db::syntax::generator>  generator_;
     };
   }; // end of ns:csl::db
 }; // end of ns:csl

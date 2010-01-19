@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, CodeSLoop Team
+Copyright (c) 2008,2009,2010, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -381,6 +381,7 @@ namespace csl
 
         bool free_at(uint64_t pos);
         bool is_free_at(uint64_t pos);
+        void reset();
         T & get(uint64_t at);
         T * get_ptr(uint64_t at);
         uint64_t iterator_pos(const iterator & it);

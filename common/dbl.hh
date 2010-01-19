@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, CodeSLoop Team
+Copyright (c) 2008,2009,2010, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -59,15 +59,19 @@ namespace csl
         double value_;
 
       public:
-       typedef double value_t;
-       enum { var_type_v =  CSL_TYPE_DOUBLE };
+        typedef double value_t;
+        enum { var_type_v =  CSL_TYPE_DOUBLE };
 
-       inline dbl() : var(), value_(0.0) { }             ///<default constructor
-       inline dbl(double v) : var(), value_(v) { }       ///<copy constructor
-       virtual inline ~dbl() {}                          ///<destructor
-       inline value_t value() const { return value_; }    ///<returns the double value
-       inline int var_type() const { return var_type_v; } ///<value type helps distinguish from other var types
-       inline void reset() { value_ = 0.0; }             ///<resets the internal value to 0.0
+        inline dbl(double v) : var(), value_(v)          { }
+        inline dbl(int64_t v) : var()                    { from_integer(v); }
+        inline dbl(const char * v) : var()               { from_string(v);  }
+        inline dbl(const wchar_t * v) : var()            { from_string(v);  }
+
+        inline dbl() : var(), value_(0.0) { }             ///<default constructor
+        virtual inline ~dbl() {}                          ///<destructor
+        inline value_t value() const { return value_; }    ///<returns the double value
+        inline int var_type() const { return var_type_v; } ///<value type helps distinguish from other var types
+        inline void reset() { value_ = 0.0; }             ///<resets the internal value to 0.0
 
         /** @brief copy operator */
         inline dbl & operator=(const dbl & other)
@@ -94,13 +98,13 @@ namespace csl
         inline bool to_integer(int64 & v) const { return v.from_double(value_); }
 
         /**
-        @brief convert to long long
+        @brief convert to int64_t
         @param v is where to put the data
         @return true if successful
 
         convert using cast and assignment
          */
-        inline bool to_integer(long long & v) const { v = static_cast<long long>(value_); return true; }
+        inline bool to_integer(int64_t & v) const { v = static_cast<int64_t>(value_); return true; }
 
         /**
         @brief convert to common::dbl
@@ -203,13 +207,13 @@ namespace csl
         inline bool from_integer(const int64 & v) { return v.to_double( value_ ); }
 
         /**
-        @brief convert a long long
+        @brief convert a int64_t
         @param v is the value to be stored
         @return true if successful
 
         the conversion is done using internal cast and assignment
          */
-        inline bool from_integer(long long v) { value_ = static_cast<double>(v); return true; }
+        inline bool from_integer(int64_t v) { value_ = static_cast<double>(v); return true; }
 
         /**
         @brief convert a common::dbl

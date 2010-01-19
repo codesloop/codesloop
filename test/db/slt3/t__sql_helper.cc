@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, CodeSLoop Team
+Copyright (c) 2008,2009,2010, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -36,10 +36,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/db/slt3/tran.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/mpool.hh"
+#include "codesloop/common/mpool.hh"
+#include "codesloop/common/int64.hh"
 #include <assert.h>
 #include <stdlib.h>
 
 using namespace csl::db;
+using namespace csl::common;
 
 /** @brief contains tests related to slt3::sql::helper */
 namespace test_sql_helper {
@@ -94,7 +97,7 @@ namespace test_sql_helper {
       x.height_ = 3.14;
       assert( x.save(t) == true );
 
-      x2.id_ = 100000000;
+      x2.id_ = static_cast<int64::value_t>(100000000LL);
       assert( x2.find_by_id(t) == false );
       assert( x2.height_.get() != 3.14 );
       assert( x.find_by_id(t) == true );

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, CodeSLoop Team
+Copyright (c) 2008,2009,2010, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -79,8 +79,8 @@ namespace csl
         /** @brief abstract function: convert to common::int64 */
         virtual bool to_integer(int64 & v) const = 0;
 
-        /** @brief abstract function: convert to long long */
-        virtual bool to_integer(long long & v) const = 0;
+        /** @brief abstract function: convert to int64_t */
+        virtual bool to_integer(int64_t & v) const = 0;
 
         /** @brief abstract function: convert to common::dbl */
         virtual bool to_double(dbl & v) const = 0;
@@ -117,8 +117,8 @@ namespace csl
         /** @brief abstract function: convert from common::int64 */
         virtual bool from_integer(const int64 & v) = 0;
 
-        /** @brief abstract function: convert from long long */
-        virtual bool from_integer(long long v) = 0;
+        /** @brief abstract function: convert from int64_t */
+        virtual bool from_integer(int64_t v) = 0;
 
         /** @brief abstract function: convert from common::dbl */
         virtual bool from_double(const dbl & v) = 0;
@@ -163,9 +163,9 @@ namespace csl
         virtual const unsigned char * ucharp_data() const = 0;
 
         /** @brief convert variable to signed 64 bit integer using built in conversion */
-        virtual inline operator long long () const
+        virtual inline operator int64_t () const
         {
-         long long ret = 0;
+         int64_t ret = 0;
          this->to_integer(ret);
          return ret;
         }
@@ -179,7 +179,7 @@ namespace csl
         }
 
         /** @brief convert variable from signed 64 bit integer using polymorphic conversion */
-        virtual inline void operator=(long long v)
+        virtual inline void operator=(int64_t v)
         {
          this->from_integer(v);
         }
@@ -199,8 +199,8 @@ namespace csl
         /** @brief initialize from wchar_t string */
         virtual inline bool set(const wchar_t * v) { return (this->from_string(v)); }
 
-        /** @brief initialize from long long value */
-        virtual inline bool set(long long v) { return (this->from_integer(v)); }
+        /** @brief initialize from int64_t value */
+        virtual inline bool set(int64_t v) { return (this->from_integer(v)); }
 
         /** @brief initialize from double value */
         virtual inline bool set(double v) { return (this->from_double(v)); }
@@ -211,11 +211,11 @@ namespace csl
         /** @brief returns the value as double */
         virtual inline double get_double() const { return static_cast<double>(*this); }
 
-        /** @brief returns the value as long long */
-        virtual inline long long get_long() const { return static_cast<long long>(*this); }
+        /** @brief returns the value as int64_t */
+        virtual inline int64_t get_long() const { return static_cast<int64_t>(*this); }
 
-        /** @brief converts and copies the internal value to long long */
-        virtual inline bool get(long long & v) { return (this->to_integer(v)); }
+        /** @brief converts and copies the internal value to int64_t */
+        virtual inline bool get(int64_t & v) { return (this->to_integer(v)); }
 
         /** @brief converts and copies the internal value to double */
         virtual inline bool get(double & v) { return (this->to_double(v)); }

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, CodeSLoop Team
+Copyright (c) 2008,2009,2010, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -29,48 +29,82 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "codesloop/db/exc.hh"
+#include "codesloop/db/conn.hh"
+#include "codesloop/db/tran.hh"
+#include "codesloop/db/query.hh"
+#include "codesloop/db/driver.hh"
 #include "codesloop/common/test_timer.h"
 #include "codesloop/common/ustr.hh"
+#include "codesloop/common/int64.hh"
 #include "codesloop/common/common.h"
 #include <assert.h>
 
 using namespace csl::common;
+using namespace csl::db;
 
 namespace test_syntax {
 
-  struct X
+  void conn_syntax_dummy()
   {
-    X() {}
+    csl::db::conn c( driver::d_dummy );
 
-    struct update_columns
+    /* conn features */
+    bool open_ret = c.open("test.db");
+    uint64_t liid = c.last_insert_id();
+    uint64_t chcn = c.change_count();
+    /*void*/ c.reset_change_count();
+    bool close_ret = c.close();
+  }
+
+  void tran_syntax_dummy()
+  {
+    conn c( driver::d_dummy );
+    bool open_ret = c.open("test.db");
+
+    /* tran features */
     {
-      update_columns(X * x) : x_(x) {}
-      X * x_;
-
-      update_columns & set(const char * column, csl::common::ustr & v)
-      {
-        x_->result_ += v;
-        return *this;
-      }
-    };
-
-    update_columns update(const char * table)
-    {
-      result_ += "uppdate ";
-      result_ += table;
-      return update_columns(this);
+      csl::db::tran t(c);
+      t.commit_on_destruct();
+      t.commit_on_destruct(false);
+      t.rollback_on_destruct();
+      t.rollback_on_destruct(true);
+      t.commit();
+      t.rollback();
     }
 
-    ustr result_;
-  };
+    /* subtransactions */
+    {
+      csl::db::tran t0(c);
+      csl::db::tran t1(t0);
+    }
+  }
 
-  void test1()
+  void query_syntax_dummy()
   {
-    X x;
-    ustr els("oo");
-    x.update("hello").set("elso",els);
+    conn c( driver::d_dummy );
+    bool open_ret = c.open("test.db");
 
-    fprintf(stderr,"%s",x.result_.c_str());
+    tran t(c);
+
+    ustr first("1st");
+    ustr second("2nd");
+
+    {
+      /* first INSERT usage scenario */
+      csl::db::query q(t);
+      q.INSERT_INTO("hello_table").VAL("f1",first).VAL("f2",second).GO();
+    }
+
+    {
+      /* second INSERT usage scenario */
+      csl::db::query q(t);
+      syntax::insert_column & ic(q.INSERT_INTO("hello_table").VAL("f1",first).VAL("f2",second));
+      ic.GO();
+
+      first  = "1st-2";
+      second = "2nd-2";
+      ic.GO();
+    }
   }
 
 } // end of test_syntax
@@ -79,10 +113,10 @@ using namespace test_syntax;
 
 int main()
 {
-  test1();
-  //csl_common_print_results( "baseline      ", csl_common_test_timer_v0(baseline),"" );
+  conn_syntax_dummy();
+  tran_syntax_dummy();
+  query_syntax_dummy();
   return 0;
 }
 
 // EOF
-

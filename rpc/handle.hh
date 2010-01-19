@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, CodeSLoop Team
+Copyright (c) 2008,2009,2010, CodeSLoop Team
  
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -36,7 +36,7 @@ namespace csl
 
 #define CSL_RPC_HANDLE_NULL  csl::rpc::handle(NULL)
     /** @brief call identifier */
-    typedef unsigned long long int handle;
+    typedef uint64_t handle;
 
     extern handle __handle_sequence;
   }

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, CodeSLoop Team
+Copyright (c) 2008,2009,2010, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -48,11 +48,11 @@ namespace csl
     }
 
     /* conversions to other types */
-    bool binry::to_integer(long long & v) const
+    bool binry::to_integer(int64_t & v) const
     {
-      if( value_.size() < sizeof(long long) ) { return false; }
+      if( value_.size() < sizeof(int64_t) ) { return false; }
 
-      const long long * p = reinterpret_cast<const long long *>(value_.data());
+      const int64_t * p = reinterpret_cast<const int64_t *>(value_.data());
       v = *p;
 
       return true;
@@ -124,9 +124,9 @@ namespace csl
     }
 
     /* conversions from other types */
-    bool binry::from_integer(long long v)
+    bool binry::from_integer(int64_t v)
     {
-      long long * p = reinterpret_cast<long long *>(value_.allocate(sizeof(long long)));
+      int64_t * p = reinterpret_cast<int64_t *>(value_.allocate(sizeof(int64_t)));
       *p = v;
       return true;
     }

@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009, CodeSLoop Team
+# Copyright (c) 2008,2009,2010, CodeSLoop Team
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -62,5 +62,13 @@ ELSE(WIN32)
 ENDIF(WIN32)
 
 ADD_LIBRARY( csl_common_libev STATIC evwrap.c evwrap.h config.h )
+
+FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
+INSTALL( FILES ${includes} DESTINATION include/codesloop/common/libev ) 
+INSTALL(TARGETS csl_common_libev
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
 
 # -- EOF --

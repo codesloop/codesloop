@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, CodeSLoop Team
+Copyright (c) 2008,2009,2010, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -157,7 +157,7 @@ namespace csl
         v >> high;
         v >> low;
 
-        value_ = ( (static_cast<long long>(high)<<32) + static_cast<long long>(low) );
+        value_ = ( (static_cast<int64_t>(high)<<32) + static_cast<int64_t>(low) );
 
         return true;
       }

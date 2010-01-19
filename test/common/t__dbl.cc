@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, CodeSLoop Team
+Copyright (c) 2008,2009,2010, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -51,7 +51,7 @@ namespace test_dbl {
 
   void conv_int()
   {
-    long long iorig=12345678, idest=0;
+    int64_t iorig=12345678, idest=0;
     dbl v;
     assert( v.from_integer( iorig ) == true );
     assert( v.to_integer( idest ) == true );
@@ -68,7 +68,7 @@ namespace test_dbl {
 
   void conv_double()
   {
-    double dorig=12345.6789, ddest=0;
+    dbl::value_t dorig=12345.6789, ddest=0;
     dbl v;
     assert( v.from_double( dorig ) == true );
     assert( v.to_double( ddest ) == true );
@@ -89,17 +89,17 @@ namespace test_dbl {
     int64 o;
     assert( v.from_string(L"998877.22221111") == true );
     assert( v.to_integer(o) == true ); /**/
-    assert( static_cast<long long>(v.value()) == o.value() );
+    assert( static_cast<int64::value_t>(v.value()) == o.value() );
     assert( o.value() == 998877LL );
   }
 
   void to_integer_l()
   {
     dbl v;
-    long long o;
+    int64::value_t o;
     assert( v.from_string("-998877.22221111") == true );
     assert( v.to_integer(o) == true ); /**/
-    assert( static_cast<long long>(v.value()) == o );
+    assert( static_cast<int64::value_t>(v.value()) == o );
     assert( o == -998877LL );
   }
 
@@ -115,7 +115,7 @@ namespace test_dbl {
   void to_double_d()
   {
     dbl v;
-    double o;
+    dbl::value_t o;
     assert( v.from_integer( 199988812LL ) == true );
     assert( v.to_double(o) == true );
     assert( o == 199988812.0 );
@@ -167,11 +167,11 @@ namespace test_dbl {
     dbl v;
     int64 i;
     assert( i.from_integer(99991111LL) == true );
-    unsigned char o[sizeof(double)];
+    unsigned char o[sizeof(dbl::value_t)];
     uint64_t sz = 0;
     assert( v.from_integer( i ) == true );
     assert( v.to_binary( o,sz ) == true );
-    assert( sz == sizeof(double) );
+    assert( sz == sizeof(dbl::value_t) );
     dbl v2;
     assert( v2.from_binary( o,sz ) == true );
     assert( v2.value() == 99991111.0 );
@@ -182,12 +182,12 @@ namespace test_dbl {
     dbl v;
     dbl i;
     assert( i.from_integer(-99991111LL) == true );
-    unsigned char o[sizeof(double)];
+    unsigned char o[sizeof(dbl::value_t)];
     void * vp = o;
     uint64_t sz = 0;
     assert( v.from_double(i) == true );
     assert( v.to_binary( vp,sz ) == true );
-    assert( sz == sizeof(double) );
+    assert( sz == sizeof(dbl::value_t) );
     dbl v2;
     assert( v2.from_binary( vp,sz ) == true );
     assert( v2.value() == -99991111.0 );

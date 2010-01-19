@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, CodeSLoop Team
+Copyright (c) 2008,2009,2010, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -108,7 +108,7 @@ namespace test_query {
 
     pa1.set(1.0);
     pa2.set("10000.001");
-    pa3.set(100ll);
+    pa3.set(static_cast<int64::value_t>(100LL));
 
     dbl & pb1(q.dbl_param(1));
     ustr & pb2(q.ustr_param(2));
@@ -122,7 +122,7 @@ namespace test_query {
     assert( pb1.get(rhs) == true );
     assert( lhs == rhs );
 
-    assert( pb1.get_long() == 1ll );
+    assert( pb1.get_long() == 1LL );
     assert( pb1.get_double() == 1.0 );
 
     assert( pb1.get(lhs) == true );
@@ -135,7 +135,7 @@ namespace test_query {
     assert( pb2.get(rhs) == true );
 
     assert( lhs == rhs );
-    assert( pb2.get_long() == 10000ll );
+    assert( pb2.get_long() == 10000LL );
     assert( pb2.get_double() == 10000.001 );
 
     assert( pb2.get(lhs) == true );
@@ -148,7 +148,7 @@ namespace test_query {
     assert( pb3.get(rhs) == true );
 
     assert( lhs == rhs );
-    assert( pb3.get_long() == 100ll );
+    assert( pb3.get_long() == 100LL );
     assert( pb3.get_double() == 100.0 );
 
 

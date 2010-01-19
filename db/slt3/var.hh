@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, CodeSLoop Team
+Copyright (c) 2008,2009,2010, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -363,6 +363,16 @@ namespace csl
         inline varT & operator=(const common::binry::buf_t & other)
         {
           bool success = value_.from_binary(other.data(),other.size());
+          if( success ) parent()->on_change();
+          return *this;
+        }
+
+        /** @brief copy constructor (initialize from binary buffer) */
+        template <typename X>
+        inline varT & operator=(const X & other)
+        {
+          T tmp(other);
+          bool success = value_.from_var(tmp);
           if( success ) parent()->on_change();
           return *this;
         }

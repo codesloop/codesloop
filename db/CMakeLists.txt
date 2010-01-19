@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009, CodeSloop Team
+# Copyright (c) 2008,2009,2010, CodeSloop Team
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -23,19 +23,33 @@
 
 # SET(CMAKE_VERBOSE_MAKEFILE ON)
 
-LINK_DIRECTORIES( ../nthread
-                  ../common )
+LINK_DIRECTORIES(
+                  ../nthread
+                  ../common
+                  ../db/dummy
+                  ../db/mysql
+                  ../db/slt3
+                )
 
 INCLUDE_DIRECTORIES( ../.. )
 
-SUBDIRS( slt3 )
+LINK_LIBRARIES(
+                csl_db_dummy
+                csl_db_slt3
+                csl_db_mysql
+                csl_common
+              )
+
+SUBDIRS( slt3
+         mysql
+         dummy )
 
 ADD_LIBRARY( csl_db STATIC
              exc.cc      exc.hh
              driver.cc   driver.hh
-             conn.cc     conn.hh
-             tran.cc     tran.hh
-             query.cc    query.hh
+             conn.hh
+             tran.hh
+             query.hh
            )
 
 FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")

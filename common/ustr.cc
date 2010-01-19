@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, CodeSLoop Team
+Copyright (c) 2008,2009,2010, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -214,7 +214,7 @@ namespace csl
     }
 
     /* conversions to other types */
-    bool ustr::to_integer(long long & v) const
+    bool ustr::to_integer(int64_t & v) const
     {
       v = ATOLL(data());
       return true;
@@ -262,7 +262,7 @@ namespace csl
     }
 
     /* conversions from other types */
-    bool ustr::from_integer(long long v)
+    bool ustr::from_integer(int64_t v)
     {
       char * p = reinterpret_cast<char *>(buf_.allocate(buf_size-1));
       int ret = SNPRINTF(p,(buf_size-1),"%lld",v);
@@ -338,14 +338,13 @@ namespace csl
       }
     }
 
-
     int64 ustr::crc64() const
     {
       int64 ret;
       int i, j;
-      unsigned long long crc = 0x0000000000000000ULL, part;
+      uint64_t crc = 0x0000000000000000ULL, part;
       static int init = 0;
-      static unsigned long long CRCTable[256];
+      static uint64_t CRCTable[256];
       const unsigned char * seq = ucharp_data();
 
       if (!init)
@@ -368,9 +367,8 @@ namespace csl
       while (*seq)
           crc = CRCTable[(crc ^ *seq++) & 0xff] ^ (crc >> 8);
 
-      return int64(crc);
+      return int64(static_cast<int64_t>(crc));
     }
-
   };
 };
 

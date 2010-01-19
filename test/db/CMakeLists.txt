@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009, CodeSloop Team
+# Copyright (c) 2008,2009,2010, CodeSloop Team
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -25,11 +25,11 @@
 
 SUBDIRS(
          slt3
+         mysql
        )
 
 LINK_DIRECTORIES(
                   ../../db
-                  ../../db/slt3
                   ../../common
                 )
 
@@ -85,12 +85,14 @@ ELSE(WIN32)
                  )
 
   LINK_LIBRARIES(
+                  csl_db_dummy
                   csl_db
                   csl_common
                   ${LIBDL}
                 )
 ENDIF(WIN32)
 
-ADD_EXECUTABLE( t__syntax       t__syntax.cc )
+ADD_EXECUTABLE( t__syntax          t__syntax.cc )
+ADD_EXECUTABLE( t__syntax_cxx_sql  t__syntax_cxx_sql.cc )
 
 # -- EOF --

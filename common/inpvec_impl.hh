@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, CodeSLoop Team
+Copyright (c) 2008,2009,2010, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -416,7 +416,7 @@ namespace csl
     template <typename T> void inpvec<T>::allocate(mul_t mul)
     {
       ENTER_FUNCTION();
-      CSL_DEBUGF(L"allocate(%lld)",mul);
+      CSL_DEBUGF(L"allocate(%lld)",static_cast<uint64_t>(mul));
       item * n = new item( );
       n->mul_alloc( mul );
       n->parent_ = this;
@@ -1020,6 +1020,35 @@ namespace csl
       RETURN_FUNCTION_X( ret );
     }
 
+    template <typename T> void inpvec<T>::reset()
+    {
+      ENTER_FUNCTION_X( );
+      CSL_DEBUGF_X(L"reset()");
+      item * p = head_.next_;
+      item * x = p;
+
+      while( p )
+      {
+        x = p;
+        p = p->next_;
+        delete x;
+      }
+
+      head_.destroy();
+      //
+      pre_bmap_          = 0;
+      head_.buffer_      = 0;
+      head_.free_        = 0;
+      head_.mul_         = 1;
+      head_.bmap_        = &pre_bmap_;
+      head_.items_       = reinterpret_cast<T *>(pre_items_);
+      head_.next_        = 0;
+      head_.parent_      = this;
+      tail_              = &head_;
+      n_items_           = 0;
+      //
+      LEAVE_FUNCTION_X( );
+    }
 
     template <typename T> uint64_t inpvec<T>::iterator_pos(const iterator & it)
     {

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008,2009, CodeSLoop Team
+Copyright (c) 2008,2009,2010, CodeSLoop Team
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -57,7 +57,7 @@ namespace csl
           data * dx = *it;
 
           query::colhead ch;
-          common::int64 fd(id);
+          common::int64 fd( static_cast<common::int64::value_t>(id) );
 
           ch.type_  = query::colhead::t_integer;
           dx->var_->set_value(&ch,&fd);
