@@ -26,12 +26,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _csl_db_conn_hh_included_
 #define _csl_db_conn_hh_included_
 
+#include "codesloop/db/driver.hh"
+#include "codesloop/common/obj.hh"
 #include "codesloop/common/ustr.hh"
 #include "codesloop/common/str.hh"
-#include "codesloop/common/common.h"
 #include "codesloop/common/logger.hh"
-#include "codesloop/common/obj.hh"
-#include "codesloop/db/driver.hh"
+#include "codesloop/common/common.h"
 #ifdef __cplusplus
 #include <memory>
 
@@ -132,7 +132,7 @@ namespace csl
         uint64_t last_insert_id()
         {
           ENTER_FUNCTION();
-          uint64_t ret = driver_->last_insert_id()
+          uint64_t ret = driver_->last_insert_id();
           CSL_DEBUGF(L"last_insert_id() => %lld",ret);
           RETURN_FUNCTION(ret);
         }
@@ -140,7 +140,7 @@ namespace csl
         uint64_t change_count()
         {
           ENTER_FUNCTION();
-          uint64_t ret = driver_->change_count()
+          uint64_t ret = driver_->change_count();
           CSL_DEBUGF(L"change_count() => %lld",ret);
           RETURN_FUNCTION(ret);
         }
