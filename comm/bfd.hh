@@ -124,7 +124,7 @@ namespace csl
 
         int file_descriptor() const { return fd_; }
 
-        const unsigned char * data() const { buf_.data(); }
+        const unsigned char * data() const { return buf_.data(); }
 
       private:
         typedef rdbuf<512,max_size_> buf_t;
