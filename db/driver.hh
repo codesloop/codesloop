@@ -52,7 +52,8 @@ namespace csl
           // interface
           virtual void table_name(const char * table) = 0;
           virtual const char * table_name() = 0;
-          virtual insert_column & VAL(const char * column_name, const var & value) = 0;
+          virtual insert_column & VAL(const char * column_name,
+                                      const var & value) = 0;
           virtual bool GO() = 0;
 
           // internals
@@ -93,7 +94,8 @@ namespace csl
     {
       public:
         // interface
-        virtual bool bind(uint64_t which, const ustr & column, const var & value) = 0;
+        virtual bool const_bind(uint64_t which, const ustr & column, const var & value) = 0;
+        virtual bool bind(uint64_t which, ustr & column, var & value) = 0;
         virtual bool execute() = 0;
 
         // internals

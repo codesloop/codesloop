@@ -119,7 +119,8 @@ namespace csl
       {
         public:
           // interface
-          bool bind(uint64_t which, const ustr & column, const var & value);
+          bool const_bind(uint64_t which, const ustr & column, const var & value);
+          bool bind(uint64_t which, ustr & column, var & value);
           bool execute();
 
           // internals

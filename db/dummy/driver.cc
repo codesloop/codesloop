@@ -124,11 +124,12 @@ namespace csl
           {
             insert_column::items_t::iterator it = insert_column_.items().begin();
             insert_column::item * i = *it;
-            statement_->bind( 1ULL, i->column_, *(i->arg_) );
+
+            statement_->const_bind( 1ULL, i->column_, *(i->arg_) );
 
             while( (i=it.next_used()) != 0 )
             {
-              statement_->bind( it.get_pos()+1, i->column_, *(i->arg_) );
+              statement_->const_bind( it.get_pos()+1, i->column_, *(i->arg_) );
             }
           }
 
@@ -192,7 +193,15 @@ namespace csl
         LEAVE_FUNCTION();
       }
 
-      bool statement::bind(uint64_t which, const ustr & column, const var & value)
+      bool statement::const_bind(uint64_t which, const ustr & column, const var & value)
+      {
+        ENTER_FUNCTION();
+        ustr tmp; tmp << value;
+        CSL_DEBUGF(L"const_bind(which:'param%lld',column:%s,value:'%s')",which,column.c_str(),tmp.c_str());
+        RETURN_FUNCTION(true);
+      }
+
+      bool statement::bind(uint64_t which, ustr & column, var & value)
       {
         ENTER_FUNCTION();
         ustr tmp; tmp << value;

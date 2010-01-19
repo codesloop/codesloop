@@ -30,6 +30,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/common/obj.hh"
 #include "codesloop/common/ustr.hh"
 #include "codesloop/common/inpvec.hh"
+#include "codesloop/common/tbuf.hh"
 
 // mysql related thingies
 #include <mysql/mysql.h>
@@ -54,7 +55,7 @@ namespace csl
             void table_name(const char * table);
             const char * table_name();
             csl::db::syntax::insert_column & VAL(const char * column_name,
-                                                const var & value);
+                                                 const var & value);
             bool GO();
 
             // internals
@@ -121,7 +122,8 @@ namespace csl
       {
         public:
           // interface
-          bool bind(uint64_t which, const ustr & column, const var & value);
+          bool const_bind(uint64_t which, const ustr & column, const var & value);
+          bool bind(uint64_t which, ustr & column, var & value);
           bool execute();
 
           // internals
@@ -134,6 +136,24 @@ namespace csl
 
           MYSQL_STMT * stmt_;
           MYSQL *      conn_;
+          MYSQL_BIND * bound_variables_;
+          uint64_t     param_count_;
+
+          typedef common::tbuf<sizeof(double)> buf_t;
+
+          struct item
+          {
+            const var *     arg_;
+            buf_t           buffer_;
+            my_bool         is_null_;
+            unsigned long   length_;
+
+            item() : arg_(0), is_null_(1), length_(0) { }
+          };
+
+          typedef common::inpvec<item> buf_vec_t;
+
+          buf_vec_t params_;
 
           CSL_OBJ(csl::db::mysql,statement);
           USE_EXC();

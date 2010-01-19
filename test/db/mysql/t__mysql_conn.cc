@@ -26,10 +26,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/db/conn.hh"
 #include "codesloop/common/test_timer.h"
 #include "codesloop/common/common.h"
+#include "codesloop/common/int64.hh"
+#include "codesloop/common/ustr.hh"
 #include <assert.h>
 #include <string.h>
 
 using namespace csl::db;
+using namespace csl::common;
 
 void usage()
 {

@@ -48,42 +48,47 @@ namespace csl
     {
       public:
         enum {
-          rs_unknown,           ///<Unknown error.
-          rs_notopened,         ///<Database not opened.
-          rs_nullparam,         ///<Null parameter given.
-          rs_nulltran,          ///<Transaction is null.
-          rs_nullconn,          ///<Connection is null.
-          rs_nulldb,            ///<DB handle is null.
-          rs_nullstmnt,         ///<Statement handle is null.
+          rs_unknown,             ///<Unknown error.
+          rs_notopened,           ///<Database not opened.
+          rs_nullparam,           ///<Null parameter given.
+          rs_nulltran,            ///<Transaction is null.
+          rs_nullconn,            ///<Connection is null.
+          rs_nulldb,              ///<DB handle is null.
+          rs_nullstmnt,           ///<Statement handle is null.
           rs_transaction_already_started, ///<Transaction already aborted.
-          rs_internal,          ///<Internal error.
-          rs_permission,        ///<Access permission denied. Cannot read or write to the database file.
-          rs_abort,             ///<A callback routine caused the transaction to abort.
-          rs_busy,              ///<The database file locked.
-          rs_locked,            ///<Table locked.
-          rs_nomem,             ///<Malloc failed.
-          rs_readonly,          ///<Readonly database.
-          rs_ioerr,             ///<Input/Output error.
-          rs_corrupt,           ///<Corrupt database.
-          rs_notfound,          ///<Not found.
-          rs_cantopen,          ///<Cannot open DB.
-          rs_full,              ///<Database full.
-          rs_protocol,          ///<Database locked or lock protocol error.
-          rs_empty,             ///<The database table is empty.
-          rs_schema,            ///<Schema changed.
-          rs_toobig,            ///<Too big.
-          rs_constraint,        ///<Constraint violation.
-          rs_mismatch,          ///<Data type mismatch.
-          rs_misuse,            ///<Library misuse.
-          rs_auth,              ///<Authorization error.
-          rs_format,            ///<Format error.
-          rs_range,             ///<Range error.
-          rs_notadb,            ///<Not a database.
-          rs_cannot_reg,        ///<Cannot register database
-          rs_not_implemented,   ///<Not implemented
-          rs_mysql_init,        ///<mysql_init() failed
-          rs_mysql_real_connect,///<mysq_real_co
-          rs_mysql_outofmem,    ///<mysql client ran out of memory
+          rs_internal,            ///<Internal error.
+          rs_permission,          ///<Access permission denied. Cannot read or write to the database file.
+          rs_abort,               ///<A callback routine caused the transaction to abort.
+          rs_busy,                ///<The database file locked.
+          rs_locked,              ///<Table locked.
+          rs_nomem,               ///<Malloc failed.
+          rs_readonly,            ///<Readonly database.
+          rs_ioerr,               ///<Input/Output error.
+          rs_corrupt,             ///<Corrupt database.
+          rs_notfound,            ///<Not found.
+          rs_cantopen,            ///<Cannot open DB.
+          rs_full,                ///<Database full.
+          rs_protocol,            ///<Database locked or lock protocol error.
+          rs_empty,               ///<The database table is empty.
+          rs_schema,              ///<Schema changed.
+          rs_toobig,              ///<Too big.
+          rs_constraint,          ///<Constraint violation.
+          rs_mismatch,            ///<Data type mismatch.
+          rs_misuse,              ///<Library misuse.
+          rs_auth,                ///<Authorization error.
+          rs_format,              ///<Format error.
+          rs_range,               ///<Range error.
+          rs_notadb,              ///<Not a database.
+          rs_cannot_reg,          ///<Cannot register database
+          rs_not_implemented,     ///<Not implemented
+          rs_mysql_init,          ///<mysql_init() failed
+          rs_mysql_real_connect,  ///<mysql_real_connect() failed
+          rs_mysql_outofmem,      ///<mysql client ran out of memory
+          rs_empty_query,         ///<The query is empty
+          rs_cannot_prepare,      ///<Cannot prepare query
+          rs_invalid_param,       ///<Invalid parameter received
+          rs_mysql_stmt_bind,     ///<mysql_stmt_bind_param() failed
+          rs_mysql_stmt_execute,  ///<mysql_stmt_execute() failed
         };
 
         /** @brief converts reason code to string */

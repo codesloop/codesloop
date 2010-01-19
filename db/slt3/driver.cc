@@ -144,7 +144,15 @@ namespace csl
         LEAVE_FUNCTION();
       }
 
-      bool statement::bind(uint64_t which, const ustr & column, const var & value)
+      bool statement::const_bind(uint64_t which, const ustr & column, const var & value)
+      {
+        ENTER_FUNCTION();
+        ustr tmp; tmp << value;
+        CSL_DEBUGF(L"const_bind(which:'param%lld',column:%s,value:'%s')",which,column.c_str(),tmp.c_str());
+        RETURN_FUNCTION(true);
+      }
+
+      bool statement::bind(uint64_t which, ustr & column, var & value)
       {
         ENTER_FUNCTION();
         ustr tmp; tmp << value;

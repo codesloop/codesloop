@@ -49,7 +49,7 @@ namespace csl
             void table_name(const char * table);
             const char * table_name();
             csl::db::syntax::insert_column & VAL(const char * column_name,
-                                                const var & value);
+                                                 const var & value);
             bool GO();
 
             // internals
@@ -103,7 +103,8 @@ namespace csl
       {
         public:
           // interface
-          bool bind(uint64_t which, const ustr & column, const var & value);
+          bool const_bind(uint64_t which, const ustr & column, const var & value);
+          bool bind(uint64_t which, ustr & column, var & value);
           bool execute();
 
           // internals
