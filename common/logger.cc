@@ -65,11 +65,11 @@ namespace csl
 
     int logger::init() {
       logfile_ = CSL_LOGFILE;
-#ifdef DEBUG
+#ifdef ENABLE_LOGGER
       class_to_trace_= ( getenv(CSL_TRACE_SCOPE) == NULL  ?  L"all" : wgetenv(CSL_TRACE_SCOPE) );
       enable_trace_  = ( getenv(CSL_TRACE_ENABLE) == NULL ?  false : true );
       enable_stderr_ = ( getenv(CSL_TRACE_STDERR) == NULL ?  false : true ) ;
-#endif
+#endif /*ENABLE_LOGGER*/
 
       // TODO: use config file parser class (maybe a ragel based one)
 
@@ -84,10 +84,10 @@ namespace csl
 
     void logger::log( logger_types type, const char * pstrFormat, ...)
     {
-#ifndef DEBUG
+#ifndef ENABLE_LOGGER
       if ( type == LOG_DEBUG )
               return;
-#endif
+#endif /*ENABLE_LOGGER*/
       va_list args;
       va_start(args, pstrFormat);
       log( type, pstrFormat, args );
@@ -111,10 +111,10 @@ namespace csl
 
     void logger::log( logger_types type, const wchar_t * pstrFormat, ...)
     {
-#ifndef DEBUG
+#ifndef ENABLE_LOGGER
       if ( type == LOG_DEBUG )
               return;
-#endif
+#endif /*ENABLE_LOGGER*/
       va_list args;
       va_start(args, pstrFormat);
       log(type, pstrFormat, args );
@@ -127,10 +127,10 @@ namespace csl
       char   szDateBuf[128];
       time_t ostime;
 
-#ifndef DEBUG
+#ifndef ENABLE_LOGGER
       if ( type == LOG_DEBUG )
         return;
-#endif
+#endif /*ENABLE_LOGGER*/
 
       if ( static_cast<int>(type) >= static_cast<int>(LOG_LAST) || static_cast<int>(type) <= LOG_UNKNOWN )
         throw exc(exc::rs_invalid_param,get_class_name(),L"Unknown log type");
@@ -154,7 +154,7 @@ namespace csl
                << std::endl;
 
         fs_log.close();
-#ifdef DEBUG
+#ifdef ENABLE_LOGGER
         if ( enable_stderr_ )
           std::wcerr  << szDateBuf
                       << L" ("
@@ -164,7 +164,7 @@ namespace csl
                       << L"] "
                       << st.c_str()
                       << std::endl;
-#endif
+#endif /*ENABLE_LOGGER*/
 
       } catch ( std::exception ex ) {
         std::cerr << ex.what();

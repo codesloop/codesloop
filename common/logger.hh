@@ -45,8 +45,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // enable logger when debugging
 #ifdef DEBUG
+#ifndef ENABLE_LOGGER
 #define ENABLE_LOGGER
-#endif
+#endif /* ENABLE_LOGGER */
+#endif /* DEBUG */
 
 /*
 DEBUG               - this tells to compile in the debugging code
@@ -134,11 +136,11 @@ DEBUG_ENABLE_INDENT - this tells wether to indent the debug output or not
    }
 #endif /* DEBUG_ENABLE_INDENT */
 
-#else /* !DEBUG */
+#else /*!DEBUG*/
  #define ENTER_FUNCTION()
  #define LEAVE_FUNCTION()       return
  #define RETURN_FUNCTION(ret)   return(ret)
-#endif /* DEBUG */
+#endif /*DEBUG*/
 
 #ifdef DEBUG_VERBOSE
  #define ENTER_FUNCTION_X()       ENTER_FUNCTION()
@@ -244,13 +246,13 @@ namespace csl {
         static inline void      debug( const str & st,
                                        const wchar_t * invoker = NULL )
         {
-#ifdef DEBUG
+#ifdef ENABLE_LOGGER
           if ( class_to_trace_ == L"all" ||
               class_to_trace_.find( str(invoker) ) != str::npos )
           {
             log( LOG_DEBUG, st );
           }
-#endif
+#endif /*ENABLE_LOGGER*/
         }
 
         /** @brief shortcut function for debug messages
@@ -261,7 +263,7 @@ namespace csl {
         static inline void      debug( const wchar_t * invoker,
             const wchar_t * fmt, ... )
         {
-#ifdef DEBUG
+#ifdef ENABLE_LOGGER
           if ( class_to_trace_ == L"all" ||
               class_to_trace_.find( str(invoker) ) != str::npos )
           {
@@ -271,7 +273,7 @@ namespace csl {
             log( LOG_DEBUG, fmt, args );
             va_end(args);
           }
-#endif
+#endif /*ENABLE_LOGGER*/
         }
 
         /** @brief shortcut function for debug messages
@@ -285,7 +287,7 @@ namespace csl {
                                        const wchar_t * fmt1,
                                        ... )
         {
-#ifdef DEBUG
+#ifdef ENABLE_LOGGER
           if ( class_to_trace_ == L"all" ||
                class_to_trace_.find( str(invoker) ) != str::npos )
           {
@@ -311,7 +313,7 @@ namespace csl {
             log( LOG_DEBUG, fmt.c_str(), args );
             va_end(args);
           }
-#endif
+#endif /*ENABLE_LOGGER*/
         }
 #endif /*DEBUG_ENABLE_INDENT*/
 
