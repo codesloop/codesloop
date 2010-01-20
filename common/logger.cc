@@ -51,12 +51,12 @@ namespace csl
     }
 
     std::string logger::logfile_;
-#ifdef DEBUG
+#ifdef ENABLE_LOGGER
     str logger::class_to_trace_;
 
     bool   logger::enable_trace_;
     bool   logger::enable_stderr_;
-#endif
+#endif /*ENABLE_LOGGER*/
 
     // type name to string helper 
     static const wchar_t * LOGTYPE_NAMES [] = { 

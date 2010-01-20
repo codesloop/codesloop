@@ -43,6 +43,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CSL_TRACE_STDERR   "CSL_TRACE_STDERR"
 #define CSL_TRACE_SCOPE    "CSL_TRACE_SCOPE"
 
+// enable logger when debugging
+#ifdef DEBUG
+#define ENABLE_LOGGER
+#endif
+
 /*
 DEBUG               - this tells to compile in the debugging code
 DEBUG_VERBOSE       - this tells to produce extensive debug output
@@ -315,12 +320,12 @@ namespace csl {
 
       private:
         static std::string   logfile_;
-#ifdef DEBUG
+#ifdef ENABLE_LOGGER
       public:
         static bool          enable_trace_;
         static str           class_to_trace_;
         static bool          enable_stderr_;
-#endif
+#endif /*ENABLE_LOGGER*/
     }; /* class */
   }; /* namespace common */
 }; /* namespace csl */
