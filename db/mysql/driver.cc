@@ -265,10 +265,18 @@ namespace csl
 
         if( value.var_size() > 0 )
         {
-          bf = i->buffer_.allocate( value.var_size() );
-          ::memcpy( bf,value.ucharp_data(),static_cast<size_t>(value.var_size()) );
+          size_t sz = static_cast<size_t>(value.var_size());
+
+          // TODO : check str type here....
+
+          // remove trailing zero
+          if( value.var_type() == CSL_TYPE_USTR )     { --sz; }
+          else if( value.var_type() == CSL_TYPE_STR ) { sz -= sizeof(wchar_t); }
+
+          bf = i->buffer_.allocate( sz );
+          ::memcpy( bf,value.ucharp_data(),sz );
           i->is_null_ = 0;
-          i->length_  = static_cast<unsigned long>(value.var_size());
+          i->length_  = static_cast<unsigned long>(sz);
         }
         else
         {
