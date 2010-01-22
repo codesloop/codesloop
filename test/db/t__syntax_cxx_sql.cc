@@ -263,7 +263,28 @@ namespace test_syntax_cxx_sql {
     int64 i1(1);
 
     x.UPDATE("hello").SET("elso",els).SET("what",i1).WHERE("what","=",i1).AND("Q","<",els);
+
+    // x.UPDATE("hello").SET("elso",els).SET("what",i1).WHERE(COND("what","=",i1).AND("Q","<",els)).
+    //                                                    OR(COND("qq",">",i1).AND("WW",">",els));
     // fprintf(stderr,"%s\n",x.result().c_str());
+
+    // SELECT a, b, c, d FROM x WHERE ( a=5 OR b=? AND q='r' ) OR z=?
+    //   .. join .. in TABLES ..
+    //   .. functions .. in WHERE, CONVERSIONS ..
+    //   .. step, next .. in RESULTSETS ..
+
+    // x.SELECT().FROM(TABLE("name").FIELD("f1",var1).FIELD("f2",var2))
+    //           .FROM(TABLE("nam2").FIELD("f3",var3))
+    //           .WHERE()...
+
+    // x.SELECT().FROM(TABLE("name").FIELD("f1",var1).FIELD("f2",var2))
+    //           .FROM(TABLE("nam2").FIELD("f3",var3))
+    //           .JOIN("name","f1","nam2","f3")
+    //           .WHERE()...
+
+    //
+    // -- mezok
+    // -- kapcsolatok
 
     x.INSERT_INTO("hello").VAL("elso",els).VAL("masodik",i1);
     // fprintf(stderr,"%s\n",x.result().c_str());

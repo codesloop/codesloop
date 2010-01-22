@@ -32,6 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/common/inpvec.hh"
 #include "codesloop/common/common.h"
 #ifdef __cplusplus
+#include <memory>
 
 namespace csl
 {
@@ -43,6 +44,8 @@ namespace csl
   namespace db
   {
     class driver;
+    class statement;
+    class TABLE;
 
     namespace syntax
     {
@@ -50,45 +53,110 @@ namespace csl
       {
         public:
           // interface
-          virtual void table_name(const char * table) = 0;
-          virtual const char * table_name() = 0;
+          virtual void table_name(const char * table);
+          virtual const char * table_name();
+
           virtual insert_column & VAL(const char * column_name,
-                                      const var & value) = 0;
+                                      const var & value);
           virtual bool GO() = 0;
 
           // internals
           insert_column() {}
           virtual ~insert_column() {}
+
+          struct item
+          {
+            ustr         column_;
+            const var *  arg_;
+          };
+
+          typedef inpvec<item> items_t;
+          virtual items_t & items() { return items_; }
+
+        private:
+          ustr table_name_;
+          items_t items_;
+
+          CSL_OBJ(csl::db::syntax,insert_column);
       };
 
       class update_column
       {
         public:
+          CSL_OBJ(csl::db::syntax,update_column);
       };
 
       class where_condition
       {
         public:
+          CSL_OBJ(csl::db::syntax,where_condition);
+      };
+
+      class select_query
+      {
+        public:
+          virtual select_query & FROM( const TABLE & t ) = 0;
+          virtual bool GO() = 0;
+
+          // internals
+          select_query() {}
+          virtual ~select_query() {}
+
+          CSL_OBJ(csl::db::syntax,select_query);
       };
 
       class generator
       {
         public:
           // interface
-          virtual insert_column & INSERT_INTO(const char * table) = 0;
+          virtual insert_column & INSERT_INTO(const char * table);
+          virtual select_query  & SELECT();
           virtual bool GO() = 0;
+          virtual insert_column & insert_column_ref() = 0;
+          virtual select_query & select_query_ref() = 0;
 
           // internals
           generator(driver & d) : driver_(&d) {}
           virtual ~generator() {}
           driver & get_driver() { return *driver_; }
 
+
+          typedef std::auto_ptr<csl::db::statement> statement_ptr_t;
+
+          statement_ptr_t & statement_ptr() { return statement_; }
+
         private:
           // no default construction
           generator() {}
           driver * driver_;
+
+          statement_ptr_t statement_;
+          CSL_OBJ(csl::db::syntax,generator);
       };
     }
+
+    class TABLE
+    {
+      public:
+        struct field
+        {
+          const char * name_;
+          var *        var_;
+        };
+
+        typedef inpvec<field> fields_t;
+
+        TABLE(const char * name);
+        TABLE & FIELD(const char * name, var & v);
+
+        virtual fields_t &    fields() { return fields_; }
+        virtual const ustr &  name()   { return name_;   }
+
+      private:
+        ustr       name_;
+        fields_t   fields_;
+        CSL_OBJ(csl::db,TABLE);
+    };
 
     class statement
     {
@@ -109,6 +177,8 @@ namespace csl
         statement() {}
         driver * driver_;
         ustr     query_;
+
+        CSL_OBJ(csl::db,statement);
     };
 
     class driver
@@ -168,6 +238,8 @@ namespace csl
 
         // internals
         virtual ~driver() {}
+
+        CSL_OBJ(csl::db,driver);
     };
   }; // end of ns:csl::db
 }; // end of ns:csl

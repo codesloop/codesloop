@@ -43,43 +43,6 @@ namespace csl
       namespace syntax
       {
         // ==============================================================
-        // == interface =================================================
-        // ==============================================================
-        void insert_column::table_name(const char * table)
-        {
-          ENTER_FUNCTION();
-          CSL_DEBUGF(L"table_name(%s)",table);
-          table_name_ = table;
-          LEAVE_FUNCTION();
-        }
-
-        const char * insert_column::table_name()
-        {
-          ENTER_FUNCTION();
-          CSL_DEBUGF(L"table_name() => %s",table_name_.c_str());
-          RETURN_FUNCTION(table_name_.c_str());
-        }
-        // ==============================================================
-        // == insert query ==============================================
-        // ==============================================================
-        csl::db::syntax::insert_column & generator::INSERT_INTO(const char * table)
-        {
-          ENTER_FUNCTION();
-          CSL_DEBUGF(L"INSERT_INTO(%s)",table);
-          insert_column_.table_name(table);
-          RETURN_FUNCTION(insert_column_);
-        }
-
-        csl::db::syntax::insert_column & insert_column::VAL(const char * column_name,
-                                                            const var & value)
-        {
-          ENTER_FUNCTION();
-          ustr tmp; tmp << value;
-          CSL_DEBUGF(L"VAL(%s,'%s')",column_name,tmp.c_str());
-          RETURN_FUNCTION((*this));
-        }
-
-        // ==============================================================
         // = others =====================================================
         // ==============================================================
         bool generator::GO()

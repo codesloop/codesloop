@@ -23,12 +23,12 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#if 0
+// #if 0
 #ifndef DEBUG
 #define DEBUG
 #define DEBUG_ENABLE_INDENT
 #endif /* DEBUG */
-#endif
+// #endif
 
 #include "codesloop/common/logger.hh"
 #include "codesloop/common/common.h"
@@ -44,57 +44,12 @@ namespace csl
       namespace syntax
       {
         // ==============================================================
-        // == interface =================================================
-        // ==============================================================
-        void insert_column::table_name(const char * table)
-        {
-          ENTER_FUNCTION();
-          CSL_DEBUGF(L"table_name(%s)",table);
-          table_name_ = table;
-          LEAVE_FUNCTION();
-        }
-
-        const char * insert_column::table_name()
-        {
-          ENTER_FUNCTION();
-          CSL_DEBUGF(L"table_name() => %s",table_name_.c_str());
-          RETURN_FUNCTION(table_name_.c_str());
-        }
-
-        // ==============================================================
-        // == insert query ==============================================
-        // ==============================================================
-        csl::db::syntax::insert_column & generator::INSERT_INTO(const char * table)
-        {
-          ENTER_FUNCTION();
-          CSL_DEBUGF(L"INSERT_INTO(%s)",table);
-          insert_column_.table_name(table);
-          statement_.reset(0);
-          RETURN_FUNCTION(insert_column_);
-        }
-
-        csl::db::syntax::insert_column & insert_column::VAL(const char * column_name,
-                                                            const var & value)
-        {
-          ENTER_FUNCTION();
-          ustr tmp; tmp << value;
-          CSL_DEBUGF(L"VAL(%s,'%s') [%lld]",column_name,tmp.c_str(),items_.n_items()+1);
-          {
-            item i;
-            i.column_ = column_name;
-            i.arg_    = &value;
-            items_.push_back(i);
-          }
-          RETURN_FUNCTION((*this));
-        }
-
-        // ==============================================================
         // = others =====================================================
         // ==============================================================
         bool generator::GO()
         {
           ENTER_FUNCTION();
-          if(statement_.get() == 0)
+          if(statement_ptr().get() == 0)
           {
             // calculate statement
             if( insert_column_.items().n_items() > 0 )
@@ -115,7 +70,7 @@ namespace csl
               query << " ) VALUES ( " << bound << " )";
 
               // prepare statement
-              statement_.reset(get_driver().prepare(query));
+              statement_ptr().reset(get_driver().prepare(query));
             }
           }
 
@@ -125,16 +80,16 @@ namespace csl
             insert_column::items_t::iterator it = insert_column_.items().begin();
             insert_column::item * i = *it;
 
-            statement_->const_bind( 1ULL, i->column_, *(i->arg_) );
+            statement_ptr()->const_bind( 1ULL, i->column_, *(i->arg_) );
 
             while( (i=it.next_used()) != 0 )
             {
-              statement_->const_bind( it.get_pos()+1, i->column_, *(i->arg_) );
+              statement_ptr()->const_bind( it.get_pos()+1, i->column_, *(i->arg_) );
             }
           }
 
           // execute statement
-          RETURN_FUNCTION(statement_->execute());
+          RETURN_FUNCTION(statement_ptr()->execute());
         }
 
         bool insert_column::GO()

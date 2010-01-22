@@ -48,35 +48,16 @@ namespace csl
         {
           public:
             // interface
-            void table_name(const char * table);
-            const char * table_name();
-            csl::db::syntax::insert_column & VAL(const char * column_name,
-                                                 const var & value);
             bool GO();
 
             // internals
             insert_column(csl::db::dummy::syntax::generator & g);
             virtual ~insert_column() {}
 
-            struct item
-            {
-              ustr         column_;
-              const var *  arg_;
-            };
-
-            typedef inpvec<item> items_t;
-
-            items_t & items() { return items_; }
-
           private:
             // no default construction
             insert_column();
-
-            ustr table_name_;
             csl::db::dummy::syntax::generator * generator_;
-
-            items_t items_;
-
             CSL_OBJ(csl::db::dummy::syntax,insert_column);
         };
 
@@ -93,12 +74,28 @@ namespace csl
             CSL_OBJ(csl::db::dummy::syntax,where_condition);
         };
 
+        class select_query : public csl::db::syntax::select_query
+        {
+          public:
+            select_query & FROM( const TABLE & t )
+            { // TODO XXX TODO XXX TODO
+              return *this;
+            }
+            bool GO()
+            { // TODO XXX TODO XXX TODO
+              return false;
+            }
+            CSL_OBJ(csl::db::dummy::syntax,select_query);
+        };
+
         class generator : public csl::db::syntax::generator
         {
           public:
             // interface
-            csl::db::syntax::insert_column & INSERT_INTO(const char * table);
             bool GO();
+
+            csl::db::syntax::insert_column & insert_column_ref() { return insert_column_; }
+            csl::db::syntax::select_query & select_query_ref()   { return select_query_;  }
 
             // internals
             generator(csl::db::driver & d);
@@ -107,10 +104,8 @@ namespace csl
           private:
             // no default construction
             generator();
-
-            insert_column insert_column_;
-            std::auto_ptr<csl::db::statement> statement_;
-
+            csl::db::dummy::syntax::insert_column insert_column_;
+            csl::db::dummy::syntax::select_query  select_query_;
             CSL_OBJ(csl::db::dummy::syntax,generator);
         };
       }
