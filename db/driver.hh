@@ -212,6 +212,19 @@ namespace csl
           ustr   db_name_;
           ustr   user_;
           ustr   password_;
+  
+          connect_desc() {}
+          connect_desc(const char * host,
+                       const char * port,
+                       const char * db_name,
+                       const char * user,
+                       const char * pass) : host_(host),
+                                            db_name_(db_name),
+                                            user_(user),
+                                            password_(pass)
+          {
+            port_.from_string(port);
+          }
         };
 
         virtual bool open(const connect_desc & info) = 0;

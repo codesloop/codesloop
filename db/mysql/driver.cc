@@ -31,9 +31,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "codesloop/common/logger.hh"
+#include "codesloop/common/str.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/db/mysql/driver.hh"
 #include "codesloop/db/exc.hh"
+
+using csl::common::str;
 
 namespace csl
 {
@@ -141,23 +144,24 @@ namespace csl
       {
         ENTER_FUNCTION();
 
-        if( !conn_ )         { THRNORET(csl::db::exc::rs_nullparam); }
-        if( q.size() == 0 )  { THRNORET(csl::db::exc::rs_empty_query); }
+        if( !conn_ )         { THRRNORET(csl::db::exc::rs_nullparam,L"conn_ is null"); }
+        if( q.size() == 0 )  { THRRNORET(csl::db::exc::rs_empty_query,L"query is empty"); }
 
         stmt_ = mysql_stmt_init(conn_);
 
-        if( stmt_ == NULL ) { THRNORET(csl::db::exc::rs_mysql_outofmem);           }
+        if( stmt_ == NULL ) { THRRNORET(csl::db::exc::rs_mysql_outofmem,L"mysql out of mem"); }
         else                { CSL_DEBUGF(L"mysql statement initialized:%p",stmt_); }
 
         if( mysql_stmt_prepare(stmt_, q.c_str(), static_cast<unsigned long>(q.size())) )
         {
-          CSL_DEBUGF(L"cannot prepare query:[%s] ERROR:[%s]",
+          str err(mysql_stmt_error(stmt_));
+          CSL_DEBUGF(L"cannot prepare query:[%s] ERROR:[%ls]",
                       q.c_str(),
-                      mysql_stmt_error(stmt_) );
+                      err.c_str() );
 
           mysql_stmt_close(stmt_);
           stmt_ = 0;
-          THRNORET(csl::db::exc::rs_cannot_prepare);
+          THRRNORET(csl::db::exc::rs_cannot_prepare,err.c_str());
         }
 
         param_count_= mysql_stmt_param_count(stmt_);
@@ -209,12 +213,12 @@ namespace csl
         {
           CSL_DEBUGF(L"trying to bind an invalid index:%lld [bound_variables_:%lld]",
                      which, param_count_ );
-          THR(csl::db::exc::rs_invalid_param, false);
+          THRR(csl::db::exc::rs_invalid_param,L"invalid parameter index",false);
         }
 
         item * i = params_.construct(which-1);
 
-        if( !i ) { THR(db::exc::rs_internal,false); }
+        if( !i ) { THRR(db::exc::rs_internal,L"inpvec cannot construct",false); }
 
         unsigned char * bf = 0;
         i->arg_ = &value;
@@ -278,7 +282,7 @@ namespace csl
       {
         ENTER_FUNCTION();
 
-        if( stmt_ == 0 ) { THR(db::exc::rs_nullstmnt,false); }
+        if( stmt_ == 0 ) { THRR(db::exc::rs_nullstmnt,L"stmt_ variable is null",false); }
 
         if( param_count_ > 0 && bound_variables_ > 0 )
         {
@@ -286,15 +290,17 @@ namespace csl
 
           if( mysql_stmt_bind_param(stmt_, bound_variables_) )
           {
-            CSL_DEBUGF(L"mysql_bind_param() => ERROR[%s]", mysql_stmt_error(stmt_));
-            THR(db::exc::rs_mysql_stmt_bind,false);
+            str err(mysql_stmt_error(stmt_));
+            CSL_DEBUGF(L"mysql_bind_param() => ERROR[%ls]", err.c_str());
+            THRR(db::exc::rs_mysql_stmt_bind,err.c_str(),false);
           }
         }
 
         if( mysql_stmt_execute(stmt_) )
         {
-          CSL_DEBUGF(L"mysql_stmt_execute() => ERROR[%s]",mysql_stmt_error(stmt_));
-          THR(db::exc::rs_mysql_stmt_execute,false);
+          str err(mysql_stmt_error(stmt_));
+          CSL_DEBUGF(L"mysql_stmt_execute() => ERROR[%ls]",err.c_str());
+          THRR(db::exc::rs_mysql_stmt_execute,err.c_str(),false);
         }
 
         my_ulonglong affected_rows = mysql_stmt_affected_rows(stmt_);
@@ -333,6 +339,14 @@ namespace csl
 
         bool ret = false;
 
+        if( !conn_ )
+        {
+          // init
+          conn_ = mysql_init(NULL);
+          if( !conn_ ) { THRR(db::exc::rs_mysql_init,L"mysql_init() failed",false); }
+          else         { CSL_DEBUGF(L"mysql connection: %p",conn_); }
+        }
+
         CSL_DEBUGF(L"open(info[host:%s port:%lld db_name:%s user:%s password:%s])",
                     info.host_.c_str(),
                     info.port_.value(),
@@ -349,10 +363,11 @@ namespace csl
                                 NULL, /* unix socket */
                                 0 /* client flags */ ) == NULL )
         {
-          CSL_DEBUGF(L"mysql error [%s] during mysql_real_connect(%p,...)",
-                       mysql_error(conn_),
+          str err(mysql_error(conn_));
+          CSL_DEBUGF(L"mysql error [%ls] during mysql_real_connect(%p,...)",
+                       err.c_str(),
                        conn_ );
-          THR(db::exc::rs_mysql_real_connect,ret);
+          THRR(db::exc::rs_mysql_real_connect,err.c_str(),ret);
         }
         ret = true;
 
@@ -370,7 +385,16 @@ namespace csl
       bool driver::close()
       {
         ENTER_FUNCTION();
-        RETURN_FUNCTION(false);
+        bool ret = false;
+        if( conn_ )
+        {
+          ret = true;
+          CSL_DEBUGF(L"closing mysql connection:%p",conn_);
+          mysql_close(conn_);
+          conn_ = 0;
+        }
+        CSL_DEBUGF(L"close() => %s",(ret==true?"TRUE":"FALSE"));
+        RETURN_FUNCTION(ret);
       }
 
       // transactions
@@ -444,11 +468,6 @@ namespace csl
       driver::driver() : conn_(0), use_exc_(true)
       {
         ENTER_FUNCTION();
-        // init
-        conn_ = mysql_init(NULL);
-        if( !conn_ ) { THRNORET(db::exc::rs_mysql_init);          }
-        else         { CSL_DEBUGF(L"mysql connection: %p",conn_); }
-        //
         LEAVE_FUNCTION();
       }
 

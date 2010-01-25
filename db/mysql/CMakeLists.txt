@@ -45,6 +45,7 @@ IF(NOT WIN32)
                    -Wcomment
                    -Wshadow
                    -Wredundant-decls
+                   -DDEBUG
                  )
 
 ELSE(NOT WIN32)
