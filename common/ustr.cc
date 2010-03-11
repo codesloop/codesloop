@@ -183,7 +183,7 @@ namespace csl
 
     uint64_t ustr::find(const ustr & s) const
     {
-      char * p = strstr( data(), s.data() );
+      const char * p = strstr( data(), s.data() );
       uint64_t ret = npos;
 
       if ( p != NULL ) {
