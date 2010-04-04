@@ -23,11 +23,23 @@
 
 # SET(CMAKE_VERBOSE_MAKEFILE ON)
 
+IF(MYSQL_FOUND)
+  SET(MYSQL_DB_DRIVER_LINKDIR ../db/mysql)
+  SET(MYSQL_DB_DRIVER_DIR mysql)
+  SET(MYSQL_DB_DRIVER_LIB csl_db_mysql)
+  ADD_DEFINITIONS( -DUSE_MYSQL )
+ELSE(MYSQL_FOUND)
+  SET(MYSQL_DB_DRIVER_LINKDIR)
+  SET(MYSQL_DB_DRIVER_DIR)
+  SET(MYSQL_DB_DRIVER_LIB)
+  ADD_DEFINITIONS( -DSKIP_MYSQL )
+ENDIF(MYSQL_FOUND)
+
 LINK_DIRECTORIES(
                   ../nthread
                   ../common
                   ../db/dummy
-                  ../db/mysql
+                  ${MYSQL_DB_DRIVER_LINKDIR} 
                   ../db/slt3
                 )
 
@@ -36,13 +48,14 @@ INCLUDE_DIRECTORIES( ../.. )
 LINK_LIBRARIES(
                 csl_db_dummy
                 csl_db_slt3
-                csl_db_mysql
+		${MYSQL_DB_DRIVER_LIB}
                 csl_common
               )
 
 SUBDIRS( slt3
-         mysql
-         dummy )
+         ${MYSQL_DB_DRIVER_DIR}
+         dummy 
+       )
 
 ADD_LIBRARY( csl_db STATIC
              exc.cc      exc.hh

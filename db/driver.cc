@@ -33,7 +33,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/db/driver.hh"
 #include "codesloop/db/dummy/driver.hh"
 #include "codesloop/db/slt3/driver.hh"
+#ifdef USE_MYSQL
 #include "codesloop/db/mysql/driver.hh"
+#endif /*USE_MYSQL*/
 #include "codesloop/common/logger.hh"
 
 namespace csl
@@ -122,8 +124,10 @@ namespace csl
         case d_sqlite3:
           return csl::db::slt3::driver::instance();
 
+#ifdef USE_MYSQL
         case d_mysql:
           return csl::db::mysql::driver::instance();
+#endif /*USE_MYSQL*/
       };
       return 0;
     }

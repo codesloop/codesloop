@@ -21,57 +21,10 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-LINK_DIRECTORIES(
-                  ../../common
-                  ../../db
-                )
-
-LINK_LIBRARIES(
-                csl_common
-                csl_db
-              )
-
-
+LINK_DIRECTORIES( ../../common ../../db )
+LINK_LIBRARIES( csl_common csl_db )
 INCLUDE_DIRECTORIES( ../../.. )
-
-IF(NOT WIN32)
-
-  SET( CMAKE_CXX_FLAGS "-Wconversion -Wcast-qual -Wpointer-arith -Wcast-align -Wold-style-cast" )
-
-  ADD_DEFINITIONS(
-                   -Wall
-                   -g3
-                   -Wwrite-strings
-                   -Wcomment
-                   -Wshadow
-                   -Wredundant-decls
-                 )
-
-ELSE(NOT WIN32)
-
-  IF(MSYS)
-
-    SET( CMAKE_CXX_FLAGS "-Wconversion -Wcast-qual -Wpointer-arith -Wcast-align -Wold-style-cast" )
-
-    ADD_DEFINITIONS(
-                      -Wall
-                      -g3
-                      -Wwrite-strings
-                      -Wcomment
-                      -Wshadow
-                      -Wredundant-decls
-                   )
-
-  ELSE(MSYS)
-
-
-  ENDIF(MSYS)
-
-ENDIF(NOT WIN32)
-
-ADD_LIBRARY( csl_db_dummy STATIC
-             driver.cc  driver.hh
-           )
+ADD_LIBRARY( csl_db_dummy STATIC driver.cc  driver.hh )
 
 FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
 INSTALL( FILES ${includes} DESTINATION include/codesloop/db/dummy )
