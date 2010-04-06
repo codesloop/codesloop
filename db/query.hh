@@ -46,6 +46,12 @@ namespace csl
           return generator_->INSERT_INTO(table);
         }
 
+        csl::db::syntax::select_query & SELECT()
+        {
+          generator_.reset(tran_->get_driver().generator(tran_->get_driver()));
+          return generator_->SELECT();
+        }
+
       private:
         /* no default construction */
         query() : tran_(0) { }

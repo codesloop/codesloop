@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009,2010, CodeSLoop Team
+# Copyright (c) 2008,2009,2010, CodeSloop Team
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -21,17 +21,41 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-LINK_DIRECTORIES( ../../common ../../db)
-INCLUDE_DIRECTORIES( ../../.. )
-LINK_LIBRARIES( csl_common csl_db mysqlclient )
-ADD_LIBRARY( csl_db_mysql STATIC driver.cc  driver.hh )
-
-FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
-INSTALL( FILES ${includes} DESTINATION include/codesloop/db/mysql )
-INSTALL(TARGETS csl_db_mysql
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
+FIND_PATH(MYSQL_INCLUDE_DIR mysql_version.h
+  HINTS
+  $ENV{MYSQL_DIR}
+  PATH_SUFFIXES mysql
+  PATHS
+  /usr/local/include
+  /usr/include
+  /sw/include
+  /opt/local/include
+  /opt/include
 )
+
+FIND_LIBRARY(MYSQL_LIBRARY
+  NAMES mysqlclient
+  HINTS
+  $ENV{MYSQL_DIR}
+  PATH_SUFFIXES lib64 lib
+  PATHS
+  /usr/local
+  /usr
+  /sw
+  /opt/local
+  /opt
+)
+
+SET(MYSQL_FOUND "NO")
+
+IF(MYSQL_INCLUDE_DIR AND MYSQL_LIBRARY)
+   SET(MYSQL_FOUND TRUE)
+ENDIF(MYSQL_INCLUDE_DIR AND MYSQL_LIBRARY)
+
+IF(MYSQL_FOUND)
+  MESSAGE(STATUS "MySQL found")
+ELSE(MYSQL_FOUND)
+  MESSAGE(STATUS "MySQL NOT found")
+ENDIF(MYSQL_FOUND)
 
 # -- EOF --

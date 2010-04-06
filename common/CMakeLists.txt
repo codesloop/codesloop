@@ -23,23 +23,6 @@
 
 IF(WIN32)
 
-  IF(MSYS)
-
-    ADD_DEFINITIONS( -Wall
-                     -Wwrite-strings
-                     -Wcast-qual
-                     -Wpointer-arith
-                     -Wold-style-cast
-                     -Wconversion
-                     -Wcomment
-                     -Wcast-align
-                     -Wshadow
-                     -Wredundant-decls
-                     -g3
-                   )
-
-  ENDIF(MSYS)
-
   LINK_DIRECTORIES(
       $ENV{ZLIB_DEV_ENV}/lib
       ../../../3rdparty/zlib/GnuWin32/lib )
@@ -52,29 +35,9 @@ ELSE(WIN32)
 
   SUBDIRS( libev )
 
-  ADD_DEFINITIONS(
-                   -Wall
-                   -Wwrite-strings
-                   -Wcast-qual
-                   -Wpointer-arith
-                   -Wold-style-cast
-                   -Wconversion
-                   -Wcomment
-                   -Wcast-align
-                   -Winline
-                   -Wshadow
-                   -Wredundant-decls
-                   -g3
-                 )
-
 ENDIF(WIN32)
 
-ADD_DEFINITIONS( -DDEBUG)
-
-INCLUDE_DIRECTORIES(
-             ../..
-             )
-
+INCLUDE_DIRECTORIES( ../.. )
 
 ADD_LIBRARY( csl_common STATIC
              cexc.cc       cexc.hh
@@ -101,6 +64,10 @@ ADD_LIBRARY( csl_common STATIC
              str.cc        str.hh
              ustr.cc       ustr.hh
              binry.cc      binry.hh )
+
+# ADD_DEFINITIONS( -DENABLE_LOGGER )
+SET_SOURCE_FILES_PROPERTIES( logger.cc PROPERTIES 
+                             COMPILE_FLAGS -DENABLE_LOGGER )
 
 ADD_DEPENDENCIES( csl_common libev/config.h )
 

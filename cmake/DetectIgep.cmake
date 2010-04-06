@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009,2010, CodeSLoop Team
+# Copyright (c) 2008,2009,2010, CodeSloop Team
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -21,17 +21,22 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-LINK_DIRECTORIES( ../../common ../../db)
-INCLUDE_DIRECTORIES( ../../.. )
-LINK_LIBRARIES( csl_common csl_db mysqlclient )
-ADD_LIBRARY( csl_db_mysql STATIC driver.cc  driver.hh )
+SET(IGEP_CXX_FLAGS "")
+SET(IGEP_C_FLAGS "")
 
-FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
-INSTALL( FILES ${includes} DESTINATION include/codesloop/db/mysql )
-INSTALL(TARGETS csl_db_mysql
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-)
+SET(IGEP_COMPILATION_FLAGS "-march=armv7-a -mfpu=neon -mtune=cortex-a8 -mfloat-abi=softfp")
+
+IF(CMAKE_SYSTEM_NAME MATCHES "Linux")
+  IF(CMAKE_SYSTEM_PROCESSOR MATCHES "armv7l")
+    EXEC_PROGRAM(cat ARGS "/proc/cpuinfo" OUTPUT_VARIABLE CPUINFO)
+    STRING(REGEX REPLACE "^.*(IGEP v2).*$" "\\1" IS_IGEP ${CPUINFO})
+    STRING(COMPARE EQUAL "IGEP v2" "${IS_IGEP}" IS_IGEP_TRUE)
+    IF(IS_IGEP_TRUE)
+      MESSAGE(STATUS "Configuring for the IGEP v2 platform")
+      SET(IGEP_CXX_FLAGS ${IGEP_COMPILATION_FLAGS})
+      SET(IGEP_C_FLAGS ${IGEP_COMPILATION_FLAGS})
+    ENDIF(IS_IGEP_TRUE)
+  ENDIF(CMAKE_SYSTEM_PROCESSOR MATCHES "armv7l")
+ENDIF(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
 # -- EOF --

@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009,2010, CodeSLoop Team
+# Copyright (c) 2008,2009,2010, CodeSloop Team
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -21,17 +21,25 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-LINK_DIRECTORIES( ../../common ../../db)
-INCLUDE_DIRECTORIES( ../../.. )
-LINK_LIBRARIES( csl_common csl_db mysqlclient )
-ADD_LIBRARY( csl_db_mysql STATIC driver.cc  driver.hh )
+SET(GCC_COMMON_WARNINGS " -Wall -Wwrite-strings -Wcast-qual -Wpointer-arith -Wconversion -Wcomment -Wcast-align -Wshadow -Wredundant-decls ")
 
-FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
-INSTALL( FILES ${includes} DESTINATION include/codesloop/db/mysql )
-INSTALL(TARGETS csl_db_mysql
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-)
+SET(GCC_C_FLAGS_RELEASE "")
+SET(GCC_C_FLAGS_DEBUG "")
+SET(GCC_CXX_FLAGS_RELEASE "")
+SET(GCC_CXX_FLAGS_DEBUG "")
+
+IF(WIN32)
+  IF(MSYS)
+    SET(GCC_C_FLAGS_RELEASE   " -O3 ${GCC_COMMON_WARNINGS} ")
+    SET(GCC_C_FLAGS_DEBUG     " -g3 ${GCC_COMMON_WARNINGS} ")
+    SET(GCC_CXX_FLAGS_RELEASE " -O3 ${GCC_COMMON_WARNINGS} -Wold-style-cast ")
+    SET(GCC_CXX_FLAGS_DEBUG   " -g3 ${GCC_COMMON_WARNINGS} -Wold-style-cast ")
+  ENDIF(MSYS)
+ELSE(WIN32)
+  SET(GCC_C_FLAGS_RELEASE   " -O3 ${GCC_COMMON_WARNINGS} ")
+  SET(GCC_C_FLAGS_DEBUG     " -g3 ${GCC_COMMON_WARNINGS} ")
+  SET(GCC_CXX_FLAGS_RELEASE " -O3 ${GCC_COMMON_WARNINGS} -Wold-style-cast ")
+  SET(GCC_CXX_FLAGS_DEBUG   " -g3 ${GCC_COMMON_WARNINGS} -Wold-style-cast ")
+ENDIF(WIN32)
 
 # -- EOF --

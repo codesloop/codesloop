@@ -29,6 +29,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/common/pbuf.hh"
 #include "codesloop/common/arch.hh"
 #include "codesloop/rpc/exc.hh"
+#include <assert.h>
 
 /**
   @file rpc/src/srv_trans_tcp.cc

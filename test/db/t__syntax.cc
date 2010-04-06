@@ -79,7 +79,7 @@ namespace test_syntax {
     }
   }
 
-  void query_syntax_dummy()
+  void insert_syntax_dummy()
   {
     conn c( driver::d_dummy );
     bool open_ret = c.open("test.db");
@@ -107,6 +107,22 @@ namespace test_syntax {
     }
   }
 
+  void select_syntax_dummy()
+  {
+    conn c( driver::d_dummy );
+    bool open_ret = c.open("test.db");
+
+    tran t(c);
+
+    {
+      /**/
+      ustr r1,r2,r3;
+      query q(t);
+      q.SELECT().FROM(TABLE("T1").FIELD("F1",r1).FIELD("F2",r2)).
+                 FROM(TABLE("T2").FIELD("G1",r1).FIELD("G2",r2)).GO();
+    }
+  }
+
 } // end of test_syntax
 
 using namespace test_syntax;
@@ -115,7 +131,8 @@ int main()
 {
   conn_syntax_dummy();
   tran_syntax_dummy();
-  query_syntax_dummy();
+  insert_syntax_dummy();
+  select_syntax_dummy();
   return 0;
 }
 

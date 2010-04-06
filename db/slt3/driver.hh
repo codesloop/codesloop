@@ -46,10 +46,6 @@ namespace csl
         {
           public:
             // interface
-            void table_name(const char * table);
-            const char * table_name();
-            csl::db::syntax::insert_column & VAL(const char * column_name,
-                                                 const var & value);
             bool GO();
 
             // internals
@@ -59,10 +55,7 @@ namespace csl
           private:
             // no default construction
             insert_column();
-
-            common::ustr table_name_;
             csl::db::slt3::syntax::generator * generator_;
-
             CSL_OBJ(csl::db::slt3::syntax,insert_column);
         };
 
@@ -78,12 +71,28 @@ namespace csl
             CSL_OBJ(csl::db::slt3::syntax,where_condition);
         };
 
+        class select_query : public csl::db::syntax::select_query
+        {
+          public:
+            select_query & FROM( const TABLE & t )
+            { // TODO XXX TODO XXX TODO
+              return *this;
+            }
+            bool GO()
+            { // TODO XXX TODO XXX TODO
+              return false;
+            }
+            CSL_OBJ(csl::db::slt3::syntax,select_query);
+        };
+
         class generator : public csl::db::syntax::generator
         {
           public:
             // interface
-            csl::db::syntax::insert_column & INSERT_INTO(const char * table);
             bool GO();
+
+            csl::db::syntax::insert_column & insert_column_ref() { return insert_column_; }
+            csl::db::syntax::select_query & select_query_ref()   { return select_query_;  }
 
             // internals
             generator(csl::db::driver & d);
@@ -92,9 +101,8 @@ namespace csl
           private:
             // no default construction
             generator();
-
-            insert_column insert_column_;
-
+            csl::db::slt3::syntax::insert_column insert_column_;
+            csl::db::slt3::syntax::select_query  select_query_;
             CSL_OBJ(csl::db::slt3::syntax,generator);
         };
       }

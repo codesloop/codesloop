@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009,2010, CodeSLoop Team
+# Copyright (c) 2008,2009,2010, CodeSloop Team
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -21,17 +21,33 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-LINK_DIRECTORIES( ../../common ../../db)
-INCLUDE_DIRECTORIES( ../../.. )
-LINK_LIBRARIES( csl_common csl_db mysqlclient )
-ADD_LIBRARY( csl_db_mysql STATIC driver.cc  driver.hh )
+INCLUDE(DetectIgep)
+INCLUDE(DetectGcc)
 
-FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
-INSTALL( FILES ${includes} DESTINATION include/codesloop/db/mysql )
-INSTALL(TARGETS csl_db_mysql
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-)
+# IGEP and GCC flags can safely be added here
+# because they are set to empty if not usable
+
+SET(COMMON_CXX_FLAGS ${IGEP_CXX_FLAGS})
+SET(COMMON_C_FLAGS ${IGEP_C_FLAGS})
+
+SET(CMAKE_C_FLAGS_DEBUG " ${GCC_C_FLAGS_DEBUG} ${COMMON_C_FLAGS} ")
+SET(CMAKE_C_FLAGS_RELEASE " ${GCC_C_FLAGS_RELEASE} ${COMMON_C_FLAGS} ")
+
+SET(CMAKE_CXX_FLAGS_DEBUG " ${GCC_CXX_FLAGS_DEBUG} ${COMMON_CXX_FLAGS} ")
+SET(CMAKE_CXX_FLAGS_RELEASE " ${GCC_CXX_FLAGS_RELEASE} ${COMMON_CXX_FLAGS} ")
+
+# default is debug configuration
+SET(CMAKE_C_FLAGS ${CMAKE_C_FLAGS_DEBUG})
+SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS_DEBUG})
+
+# change config if release
+IF(CMAKE_BUILD_TYPE MATCHES "release")
+  SET(CMAKE_C_FLAGS ${CMAKE_CXX_FLAGS_RELEASE})
+  SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS_RELEASE})
+ENDIF(CMAKE_BUILD_TYPE MATCHES "release")
+
+MESSAGE(STATUS "Build type: " ${CMAKE_BUILD_TYPE})
+MESSAGE(STATUS "C FLAGS:    " ${CMAKE_C_FLAGS})
+MESSAGE(STATUS "CXX FLAGS:  " ${CMAKE_CXX_FLAGS})
 
 # -- EOF --

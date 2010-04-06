@@ -95,6 +95,9 @@ ELSE(WIN32)
 
 ENDIF(WIN32)
 
+SET_SOURCE_FILES_PROPERTIES( t__logger.cc PROPERTIES 
+                             COMPILE_FLAGS -DENABLE_LOGGER )
+
 ADD_EXECUTABLE( t__zfile         t__zfile.cc )
 ADD_EXECUTABLE( t__circbuf       t__circbuf.cc )
 ADD_EXECUTABLE( t__pvlist        t__pvlist.cc )

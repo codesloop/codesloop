@@ -269,7 +269,7 @@ namespace csl
 
     uint64_t str::find(const str & s) const
     {
-      wchar_t * p = ::wcsstr( data(), s.data() );
+      const wchar_t * p = ::wcsstr( data(), s.data() );
       uint64_t ret = npos;
 
       if ( p != NULL ) {
