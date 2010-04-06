@@ -21,27 +21,43 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-PROJECT(codesloop)
-ENABLE_TESTING()
+FIND_PATH( ZLIB_INCLUDE_DIR zlib.h
+  HINTS $ENV{ZLIB_DIR} 
+  PATHS
+  /usr/local/include
+  /usr/include
+  /sw/include
+  /opt/local/include
+  /opt/include
+  )
 
-# SET(CMAKE_VERBOSE_MAKEFILE ON)
-SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
-INCLUDE(DefaultCompilerFlags)
-FIND_PACKAGE(MySQL)
-FIND_PACKAGE(ZLib)
-FIND_PACKAGE(Dlopen)
+SET(ZLIB_NAMES z zlib zdll)
 
-SUBDIRS(
-         common
-         comm
-         sec
-         nthread
-         db
-         # sched
-         rpc
-         example
-         test
-       )
+FIND_LIBRARY( ZLIB_LIBRARY NAMES ${ZLIB_NAMES}
+  HINTS $ENV{ZLIB_DIR}
+  PATH_SUFFIXES lib64 lib
+  PATHS
+  /usr/local
+  /usr
+  /sw
+  /opt/local
+  /opt
+  )
+
+SET(ZLIB_FOUND "NO")
+
+IF(ZLIB_INCLUDE_DIR AND ZLIB_LIBRARY)
+   SET(ZLIB_FOUND TRUE)
+ELSE(ZLIB_INCLUDE_DIR AND ZLIB_LIBRARY)
+   SET(ZLIB_INCLUDE_DIR "")
+   SET(ZLIB_LIBRARY "")
+ENDIF(ZLIB_INCLUDE_DIR AND ZLIB_LIBRARY)
+
+IF(ZLIB_FOUND)
+  MESSAGE(STATUS "zlib found: ${ZLIB_LIBRARY}")
+ELSE(ZLIB_FOUND)
+  MESSAGE(STATUS "zlib NOT found")
+ENDIF(ZLIB_FOUND)
 
 # -- EOF --
+

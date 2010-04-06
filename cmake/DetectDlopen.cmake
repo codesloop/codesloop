@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009,2010, CodeSloop Team
+# Copyright (c) 2008,2009,2010, CodeSLoop Team
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -21,27 +21,39 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-PROJECT(codesloop)
-ENABLE_TESTING()
+FIND_PATH(DLOPEN_INCLUDE_DIR dlfcn.h
+  PATHS
+  /usr/local/include
+  /usr/include
+  /sw/include
+  /opt/local/include
+  /opt/include
+  )
 
-# SET(CMAKE_VERBOSE_MAKEFILE ON)
-SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
-INCLUDE(DefaultCompilerFlags)
-FIND_PACKAGE(MySQL)
-FIND_PACKAGE(ZLib)
-FIND_PACKAGE(Dlopen)
+FIND_LIBRARY(DLOPEN_LIBRARY NAMES dl
+  PATH_SUFFIXES lib64 lib
+  PATHS
+  /usr/local
+  /usr
+  /sw
+  /opt/local
+  /opt
+  )
 
-SUBDIRS(
-         common
-         comm
-         sec
-         nthread
-         db
-         # sched
-         rpc
-         example
-         test
-       )
+SET(DLOPEN_FOUND "NO")
+
+IF(DLOPEN_INCLUDE_DIR AND DLOPEN_LIBRARY)
+   SET(DLOPEN_FOUND TRUE)
+ELSE(DLOPEN_INCLUDE_DIR AND DLOPEN_LIBRARY)
+   SET(DLOPEN_LIBRARY "")
+   SET(DLOPEN_INCLUDE_DIR "")
+ENDIF(DLOPEN_INCLUDE_DIR AND DLOPEN_LIBRARY)
+
+IF(DLOPEN_FOUND)
+  MESSAGE(STATUS "dlopen found: ${DLOPEN_LIBRARY}")
+ELSE(DLOPEN_FOUND)
+  MESSAGE(STATUS "dlopen NOT found")
+ENDIF(DLOPEN_FOUND)
 
 # -- EOF --
+

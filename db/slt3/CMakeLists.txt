@@ -21,65 +21,19 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+# -- db / slt3 --
+
 LINK_DIRECTORIES( ../nthread ../common ) 
 INCLUDE_DIRECTORIES( ../../.. )
-
-IF(NOT WIN32)
-
-  SET( CMAKE_CXX_FLAGS "-Wconversion -Wcast-qual -Wpointer-arith -Wcast-align -Wold-style-cast" )
-
-  ADD_DEFINITIONS(
-                    -Wall
-                    -g3
-                    # -O3 -Os
-                    -DTHREADSAFE=1
-                   -DSQLITE_DEFAULT_PAGE_SIZE=32768
-                   -DSQLITE_MAX_ATTACHED=30
-                   -DSQLITE_ENABLE_COLUMN_METADATA=1
-                   -DSQLITE_DEFAULT_CACHE_SIZE=10000
-                   -Wwrite-strings
-                   -Wcomment
-                   -Wshadow
-                   -Wredundant-decls
-                 )
-
-ELSE(NOT WIN32)
-
-  IF(MSYS)
-
-    SET( CMAKE_CXX_FLAGS "-Wconversion -Wcast-qual -Wpointer-arith -Wcast-align -Wold-style-cast" )
-
-    ADD_DEFINITIONS(
-                      -Wall
-                      -g3
-                      -DTHREADSAFE=1
-                      -DSQLITE_DEFAULT_PAGE_SIZE=32768
-                      -DSQLITE_MAX_ATTACHED=30
-                      -DSQLITE_ENABLE_COLUMN_METADATA=1
-                      -DSQLITE_DEFAULT_CACHE_SIZE=10000
-                      # -DDEBUG
-                      # -DPRINT_SQL
-                     -Wwrite-strings
-                     -Wcomment
-                     -Wshadow
-                     -Wredundant-decls
-                   )
-
-  ELSE(MSYS)
-
-    ADD_DEFINITIONS(
-                     -DTHREADSAFE=1
-                     -DSQLITE_DEFAULT_PAGE_SIZE=32768
-                     -DSQLITE_MAX_ATTACHED=30
-                     -DSQLITE_ENABLE_COLUMN_METADATA=1
-                     -DSQLITE_DEFAULT_CACHE_SIZE=10000
-                     # -DDEBUG
-                     # -DPRINT_SQL
-                   )
-
-  ENDIF(MSYS)
-
-ENDIF(NOT WIN32)
+ADD_DEFINITIONS(
+                 -DTHREADSAFE=1
+                 -DSQLITE_DEFAULT_PAGE_SIZE=32768
+                 -DSQLITE_MAX_ATTACHED=30
+                 -DSQLITE_ENABLE_COLUMN_METADATA=1
+                 -DSQLITE_DEFAULT_CACHE_SIZE=10000
+                 # -DDEBUG
+                 # -DPRINT_SQL
+               )
 
 ADD_LIBRARY( csl_db_slt3 STATIC
              sqlite3.c

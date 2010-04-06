@@ -21,6 +21,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+# -- comm --
+
 LINK_DIRECTORIES(
                   ../nthread
                   ../common/libev
@@ -28,46 +30,7 @@ LINK_DIRECTORIES(
                   ../sec
                 )
 
-INCLUDE_DIRECTORIES(
-                     ../..
-                   )
-
-IF(NOT WIN32)
-
-    ADD_DEFINITIONS(
-                     -Wall
-                     -Wwrite-strings
-                     -Wcast-qual
-                     -Wpointer-arith
-                     -Wold-style-cast
-                     -Wconversion
-                     -Wcomment
-                     -Wcast-align
-                     -Wshadow
-                     -Wredundant-decls
-                     -g3
-                   )
-
-ELSE(NOT WIN32)
-
-  IF(MSYS)
-
-    ADD_DEFINITIONS(
-                     -Wall
-                     -Wwrite-strings
-                     -Wcast-qual
-                     -Wpointer-arith
-                     -Wold-style-cast
-                     -Wconversion
-                     -Wcomment
-                     -Wcast-align
-                     -Wshadow
-                     -Wredundant-decls
-                     -g3
-                   )
-  ENDIF(MSYS)
-
-ENDIF(NOT WIN32)
+INCLUDE_DIRECTORIES( ../.. )
 
 LINK_LIBRARIES( csl_common_libev csl_common )
 
