@@ -44,6 +44,7 @@ FIND_LIBRARY(MYSQL_LIBRARY
   /sw
   /opt/local
   /opt
+  /usr/local/lib/mysql/
 )
 
 SET(MYSQL_FOUND "NO")
