@@ -24,9 +24,13 @@
 LINK_DIRECTORIES(
                   ../../common
                   ../../db
+                  /usr/local/lib
+                  /usr/local/lib/mysql
                 )
 
-INCLUDE_DIRECTORIES( ../../.. )
+INCLUDE_DIRECTORIES(  ../../..
+                      /usr/local/include
+                  )
 
 LINK_LIBRARIES(
                 csl_common

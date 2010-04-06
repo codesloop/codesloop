@@ -29,9 +29,13 @@ LINK_DIRECTORIES(
                   ../db/dummy
                   ../db/mysql
                   ../db/slt3
+                  /usr/local/lib
+                  /usr/local/lib/mysql
                 )
 
-INCLUDE_DIRECTORIES( ../.. )
+INCLUDE_DIRECTORIES(  ../.. 
+                      /usr/local/include
+                    )
 
 LINK_LIBRARIES(
                 csl_db_dummy
