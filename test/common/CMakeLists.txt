@@ -21,82 +21,18 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IF(WIN32)
+# -- test / common --
 
-  IF(MSYS)
+LINK_DIRECTORIES( ../../common
+                  ${ZLIB_LIBRARY_DIR} )
 
-    SET(ZLIB z)
+INCLUDE_DIRECTORIES( ../../.. ${ZLIB_INCLUDE_DIR} )
 
-    ADD_DEFINITIONS(
-                     -Wall
-                     -Wwrite-strings
-                     -Wcast-qual
-                     -Wpointer-arith
-                     -Wold-style-cast
-                     -Wconversion
-                     -Wcomment
-                     -Wcast-align
-                     -Wshadow
-                     -Wredundant-decls
-                     -g3
-                   )
+LINK_LIBRARIES( csl_common
+                ${ZLIB_LIBRARY}
+                ${WSOCK32_LIBRARY} )
 
-  ELSE(MSYS)
-
-    SET(ZLIB zlib)
-
-  ENDIF(MSYS)
-
-  LINK_DIRECTORIES(
-                    ../../common
-                    "C:/Program Files/GnuWin32/lib/"
-                    $ENV{ZLIB_DEV_ENV}/lib
-                    ../../../3rdparty/zlib/GnuWin32/lib
-                  )
-
-  INCLUDE_DIRECTORIES( ../../..
-                       ../../common
-                       "C:/Program Files/GnuWin32/include/"
-                       $ENV{ZLIB_DEV_ENV}/include
-                       ../../../3rdparty/zlib/GnuWin32/include
-                     )
-
-  LINK_LIBRARIES(
-                  csl_common
-                  ${ZLIB}
-                  wsock32
-                )
-
-ELSE(WIN32)
-
-  ADD_DEFINITIONS(
-                   -Wall
-                   -Wwrite-strings
-                   -Wcast-qual
-                   -Wpointer-arith
-                   -Wold-style-cast
-                   -Wconversion
-                   -Wcomment
-                   -Wcast-align
-                   -Winline
-                   -Wshadow
-                   -Wredundant-decls
-                   -g3
-                 )
-
-  LINK_DIRECTORIES( ../../common )
-
-  INCLUDE_DIRECTORIES( ../../..   ../../common )
-
-  LINK_LIBRARIES(
-                  csl_common
-                  z
-                )
-
-ENDIF(WIN32)
-
-SET_SOURCE_FILES_PROPERTIES( t__logger.cc PROPERTIES 
-                             COMPILE_FLAGS -DENABLE_LOGGER )
+SET_SOURCE_FILES_PROPERTIES( t__logger.cc PROPERTIES  COMPILE_FLAGS -DENABLE_LOGGER )
 
 ADD_EXECUTABLE( t__zfile         t__zfile.cc )
 ADD_EXECUTABLE( t__circbuf       t__circbuf.cc )
@@ -121,7 +57,6 @@ ADD_EXECUTABLE( t__hash_exp      t__hash_exp.cc )
 ADD_EXECUTABLE( t__auto_cloce    t__auto_close.cc )
 ADD_EXECUTABLE( t__rdbuf         t__rdbuf.cc )
 ADD_EXECUTABLE( t__read_res      t__read_res.cc )
-
 
 ADD_TEST(common_auto_cloce ${EXECUTABLE_OUTPUT_PATH}/t__auto_cloce)
 ADD_TEST(common_binry ${EXECUTABLE_OUTPUT_PATH}/t__binry)

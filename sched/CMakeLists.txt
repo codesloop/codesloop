@@ -21,54 +21,9 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-LINK_DIRECTORIES(
-                  ../nthread
-                  ../common
-                  ../sec
-                  ../db
-                )
+# -- sched --
 
-INCLUDE_DIRECTORIES(
-                     ../..
-                    )
-
-IF(WIN32)
-
-  IF(MSYS)
-
-    ADD_DEFINITIONS(
-                     -Wall
-                     -Wwrite-strings
-                     -Wcast-qual
-                     -Wpointer-arith
-                     -Wold-style-cast
-                     -Wconversion
-                     -Wcomment
-                     -Wcast-align
-                     -Wshadow
-                     -Wredundant-decls
-                     -g3
-                   )
-
-  ENDIF(MSYS)
-
-ELSE(WIN32)
-
-  ADD_DEFINITIONS(
-                   -Wall
-                   -Wwrite-strings
-                   -Wcast-qual
-                   -Wpointer-arith
-                   -Wold-style-cast
-                   -Wconversion
-                   -Wcomment
-                   -Wcast-align
-                   -Wshadow
-                   -Wredundant-decls
-                   -g3
-                 )
-
-  ENDIF(WIN32)
+INCLUDE_DIRECTORIES( ../.. )
 
 ADD_LIBRARY( csl_sched STATIC
              schedule.cc      schedule.hh
@@ -81,8 +36,7 @@ ADD_LIBRARY( csl_sched STATIC
              data.cc          data.hh
              cfg.cc           cfg.hh
              item_state.cc    item_state.hh
-             synchr.cc        synchr.hh
-           )
+             synchr.cc        synchr.hh )
 
 FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
 INSTALL( FILES ${includes} DESTINATION include/codesloop/sched )

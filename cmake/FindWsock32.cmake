@@ -1,4 +1,4 @@
-# Copyright (c) 2008,2009,2010, CodeSLoop Team
+# Copyright (c) 2008,2009,2010, CodeSloop Team
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -21,39 +21,19 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-FIND_PATH(DLOPEN_INCLUDE_DIR dlfcn.h
-  PATHS
-  /usr/local/include
-  /usr/include
-  /sw/include
-  /opt/local/include
-  /opt/include
-  )
+SET(WSOCK32_FOUND "NO")
+SET(WSOCK32_LIBRARY "")
 
-FIND_LIBRARY(DLOPEN_LIBRARY NAMES dl
-  PATH_SUFFIXES lib64 lib
-  PATHS
-  /usr/local
-  /usr
-  /sw
-  /opt/local
-  /opt
-  )
+IF(WIN32)
+  SET(WSOCK32_FOUND TRUE)
+  SET(WSOCK32_LIBRARY wsock32)
+ENDIF(WIN32)
 
-SET(DLOPEN_FOUND "NO")
-
-IF(DLOPEN_INCLUDE_DIR AND DLOPEN_LIBRARY)
-   SET(DLOPEN_FOUND TRUE)
-ELSE(DLOPEN_INCLUDE_DIR AND DLOPEN_LIBRARY)
-   SET(DLOPEN_LIBRARY "")
-   SET(DLOPEN_INCLUDE_DIR "")
-ENDIF(DLOPEN_INCLUDE_DIR AND DLOPEN_LIBRARY)
-
-IF(DLOPEN_FOUND)
-  MESSAGE(STATUS "dlopen found: ${DLOPEN_LIBRARY}")
-ELSE(DLOPEN_FOUND)
-  MESSAGE(STATUS "dlopen NOT found")
-ENDIF(DLOPEN_FOUND)
+IF(WSOCK32_FOUND)
+  MESSAGE(STATUS "wsock32 found")
+ELSE(WSOCK32_FOUND)
+  MESSAGE(STATUS "wsock32 NOT found")
+ENDIF(WSOCK32_FOUND)
 
 # -- EOF --
 

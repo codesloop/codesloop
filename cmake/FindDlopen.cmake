@@ -22,23 +22,11 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 FIND_PATH(DLOPEN_INCLUDE_DIR dlfcn.h
-  PATHS
-  /usr/local/include
-  /usr/include
-  /sw/include
-  /opt/local/include
-  /opt/include
-  )
+  PATHS /usr/local/include /usr/include /sw/include /opt/local/include /opt/include )
 
 FIND_LIBRARY(DLOPEN_LIBRARY NAMES dl
   PATH_SUFFIXES lib64 lib
-  PATHS
-  /usr/local
-  /usr
-  /sw
-  /opt/local
-  /opt
-  )
+  PATHS /usr/local /usr /sw /opt/local /opt )
 
 SET(DLOPEN_FOUND "NO")
 

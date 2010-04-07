@@ -23,122 +23,21 @@
 
 # SET(CMAKE_VERBOSE_MAKEFILE ON)
 
-IF(WIN32)
+# -- test / sec --
 
-  IF(MSYS)
-  
-    LINK_LIBRARIES(
-                    csl_sec
-                    csl_common
-                    eay32
-                    z
-                    wsock32
-                  )
+LINK_LIBRARIES( csl_sec
+                csl_common
+                ${OPENSSL_LIBS}
+                ${ZLIB_LIBRARY}
+                ${WSOCK32_LIBRARY}
+                ${DLOPEN_LIBRARY} )
 
-    INCLUDE_DIRECTORIES( ../../..  
-                         ../../sec
-                         ../../common
-                         c:/OpenSSL/include
-                         $ENV{OPENSSL_DEV_ENV}/include
-                         ../../../3rdparty/OpenSSL/include
-                       )
+INCLUDE_DIRECTORIES( ../../.. ${OPENSSL_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR} )
 
-    LINK_DIRECTORIES( ../../sec
-                      ../../common
-                      c:/OpenSSL/lib/MinGW
-                      $ENV{OPENSSL_DEV_ENV}/lib/MinGW
-                      ../../../3rdparty/OpenSSL/lib/MinGW
-                      )
-                      
-    ADD_DEFINITIONS(
-                     -Wall
-                     -Wwrite-strings
-                     -Wcast-qual
-                     -Wpointer-arith
-                     -Wold-style-cast
-                     -Wconversion
-                     -Wcomment
-                     -Wcast-align
-                     -Wshadow
-                     -Wredundant-decls
-                     -g3
-                   )
-
-  ELSE(MSYS)
-
-    LINK_LIBRARIES(
-                    csl_sec
-                    csl_common
-                    ssleay32MT
-                    libeay32MT
-                    zlib
-                    wsock32
-                  )
-
-    INCLUDE_DIRECTORIES( ../../..  
-                         ../../sec
-                         ../../common
-                         c:/OpenSSL/include
-                         $ENV{OPENSSL_DEV_ENV}/include
-                         ../../../3rdparty/OpenSSL/include
-                         $ENV{ZLIB_DEV_ENV}/include
-                         ../../../3rdparty/zlib/GnuWin32/include
-                       )
-
-    LINK_DIRECTORIES( ../../sec
-                      ../../common
-                      c:/OpenSSL/lib/VC/static
-                      $ENV{OPENSSL_DEV_ENV}/lib/VC/static
-                      ../../../3rdparty/OpenSSL/lib/VC/static
-                      $ENV{ZLIB_DEV_ENV}/lib
-                      ../../../3rdparty/zlib/GnuWin32/lib
-                      )
-  ENDIF(MSYS)
-
-ELSE(WIN32)
-
-  find_library(DLOPEN_FOUND NAMES dl PATH /usr/lib /lib /usr/local/lib)
-  set(LIBDL)
-
-  if (DLOPEN_FOUND)
-    set(LIBDL dl)
-    set(HAVE_LIBDL TRUE)
-  endif (DLOPEN_FOUND)
-
-  ADD_DEFINITIONS(
-                   -Wall
-                   -Wwrite-strings
-                   -Wcast-qual
-                   -Wpointer-arith
-                   -Wold-style-cast
-                   -Wconversion
-                   -Wcomment
-                   -Wcast-align
-                   -Wshadow
-                   -Wredundant-decls
-                   -g3
-                 )
-
-  INCLUDE_DIRECTORIES( ../../..  
-      ../../sec
-      ../../common
-      /usr/local/ssl/include )
-
-  LINK_LIBRARIES(
-      csl_sec
-      csl_common
-      ssl
-      crypto
-      z
-      stdc++
-      ${LIBDL} )
-
-  LINK_DIRECTORIES(
-      ../../sec
-      ../../common
-       /usr/local/ssl/lib )
-
-ENDIF(WIN32)
+LINK_DIRECTORIES( ../../sec
+                  ../../common
+                  ${OPENSSL_LIBRARY_DIR}
+                  ${ZLIB_LIBRARY_DIR} )
 
 ADD_EXECUTABLE(t__umac               t__umac.cc)
 ADD_EXECUTABLE(t__crypt_buf          t__crypt_buf.cc)

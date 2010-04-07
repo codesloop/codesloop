@@ -23,106 +23,24 @@
 
 # -- example --
 
-IF(WIN32)
-
-  IF(MSYS)
-
-    SET(ZLIB z)
-
-    ADD_DEFINITIONS(
-                     -Wall
-                     -Wwrite-strings
-                     -Wcast-qual
-                     -Wpointer-arith
-                     -Wold-style-cast
-                     -Wconversion
-                     -Wcomment
-                     -Wcast-align
-                     -Wshadow
-                     -Wredundant-decls
-                     -g3
-                   )
-
-  ELSE(MSYS)
-
-    SET(ZLIB zlib)
-
-  ENDIF(MSYS)
-
-  LINK_DIRECTORIES(
-                  ../common
+LINK_DIRECTORIES( ../common
                   ../sec
                   ../nthread
                   ../db
-                  ../db/slt3
-                  "C:/Program Files/GnuWin32/lib/"
-                  $ENV{ZLIB_DEV_ENV}/lib
-                  ../../3rdparty/zlib/GnuWin32/lib
-                  )
+                  ../db/slt3 )
+		  
+INCLUDE_DIRECTORIES( ../.. ${ZLIB_INCLUDE_DIR} ${OPENSSL_INCLUDE_DIR} )
 
-  INCLUDE_DIRECTORIES(
-                  ../..
-                  "C:/Program Files/GnuWin32/include/"
-                  $ENV{ZLIB_DEV_ENV}/include
-                  ../../3rdparty/zlib/GnuWin32/include
-                  )
+ADD_DEFINITIONS( ${PTHREAD_FLAGS} )
 
-  LINK_LIBRARIES(
-                  csl_db_slt3
-                  csl_db
-                  csl_nthread
-                  csl_common
-                  ${ZLIB}
-                  wsock32
-                  )
-ELSE(WIN32)
-
-  FIND_LIBRARY(DLOPEN_FOUND NAMES dl PATH /usr/lib /lib /usr/local/lib)
-  SET(LIBDL)
-
-  IF(DLOPEN_FOUND)
-   SET(LIBDL dl)
-   SET(HAVE_LIBDL TRUE)
-  ENDIF(DLOPEN_FOUND)
-
-  LINK_DIRECTORIES(
-                  ../common
-                  ../sec
-                  ../nthread
-                  ../db
-                  ../db/slt3
-                  )
-
-  INCLUDE_DIRECTORIES(
-                     ../..
-                     )
-
-  ADD_DEFINITIONS(
-                   -Wall
-                   -Wwrite-strings
-                   -Wcast-qual
-                   -Wpointer-arith
-                   -Wold-style-cast
-                   -Wconversion
-                   -Wcomment
-                   -Wcast-align
-                   -Wshadow
-                   -Wredundant-decls
-                   -g3
-                   -pthread
-                 )
-
-  LINK_LIBRARIES(
-                  csl_db_slt3
-                  csl_db
-                  csl_nthread
-                  csl_common
-                  pthread
-                  ${LIBDL}
-                  z
-                )
-
-ENDIF(WIN32)
+LINK_LIBRARIES( csl_db_slt3
+                csl_db
+                csl_nthread
+                csl_common
+                ${PTHREAD_LIBRARY}
+                ${DLOPEN_LIBRARY}
+                ${ZLIB_LIBRARY}
+                ${WSOCK32_LIBRARY} )
 
 ADD_EXECUTABLE( ex_zfile1 ex_zfile1.cc )
 ADD_EXECUTABLE( ex_zfile2 ex_zfile2.cc )

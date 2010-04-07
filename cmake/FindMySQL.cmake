@@ -22,29 +22,15 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 FIND_PATH(MYSQL_INCLUDE_DIR mysql_version.h
-  HINTS
-  $ENV{MYSQL_DIR}
+  HINTS $ENV{MYSQL_DIR}
   PATH_SUFFIXES mysql
-  PATHS
-  /usr/local/include
-  /usr/include
-  /sw/include
-  /opt/local/include
-  /opt/include
-)
+  PATHS /usr/local/include /usr/include /sw/include /opt/local/include /opt/include )
 
 FIND_LIBRARY(MYSQL_LIBRARY
   NAMES mysqlclient
-  HINTS
-  $ENV{MYSQL_DIR}
+  HINTS $ENV{MYSQL_DIR}
   PATH_SUFFIXES lib64 lib
-  PATHS
-  /usr/local
-  /usr
-  /sw
-  /opt/local
-  /opt
-)
+  PATHS /usr/local /usr /sw /opt/local /opt )
 
 SET(MYSQL_FOUND "NO")
 

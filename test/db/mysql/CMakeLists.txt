@@ -21,78 +21,28 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+# -- test / db / mysql --
+
 LINK_DIRECTORIES(
                   ../../../db
                   ../../../db/mysql
                   ../../../nthread
-                  ../../../common
-                )
+                  ../../../common )
 
 INCLUDE_DIRECTORIES( ../../../.. )
 
-IF(WIN32)
+LINK_LIBRARIES( csl_db_mysql
+                csl_db
+                csl_nthread
+                csl_common
+                ${MYSQL_LIBRARY}
+                ${WSOCK32_LIBRARY}
+                ${PTHREAD_LIBRARY}
+                ${DLOPEN_LIBRARY} )
+                
+ADD_DEFINITIONS( ${PTHREAD_FLAG} )
 
-  LINK_LIBRARIES(
-                  csl_db_mysql
-                  csl_db
-                  csl_nthread
-                  csl_common
-                  wsock32
-                )
-
-  IF(MSYS)
-
-    ADD_DEFINITIONS( -Wall
-                     -Wwrite-strings
-                     -Wcast-qual
-                     -Wpointer-arith
-                     -Wold-style-cast
-                     -Wconversion
-                     -Wcomment
-                     -Wcast-align
-                     -Wshadow
-                     -Wredundant-decls
-                     -g3
-                   )
-
-  ENDIF(MSYS)
-
-ELSE(WIN32)
-
-  find_library(DLOPEN_FOUND NAMES dl PATH /usr/lib /lib /usr/local/lib)
-  set(LIBDL)
-
-  if (DLOPEN_FOUND)
-   set(LIBDL dl)
-   set(HAVE_LIBDL TRUE)
-  endif (DLOPEN_FOUND)
-
-  ADD_DEFINITIONS(
-                   -Wall
-                   -Wwrite-strings
-                   -Wcast-qual
-                   -Wpointer-arith
-                   -Wold-style-cast
-                   -Wconversion
-                   -Wcomment
-                   -Wcast-align
-                   -Wshadow
-                   -Wredundant-decls
-                   -g3
-                 )
-
-  LINK_LIBRARIES(
-                  csl_db_mysql
-                  csl_db
-                  csl_nthread
-                  csl_common
-                  pthread
-                  ${LIBDL}
-                )
-
-ENDIF(WIN32)
-
-ADD_EXECUTABLE( t__mysql_conn         t__mysql_conn.cc )
+ADD_EXECUTABLE( t__mysql_conn  t__mysql_conn.cc )
 
 ADD_TEST(db_mysql_conn ${EXECUTABLE_OUTPUT_PATH}/t__mysql_conn)
 

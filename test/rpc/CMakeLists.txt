@@ -23,27 +23,10 @@
 
 # SET(CMAKE_VERBOSE_MAKEFILE ON)
 
-IF(WIN32)
-
-
-ELSE(WIN32)
-  ADD_DEFINITIONS(
-                   -Wall
-                   -Wwrite-strings
-                   -Wcast-qual
-                   -Wpointer-arith
-                   -Wold-style-cast
-                   -Wconversion
-                   -Wcomment
-                   -Wcast-align
-                   -Wshadow
-                   -Wredundant-decls
-                   -g3
-                 )
-ENDIF(WIN32)
+# -- test / rpc --
 
 # ADD_DEFINITIONS( -DDEBUG )
-
+ADD_DEFINITIONS( ${PTHREAD_FLAG} )
 
 ADD_CUSTOM_COMMAND( OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/hello_cli.cc
                     ${CMAKE_CURRENT_SOURCE_DIR}/hello_cli.hh
@@ -55,31 +38,23 @@ ADD_CUSTOM_COMMAND( OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/hello_cli.cc
                     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} )
 
 INCLUDE_DIRECTORIES( ../../.. )
-LINK_DIRECTORIES( ../../common
-                 ../../rpc 
-                )
 
-LINK_LIBRARIES(
-                csl_rpc
+LINK_DIRECTORIES( ../../common ../../rpc  )
+
+LINK_LIBRARIES( csl_rpc
                 csl_comm
                 csl_nthread
-                csl_common_libev                
+                csl_common_libev
                 csl_common
-                pthread
-              )
-
+                ${PTHREAD_LIBRARY} )
 
 ADD_EXECUTABLE( hello_cli
-                 hello_cli_main.cc
-                 hello_cli.cc hello_cli.hh
-              )
+                hello_cli_main.cc
+                hello_cli.cc hello_cli.hh )
 
 ADD_EXECUTABLE( hello_srv
-                 hello_srv_main.cc
-                 hello_srv.cc hello_srv.hh
-              )
-
-
+                hello_srv_main.cc
+                hello_srv.cc hello_srv.hh )
 
 # simple conversion tests
 #ADD_TEST(rpc_csrgen_exp1 ../../rpc/csrgen exp1.txt )

@@ -45,8 +45,7 @@ ADD_LIBRARY( csl_db_slt3 STATIC
              tran.cc          tran.hh
              query.cc         query.hh
              obj.cc           obj.hh
-             driver.cc        driver.hh
-           )
+             driver.cc        driver.hh )
 
 FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
 INSTALL( FILES ${includes} DESTINATION include/codesloop/db/slt3 )

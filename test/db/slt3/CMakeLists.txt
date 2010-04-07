@@ -21,6 +21,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+# -- test / db / slt3 --
+
 LINK_DIRECTORIES(
                   ../../../db
                   ../../../db/slt3
@@ -30,67 +32,16 @@ LINK_DIRECTORIES(
 
 INCLUDE_DIRECTORIES( ../../../.. )
 
-IF(WIN32)
 
-  LINK_LIBRARIES(
-                  csl_db_slt3
-                  csl_db
-                  csl_nthread
-                  csl_common
-                  wsock32
-                )
+LINK_LIBRARIES( csl_db_slt3
+                csl_db
+                csl_nthread
+                csl_common
+                ${WSOCK32_LIBRARY}
+                ${PTHREAD_LIBRARY}
+                ${DLOPEN_LIBRARY} )
 
-  IF(MSYS)
-
-    ADD_DEFINITIONS( -Wall
-                     -Wwrite-strings
-                     -Wcast-qual
-                     -Wpointer-arith
-                     -Wold-style-cast
-                     -Wconversion
-                     -Wcomment
-                     -Wcast-align
-                     -Wshadow
-                     -Wredundant-decls
-                     -g3
-                   )
-
-  ENDIF(MSYS)
-
-ELSE(WIN32)
-
-  find_library(DLOPEN_FOUND NAMES dl PATH /usr/lib /lib /usr/local/lib)
-  set(LIBDL)
-
-  if (DLOPEN_FOUND)
-   set(LIBDL dl)
-   set(HAVE_LIBDL TRUE)
-  endif (DLOPEN_FOUND)
-
-  ADD_DEFINITIONS(
-                   -Wall
-                   -Wwrite-strings
-                   -Wcast-qual
-                   -Wpointer-arith
-                   -Wold-style-cast
-                   -Wconversion
-                   -Wcomment
-                   -Wcast-align
-                   -Wshadow
-                   -Wredundant-decls
-                   -g3
-                 )
-
-  LINK_LIBRARIES(
-                  csl_db_slt3
-                  csl_db
-                  csl_nthread
-                  csl_common
-                  pthread
-                  ${LIBDL}
-                )
-
-ENDIF(WIN32)
+ADD_DEFINITIONS( ${PTHREAD_FLAG} )
 
 ADD_EXECUTABLE( t__sqlite       t__sqlite.cc )
 ADD_EXECUTABLE( t__conn         t__conn.cc )

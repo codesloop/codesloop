@@ -21,28 +21,24 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+# Win32 dirs
+# "C:/Program Files/GnuWin32/lib/"
+# $ENV{ZLIB_DEV_ENV}/lib
+# ../../3rdparty/zlib/GnuWin32/lib
+# "C:/Program Files/GnuWin32/include/"
+# $ENV{ZLIB_DEV_ENV}/include
+# ../../3rdparty/zlib/GnuWin32/include
+
 FIND_PATH( ZLIB_INCLUDE_DIR zlib.h
-  HINTS $ENV{ZLIB_DIR} 
-  PATHS
-  /usr/local/include
-  /usr/include
-  /sw/include
-  /opt/local/include
-  /opt/include
-  )
+  HINTS $ENV{ZLIB_DIR} $ENV{ZLIB_DEV_ENV}
+  PATHS /usr/local/include /usr/include /sw/include /opt/local/include /opt/include )
 
 SET(ZLIB_NAMES z zlib zdll)
 
 FIND_LIBRARY( ZLIB_LIBRARY NAMES ${ZLIB_NAMES}
-  HINTS $ENV{ZLIB_DIR}
+  HINTS $ENV{ZLIB_DIR} $ENV{ZLIB_DEV_ENV}
   PATH_SUFFIXES lib64 lib
-  PATHS
-  /usr/local
-  /usr
-  /sw
-  /opt/local
-  /opt
-  )
+  PATHS /usr/local /usr /sw /opt/local /opt )
 
 SET(ZLIB_FOUND "NO")
 
@@ -54,7 +50,7 @@ ELSE(ZLIB_INCLUDE_DIR AND ZLIB_LIBRARY)
 ENDIF(ZLIB_INCLUDE_DIR AND ZLIB_LIBRARY)
 
 IF(ZLIB_FOUND)
-  MESSAGE(STATUS "zlib found: ${ZLIB_LIBRARY}")
+  MESSAGE(STATUS "zlib found: ${ZLIB_LIBRARY} ${ZLIB_INCLUDE_DIR} ${ZLIB_LIBRARY_DIR}")
 ELSE(ZLIB_FOUND)
   MESSAGE(STATUS "zlib NOT found")
 ENDIF(ZLIB_FOUND)

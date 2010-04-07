@@ -21,150 +21,31 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# test/comm
+# -- test / comm --
 
-IF(WIN32)
+LINK_DIRECTORIES( ../../comm
+                  ../../nthread
+                  ../../sec
+                  ../../common
+                  ../../common/libev
+                  ${OPENSSL_LIBRARY_DIR}
+                  ${ZLIB_LIBRARY_DIR}
+                  ${DLOPEN_LIBRARY_DIR} )
 
-  IF(MSYS)
+LINK_LIBRARIES( csl_comm
+                csl_sec
+                csl_nthread
+                csl_common
+                csl_common_libev
+                ${OPENSSL_LIBS}
+                ${ZLIB_LIBRARY}
+                ${PTHREAD_LIBRARY}
+                ${WSOCK32_LIBRARY}
+                ${DLOPEN_LIBRARY} )
 
-    LINK_LIBRARIES(
-                    csl_comm
-                    csl_sec
-                    csl_nthread
-                    csl_common
-                    eay32
-                    z
-                    wsock32
-                  )
+INCLUDE_DIRECTORIES( ../../.. ${OPENSSL_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR} ${DLOPEN_INCLUDE_DIR} )
 
-    INCLUDE_DIRECTORIES( ../../..
-                         ../../comm
-                         ../../nthread
-                         ../../sec
-                         ../../common
-                         c:/OpenSSL/include
-                         $ENV{OPENSSL_DEV_ENV}/include
-                         ../../../3rdparty/OpenSSL/include
-                       )
-
-    LINK_DIRECTORIES(
-                      ../../comm
-                      ../../nthread
-                      ../../sec
-                      ../../common
-                      ../../common/libev
-                      c:/OpenSSL/lib/MinGW
-                      $ENV{OPENSSL_DEV_ENV}/lib/MinGW
-                      ../../../3rdparty/OpenSSL/lib/MinGW
-                      )
-
-    ADD_DEFINITIONS(
-                     -Wall
-                     -Wwrite-strings
-                     -Wcast-qual
-                     -Wpointer-arith
-                     -Wold-style-cast
-                     -Wconversion
-                     -Wcomment
-                     -Wcast-align
-                     -Wshadow
-                     -Wredundant-decls
-                     -g3
-                   )
-
-  ELSE(MSYS)
-
-    LINK_LIBRARIES(
-                    csl_comm
-                    csl_sec
-                    csl_nthread
-                    csl_common
-                    csl_common_libev
-                    ssleay32MT
-                    libeay32MT
-                    zlib
-                    wsock32
-                  )
-
-    INCLUDE_DIRECTORIES( ../../..
-                         ../../comm
-                         ../../common
-                         c:/OpenSSL/include
-                         $ENV{OPENSSL_DEV_ENV}/include
-                         ../../../3rdparty/OpenSSL/include
-                         $ENV{ZLIB_DEV_ENV}/include
-                         ../../../3rdparty/zlib/GnuWin32/include
-                       )
-
-    LINK_DIRECTORIES(
-                      ../../comm
-                      ../../common
-                      c:/OpenSSL/lib/VC/static
-                      $ENV{OPENSSL_DEV_ENV}/lib/VC/static
-                      ../../../3rdparty/OpenSSL/lib/VC/static
-                      $ENV{ZLIB_DEV_ENV}/lib
-                      ../../../3rdparty/zlib/GnuWin32/lib
-                     )
-  ENDIF(MSYS)
-
-ELSE(WIN32)
-
- FIND_LIBRARY(DLOPEN_FOUND NAMES dl PATH /usr/lib /lib /usr/local/lib)
- SET(LIBDL)
-
- IF(DLOPEN_FOUND)
-
-   SET(LIBDL dl)
-
-   SET(HAVE_LIBDL TRUE)
-
- ENDIF(DLOPEN_FOUND)
-
-  LINK_DIRECTORIES(
-                    /usr/local/ssl/lib/
-                    ../../comm
-                    ../../nthread
-                    ../../sec
-                    ../../common
-                  )
-
-  INCLUDE_DIRECTORIES( ../../..
-                       /usr/local/ssl/include/
-                       ../../comm
-                       ../../nthread
-                       ../../sec
-                       ../../common
-                     )
-
-  ADD_DEFINITIONS(
-                   -Wall
-                   -Wwrite-strings
-                   -Wcast-qual
-                   -Wpointer-arith
-                   -Wold-style-cast
-                   -Wconversion
-                   -Wcomment
-                   -Wcast-align
-                   -Wshadow
-                   -Wredundant-decls
-                   -g3
-                   -pthread
-                 )
-
-  LINK_LIBRARIES(
-                  csl_comm
-                  csl_sec
-                  csl_nthread
-                  csl_common
-                  csl_common_libev
-                  ssl
-                  crypto
-                  z
-                  pthread
-                  ${LIBDL}
-                )
-
-ENDIF(WIN32)
+ADD_DEFINITIONS( ${PTHREAD_FLAG} )
 
 ADD_EXECUTABLE( t__bfd                 t__bfd.cc )
 ADD_EXECUTABLE( t__mt_udp              t__mt_udp.cc )

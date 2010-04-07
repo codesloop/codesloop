@@ -28,9 +28,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief Tests to verify crypt_pkt
  */
 
-#include "exc.hh"
 #include "codesloop/common/pbuf.hh"
 #include "codesloop/common/zfile.hh"
+#include "codesloop/sec/exc.hh"
 #include "codesloop/sec/crypt_pkt.hh"
 #include "codesloop/sec/crypt_buf.hh"
 #include "codesloop/common/test_timer.h"

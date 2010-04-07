@@ -28,7 +28,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    @brief basic SHA1 tests
 */
 
-#include "csl_sec.h"
+#include "codesloop/sec/csl_sec.h"
 #include <string.h>
 #include <stdio.h>
 

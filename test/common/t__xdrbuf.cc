@@ -40,7 +40,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "codesloop/common/test_timer.h"
 #include "codesloop/common/str.hh"
 #include "codesloop/common/ustr.hh"
-#include "exc.hh"
+#include "codesloop/common/exc.hh"
 #include <assert.h>
 
 using namespace csl::common;

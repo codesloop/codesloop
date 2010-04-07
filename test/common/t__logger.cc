@@ -36,12 +36,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "codesloop/common/logger.hh"
 #include "codesloop/common/obj.hh"
-#include "exc.hh"
+#include "codesloop/common/exc.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/str.hh"
-#include <assert.h>
 #include "codesloop/common/test_timer.h"
 #include <sys/stat.h>
+#include <assert.h>
 
 #define LOG_TEST_MSG L"logger test"
 

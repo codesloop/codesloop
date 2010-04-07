@@ -33,7 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif /* DEBUG */
 
 #include "codesloop/common/logger.hh"
-#include "exc.hh"
+#include "codesloop/common/exc.hh"
 #include "codesloop/common/common.h"
 #include "codesloop/common/str.hh"
 #include "codesloop/common/ustr.hh"

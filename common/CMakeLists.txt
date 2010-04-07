@@ -21,23 +21,13 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IF(WIN32)
+# -- common --
 
-  LINK_DIRECTORIES(
-      $ENV{ZLIB_DEV_ENV}/lib
-      ../../../3rdparty/zlib/GnuWin32/lib )
-
-  INCLUDE_DIRECTORIES(
-      $ENV{ZLIB_DEV_ENV}/include
-      ../../../3rdparty/zlib/GnuWin32/include )
-
-ELSE(WIN32)
-
+IF(NOT WIN32)
   SUBDIRS( libev )
+ENDIF(NOT WIN32)
 
-ENDIF(WIN32)
-
-INCLUDE_DIRECTORIES( ../.. )
+INCLUDE_DIRECTORIES( ../.. ${ZLIB_INCLUDE_DIR} )
 
 ADD_LIBRARY( csl_common STATIC
              cexc.cc       cexc.hh

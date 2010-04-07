@@ -23,25 +23,7 @@
 
 # SET(CMAKE_VERBOSE_MAKEFILE ON)
 
-
-IF(WIN32)
-  ADD_DEFINITIONS(-Wall)
-ELSE(WIN32)
-  ADD_DEFINITIONS(
-                   -Wall
-                   -Wwrite-strings
-                   -Wcast-qual
-                   -Wpointer-arith
-                   -Wold-style-cast
-                   -Wconversion
-                   -Wcomment
-                   -Wcast-align
-                   -Winline
-                   -Wshadow
-                   -Wredundant-decls
-                   -g3
-                 )
-ENDIF(WIN32)
+# -- rpc --
 
 # ADD_DEFINITIONS( -DDEBUG )
 
@@ -56,24 +38,21 @@ ADD_CUSTOM_COMMAND( OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/csrparser.cc
                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} )
 
 ADD_EXECUTABLE( csrgen  csrparser.cc    csrparser.hh
-                        iface.cc        iface.hh 
-                        stub_base.cc    stub_base.hh
-                        stub_header.cc  stub_header.hh
-                        stub_server.cc  stub_server.hh
-                        stub_client.cc  stub_client.hh
-                        exc.cc          exc.hh
-                        csrgen_main.cc 
-                        csrgen.hh)
+                iface.cc        iface.hh 
+                stub_base.cc    stub_base.hh
+                stub_header.cc  stub_header.hh
+                stub_server.cc  stub_server.hh
+                stub_client.cc  stub_client.hh
+                exc.cc          exc.hh
+                csrgen_main.cc 
+                csrgen.hh )
 
 ADD_LIBRARY( csl_rpc STATIC
              handle.cc        handle.hh
              cli_trans_tcp.cc cli_trans_tcp.hh
              srv_trans_tcp.cc srv_trans_tcp.hh
              srv_trans.cc     srv_trans.hh
-             cli_trans.cc     cli_trans.hh
-          )
-
-
+             cli_trans.cc     cli_trans.hh )
 
 FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
 INSTALL( FILES ${includes} DESTINATION include/codesloop/rpc )

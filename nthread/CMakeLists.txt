@@ -21,57 +21,19 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IF(WIN32)
+# -- nthread --
 
-  INCLUDE_DIRECTORIES( ../.. )
+INCLUDE_DIRECTORIES( ../.. )
 
-  IF(MSYS)
+ADD_DEFINITIONS( ${PTHREAD_FLAGS} )
 
-    ADD_DEFINITIONS(
-                     -Wall
-                     -Wwrite-strings
-                     -Wcast-qual
-                     -Wpointer-arith
-                     -Wold-style-cast
-                     -Wconversion
-                     -Wcomment
-                     -Wcast-align
-                     -Wshadow
-                     -Wredundant-decls
-                     -g3
-                   )
-
-  ENDIF(MSYS)
-
-ELSE(WIN32)
-
-  ADD_DEFINITIONS(
-                   -Wall
-                   -Wwrite-strings
-                   -Wcast-qual
-                   -Wpointer-arith
-                   -Wold-style-cast
-                   -Wconversion
-                   -Wcomment
-                   -Wcast-align
-                   -Wshadow
-                   -Wredundant-decls
-                   -g3
-                   -pthread
-                 )
-
-  INCLUDE_DIRECTORIES( ../.. )
-
-ENDIF(WIN32)
-
-ADD_LIBRARY(
-    csl_nthread STATIC
-    exc.cc       exc.hh
-    mutex.cc     mutex.hh
-    event.cc     event.hh
-    pevent.cc    pevent.hh
-    thread.cc    thread.hh
-    thrpool.cc   thrpool.hh )
+ADD_LIBRARY( csl_nthread STATIC
+             exc.cc       exc.hh
+             mutex.cc     mutex.hh
+             event.cc     event.hh
+             pevent.cc    pevent.hh
+             thread.cc    thread.hh
+             thrpool.cc   thrpool.hh )
 
 FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
 INSTALL( FILES ${includes} DESTINATION include/codesloop/nthread )
@@ -80,4 +42,5 @@ INSTALL(TARGETS csl_nthread
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
+
 # -- EOF --

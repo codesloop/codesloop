@@ -23,6 +23,8 @@
 
 # SET(CMAKE_VERBOSE_MAKEFILE ON)
 
+# -- test --
+
 SUBDIRS(
          common
          comm

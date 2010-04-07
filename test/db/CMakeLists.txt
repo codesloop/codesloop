@@ -21,82 +21,27 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+# -- test / db --
+
 # SET(CMAKE_VERBOSE_MAKEFILE ON)
+
 IF(MYSQL_FOUND)
   SET(MYSQL_DB_TEST_DIR mysql)
 ELSE(MYSQL_FOUND)
   SET(MYSQL_DB_TEST_DIR)
 ENDIF(MYSQL_FOUND)
 
+SUBDIRS( slt3 ${MYSQL_DB_TEST_DIR} )
 
-SUBDIRS(
-         slt3
-         ${MYSQL_DB_TEST_DIR}
-       )
-
-LINK_DIRECTORIES(
-                  ../../db
-                  ../../common
-                )
+LINK_DIRECTORIES( ../../db ../../common )
 
 INCLUDE_DIRECTORIES( ../../.. )
 
-IF(WIN32)
-
-  LINK_LIBRARIES(
-                  csl_db
-                  csl_common
-                  wsock32
-                )
-
-  IF(MSYS)
-
-    ADD_DEFINITIONS( -Wall
-                     -Wwrite-strings
-                     -Wcast-qual
-                     -Wpointer-arith
-                     -Wold-style-cast
-                     -Wconversion
-                     -Wcomment
-                     -Wcast-align
-                     -Wshadow
-                     -Wredundant-decls
-                     -g3
-                   )
-
-  ENDIF(MSYS)
-
-ELSE(WIN32)
-
-  find_library(DLOPEN_FOUND NAMES dl PATH /usr/lib /lib /usr/local/lib)
-  set(LIBDL)
-
-  if (DLOPEN_FOUND)
-   set(LIBDL dl)
-   set(HAVE_LIBDL TRUE)
-  endif (DLOPEN_FOUND)
-
-  ADD_DEFINITIONS(
-                   -Wall
-                   -Wwrite-strings
-                   -Wcast-qual
-                   -Wpointer-arith
-                   -Wold-style-cast
-                   -Wconversion
-                   -Wcomment
-                   -Wcast-align
-                   -Wshadow
-                   -Wredundant-decls
-                   -g3
-                 )
-
-  LINK_LIBRARIES(
-                  csl_db_dummy
-                  csl_db
-                  csl_common
-                  ${LIBDL}
-                )
-ENDIF(WIN32)
+LINK_LIBRARIES( csl_db_dummy
+                csl_db
+                csl_common
+                ${WSOCK32_LIBRARY}
+                ${DLOPEN_LIBRARY} )
 
 ADD_EXECUTABLE( t__syntax          t__syntax.cc )
 ADD_EXECUTABLE( t__syntax_cxx_sql  t__syntax_cxx_sql.cc )

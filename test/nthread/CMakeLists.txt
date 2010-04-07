@@ -21,88 +21,27 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IF(WIN32)
+# -- test / nthread --
 
-  IF(MSYS)
-
-    LINK_LIBRARIES(
-                    csl_nthread
-                    csl_common
-                    z
-                    wsock32
+LINK_LIBRARIES( csl_nthread
+                csl_common
+                ${PTHREAD_LIBRARY}
+                ${ZLIB_LIBRARY}
+                ${WSOCK32_LIBRARY}
                   )
 
-    ADD_DEFINITIONS(
-                     -Wall
-                     -Wwrite-strings
-                     -Wcast-qual
-                     -Wpointer-arith
-                     -Wold-style-cast
-                     -Wconversion
-                     -Wcomment
-                     -Wcast-align
-                     -Wshadow
-                     -Wredundant-decls
-                     -g3
-                   )
+INCLUDE_DIRECTORIES( ../../.. ${ZLIB_INCLUDE_DIR} )
 
-  ELSE(MSYS)
-
-    LINK_LIBRARIES(
-                    csl_nthread
-                    csl_common
-                    zlib
-                    wsock32
+LINK_DIRECTORIES( ../../nthread
+                  ../../common
+                  ${ZLIB_LIBRARY_DIR}
                   )
 
-  ENDIF(MSYS)
+INCLUDE_DIRECTORIES( ../../.. )
 
-  INCLUDE_DIRECTORIES( ../../..  
-                        ../../nthread
-                        ../../common
-                        $ENV{ZLIB_DEV_ENV}/include
-                        ../../../3rdparty/zlib/GnuWin32/include
-                      )
-
-  LINK_DIRECTORIES(
-                    ../../nthread
-                    ../../common
-                    $ENV{ZLIB_DEV_ENV}/lib
-                    ../../../3rdparty/zlib/GnuWin32/lib
-                  )
-
-ELSE(WIN32)
-
-  ADD_DEFINITIONS(
-                   -Wall
-                   -Wwrite-strings
-                   -Wcast-qual
-                   -Wpointer-arith
-                   -Wold-style-cast
-                   -Wconversion
-                   -Wcomment
-                   -Wcast-align
-                   -Wshadow
-                   -Wredundant-decls
-                   -g3
-                   -pthread
-                 )
-
-  INCLUDE_DIRECTORIES( ../../..   ../../nthread
-                       ../../common )
-
-  LINK_LIBRARIES( csl_nthread
-                  csl_common
-                  pthread
-                  z )
-
-  LINK_DIRECTORIES( ../../nthread
-                    ../../common )
-
-  ADD_EXECUTABLE( t__pt_mutex      t__pt_mutex.cc )
-
-ENDIF(WIN32)
-
+IF(NOT WIN32)
+  ADD_EXECUTABLE( t__pt_mutex t__pt_mutex.cc )
+ENDIF(NOT WIN32)
 
 ADD_EXECUTABLE( t__mutex         t__mutex.cc )
 ADD_EXECUTABLE( t__thread        t__thread.cc )

@@ -42,30 +42,26 @@ LINK_DIRECTORIES(
                   ../common
                   ../db/dummy
                   ${MYSQL_DB_DRIVER_LINKDIR} 
-                  ../db/slt3
-                )
+                  ../db/slt3 )
 
 INCLUDE_DIRECTORIES( ../.. )
 
 LINK_LIBRARIES(
                 csl_db_dummy
                 csl_db_slt3
-		${MYSQL_DB_DRIVER_LIB}
-                csl_common
-              )
+                ${MYSQL_DB_DRIVER_LIB}
+                csl_common )
 
 SUBDIRS( slt3
          ${MYSQL_DB_DRIVER_DIR}
-         dummy 
-       )
+         dummy )
 
 ADD_LIBRARY( csl_db STATIC
              exc.cc      exc.hh
              driver.cc   driver.hh
              conn.hh
              tran.hh
-             query.hh
-           )
+             query.hh )
 
 FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
 INSTALL( FILES ${includes} DESTINATION include/codesloop/db )
