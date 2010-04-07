@@ -53,7 +53,11 @@ ADD_LIBRARY( csl_common STATIC
              dbl.cc        dbl.hh
              str.cc        str.hh
              ustr.cc       ustr.hh
-             binry.cc      binry.hh )
+             binry.cc      binry.hh
+             # -- replacements for rdbuf, read_res, tbuf
+             limited_work_buffer.hh
+             work_buffer_part.cc work_buffer_part.hh
+             preallocated_array.hh preallocated_array_impl.hh )
 
 # ADD_DEFINITIONS( -DENABLE_LOGGER )
 SET_SOURCE_FILES_PROPERTIES( logger.cc PROPERTIES 
