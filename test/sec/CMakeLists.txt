@@ -30,7 +30,8 @@ LINK_LIBRARIES( csl_sec
                 ${OPENSSL_LIBS}
                 ${ZLIB_LIBRARY}
                 ${WSOCK32_LIBRARY}
-                ${DLOPEN_LIBRARY} )
+                ${DLOPEN_LIBRARY}
+                ${STDCXX_LIBRARY} )
 
 INCLUDE_DIRECTORIES( ../../.. ${OPENSSL_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR} )
 
