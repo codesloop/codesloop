@@ -24,8 +24,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
-   @file t__tbuf.cc
-   @brief Tests to verify tbuf
+   @file t__preallocated_array.cc
+   @brief Tests to verify preallocated_array
  */
 
 #ifndef DEBUG
@@ -33,7 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif /* DEBUG */
 
 #include "codesloop/common/pbuf.hh"
-#include "codesloop/common/tbuf.hh"
+#include "codesloop/common/preallocated_array.hh"
 #include "codesloop/common/str.hh"
 #include "codesloop/common/test_timer.h"
 #include "codesloop/common/zfile.hh"
@@ -42,16 +42,16 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 
 using csl::common::pbuf;
-using csl::common::tbuf;
+using csl::common::preallocated_array;
 using csl::common::str;
 
-/** @brief contains tests related to tbuf */
-namespace test_tbuf {
+/** @brief contains tests related to preallocated_array */
+namespace test_preallocated_array {
 
   /** @test baseline for performance comparison */
-  void tbuf_baseline()
+  void preallocated_array_baseline()
   {
-    tbuf<128> b;
+    preallocated_array<char,128> b;
   }
 
   /** @test baseline for performance comparison */
@@ -72,11 +72,11 @@ namespace test_tbuf {
     str b;
   }
 
-  /** @test adds 6 bytes to tbuf (for performance comparison) */
-  void tbuf_hello()
+  /** @test adds 6 bytes to preallocated_array (for performance comparison) */
+  void preallocated_array_hello()
   {
-    tbuf<128> b;
-    b.set( reinterpret_cast<const unsigned char *>("Hello"),6);
+    preallocated_array<char,128> b;
+    b.set( "Hello", 6 );
   }
 
   /** @test adds 6 bytes to pbuf (for performance comparison) */
@@ -103,24 +103,24 @@ namespace test_tbuf {
   /** @test @todo */
   void test_selfequal()
   {
-    tbuf<10> t;
+    preallocated_array<char, 10> t;
     t = t;
   }
 
-} // end of test_tbuf
+} // end of test_preallocated_array
 
-using namespace test_tbuf;
+using namespace test_preallocated_array;
 
 int main()
 {
   test_selfequal();
 
-  csl_common_print_results( "tbuf_baseline      ", csl_common_test_timer_v0(tbuf_baseline),"" );
+  csl_common_print_results( "PA_baseline        ", csl_common_test_timer_v0(preallocated_array_baseline),"" );
   csl_common_print_results( "pbuf_baseline      ", csl_common_test_timer_v0(pbuf_baseline),"" );
   csl_common_print_results( "str_baseline       ", csl_common_test_timer_v0(str_baseline),"" );
   csl_common_print_results( "string_baseline    ", csl_common_test_timer_v0(string_baseline),"" );
 
-  csl_common_print_results( "tbuf_hello         ", csl_common_test_timer_v0(tbuf_hello),"" );
+  csl_common_print_results( "PA_hello           ", csl_common_test_timer_v0(preallocated_array_hello),"" );
   csl_common_print_results( "pbuf_hello         ", csl_common_test_timer_v0(pbuf_hello),"" );
   csl_common_print_results( "str_hello          ", csl_common_test_timer_v0(str_hello),"" );
   csl_common_print_results( "string_hello       ", csl_common_test_timer_v0(string_hello),"" );

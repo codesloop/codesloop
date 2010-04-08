@@ -32,50 +32,39 @@ namespace csl
 {
   namespace common
   {
-    template <uint64_t SZ>
-    uint8_t * preallocated_array<SZ>::allocate(uint64_t sz)
+    template <typename T,size_t SZ>
+    T * preallocated_array<T,SZ>::allocate(size_t sz)
     {
-      // XXX solve circular deps here
-      // ENTER_FUNCTION();
-      // CSL_DEBUGF(L"allocate(sz:%lld)",sz);
-      uint8_t * ret = data_;
+      T * ret = data_;
 
       if( !sz )
       {
-        // CSL_DEBUGF(L"resetting buffer, because of 0 size");
         reset();
       }
       else if( sz <= size_ )
       {
-        // CSL_DEBUGF(L"not (re)allocating memory as there is enough already");
         size_ = sz;
       }
-      else if( sz <= sizeof(preallocated_) && data_ == preallocated_ )
+      else if( sz <= SZ && is_static() )
       {
-        // CSL_DEBUGF(L"size fits into the preallocated block");
         size_ = sz;
       }
       else
       {
-        // CSL_DEBUGF(L"need to allocate %lld bytes",sz);
-        uint8_t * tmp = reinterpret_cast<uint8_t *>(::malloc( static_cast<size_t>(sz) ));
-        // CSL_DEBUG_ASSERT( tmp != 0 );
+        T * tmp = reinterpret_cast<T *>( ::malloc( item_size_*sz ) );
 
         if( !tmp )
         {
-          // CSL_DEBUGF(L"malloc failed");
           ret = 0;
         }
         else
         {
           if( size_ > 0 )
           {
-            // CSL_DEBUGF(L"there was data in the previous buffer, must copy it");
-            ::memcpy( tmp, data_, static_cast<size_t>(size_) );
+            ::memcpy( tmp, data_, size_ );
 
-            if( data_ != preallocated_ )
+            if( is_static() == false )
             {
-              // CSL_DEBUGF(L"copied from dynamic buffer. must free that.");
               ::free( data_ );
             }
           }
@@ -85,24 +74,217 @@ namespace csl
           ret = data_;
         }
       }
-      // RETURN_FUNCTION( ret );
       return ( ret );
     }
 
-    template <uint64_t SZ>
-    void preallocated_array<SZ>::reset()
+    template <typename T,size_t SZ>
+    void preallocated_array<T,SZ>::reset()
     {
-      // XXX solve circular deps here
-      // ENTER_FUNCTION();
-      if( data_ && data_ != preallocated_ )
+      if( data_ && is_static() == false )
       {
-        // CSL_DEBUGF(L"there is dynamic data allocated. need to free that.");
         ::free( data_ );
         data_ = preallocated_;
       }
       size_ = 0;
-      // LEAVE_FUNCTION();
     }
+    
+    template <typename T, size_t SZ>
+    preallocated_array<T,SZ>::~preallocated_array()
+    {
+      reset();
+    }
+    
+    template <typename T, size_t SZ>
+    preallocated_array<T,SZ>::preallocated_array()
+        : data_(preallocated_), size_(0)
+    {
+    }
+    
+    template <typename T, size_t SZ>
+    preallocated_array<T,SZ>::preallocated_array(const T & c)
+        : data_(preallocated_), size_(1)
+    {
+      preallocated_[0] = c;
+    }
+    
+    template <typename T, size_t SZ>
+    bool preallocated_array<T,SZ>::set(const T * dta, size_t sz)
+    {
+      /* if no data on the other side we are done */
+      if( !sz )  { reset(); return true; }
+
+      /* if sz is not zero than dta must not be null */
+      if( !dta ) { return false; }
+
+      if( allocate(sz) )
+      {
+        /* copy in the data */
+        ::memcpy( data_, dta, item_size_ * sz );
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
+    
+    template <typename T, size_t SZ>
+    T * preallocated_array<T,SZ>::allocate_nocopy(size_t sz)
+    {
+      if( !sz ) { reset(); return data_; }
+
+      if( sz <= size_ )
+      {
+        /* the requested data is smaller than the allocated */
+        size_ = sz;
+        return data_;
+      }
+      else if( sz <= SZ )
+      {
+        /* data fits into preallocated size */
+        if( size_ > 0 && is_static() == false ) ::free( data_ );
+
+        data_ = preallocated_;
+        size_ = sz;
+        return data_;
+      }
+      else
+      {
+        /* cannot use the preallocated space */
+        T * tmp =
+            reinterpret_cast<T *>(::malloc( item_size_*sz ));
+
+        if( !tmp ) return 0;
+
+        /* already have data ? */
+        if( size_ > 0 && is_static() == false ) ::free( data_ );
+
+        data_ = tmp;
+        size_ = sz;
+        return data_;
+      }
+    }
+    
+    template <typename T, size_t SZ>
+    preallocated_array<T,SZ> &
+    preallocated_array<T,SZ>::operator=(const char * other)
+    {
+      if( other ) set( other, (::strlen(other)+1) );
+      return *this;
+    }
+    
+    template <typename T, size_t SZ>
+    preallocated_array<T,SZ> &
+    preallocated_array<T,SZ>::operator=(const preallocated_array & other)
+    {
+      /* return immediately if they are the same */
+      if( &other == this || other.data_ == data_ )
+      {
+        return *this;
+      }
+
+      /* quick return if empty */
+      if( other.is_empty() ) { reset(); return *this; }
+
+      T * tmp = allocate_nocopy( other.size_ );
+
+      if( tmp )
+      {
+        ::memcpy( tmp, other.data_, other.size_*item_size_ );
+      }
+      return *this;
+    }
+    
+    template <typename T, size_t SZ>
+    preallocated_array<T,SZ>::preallocated_array(const preallocated_array & other)
+        : data_(preallocated_), size_(0)
+    {
+      *this = other;
+    }
+
+    template <typename T, size_t SZ>
+    preallocated_array<T,SZ>::preallocated_array(const T * other)
+        : data_(preallocated_), size_(0)
+    {
+      *this = other;
+    }
+    
+    template <typename T, size_t SZ>
+    bool preallocated_array<T,SZ>::operator==(const preallocated_array & other) const
+    {
+      if( other.size_ != size_ ) return false;
+      if( size_ == 0 )           return true;
+      if( data_ == 0 )           return false;
+      if( other.data_ == 0 )     return false;
+      return (::memcmp( other.data_, data_, size_*item_size_ ) == 0);
+    }
+
+    template <typename T, size_t SZ>
+    preallocated_array<T,SZ> &
+    preallocated_array<T,SZ>::operator=(const pbuf & other)
+    {
+      size_t sz = other.size();
+
+      /* quick return if empty */
+      if( !sz ) { reset(); return *this; }
+
+      T * tmp = allocate(sz);
+
+      if( tmp ) other.copy_to(tmp);
+
+      return *this;
+    }
+
+    template <typename T, size_t SZ>
+    bool preallocated_array<T,SZ>::preallocated_array<T,SZ>::get(T * dta) const
+    {
+      if( !dta || !size_ || !data_ ) { return false; }
+      ::memcpy( dta,data_,size_*item_size_ );
+      return true;
+    }
+    
+    template <typename T, size_t SZ>
+    void preallocated_array<T,SZ>::append(const T & c)
+    {
+      set_at(size_,c);
+    }
+
+    template <typename T, size_t SZ>
+    bool preallocated_array<T,SZ>::append(const uint8_t * dta, size_t sz)
+    {
+       /* if no data on the other side we are done */
+       if( !sz )  { return true; }
+
+      /* if sz is not zero than dta must not be null */
+      if( !dta ) { return false; }
+
+      if( allocate(size_+sz) )
+      {
+        /* copy in the data */
+        ::memcpy( data_+size_-sz, dta, sz*item_size_ );
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
+
+    template <typename T, size_t SZ>
+    bool preallocated_array<T,SZ>::append(const preallocated_array & other)
+    {
+      return append( other.data(), other.size() );
+    }
+
+    template <typename T, size_t SZ>
+    void preallocated_array<T,SZ>::set_at(size_t pos,const T & c)
+    {
+      uint8_t * t = data_;
+      if( pos >= size_ ) t = allocate( pos+1 );
+      t[pos] = c;
+    }
+
+
   }
 }
 
