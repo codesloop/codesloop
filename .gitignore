@@ -252,3 +252,6 @@ test/rpc/hello_cli
 test/db/t__syntax_cxx_sql
 install_manifest.txt
 test/db/mysql/t__mysql_conn
+test/common/t__preallocated_array
+test/common/t__limited_work_buffer
+test/common/t__work_buffer_part
