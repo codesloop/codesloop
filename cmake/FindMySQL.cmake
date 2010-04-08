@@ -21,16 +21,15 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-FIND_PATH(MYSQL_INCLUDE_DIR mysql_version.h
+FIND_PATH(MYSQL_INCLUDE_DIR mysql/mysql_version.h
   HINTS $ENV{MYSQL_DIR}
-  PATH_SUFFIXES mysql
-  PATHS /usr/local/include /usr/include /sw/include /opt/local/include /opt/include )
+  PATHS /usr /usr/local/include /usr/include /sw/include /opt/local/include /opt/include )
 
 FIND_LIBRARY(MYSQL_LIBRARY
   NAMES mysqlclient
   HINTS $ENV{MYSQL_DIR}
   PATH_SUFFIXES lib64 lib
-  PATHS /usr/local /usr /sw /opt/local /opt )
+  PATHS /usr/local /usr /sw /opt/local /opt /usr/local/lib /usr/local/lib/mysql )
 
 SET(MYSQL_FOUND "NO")
 
@@ -42,7 +41,7 @@ ELSE(MYSQL_INCLUDE_DIR AND MYSQL_LIBRARY)
 ENDIF(MYSQL_INCLUDE_DIR AND MYSQL_LIBRARY)
 
 IF(MYSQL_FOUND)
-  MESSAGE(STATUS "MySQL found")
+  MESSAGE(STATUS "MySQL found include dir: ${MYSQL_INCLUDE_DIR} lib: ${MYSQL_LIBRARY} ${MYSQL_LIBRARY_PATH}")
 ELSE(MYSQL_FOUND)
   MESSAGE(STATUS "MySQL NOT found")
 ENDIF(MYSQL_FOUND)

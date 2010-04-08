@@ -44,7 +44,7 @@ LINK_DIRECTORIES(
                   ${MYSQL_DB_DRIVER_LINKDIR} 
                   ../db/slt3 )
 
-INCLUDE_DIRECTORIES( ../.. )
+INCLUDE_DIRECTORIES(  ../.. ${MYSQL_INCLUDE_DIR} )
 
 LINK_LIBRARIES(
                 csl_db_dummy

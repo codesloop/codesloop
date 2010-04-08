@@ -25,7 +25,7 @@
 
 LINK_DIRECTORIES( ../../common ../../db)
 INCLUDE_DIRECTORIES( ../../.. )
-LINK_LIBRARIES( csl_common csl_db mysqlclient )
+LINK_LIBRARIES( csl_common csl_db ${MYSQL_LIBRARY} )
 ADD_LIBRARY( csl_db_mysql STATIC driver.cc  driver.hh )
 
 FILE(GLOB includes "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
